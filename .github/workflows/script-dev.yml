@@ -62,7 +62,7 @@ jobs:
 
       # gradle build
       - name: Build with Gradle
-        run: ./gradlew build -x test
+        run: ./gradlew build
 
       # docker build & push to develop
       - name: Docker build & push to dev
@@ -86,5 +86,5 @@ jobs:
           script: |
             sudo docker ps
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/docker-test-dev
-            sudo docker run -d -p 8081:8081 ${{ secrets.DOCKER_USERNAME }}/docker-test-dev
+            sudo docker run -d -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/docker-test-dev
             sudo docker image prune -f
