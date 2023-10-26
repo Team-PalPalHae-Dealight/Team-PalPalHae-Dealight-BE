@@ -13,8 +13,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import com.palpal.dealightbe.domain.Address.domain.Address;
-import com.palpal.dealightbe.domain.OAuth.domain.OAuth;
+import com.palpal.dealightbe.domain.address.domain.Address;
+import com.palpal.dealightbe.domain.oAuth.domain.OAuth;
 import com.palpal.dealightbe.global.BaseEntity;
 
 import lombok.AccessLevel;

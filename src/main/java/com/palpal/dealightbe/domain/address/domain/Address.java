@@ -1,4 +1,4 @@
-package com.palpal.dealightbe.domain.OAuth.domain;
+package com.palpal.dealightbe.domain.address.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,24 +15,24 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "oauth")
+@Table(name = "addresses")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class OAuth extends BaseEntity {
+public class Address extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private String provider;
+	private String name;
 
-	private Long providerId;
+	private int xCoordinate;
 
-	private String refreshToken;
+	private int yCoordinate;
 
 	@Builder
-	public OAuth(String provider, Long providerId, String refreshToken) {
-		this.provider = provider;
-		this.providerId = providerId;
-		this.refreshToken = refreshToken;
+	public Address(String name, int xCoordinate, int yCoordinate) {
+		this.name = name;
+		this.xCoordinate = xCoordinate;
+		this.yCoordinate = yCoordinate;
 	}
 }
