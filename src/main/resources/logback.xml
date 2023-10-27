@@ -4,10 +4,10 @@
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %F, method:%M, %L line : %m%n</pattern>
         </encoder>
     </appender>
-    <root level="debug">
-        <appender-ref ref="info"/>
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
     </root>
-    <logger name="com.palpal.dealightbe" level="debug">
-        <appender-ref ref="info"/>
+    <logger name="com.palpal.dealightbe" level="info">
+        <appender-ref ref="STDOUT"/>
     </logger>
 </configuration>
