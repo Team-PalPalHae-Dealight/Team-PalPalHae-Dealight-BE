@@ -14,7 +14,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.palpal.dealightbe.domain.address.domain.Address;
-import com.palpal.dealightbe.domain.oAuth.domain.OAuth;
+import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.global.BaseEntity;
 
 import lombok.AccessLevel;
@@ -33,18 +33,14 @@ public class Store extends BaseEntity {
 	private Long id;
 
 	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "member_id")
+	private Member member;
+
+	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "address_id")
 	private Address address;
 
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "oauth_id")
-	private OAuth oAuth;
-
-	private String ownerName;
-
 	private String name;
-
-	private String ownerPhoneNumber;
 
 	@Enumerated(EnumType.STRING)
 	private StoreStatus storeStatus = StoreStatus.CLOSED;
@@ -64,13 +60,10 @@ public class Store extends BaseEntity {
 	private boolean isDeleted = false;
 
 	@Builder
-	public Store(Address address, OAuth oAuth, String ownerName, String name, String ownerPhoneNumber,
-		String storePhoneNumber, String telephone, LocalDateTime openTime, LocalDateTime closeTime, String dayOff) {
+	public Store(Address address, String ownerName, String name, String ownerPhoneNumber,
+				 String storePhoneNumber, String telephone, LocalDateTime openTime, LocalDateTime closeTime, String dayOff) {
 		this.address = address;
-		this.oAuth = oAuth;
-		this.ownerName = ownerName;
 		this.name = name;
-		this.ownerPhoneNumber = ownerPhoneNumber;
 		this.storePhoneNumber = storePhoneNumber;
 		this.telephone = telephone;
 		this.openTime = openTime;

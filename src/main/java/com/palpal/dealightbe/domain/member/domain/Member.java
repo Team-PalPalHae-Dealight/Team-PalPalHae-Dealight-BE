@@ -10,7 +10,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.palpal.dealightbe.domain.address.domain.Address;
-import com.palpal.dealightbe.domain.oAuth.domain.OAuth;
 import com.palpal.dealightbe.global.BaseEntity;
 
 import lombok.AccessLevel;
@@ -32,10 +31,6 @@ public class Member extends BaseEntity {
 	@JoinColumn(name = "address_id")
 	private Address address;
 
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "oauth_id")
-	private OAuth oAuth;
-
 	private String realName;
 
 	private String nickName;
@@ -45,8 +40,7 @@ public class Member extends BaseEntity {
 	private boolean isDeleted = false;
 
 	@Builder
-	public Member(OAuth oAuth, String realName, String nickName, String phoneNumber) {
-		this.oAuth = oAuth;
+	public Member(String realName, String nickName, String phoneNumber) {
 		this.realName = realName;
 		this.nickName = nickName;
 		this.phoneNumber = phoneNumber;
