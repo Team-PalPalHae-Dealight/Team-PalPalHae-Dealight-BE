@@ -1,6 +1,6 @@
 package com.palpal.dealightbe.domain.store.domain;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -53,9 +53,9 @@ public class Store extends BaseEntity {
 
 	private String telephone;
 
-	private LocalDateTime openTime;
+	private LocalTime openTime;
 
-	private LocalDateTime closeTime;
+	private LocalTime closeTime;
 
 	private String image;
 
@@ -64,7 +64,7 @@ public class Store extends BaseEntity {
 	private boolean isDeleted = false;
 
 	@Builder
-	public Store(Address address, String name, String storeNumber, String telephone, LocalDateTime openTime, LocalDateTime closeTime, String dayOff) {
+	public Store(Address address, String name, String storeNumber, String telephone, LocalTime openTime, LocalTime closeTime, String dayOff) {
 		this.address = address;
 		this.name = name;
 		this.storeNumber = storeNumber;
@@ -87,7 +87,7 @@ public class Store extends BaseEntity {
 		this.image = image;
 	}
 
-	private void validateBusinessTimes(LocalDateTime openTime, LocalDateTime closeTime) {
+	private void validateBusinessTimes(LocalTime openTime, LocalTime closeTime) {
 		if (closeTime.isBefore(openTime)) {
 			log.warn("INVALID_BUSINESS_TIME : {},{}", openTime, closeTime);
 			throw new BusinessException(ErrorCode.INVALID_BUSINESS_TIME);

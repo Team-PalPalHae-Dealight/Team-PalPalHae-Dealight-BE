@@ -1,6 +1,6 @@
 package com.palpal.dealightbe.domain.store.application.dto.request;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -20,8 +20,8 @@ public record StoreCreateReq(
 	String addressName,
 	double xCoordinate,
 	double yCoordinate,
-	LocalDateTime openTime,
-	LocalDateTime closeTime,
+	LocalTime openTime,
+	LocalTime closeTime,
 	String dayOff
 ) {
 

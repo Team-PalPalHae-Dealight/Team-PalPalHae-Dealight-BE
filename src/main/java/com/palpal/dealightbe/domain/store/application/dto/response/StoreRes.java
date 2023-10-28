@@ -1,7 +1,8 @@
 package com.palpal.dealightbe.domain.store.application.dto.response;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
 import com.palpal.dealightbe.domain.store.domain.Store;
 
@@ -10,8 +11,10 @@ public record StoreRes(
 	String name,
 	String telephone,
 	AddressRes addressRes,
-	LocalDateTime openTime,
-	LocalDateTime closeTime,
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
+	LocalTime openTime,
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
+	LocalTime closeTime,
 	String dayOff
 ) {
 

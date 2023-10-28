@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Optional;
 
@@ -58,8 +56,8 @@ class StoreServiceTest {
 	@Test
 	void registerStoreSuccessTest() {
 		// given
-		LocalDateTime openTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 0));
-		LocalDateTime closeTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23, 0));
+		LocalTime openTime = LocalTime.of(9, 0);
+		LocalTime closeTime = LocalTime.of(23, 0);
 		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, "월요일");
 
 		when(memberRepository.findById(member.getId()))
@@ -79,8 +77,8 @@ class StoreServiceTest {
 	@DisplayName("업체 등록 실패 - 존재하지 않는 회원")
 	void registerStoreFailureTest_notFoundMember() {
 		// given
-		LocalDateTime openTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 0));
-		LocalDateTime closeTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23, 0));
+		LocalTime openTime = LocalTime.of(9, 0);
+		LocalTime closeTime = LocalTime.of(23, 0);
 		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, "월요일");
 
 		when(memberRepository.findById(member.getId())).thenReturn(Optional.empty());
@@ -95,8 +93,8 @@ class StoreServiceTest {
 	@DisplayName("업체 등록 실패 - 마감 시간이 오픈 시간 보다 빠른 경우")
 	void registerStoreFailureTest_invalidBusinessHour() {
 		// given
-		LocalDateTime openTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23, 0));
-		LocalDateTime closeTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 0));
+			LocalTime openTime = LocalTime.of(23, 0);
+		LocalTime closeTime = LocalTime.of(9, 0);
 		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, "월요일");
 
 		when(memberRepository.findById(member.getId()))
