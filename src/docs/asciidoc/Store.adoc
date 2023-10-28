@@ -2,7 +2,7 @@ ifndef::snippets[]
 :snippets: ../../../build/generated-snippets
 endif::[]
 
-= REST Docs 메인 서비스 API
+= REST Docs 업체 API
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs
