@@ -2,6 +2,7 @@ package com.palpal.dealightbe.domain.store.domain;
 
 import java.time.LocalTime;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -12,6 +13,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.member.domain.Member;
@@ -29,6 +33,8 @@ import lombok.extern.slf4j.Slf4j;
 @Entity
 @Table(name = "stores")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Where(clause = "is_deleted = false")
+@SQLDelete(sql = "UPDATE stores SET is_deleted = true WHERE id = ?")
 @Slf4j
 public class Store extends BaseEntity {
 
@@ -36,11 +42,11 @@ public class Store extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 	@JoinColumn(name = "member_id")
 	private Member member;
 
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 	@JoinColumn(name = "address_id")
 	private Address address;
 
@@ -61,7 +67,7 @@ public class Store extends BaseEntity {
 
 	private String dayOff;
 
-	private boolean isDeleted = false;
+	private boolean isDeleted = Boolean.FALSE;
 
 	@Builder
 	public Store(Address address, String name, String storeNumber, String telephone, LocalTime openTime, LocalTime closeTime, String dayOff) {
