@@ -21,7 +21,7 @@ import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
-import com.palpal.dealightbe.domain.store.application.dto.response.StoreRes;
+import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
@@ -66,11 +66,11 @@ class StoreServiceTest {
 			.thenReturn(new AddressRes("서울시 강남구", 67.89, 293.2323));
 
 		//when
-		StoreRes storeRes = storeService.register(member.getId(), storeCreateReq);
+		StoreCreateRes storeCreateRes = storeService.register(member.getId(), storeCreateReq);
 
 		//then
-		assertThat(storeRes.name()).isEqualTo(storeCreateReq.name());
-		assertThat(storeRes.addressRes().name()).isEqualTo(storeCreateReq.addressName());
+		assertThat(storeCreateRes.name()).isEqualTo(storeCreateReq.name());
+		assertThat(storeCreateRes.addressRes().name()).isEqualTo(storeCreateReq.addressName());
 	}
 
 	@Test

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.palpal.dealightbe.domain.store.application.StoreService;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
-import com.palpal.dealightbe.domain.store.application.dto.response.StoreRes;
+import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,9 +22,9 @@ public class StoreController {
 	private final StoreService storeService;
 
 	@PostMapping("/{memberId}")
-	public ResponseEntity<StoreRes> register(@PathVariable Long memberId, @RequestBody @Validated StoreCreateReq req) {
-		StoreRes storeRes = storeService.register(memberId, req);
+	public ResponseEntity<StoreCreateRes> register(@PathVariable Long memberId, @RequestBody @Validated StoreCreateReq req) {
+		StoreCreateRes storeCreateRes = storeService.register(memberId, req);
 
-		return ResponseEntity.ok(storeRes);
+		return ResponseEntity.ok(storeCreateRes);
 	}
 }

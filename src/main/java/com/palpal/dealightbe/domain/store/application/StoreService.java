@@ -7,7 +7,7 @@ import com.palpal.dealightbe.domain.address.application.AddressService;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
-import com.palpal.dealightbe.domain.store.application.dto.response.StoreRes;
+import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.ErrorCode;
@@ -26,7 +26,7 @@ public class StoreService {
 	private final MemberRepository memberRepository;
 	private final AddressService addressService;
 
-	public StoreRes register(Long memberId, StoreCreateReq req) {
+	public StoreCreateRes register(Long memberId, StoreCreateReq req) {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_ID : {}", memberId);
@@ -39,6 +39,6 @@ public class StoreService {
 		store.updateMember(member);
 		storeRepository.save(store);
 
-		return StoreRes.from(store);
+		return StoreCreateRes.from(store);
 	}
 }

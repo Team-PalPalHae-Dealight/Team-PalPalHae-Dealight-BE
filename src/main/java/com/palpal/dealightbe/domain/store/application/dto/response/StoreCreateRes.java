@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
 import com.palpal.dealightbe.domain.store.domain.Store;
 
-public record StoreRes(
+public record StoreCreateRes(
 	String storeNumber,
 	String name,
 	String telephone,
@@ -18,8 +18,8 @@ public record StoreRes(
 	String dayOff
 ) {
 
-	public static StoreRes from(Store store) {
-		return new StoreRes(
+	public static StoreCreateRes from(Store store) {
+		return new StoreCreateRes(
 			store.getStoreNumber(), store.getName(), store.getTelephone(), AddressRes.from(store.getAddress()),
 			store.getOpenTime(), store.getCloseTime(), store.getDayOff());
 	}

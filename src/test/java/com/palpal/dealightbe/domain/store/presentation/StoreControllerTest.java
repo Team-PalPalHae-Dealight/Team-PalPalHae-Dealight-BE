@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
 import com.palpal.dealightbe.domain.store.application.StoreService;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
-import com.palpal.dealightbe.domain.store.application.dto.response.StoreRes;
+import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 
@@ -61,23 +61,23 @@ class StoreControllerTest {
 
 		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, "월요일");
 		AddressRes addressRes = new AddressRes("서울시 강남구", 67.89, 293.2323);
-		StoreRes storeRes = new StoreRes("888-222-111", "맛짱조개", "01066772291", addressRes, openTime, closeTime, "월요일");
+		StoreCreateRes storeCreateRes = new StoreCreateRes("888-222-111", "맛짱조개", "01066772291", addressRes, openTime, closeTime, "월요일");
 
 		given(storeService.register(memberId, storeCreateReq))
-			.willReturn(storeRes);
+			.willReturn(storeCreateRes);
 
 		//when -> then
 		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/stores/{memberId}", memberId)
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(storeCreateReq)))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.storeNumber").value(storeRes.storeNumber()))
-			.andExpect(jsonPath("$.name").value(storeRes.name()))
-			.andExpect(jsonPath("$.telephone").value(storeRes.telephone()))
-			.andExpect(jsonPath("$.addressRes.name").value(storeRes.addressRes().name()))
-			.andExpect(jsonPath("$.openTime").value(storeRes.openTime().toString()))
-			.andExpect(jsonPath("$.closeTime").value(storeRes.closeTime().toString()))
-			.andExpect(jsonPath("$.dayOff").value(storeRes.dayOff()))
+			.andExpect(jsonPath("$.storeNumber").value(storeCreateRes.storeNumber()))
+			.andExpect(jsonPath("$.name").value(storeCreateRes.name()))
+			.andExpect(jsonPath("$.telephone").value(storeCreateRes.telephone()))
+			.andExpect(jsonPath("$.addressRes.name").value(storeCreateRes.addressRes().name()))
+			.andExpect(jsonPath("$.openTime").value(storeCreateRes.openTime().toString()))
+			.andExpect(jsonPath("$.closeTime").value(storeCreateRes.closeTime().toString()))
+			.andExpect(jsonPath("$.dayOff").value(storeCreateRes.dayOff()))
 			.andDo(print())
 			.andDo(document("store-register",
 				Preprocessors.preprocessRequest(prettyPrint()),
@@ -118,7 +118,7 @@ class StoreControllerTest {
 
 		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, "월요일");
 		AddressRes addressRes = new AddressRes("서울시 강남구", 67.89, 293.2323);
-		StoreRes storeRes = new StoreRes("888-222-111", "맛짱조개", "01066772291", addressRes, openTime, closeTime, "월요일");
+		StoreCreateRes storeCreateRes = new StoreCreateRes("888-222-111", "맛짱조개", "01066772291", addressRes, openTime, closeTime, "월요일");
 
 		given(storeService.register(memberId, storeCreateReq))
 			.willThrow(new BusinessException(ErrorCode.INVALID_BUSINESS_TIME));
