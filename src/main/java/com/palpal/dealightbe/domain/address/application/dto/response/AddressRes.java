@@ -12,11 +12,11 @@ public record AddressRes(
 		return new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
 	}
 
-	public static Address toAddress(AddressRes addressRes) {
+	public static Address toAddress(String name, double xCoordinate, double yCoordinate) {
 		return Address.builder()
-			.name(addressRes.name)
-			.xCoordinate(addressRes.xCoordinate)
-			.yCoordinate(addressRes.yCoordinate)
+			.name(name)
+			.xCoordinate(xCoordinate)
+			.yCoordinate(yCoordinate)
 			.build();
 	}
 }

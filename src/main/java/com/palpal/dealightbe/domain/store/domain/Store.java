@@ -45,7 +45,7 @@ public class Store extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private StoreStatus storeStatus = StoreStatus.CLOSED;
 
-	private String storePhoneNumber;
+	private String storeNumber;
 
 	private String telephone;
 
@@ -60,14 +60,21 @@ public class Store extends BaseEntity {
 	private boolean isDeleted = false;
 
 	@Builder
-	public Store(Address address, String ownerName, String name, String ownerPhoneNumber,
-				 String storePhoneNumber, String telephone, LocalDateTime openTime, LocalDateTime closeTime, String dayOff) {
+	public Store(Address address, String name, String storeNumber, String telephone, LocalDateTime openTime, LocalDateTime closeTime, String dayOff) {
 		this.address = address;
 		this.name = name;
-		this.storePhoneNumber = storePhoneNumber;
+		this.storeNumber = storeNumber;
 		this.telephone = telephone;
 		this.openTime = openTime;
 		this.closeTime = closeTime;
 		this.dayOff = dayOff;
+	}
+
+	public void updateMember(Member member) {
+		this.member = member;
+	}
+
+	public void updateAddress(Address address) {
+		this.address = address;
 	}
 }
