@@ -15,10 +15,13 @@ endif::[]
 
 === 업체 등록
 
-==== /api/stores
+==== /api/stores/{memberId}
 
 .Request
 include::{snippets}/store/store-register/http-request.adoc[]
+
+include::{snippets}/store/store-register/path-parameters.adoc[]
+
 
 include::{snippets}/store/store-register/request-fields.adoc[]
 
@@ -29,6 +32,8 @@ include::{snippets}/store/store-register/response-fields.adoc[]
 
 .Request Fail - 잘못된 영업 시간
 include::{snippets}/store/store-register-fail-invalid-business-time/http-response.adoc[]
+
+include::{snippets}/store/store-register-fail-invalid-business-time/path-parameters.adoc[]
 
 include::{snippets}/store/store-register-fail-invalid-business-time/response-fields.adoc[]
 
