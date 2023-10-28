@@ -16,16 +16,20 @@ import javax.persistence.Table;
 import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.global.BaseEntity;
+import com.palpal.dealightbe.global.error.ErrorCode;
+import com.palpal.dealightbe.global.error.exception.BusinessException;
 
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter
 @Entity
 @Table(name = "stores")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Slf4j
 public class Store extends BaseEntity {
 
 	@Id
@@ -65,6 +69,7 @@ public class Store extends BaseEntity {
 		this.name = name;
 		this.storeNumber = storeNumber;
 		this.telephone = telephone;
+		validateBusinessTimes(openTime, closeTime);
 		this.openTime = openTime;
 		this.closeTime = closeTime;
 		this.dayOff = dayOff;
@@ -76,5 +81,16 @@ public class Store extends BaseEntity {
 
 	public void updateAddress(Address address) {
 		this.address = address;
+	}
+
+	public void updateImage(String image) {
+		this.image = image;
+	}
+
+	private void validateBusinessTimes(LocalDateTime openTime, LocalDateTime closeTime) {
+		if (closeTime.isBefore(openTime)) {
+			log.warn("INVALID_BUSINESS_TIME : {},{}", openTime, closeTime);
+			throw new BusinessException(ErrorCode.INVALID_BUSINESS_TIME);
+		}
 	}
 }

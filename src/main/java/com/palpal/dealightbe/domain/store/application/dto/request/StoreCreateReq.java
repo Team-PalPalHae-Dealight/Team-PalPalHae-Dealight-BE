@@ -2,13 +2,21 @@ package com.palpal.dealightbe.domain.store.application.dto.request;
 
 import java.time.LocalDateTime;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
 import com.palpal.dealightbe.domain.store.domain.Store;
 
 public record StoreCreateReq(
+	@NotBlank(message = "사업자 등록 번호는 필수 입력값입니다.")
 	String storeNumber,
+	@NotBlank(message = "상호명은 필수 입력값입니다.")
 	String name,
+	@NotBlank(message = "업체 전화번호는 필수 입력값입니다.")
+	@Pattern(regexp = "\\d+")
 	String telephone,
+	@NotBlank(message = "업체 주소는 필수 입력값입니다.")
 	String addressName,
 	double xCoordinate,
 	double yCoordinate,

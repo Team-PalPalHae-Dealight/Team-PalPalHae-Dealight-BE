@@ -25,6 +25,7 @@ import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreRes;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
+import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -75,7 +76,8 @@ class StoreServiceTest {
 	}
 
 	@Test
-	void registerStoreFailureTest() {
+	@DisplayName("업체 등록 실패 - 존재하지 않는 회원")
+	void registerStoreFailureTest_notFoundMember() {
 		// given
 		LocalDateTime openTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 0));
 		LocalDateTime closeTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23, 0));
@@ -85,6 +87,25 @@ class StoreServiceTest {
 
 		// when -> then
 		assertThrows(EntityNotFoundException.class, () -> {
+			storeService.register(member.getId(), storeCreateReq);
+		});
+	}
+
+	@Test
+	@DisplayName("업체 등록 실패 - 마감 시간이 오픈 시간 보다 빠른 경우")
+	void registerStoreFailureTest_invalidBusinessHour() {
+		// given
+		LocalDateTime openTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(23, 0));
+		LocalDateTime closeTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 0));
+		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, "월요일");
+
+		when(memberRepository.findById(member.getId()))
+			.thenReturn(Optional.of(member));
+		when(addressService.register(eq("서울시 강남구"), eq(67.89), eq(293.2323)))
+			.thenReturn(new AddressRes("서울시 강남구", 67.89, 293.2323));
+
+		// when -> then
+		assertThrows(BusinessException.class, () -> {
 			storeService.register(member.getId(), storeCreateReq);
 		});
 	}

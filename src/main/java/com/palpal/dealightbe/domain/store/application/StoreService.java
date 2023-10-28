@@ -36,7 +36,6 @@ public class StoreService {
 		addressService.register(req.addressName(), req.xCoordinate(), req.yCoordinate());
 
 		Store store = StoreCreateReq.toStore(req);
-
 		store.updateMember(member);
 		storeRepository.save(store);
 
