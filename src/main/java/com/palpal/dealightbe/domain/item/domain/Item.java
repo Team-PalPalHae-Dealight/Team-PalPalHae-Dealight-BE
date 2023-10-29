@@ -18,9 +18,11 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import static com.palpal.dealightbe.global.error.ErrorCode.*;
 
+@Slf4j
 @Getter
 @Entity
 @Table(name = "items")
@@ -67,6 +69,7 @@ public class Item extends BaseEntity {
 
 	private int validateDiscountPrice(int discountPrice, int originalPrice) {
 		if (discountPrice > originalPrice) {
+			log.warn("INVALID_ITEM_DISCOUNT_PRICE : discount price = {}, original price = {}", discountPrice, originalPrice);
 			throw new BusinessException(INVALID_ITEM_DISCOUNT_PRICE);
 		}
 
