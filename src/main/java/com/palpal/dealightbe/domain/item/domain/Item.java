@@ -1,5 +1,6 @@
 package com.palpal.dealightbe.domain.item.domain;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -11,11 +12,14 @@ import javax.persistence.Table;
 
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.global.BaseEntity;
+import com.palpal.dealightbe.global.error.exception.BusinessException;
 
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import static com.palpal.dealightbe.global.error.ErrorCode.*;
 
 @Getter
 @Entity
@@ -27,6 +31,7 @@ public class Item extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(length = 50, nullable = false)
 	private String name;
 
 	private int stock;
@@ -35,8 +40,10 @@ public class Item extends BaseEntity {
 
 	private int originalPrice;
 
+	@Column(length = 300)
 	private String description;
 
+	@Column(length = 300)
 	private String information;
 
 	private String image;
@@ -47,14 +54,22 @@ public class Item extends BaseEntity {
 
 	@Builder
 	public Item(String name, int stock, int discountPrice, int originalPrice, String description, String information,
-		String image, Store store) {
+				String image, Store store) {
 		this.name = name;
 		this.stock = stock;
-		this.discountPrice = discountPrice;
+		this.discountPrice = validateDiscountPrice(discountPrice, originalPrice);
 		this.originalPrice = originalPrice;
 		this.description = description;
 		this.information = information;
 		this.image = image;
 		this.store = store;
+	}
+
+	private int validateDiscountPrice(int discountPrice, int originalPrice) {
+		if (discountPrice > originalPrice) {
+			throw new BusinessException(INVALID_ITEM_DISCOUNT_PRICE);
+		}
+
+		return discountPrice;
 	}
 }
