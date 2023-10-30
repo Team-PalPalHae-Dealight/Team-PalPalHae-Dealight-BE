@@ -34,6 +34,8 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -105,6 +107,8 @@ class ItemControllerTest {
 			.andDo(document("item-create",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
+				requestParameters(parameterWithName("memberId").description("고객 ID")
+				),
 				requestFields(
 					fieldWithPath("name").description("상품 이름"),
 					fieldWithPath("stock").description("재고 수"),
@@ -169,6 +173,8 @@ class ItemControllerTest {
 			.andDo(document("item-create-fail-invalid-name",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
+				requestParameters(parameterWithName("memberId").description("고객 ID")
+				),
 				requestFields(
 					fieldWithPath("name").description("상품 이름"),
 					fieldWithPath("stock").description("재고 수"),
@@ -215,6 +221,8 @@ class ItemControllerTest {
 			.andDo(document("item-create-fail-invalid-discount-price",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
+				requestParameters(parameterWithName("memberId").description("고객 ID")
+				),
 				requestFields(
 					fieldWithPath("name").description("상품 이름"),
 					fieldWithPath("stock").description("재고 수"),

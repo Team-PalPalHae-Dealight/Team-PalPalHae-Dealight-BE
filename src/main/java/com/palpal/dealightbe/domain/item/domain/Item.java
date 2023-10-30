@@ -57,9 +57,11 @@ public class Item extends BaseEntity {
 	@Builder
 	public Item(String name, int stock, int discountPrice, int originalPrice, String description, String information,
 				String image, Store store) {
+		validateDiscountPrice(discountPrice, originalPrice);
+
 		this.name = name;
 		this.stock = stock;
-		this.discountPrice = validateDiscountPrice(discountPrice, originalPrice);
+		this.discountPrice = discountPrice;
 		this.originalPrice = originalPrice;
 		this.description = description;
 		this.information = information;
@@ -67,12 +69,10 @@ public class Item extends BaseEntity {
 		this.store = store;
 	}
 
-	private int validateDiscountPrice(int discountPrice, int originalPrice) {
+	private void validateDiscountPrice(int discountPrice, int originalPrice) {
 		if (discountPrice > originalPrice) {
 			log.warn("INVALID_ITEM_DISCOUNT_PRICE : discount price = {}, original price = {}", discountPrice, originalPrice);
 			throw new BusinessException(INVALID_ITEM_DISCOUNT_PRICE);
 		}
-
-		return discountPrice;
 	}
 }
