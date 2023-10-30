@@ -35,7 +35,9 @@ import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
 import com.palpal.dealightbe.domain.store.application.StoreService;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
+import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
+import com.palpal.dealightbe.domain.store.domain.StoreStatus;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 
@@ -119,8 +121,6 @@ class StoreControllerTest {
 		LocalTime closeTime = LocalTime.of(9, 0);
 
 		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, Set.of(DayOff.MON));
-		AddressRes addressRes = new AddressRes("서울시 강남구", 67.89, 293.2323);
-		StoreCreateRes storeCreateRes = new StoreCreateRes("888-222-111", "맛짱조개", "01066772291", addressRes, openTime, closeTime, Set.of(DayOff.MON));
 
 		given(storeService.register(memberId, storeCreateReq))
 			.willThrow(new BusinessException(ErrorCode.INVALID_BUSINESS_TIME));
@@ -150,6 +150,77 @@ class StoreControllerTest {
 					fieldWithPath("openTime").description("오픈 시간"),
 					fieldWithPath("closeTime").description("마감 시간"),
 					fieldWithPath("dayOff").description("휴무일")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("오류 코드"),
+					fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("업체 마이페이지 조회 성공")
+	void getInfoSuccessTest() throws Exception {
+
+		//given
+		Long memberId = 1L;
+		Long storeId = 1L;
+		LocalTime openTime = LocalTime.of(9, 0);
+		LocalTime closeTime = LocalTime.of(23, 0);
+		StoreInfoRes storeInfoRes = new StoreInfoRes("123123213", "피나치공", "02123456", "서울시 강남구", openTime, closeTime, Set.of(DayOff.MON, DayOff.TUE), StoreStatus.OPENED, null);
+
+		given(storeService.getInfo(memberId, storeId))
+			.willReturn(storeInfoRes);
+
+		//when -> then
+		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/stores/{memberId}/{storeId}", memberId, storeId)
+				.contentType(APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andDo(print())
+			.andDo(document("store-get-info",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("memberId").description("고객 ID"),
+					parameterWithName("storeId").description("업체 ID")
+				),
+				responseFields(
+					fieldWithPath("storeNumber").description("사업자 등록 번호"),
+					fieldWithPath("name").description("상호명"),
+					fieldWithPath("telephone").description("업체 전화번호"),
+					fieldWithPath("addressName").description("업체 주소"),
+					fieldWithPath("openTime").description("오픈 시간"),
+					fieldWithPath("closeTime").description("마감 시간"),
+					fieldWithPath("dayOff").description("휴무일"),
+					fieldWithPath("storeStatus").description("영업 유무"),
+					fieldWithPath("image").description("이미지 주소")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("업체 마이페이지 조회 실패 - 소유자와 요청자가 일치하지 않음")
+	void getInfoFailTest_notMatchOwnerAndRequester() throws Exception {
+
+		//given
+		Long invalidMemberId = 1L;
+		Long storeId = 1L;
+		given(storeService.getInfo(invalidMemberId, storeId))
+			.willThrow(new BusinessException(ErrorCode.NOT_MATCH_OWNER_AND_REQUESTER));
+
+		//when -> then
+		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/stores/{memberId}/{storeId}", invalidMemberId, storeId)
+				.contentType(APPLICATION_JSON))
+			.andExpect(status().isBadRequest())
+			.andDo(print())
+			.andDo(document("store-get-info-fail-not-match-owner-and-requester",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("memberId").description("고객 ID"),
+					parameterWithName("storeId").description("업체 ID")
 				),
 				responseFields(
 					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
