@@ -25,12 +25,12 @@ public class Address extends BaseEntity {
 
 	private String name;
 
-	private int xCoordinate;
+	private double xCoordinate;
 
-	private int yCoordinate;
+	private double yCoordinate;
 
 	@Builder
-	public Address(String name, int xCoordinate, int yCoordinate) {
+	public Address(String name, double xCoordinate, double yCoordinate) {
 		this.name = name;
 		this.xCoordinate = xCoordinate;
 		this.yCoordinate = yCoordinate;
