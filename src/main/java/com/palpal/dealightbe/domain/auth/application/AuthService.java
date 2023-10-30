@@ -32,9 +32,8 @@ public class AuthService {
 				log.info("사용자(provider: {}, providerId: {})의 로그인을 진행합니다.", provider, providerId);
 				String accessToken = jwt.createAccessToken(providerId, member);
 				String refreshToken = jwt.createRefreshToken(providerId);
-				String nickName = member.getNickName();
 
-				return new LoginResponse(providerId, accessToken, refreshToken, nickName);
+				return new LoginResponse(providerId, accessToken, refreshToken);
 			})
 			.orElse(null);
 	}

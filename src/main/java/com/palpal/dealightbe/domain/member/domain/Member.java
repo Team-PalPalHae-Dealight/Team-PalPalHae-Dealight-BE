@@ -51,9 +51,13 @@ public class Member extends BaseEntity {
 	private List<MemberRole> memberRoles = new ArrayList<>();
 
 	@Builder
-	public Member(String realName, String nickName, String phoneNumber) {
+	public Member(String realName, String nickName, String phoneNumber, String provider, Long providerId,
+		List<MemberRole> memberRoles) {
 		this.realName = realName;
 		this.nickName = nickName;
 		this.phoneNumber = phoneNumber;
+		this.provider = provider;
+		this.providerId = providerId;
+		this.memberRoles = memberRoles;
 	}
 }

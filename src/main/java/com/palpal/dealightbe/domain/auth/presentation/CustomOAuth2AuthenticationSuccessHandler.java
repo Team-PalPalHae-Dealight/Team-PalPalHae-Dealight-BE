@@ -1,7 +1,5 @@
 package com.palpal.dealightbe.domain.auth.presentation;
 
-import static com.palpal.dealightbe.global.error.ErrorCode.*;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 

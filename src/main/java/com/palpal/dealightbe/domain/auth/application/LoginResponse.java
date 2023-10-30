@@ -8,8 +8,7 @@ public record LoginResponse(
 
 	Long providerId,
 	String accessToken,
-	String refreshToken,
-	String nickName
+	String refreshToken
 ) {
 	public static LoginResponse of(String accessToken, String refreshToken,
 		OAuth2AuthenticationToken oAuth2AuthenticationToken) {
@@ -17,8 +16,7 @@ public record LoginResponse(
 		Map<String, Object> attributes = oAuth2AuthenticationToken.getPrincipal().getAttributes();
 		@SuppressWarnings("unchecked") Map<String, Object> properties = (Map<String, Object>)attributes
 			.get("properties");
-		String nickName = (String)properties.get("profile_nickname");
 
-		return new LoginResponse(providerId, accessToken, refreshToken, nickName);
+		return new LoginResponse(providerId, accessToken, refreshToken);
 	}
 }

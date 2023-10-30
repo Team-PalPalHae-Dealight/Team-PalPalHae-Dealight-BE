@@ -25,4 +25,8 @@ public class Role {
 
 	@Enumerated(EnumType.STRING)
 	private RoleType type;
+
+	public Role(RoleType type) {
+		this.type = type;
+	}
 }
