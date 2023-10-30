@@ -1,11 +1,15 @@
 package com.palpal.dealightbe.domain.member.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -39,10 +43,21 @@ public class Member extends BaseEntity {
 
 	private boolean isDeleted = false;
 
+	private String provider;
+
+	private String providerId;
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "member")
+	private List<MemberRole> memberRoles = new ArrayList<>();
+
 	@Builder
 	public Member(String realName, String nickName, String phoneNumber) {
 		this.realName = realName;
 		this.nickName = nickName;
 		this.phoneNumber = phoneNumber;
+	}
+
+	public void setAddress(Address address) {
+		this.address = address;
 	}
 }
