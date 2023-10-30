@@ -93,7 +93,10 @@ public class Store extends BaseEntity {
 	}
 
 	private void validateBusinessTimes(LocalTime openTime, LocalTime closeTime) {
-		if (closeTime.isBefore(openTime)) {
+		if (openTime.isAfter(closeTime)) {
+			if (openTime.isAfter(LocalTime.of(0, 0)) && closeTime.isBefore(LocalTime.of(5, 0))) {
+				return;
+			}
 			log.warn("INVALID_BUSINESS_TIME : openTime => {}, closeTime => {}", openTime, closeTime);
 			throw new BusinessException(ErrorCode.INVALID_BUSINESS_TIME);
 		}

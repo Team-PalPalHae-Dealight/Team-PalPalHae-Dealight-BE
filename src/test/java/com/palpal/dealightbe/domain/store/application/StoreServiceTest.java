@@ -54,12 +54,33 @@ class StoreServiceTest {
 			.build();
 	}
 
-	@DisplayName("업체 등록 성공 테스트")
+	@DisplayName("업체 등록 성공")
 	@Test
 	void registerStoreSuccessTest() {
 		// given
 		LocalTime openTime = LocalTime.of(9, 0);
 		LocalTime closeTime = LocalTime.of(23, 0);
+		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, Set.of(DayOff.MON));
+
+		when(memberRepository.findById(member.getId()))
+			.thenReturn(Optional.of(member));
+		when(addressService.register(eq("서울시 강남구"), eq(67.89), eq(293.2323)))
+			.thenReturn(new AddressRes("서울시 강남구", 67.89, 293.2323));
+
+		//when
+		StoreCreateRes storeCreateRes = storeService.register(member.getId(), storeCreateReq);
+
+		//then
+		assertThat(storeCreateRes.name()).isEqualTo(storeCreateReq.name());
+		assertThat(storeCreateRes.addressRes().name()).isEqualTo(storeCreateReq.addressName());
+	}
+
+	@DisplayName("업체 등록 성공 - 가게가 저녁에 문을 열고 새벽에 닫아도 성공")
+	@Test
+	void registerStoreSuccessTest_businessTime() {
+		// given
+		LocalTime openTime = LocalTime.of(15, 0);
+		LocalTime closeTime = LocalTime.of(02, 0);
 		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, Set.of(DayOff.MON));
 
 		when(memberRepository.findById(member.getId()))
@@ -96,8 +117,8 @@ class StoreServiceTest {
 	@DisplayName("업체 등록 실패 - 마감 시간이 오픈 시간 보다 빠른 경우")
 	void registerStoreFailureTest_invalidBusinessHour() {
 		// given
-		LocalTime openTime = LocalTime.of(23, 0);
-		LocalTime closeTime = LocalTime.of(9, 0);
+		LocalTime openTime = LocalTime.of(15, 0);
+		LocalTime closeTime = LocalTime.of(13, 0);
 		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, Set.of(DayOff.MON));
 
 		when(memberRepository.findById(member.getId()))
@@ -110,4 +131,5 @@ class StoreServiceTest {
 			storeService.register(member.getId(), storeCreateReq);
 		});
 	}
+
 }
