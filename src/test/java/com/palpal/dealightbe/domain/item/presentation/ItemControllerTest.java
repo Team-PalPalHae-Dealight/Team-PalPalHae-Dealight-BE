@@ -1,6 +1,8 @@
 package com.palpal.dealightbe.domain.item.presentation;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Collections;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +21,7 @@ import com.palpal.dealightbe.domain.item.application.ItemService;
 import com.palpal.dealightbe.domain.item.application.dto.request.ItemReq;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
 import com.palpal.dealightbe.domain.item.domain.Item;
+import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
@@ -34,6 +37,8 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -58,11 +63,11 @@ class ItemControllerTest {
 	void setUp() {
 		store = Store.builder()
 			.name("동네분식")
-			.storePhoneNumber("000-0000")
-			.telephone("0000-0000")
-			.openTime(LocalDateTime.now())
-			.closeTime(LocalDateTime.now().plusHours(6))
-			.dayOff("000")
+			.storeNumber("0000000")
+			.telephone("00000000")
+			.openTime(LocalTime.now())
+			.closeTime(LocalTime.now().plusHours(6))
+			.dayOff(Collections.singleton(DayOff.MON))
 			.build();
 
 		item = Item.builder()
@@ -105,6 +110,8 @@ class ItemControllerTest {
 			.andDo(document("item-create",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
+				requestParameters(parameterWithName("memberId").description("고객 ID")
+				),
 				requestFields(
 					fieldWithPath("name").description("상품 이름"),
 					fieldWithPath("stock").description("재고 수"),
@@ -169,6 +176,8 @@ class ItemControllerTest {
 			.andDo(document("item-create-fail-invalid-name",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
+				requestParameters(parameterWithName("memberId").description("고객 ID")
+				),
 				requestFields(
 					fieldWithPath("name").description("상품 이름"),
 					fieldWithPath("stock").description("재고 수"),
@@ -215,6 +224,8 @@ class ItemControllerTest {
 			.andDo(document("item-create-fail-invalid-discount-price",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
+				requestParameters(parameterWithName("memberId").description("고객 ID")
+				),
 				requestFields(
 					fieldWithPath("name").description("상품 이름"),
 					fieldWithPath("stock").description("재고 수"),

@@ -13,14 +13,14 @@ endif::[]
 [[User-API]]
 == Item API
 
-=== 상품 등록
+=== 업체 등록
 
-==== /api/items/{memberId}
+==== /api/items?memberId={memberId}
 
 .Request - 성공
 include::{snippets}/item-create/http-request.adoc[]
 
-include::{snippets}/item-create/path-parameters.adoc[]
+include::{snippets}/item-create/request-parameters.adoc[]
 
 include::{snippets}/item-create/request-fields.adoc[]
 
@@ -30,11 +30,26 @@ include::{snippets}/item-create/http-response.adoc[]
 include::{snippets}/item-create/response-fields.adoc[]
 
 .Request Fail - 입력되지 않은 상품 이름
+include::{snippets}/item-create-fail-invalid-name/http-request.adoc[]
+
+include::{snippets}/item-create-fail-invalid-name/request-parameters.adoc[]
+
+include::{snippets}/item-create-fail-invalid-name/request-fields.adoc[]
+
+.Response Fail - 입력되지 않은 상품 이름
+
 include::{snippets}/item-create-fail-invalid-name/http-response.adoc[]
 
 include::{snippets}/item-create-fail-invalid-name/response-fields.adoc[]
 
 .Request Fail - 할인가가 원가보다 큰 경우
+include::{snippets}/item-create-fail-invalid-discount-price/http-request.adoc[]
+
+include::{snippets}/item-create-fail-invalid-discount-price/request-parameters.adoc[]
+
+include::{snippets}/item-create-fail-invalid-discount-price/request-fields.adoc[]
+
+.Response Fail - 할인가가 원가보다 큰 경우
 include::{snippets}/item-create-fail-invalid-discount-price/http-response.adoc[]
 
 include::{snippets}/item-create-fail-invalid-discount-price/response-fields.adoc[]

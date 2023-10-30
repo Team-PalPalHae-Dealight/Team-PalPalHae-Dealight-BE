@@ -1,6 +1,8 @@
 package com.palpal.dealightbe.domain.item.application;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Collections;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +17,7 @@ import com.palpal.dealightbe.domain.item.application.dto.request.ItemReq;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
+import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
@@ -44,11 +47,11 @@ class ItemServiceTest {
 	void setUp() {
 		store = Store.builder()
 			.name("동네분식")
-			.storePhoneNumber("000-0000")
-			.telephone("0000-0000")
-			.openTime(LocalDateTime.now())
-			.closeTime(LocalDateTime.now().plusHours(6))
-			.dayOff("000")
+			.storeNumber("0000000")
+			.telephone("00000000")
+			.openTime(LocalTime.now())
+			.closeTime(LocalTime.now().plusHours(6))
+			.dayOff(Collections.singleton(DayOff.MON))
 			.build();
 
 		item = Item.builder()
