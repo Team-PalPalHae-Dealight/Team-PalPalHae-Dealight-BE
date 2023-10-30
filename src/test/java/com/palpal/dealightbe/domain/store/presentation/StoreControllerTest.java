@@ -175,7 +175,7 @@ class StoreControllerTest {
 			.willReturn(storeInfoRes);
 
 		//when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/stores/{memberId}/{storeId}", memberId, storeId)
+		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/stores/profiles/{memberId}/{storeId}", memberId, storeId)
 				.contentType(APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andDo(print())
@@ -211,7 +211,7 @@ class StoreControllerTest {
 			.willThrow(new BusinessException(ErrorCode.NOT_MATCH_OWNER_AND_REQUESTER));
 
 		//when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/stores/{memberId}/{storeId}", invalidMemberId, storeId)
+		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/stores/profiles/{memberId}/{storeId}", invalidMemberId, storeId)
 				.contentType(APPLICATION_JSON))
 			.andExpect(status().isBadRequest())
 			.andDo(print())

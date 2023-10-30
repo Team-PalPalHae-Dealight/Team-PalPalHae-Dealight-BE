@@ -39,17 +39,20 @@ include::{snippets}/store/store-register-fail-invalid-business-time/response-fie
 
 === 업체 마이 페이지 조회
 
-==== /api/stores/{memberId}/{storeId}
+==== /api/stores/profiles/{memberId}/{storeId}
 
+.Request
 include::{snippets}/store/store-get-info/http-request.adoc[]
 include::{snippets}/store/store-get-info/path-parameters.adoc[]
 
+.Response
 include::{snippets}/store/store-get-info/http-response.adoc[]
 include::{snippets}/store/store-get-info/response-fields.adoc[]
 
 .Request Fail - 업체 소유자와 요청자가 같은 고객이 아니다.
 include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/http-request.adoc[]
 include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/path-parameters.adoc[]
+.Response
 include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/http-response.adoc[]
 include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/response-fields.adoc[]
 
@@ -60,5 +63,5 @@ include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/resp
 // include::{snippets}/mainItem/mainItem-update/http-request.adoc[]
 // include::{snippets}/mainItem/mainItem-update/path-parameters.adoc[]
 // .Response
-// include::{snippets}/mainItem/mainItem-update/http-response.adoc[]
+// include::{snippets}/mainItem/mainItem-update/htt p-response.adoc[]
 // include::{snippets}/mainItem/mainItem-update/response-fields.adoc[]

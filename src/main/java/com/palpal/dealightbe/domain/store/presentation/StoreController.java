@@ -30,7 +30,7 @@ public class StoreController {
 		return ResponseEntity.ok(storeCreateRes);
 	}
 
-	@GetMapping("/{memberId}/{storeId}")
+	@GetMapping("/profiles/{memberId}/{storeId}")
 	public ResponseEntity<StoreInfoRes> getInfo(@PathVariable Long memberId, @PathVariable Long storeId) {
 		StoreInfoRes infoRes = storeService.getInfo(memberId, storeId);
 
