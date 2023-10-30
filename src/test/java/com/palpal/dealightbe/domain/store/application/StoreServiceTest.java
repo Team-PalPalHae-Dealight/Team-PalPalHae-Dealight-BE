@@ -19,11 +19,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.palpal.dealightbe.domain.address.application.AddressService;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
+import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
+import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
+import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
@@ -44,6 +47,8 @@ class StoreServiceTest {
 	private StoreService storeService;
 
 	private Member member;
+	private Store store;
+	private Address address;
 
 	@BeforeEach
 	void setUp() {
@@ -51,7 +56,26 @@ class StoreServiceTest {
 			.nickName("홍섭")
 			.realName("이홍섭")
 			.phoneNumber("010010101")
+			.provider("kakao")
+			.providerId(123L)
 			.build();
+
+		address = Address.builder()
+			.name("서울시 강남구")
+			.xCoordinate(111)
+			.yCoordinate(222)
+			.build();
+
+		store = Store.builder()
+			.storeNumber("8888")
+			.name("맛짱고기")
+			.telephone("123123123")
+			.address(address)
+			.openTime(LocalTime.of(9, 0))
+			.closeTime(LocalTime.of(23, 0))
+			.dayOff(Set.of(DayOff.FRI))
+			.build();
+		store.updateMember(member);
 	}
 
 	@DisplayName("업체 등록 성공")
@@ -132,4 +156,47 @@ class StoreServiceTest {
 		});
 	}
 
+	@Test
+	@DisplayName("업체 마이페이지 조회 성공")
+	void getStoreInfoSuccessTest() throws Exception {
+
+		//given
+		when(memberRepository.findById(member.getId()))
+			.thenReturn(Optional.of(member));
+		when(storeRepository.findById(store.getId()))
+			.thenReturn(Optional.of(store));
+
+		//when
+		StoreInfoRes infoRes = storeService.getInfo(member.getId(), store.getId());
+
+		//then
+		assertThat(infoRes.storeNumber()).isEqualTo(store.getStoreNumber());
+		assertThat(infoRes.addressRes().name()).isEqualTo(store.getAddress().getName());
+		assertThat(infoRes.dayOff()).isEqualTo(store.getDayOffs());
+		assertThat(infoRes.storeStatus()).isEqualTo(store.getStoreStatus());
+	}
+
+	@Test
+	@DisplayName("업체 마이페이지 조회 실패 - 소유자와 요청자가 같지 않음")
+	void getStoreInfoSuccessTest_notMatchOwnerAndRequester() throws Exception {
+
+		//given
+		Member invalidMember = Member.builder()
+			.nickName("이홍섭")
+			.realName("김홍섭")
+			.phoneNumber("01330010101")
+			.provider("kakao")
+			.providerId(999L)
+			.build();
+
+		when(memberRepository.findById(invalidMember.getId()))
+			.thenReturn(Optional.of(invalidMember));
+		when(storeRepository.findById(store.getId()))
+			.thenReturn(Optional.of(store));
+
+		//when -> then
+		assertThrows(BusinessException.class, () -> {
+			storeService.getInfo(invalidMember.getId(), store.getId());
+		});
+	}
 }
