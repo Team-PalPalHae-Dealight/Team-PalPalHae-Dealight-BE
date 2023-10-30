@@ -81,7 +81,8 @@ class StoreServiceTest {
 		LocalTime closeTime = LocalTime.of(23, 0);
 		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, "월요일");
 
-		when(memberRepository.findById(member.getId())).thenReturn(Optional.empty());
+		when(memberRepository.findById(member.getId()))
+			.thenReturn(Optional.empty());
 
 		// when -> then
 		assertThrows(EntityNotFoundException.class, () -> {
@@ -93,7 +94,7 @@ class StoreServiceTest {
 	@DisplayName("업체 등록 실패 - 마감 시간이 오픈 시간 보다 빠른 경우")
 	void registerStoreFailureTest_invalidBusinessHour() {
 		// given
-			LocalTime openTime = LocalTime.of(23, 0);
+		LocalTime openTime = LocalTime.of(23, 0);
 		LocalTime closeTime = LocalTime.of(9, 0);
 		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, "월요일");
 
