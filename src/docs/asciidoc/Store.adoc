@@ -37,42 +37,22 @@ include::{snippets}/store/store-register-fail-invalid-business-time/path-paramet
 
 include::{snippets}/store/store-register-fail-invalid-business-time/response-fields.adoc[]
 
-// .Request Fail - 잘못된 데이터 입력
-// include::{snippets}/mainItem/mainItem-create-fail-invalid-value/http-request.adoc[]
-//
-// include::{snippets}/mainItem/mainItem-create-fail-invalid-value/request-fields.adoc[]
-//
-// include::{snippets}/mainItem/mainItem-create-fail-invalid-value/http-response.adoc[]
-//
-// include::{snippets}/mainItem/mainItem-create-fail-invalid-value/response-fields.adoc[]
+=== 업체 마이 페이지 조회
 
-// === 메인 서비스 전체 조회
-//
-// ==== /api/v1/posts
-//
-// .Request
-// include::{snippets}/mainItem/mainItem-find-all/http-request.adoc[]
-//
-// .Response
-// include::{snippets}/mainItem/mainItem-find-all/http-response.adoc[]
-//
-// include::{snippets}/mainItem/mainItem-find-all/response-fields.adoc[]
-//
-// === 메인 서비스 단건 조회
-//
-// ==== /api/v1/main-items/{id}
-//
-// include::{snippets}/mainItem/mainItem-get-one-by-id/http-request.adoc[]
-// include::{snippets}/mainItem/mainItem-get-one-by-id/path-parameters.adoc[]
-//
-// include::{snippets}/mainItem/mainItem-get-one-by-id/http-response.adoc[]
-// include::{snippets}/mainItem/mainItem-get-one-by-id/response-fields.adoc[]
-// .Request Fail - 존재하지 않는 게시물
-// include::{snippets}/mainItem/mainItem-get-one-by-id-fail-not-found/http-request.adoc[]
-// include::{snippets}/mainItem/mainItem-get-one-by-id-fail-not-found/path-parameters.adoc[]
-// include::{snippets}/mainItem/mainItem-get-one-by-id-fail-not-found/http-response.adoc[]
-// include::{snippets}/mainItem/mainItem-get-one-by-id-fail-not-found/response-fields.adoc[]
-//
+==== /api/stores/{memberId}/{storeId}
+
+include::{snippets}/store/store-get-info/http-request.adoc[]
+include::{snippets}/store/store-get-info/path-parameters.adoc[]
+
+include::{snippets}/store/store-get-info/http-response.adoc[]
+include::{snippets}/store/store-get-info/response-fields.adoc[]
+
+.Request Fail - 업체 소유자와 요청자가 같은 고객이 아니다.
+include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/http-request.adoc[]
+include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/path-parameters.adoc[]
+include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/http-response.adoc[]
+include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/response-fields.adoc[]
+
 // === 서비스 수정
 //
 // ==== /api/v1/main-items/{id}
