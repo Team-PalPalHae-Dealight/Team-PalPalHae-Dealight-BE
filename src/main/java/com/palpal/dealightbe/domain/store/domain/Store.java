@@ -14,9 +14,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
-
 import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.global.BaseEntity;
@@ -33,8 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 @Entity
 @Table(name = "stores")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Where(clause = "is_deleted = false")
-@SQLDelete(sql = "UPDATE stores SET is_deleted = true WHERE id = ?")
 @Slf4j
 public class Store extends BaseEntity {
 
@@ -67,15 +62,13 @@ public class Store extends BaseEntity {
 
 	private String dayOff;
 
-	private boolean isDeleted = Boolean.FALSE;
-
 	@Builder
 	public Store(Address address, String name, String storeNumber, String telephone, LocalTime openTime, LocalTime closeTime, String dayOff) {
+		validateBusinessTimes(openTime, closeTime);
 		this.address = address;
 		this.name = name;
 		this.storeNumber = storeNumber;
 		this.telephone = telephone;
-		validateBusinessTimes(openTime, closeTime);
 		this.openTime = openTime;
 		this.closeTime = closeTime;
 		this.dayOff = dayOff;
@@ -95,7 +88,7 @@ public class Store extends BaseEntity {
 
 	private void validateBusinessTimes(LocalTime openTime, LocalTime closeTime) {
 		if (closeTime.isBefore(openTime)) {
-			log.warn("INVALID_BUSINESS_TIME : {},{}", openTime, closeTime);
+			log.warn("INVALID_BUSINESS_TIME : openTime => {}, closeTime => {}", openTime, closeTime);
 			throw new BusinessException(ErrorCode.INVALID_BUSINESS_TIME);
 		}
 	}
