@@ -171,7 +171,7 @@ class StoreServiceTest {
 
 		//then
 		assertThat(infoRes.storeNumber()).isEqualTo(store.getStoreNumber());
-		assertThat(infoRes.addressRes().name()).isEqualTo(store.getAddress().getName());
+		assertThat(infoRes.addressName()).isEqualTo(store.getAddress().getName());
 		assertThat(infoRes.dayOff()).isEqualTo(store.getDayOffs());
 		assertThat(infoRes.storeStatus()).isEqualTo(store.getStoreStatus());
 	}
