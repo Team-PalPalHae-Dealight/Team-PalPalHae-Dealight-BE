@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 @Configuration
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class S3Config {
+	
 	@Value("${cloud.aws.credentials.accessKey}")
 	private String accessKey;
 
