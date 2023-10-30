@@ -36,10 +36,9 @@ public class ItemService {
 		checkAlreadyRegisteredItemName(itemReq.name(), store.getId());
 
 		Item item = ItemReq.toItem(itemReq, store);
+		Item savedItem = itemRepository.save(item);
 
-		itemRepository.save(item);
-
-		return ItemRes.from(item);
+		return ItemRes.from(savedItem);
 	}
 
 	private void checkAlreadyRegisteredItemName(String itemName, Long storeId) {
