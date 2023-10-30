@@ -160,7 +160,7 @@ class ItemServiceTest {
 		//when
 		//then
 		assertThrows(BusinessException.class, () -> {
-			ItemRes itemRes = itemService.update(itemId, itemReq, memberId);
+			itemService.update(itemId, itemReq, memberId);
 		});
 	}
 }
