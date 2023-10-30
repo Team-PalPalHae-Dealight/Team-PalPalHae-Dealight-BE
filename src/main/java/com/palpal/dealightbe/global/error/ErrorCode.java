@@ -24,7 +24,12 @@ public enum ErrorCode {
 	//상품
 	INVALID_ITEM_DISCOUNT_PRICE("I001", "상품 할인가는 원가보다 클 수 없습니다."),
 	NOT_FOUND_ITEM("I002", "상품이 존재하지 않습니다."),
-	ALREADY_REGISTERED_ITEM_NAME("I003", "동일한 이름을 가진 상품이 이미 등록되어 있습니다.");
+	ALREADY_REGISTERED_ITEM_NAME("I003", "동일한 이름을 가진 상품이 이미 등록되어 있습니다."),
+
+	//파일
+	NOT_FOUND_IMAGE("F001", "존재하지 않는 이미지 입니다."),
+	EMPTY_IMAGE("F002", "이미지를 업로드 바랍니다."),
+	INVALID_IMAGE_FORMAT("F003", "지원하지 않는 이미지 파일 형식입니다.");
 
 	private final String code;
 	private final String message;
