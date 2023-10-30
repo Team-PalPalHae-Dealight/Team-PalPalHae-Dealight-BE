@@ -55,7 +55,7 @@ public class StoreService {
 		Store store = storeRepository.findById(storeId)
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_STORE_BY_ID : {}", storeId);
-				throw new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
+				throw new EntityNotFoundException(ErrorCode.NOT_FOUND_STORE);
 			});
 
 		isSameOwnerAndTheRequester(member, store);
