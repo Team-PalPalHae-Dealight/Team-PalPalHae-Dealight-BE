@@ -13,7 +13,7 @@ endif::[]
 [[User-API]]
 == Item API
 
-=== 업체 등록
+=== 상품 등록
 
 ==== /api/items/{memberId}
 
