@@ -18,6 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalTime;
+import java.util.Set;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,7 @@ import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
 import com.palpal.dealightbe.domain.store.application.StoreService;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
+import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 
@@ -59,9 +61,9 @@ class StoreControllerTest {
 		LocalTime openTime = LocalTime.of(9, 0);
 		LocalTime closeTime = LocalTime.of(23, 0);
 
-		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, "월요일");
+		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, Set.of(DayOff.MON));
 		AddressRes addressRes = new AddressRes("서울시 강남구", 67.89, 293.2323);
-		StoreCreateRes storeCreateRes = new StoreCreateRes("888-222-111", "맛짱조개", "01066772291", addressRes, openTime, closeTime, "월요일");
+		StoreCreateRes storeCreateRes = new StoreCreateRes("888-222-111", "맛짱조개", "01066772291", addressRes, openTime, closeTime, Set.of(DayOff.MON));
 
 		given(storeService.register(memberId, storeCreateReq))
 			.willReturn(storeCreateRes);
@@ -77,7 +79,7 @@ class StoreControllerTest {
 			.andExpect(jsonPath("$.addressRes.name").value(storeCreateRes.addressRes().name()))
 			.andExpect(jsonPath("$.openTime").value(storeCreateRes.openTime().toString()))
 			.andExpect(jsonPath("$.closeTime").value(storeCreateRes.closeTime().toString()))
-			.andExpect(jsonPath("$.dayOff").value(storeCreateRes.dayOff()))
+			.andExpect(jsonPath("$.dayOff[0]").value(DayOff.MON.getName()))
 			.andDo(print())
 			.andDo(document("store-register",
 				Preprocessors.preprocessRequest(prettyPrint()),
@@ -116,9 +118,9 @@ class StoreControllerTest {
 		LocalTime openTime = LocalTime.of(23, 0);
 		LocalTime closeTime = LocalTime.of(9, 0);
 
-		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, "월요일");
+		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, Set.of(DayOff.MON));
 		AddressRes addressRes = new AddressRes("서울시 강남구", 67.89, 293.2323);
-		StoreCreateRes storeCreateRes = new StoreCreateRes("888-222-111", "맛짱조개", "01066772291", addressRes, openTime, closeTime, "월요일");
+		StoreCreateRes storeCreateRes = new StoreCreateRes("888-222-111", "맛짱조개", "01066772291", addressRes, openTime, closeTime, Set.of(DayOff.MON));
 
 		given(storeService.register(memberId, storeCreateReq))
 			.willThrow(new BusinessException(ErrorCode.INVALID_BUSINESS_TIME));

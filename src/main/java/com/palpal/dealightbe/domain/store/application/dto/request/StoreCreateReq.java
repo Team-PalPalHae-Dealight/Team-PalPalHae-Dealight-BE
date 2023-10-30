@@ -1,11 +1,13 @@
 package com.palpal.dealightbe.domain.store.application.dto.request;
 
 import java.time.LocalTime;
+import java.util.Set;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
+import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
 
 public record StoreCreateReq(
@@ -26,7 +28,7 @@ public record StoreCreateReq(
 	double yCoordinate,
 	LocalTime openTime,
 	LocalTime closeTime,
-	String dayOff
+	Set<DayOff> dayOff
 ) {
 
 	public static Store toStore(StoreCreateReq request) {

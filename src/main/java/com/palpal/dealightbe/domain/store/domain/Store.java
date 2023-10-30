@@ -1,8 +1,11 @@
 package com.palpal.dealightbe.domain.store.domain;
 
 import java.time.LocalTime;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -37,11 +40,11 @@ public class Store extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "member_id")
 	private Member member;
 
-	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "address_id")
 	private Address address;
 
@@ -60,10 +63,13 @@ public class Store extends BaseEntity {
 
 	private String image;
 
-	private String dayOff;
+	@ElementCollection(targetClass = DayOff.class)
+	@CollectionTable(name = "store_day_off", joinColumns = @JoinColumn(name = "store_id"))
+	@Enumerated(EnumType.STRING)
+	private Set<DayOff> dayOffs;
 
 	@Builder
-	public Store(Address address, String name, String storeNumber, String telephone, LocalTime openTime, LocalTime closeTime, String dayOff) {
+	public Store(Address address, String name, String storeNumber, String telephone, LocalTime openTime, LocalTime closeTime, Set<DayOff> dayOff) {
 		validateBusinessTimes(openTime, closeTime);
 		this.address = address;
 		this.name = name;
@@ -71,7 +77,7 @@ public class Store extends BaseEntity {
 		this.telephone = telephone;
 		this.openTime = openTime;
 		this.closeTime = closeTime;
-		this.dayOff = dayOff;
+		this.dayOffs = dayOff;
 	}
 
 	public void updateMember(Member member) {

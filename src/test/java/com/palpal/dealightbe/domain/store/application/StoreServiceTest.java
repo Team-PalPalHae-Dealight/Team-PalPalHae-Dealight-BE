@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalTime;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,6 +23,7 @@ import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
+import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
@@ -58,7 +60,7 @@ class StoreServiceTest {
 		// given
 		LocalTime openTime = LocalTime.of(9, 0);
 		LocalTime closeTime = LocalTime.of(23, 0);
-		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, "월요일");
+		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, Set.of(DayOff.MON));
 
 		when(memberRepository.findById(member.getId()))
 			.thenReturn(Optional.of(member));
@@ -79,7 +81,7 @@ class StoreServiceTest {
 		// given
 		LocalTime openTime = LocalTime.of(9, 0);
 		LocalTime closeTime = LocalTime.of(23, 0);
-		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, "월요일");
+		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, Set.of(DayOff.MON));
 
 		when(memberRepository.findById(member.getId()))
 			.thenReturn(Optional.empty());
@@ -96,7 +98,7 @@ class StoreServiceTest {
 		// given
 		LocalTime openTime = LocalTime.of(23, 0);
 		LocalTime closeTime = LocalTime.of(9, 0);
-		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, "월요일");
+		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, Set.of(DayOff.MON));
 
 		when(memberRepository.findById(member.getId()))
 			.thenReturn(Optional.of(member));
