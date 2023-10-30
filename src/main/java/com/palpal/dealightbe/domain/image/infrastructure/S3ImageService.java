@@ -62,7 +62,6 @@ public class S3ImageService implements ImageService {
 		try {
 			amazonS3.deleteObject(deleteObjectRequest);
 		} catch (SdkClientException exception) {
-			log.warn("INTERNAL_SERVER_ERROR : fileName => {}", fileName);
 			throw new ImageIOException(INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -84,7 +83,6 @@ public class S3ImageService implements ImageService {
 			amazonS3.putObject(
 				new PutObjectRequest(bucket, fileName, uploadFile).withCannedAcl(CannedAccessControlList.PublicRead));
 		} catch (SdkClientException e) {
-			log.warn("INTERNAL_SERVER_ERROR : fileName => {}", fileName);
 			throw new ImageIOException(INTERNAL_SERVER_ERROR);
 		}
 
@@ -95,7 +93,6 @@ public class S3ImageService implements ImageService {
 		boolean result = targetFile.delete();
 
 		if (!result) {
-			log.warn("INTERNAL_SERVER_ERROR : targetFile => {}", targetFile.getName());
 			throw new ImageIOException(INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -111,7 +108,6 @@ public class S3ImageService implements ImageService {
 			}
 			return convertFile;
 		} catch (IOException ioException) {
-			log.warn("INTERNAL_SERVER_ERROR : file => {}", file.getOriginalFilename());
 			throw new ImageIOException(INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -136,7 +132,7 @@ public class S3ImageService implements ImageService {
 
 	private void validateFile(MultipartFile file) {
 		if (file.isEmpty()) {
-			log.warn("EMPTY_IMAGE : file => {}", file.getOriginalFilename());
+			log.warn("EMPTY_IMAGE : {}", file.getOriginalFilename());
 			throw new InvalidValueException(EMPTY_IMAGE);
 		}
 
@@ -145,7 +141,7 @@ public class S3ImageService implements ImageService {
 			.anyMatch(extension -> extension.equalsIgnoreCase(inputExtension));
 
 		if (!isExtensionValid) {
-			log.warn("INVALID_IMAGE_FORMAT : file => {}", file.getOriginalFilename());
+			log.warn("INVALID_IMAGE_FORMAT : {}", file.getOriginalFilename());
 			throw new InvalidFileTypeException(INVALID_IMAGE_FORMAT);
 		}
 	}
