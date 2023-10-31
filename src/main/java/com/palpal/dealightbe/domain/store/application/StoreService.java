@@ -12,7 +12,6 @@ import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.ErrorCode;
-import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -58,18 +57,8 @@ public class StoreService {
 				throw new EntityNotFoundException(ErrorCode.NOT_FOUND_STORE);
 			});
 
-		isSameOwnerAndTheRequester(member, store);
+		store.isSameOwnerAndTheRequester(member, store);
 
 		return StoreInfoRes.from(store);
-	}
-
-	private void isSameOwnerAndTheRequester(Member member, Store store) {
-		Long ownerId = store.getMember().getProviderId();
-		Long requesterId = member.getProviderId();
-
-		if (!(ownerId == requesterId)) {
-			log.warn("GET:READ:NOT_MATCH_OWNER_AND_REQUESTER : ownerId => {} memberId => {}", ownerId, requesterId);
-			throw new BusinessException(ErrorCode.NOT_MATCH_OWNER_AND_REQUESTER);
-		}
 	}
 }
