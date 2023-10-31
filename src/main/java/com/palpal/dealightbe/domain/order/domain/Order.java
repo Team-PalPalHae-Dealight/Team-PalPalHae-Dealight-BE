@@ -82,7 +82,14 @@ public class Order extends BaseEntity {
 	}
 
 	private void validateArrivalTime(LocalTime arrivalTime) {
-		if (store.getCloseTime().isBefore(arrivalTime)) {
+		LocalTime storeCloseTime = store.getCloseTime();
+		LocalTime storeOpenTime = store.getOpenTime();
+
+		if (storeCloseTime.isBefore(storeOpenTime)) {
+			storeCloseTime = storeCloseTime.plusHours(24);
+		}
+
+		if (arrivalTime.isBefore(storeOpenTime) && arrivalTime.isAfter(storeCloseTime)) {
 			throw new BusinessException(INVALID_ARRIVAL_TIME);
 		}
 	}
