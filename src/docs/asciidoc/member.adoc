@@ -7,6 +7,8 @@
 
 == 멤버 프로필 조회 성공
 
+=== /api/members/profiles/{memberId} [GET]
+
 === Request
 
 include::{snippets}/member-get-profile/http-request.adoc[]
@@ -24,3 +26,28 @@ include::{snippets}/member-get-profile-not-found/http-request.adoc[]
 === Response
 
 include::{snippets}/member-get-profile-not-found/http-response.adoc[]
+
+== 멤버 프로필 수정 성공
+
+=== /api/members/profiles/{memberId} [PATCH]
+
+=== Request
+
+include::{snippets}/member-update-profile/http-request.adoc[]
+include::{snippets}/member-update-profile/request-fields.adoc[]
+
+=== Response
+
+include::{snippets}/member-update-profile/http-response.adoc[]
+include::{snippets}/member-update-profile/response-fields.adoc[]
+
+== 멤버 프로필 수정 실패: 멤버 ID가 존재하지 않는 경우
+
+=== Request
+
+include::{snippets}/member-update-profile-not-found/http-request.adoc[]
+include::{snippets}/member-update-profile-not-found/request-fields.adoc[]
+
+=== Response
+
+include::{snippets}/member-update-profile-not-found/http-response.adoc[]
