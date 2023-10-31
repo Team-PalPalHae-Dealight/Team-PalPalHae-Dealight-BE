@@ -54,7 +54,7 @@ class MemberControllerTest {
 		Long memberId = 1L;
 
 		AddressRes addressRes = new AddressRes("서울", 37.5665, 126.9780);
-		MemberProfileRes memberProfileInfo = new MemberProfileRes("유재석", "유산슬", "01012345678", "서울");
+		MemberProfileRes memberProfileInfo = new MemberProfileRes("유재석", "유산슬", "01012345678", addressRes);
 
 		given(memberService.getMemberProfile(memberId))
 			.willReturn(memberProfileInfo);
@@ -74,7 +74,9 @@ class MemberControllerTest {
 					fieldWithPath("realName").description("고객의 실명"),
 					fieldWithPath("nickName").description("고객의 닉네임"),
 					fieldWithPath("phoneNumber").description("고객의 전화번호"),
-					fieldWithPath("address.name").description("고객의 주소명")
+					fieldWithPath("address.name").description("고객의 주소명"),
+					fieldWithPath("address.xCoordinate").description("고객의 주소의 X 좌표"),
+					fieldWithPath("address.yCoordinate").description("고객의 주소의 Y 좌표")
 				)
 			));
 	}
