@@ -61,10 +61,11 @@ public class Item extends BaseEntity {
 		this.store = store;
 	}
 
-	public void deductQuantity(int quantity) {
-		if (stock < quantity) {
+	public void deductStock(int quantity) {
+		if (this.stock < quantity) {
 			throw new BusinessException(INVALID_ITEM_QUANTITY);
 		}
-		stock -= quantity;
+
+		this.stock -= quantity;
 	}
 }
