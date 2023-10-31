@@ -1,6 +1,8 @@
 package com.palpal.dealightbe.domain.item.application;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Collections;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +17,7 @@ import com.palpal.dealightbe.domain.item.application.dto.request.ItemReq;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
+import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
@@ -44,11 +47,11 @@ class ItemServiceTest {
 	void setUp() {
 		store = Store.builder()
 			.name("동네분식")
-			.storePhoneNumber("000-0000")
-			.telephone("0000-0000")
-			.openTime(LocalDateTime.now())
-			.closeTime(LocalDateTime.now().plusHours(6))
-			.dayOff("000")
+			.storeNumber("0000000")
+			.telephone("00000000")
+			.openTime(LocalTime.now())
+			.closeTime(LocalTime.now().plusHours(6))
+			.dayOff(Collections.singleton(DayOff.MON))
 			.build();
 
 		item = Item.builder()
@@ -115,6 +118,49 @@ class ItemServiceTest {
 		//then
 		assertThrows(BusinessException.class, () -> {
 			itemService.create(itemReq, memberId);
+		});
+	}
+
+	@DisplayName("상품 수정 성공 테스트")
+	@Test
+	void itemUpdateSuccessTest() {
+		//given
+		ItemReq itemReq = new ItemReq("수정이름", 1, 3000, 3500, "상세 내용 수정", "안내 사항 수정", null);
+		Long memberId = 1L;
+		Long itemId = 1L;
+
+		when(storeRepository.findByMemberId(any())).thenReturn(Optional.of(store));
+		when(itemRepository.existsByNameAndStoreId(any(), any())).thenReturn(false);
+		when(itemRepository.findById(any())).thenReturn(Optional.of(item));
+
+		//when
+		ItemRes itemRes = itemService.update(itemId, itemReq, memberId);
+
+		//then
+		assertThat(itemRes.name()).isEqualTo(itemReq.name());
+		assertThat(itemRes.stock()).isEqualTo(itemReq.stock());
+		assertThat(itemRes.discountPrice()).isEqualTo(itemReq.discountPrice());
+		assertThat(itemRes.originalPrice()).isEqualTo(itemReq.originalPrice());
+		assertThat(itemRes.description()).isEqualTo(itemReq.description());
+		assertThat(itemRes.information()).isEqualTo(itemReq.information());
+	}
+
+	@DisplayName("상품 수정 실패 테스트 - 할인가가 원가보다 큰 경우")
+	@Test
+	void itemUpdateFailureTest_invalidDiscountPrice() {
+		//given
+		ItemReq itemReq = new ItemReq("수정이름", 1, 4000, 3500, "상세 내용 수정", "안내 사항 수정", null);
+		Long memberId = 1L;
+		Long itemId = 1L;
+
+		when(storeRepository.findByMemberId(any())).thenReturn(Optional.of(store));
+		when(itemRepository.existsByNameAndStoreId(any(), any())).thenReturn(false);
+		when(itemRepository.findById(any())).thenReturn(Optional.of(item));
+
+		//when
+		//then
+		assertThrows(BusinessException.class, () -> {
+			itemService.update(itemId, itemReq, memberId);
 		});
 	}
 }
