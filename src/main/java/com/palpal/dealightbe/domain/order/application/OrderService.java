@@ -24,7 +24,9 @@ import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -37,9 +39,16 @@ public class OrderService {
 
 	public OrderRes create(OrderCreateReq orderCreateReq, Long memberProviderId) {
 		Member member = memberRepository.findMemberByProviderId(memberProviderId)
-			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_ID : {}", memberProviderId);
+				throw new EntityNotFoundException(NOT_FOUND_MEMBER);
+			});
+
 		Store store = storeRepository.findById(orderCreateReq.storeId())
-			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_STORE));
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_STORE_BY_ID : {}", orderCreateReq.storeId());
+				throw new EntityNotFoundException(NOT_FOUND_STORE);
+			});
 
 		Order order = OrderCreateReq.toOrder(orderCreateReq, member, store);
 		orderRepository.save(order);
@@ -58,7 +67,10 @@ public class OrderService {
 
 	private OrderItem createOrderItem(Order order, OrderProductReq productReq) {
 		Item item = itemRepository.findById(productReq.itemId())
-			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_ITEM));
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", productReq.itemId());
+				throw new EntityNotFoundException(NOT_FOUND_ITEM);
+			});
 		int quantity = productReq.quantity();
 
 		item.deductQuantity(quantity);
