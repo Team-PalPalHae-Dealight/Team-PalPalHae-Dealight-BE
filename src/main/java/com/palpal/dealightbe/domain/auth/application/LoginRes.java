@@ -10,7 +10,7 @@ public record LoginRes(
 	String accessToken,
 	String refreshToken
 ) {
-	public static LoginRes of(String accessToken, String refreshToken,
+	public static LoginRes from(String accessToken, String refreshToken,
 		OAuth2AuthenticationToken oAuth2AuthenticationToken) {
 		Long providerId = Long.parseLong(oAuth2AuthenticationToken.getPrincipal().getName());
 		Map<String, Object> attributes = oAuth2AuthenticationToken.getPrincipal().getAttributes();

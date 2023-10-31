@@ -10,7 +10,7 @@ public record JoinRequireRes(
 	String nickName,
 	String message
 ) {
-	public static JoinRequireRes of(OAuth2AuthenticationToken oAuth2AuthenticationToken) {
+	public static JoinRequireRes from(OAuth2AuthenticationToken oAuth2AuthenticationToken) {
 		String provider = oAuth2AuthenticationToken.getAuthorizedClientRegistrationId();
 		Long providerId = Long.parseLong(oAuth2AuthenticationToken.getPrincipal().getName());
 		Map<String, Object> attributes = oAuth2AuthenticationToken.getPrincipal().getAttributes();

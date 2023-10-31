@@ -35,7 +35,7 @@ public class CustomOAuth2AuthenticationSuccessHandler extends SavedRequestAwareA
 			LoginRes oAuth2Response = authService.login(oAuth2AuthenticationToken);
 			if (oAuth2Response == null) {
 				// 사용자 정보 조회에 실패하면 회원가입 페이지로 리다이렉트 하라는 메시지를 전달한다.
-				JoinRequireRes joinRequireResponse = JoinRequireRes.of(oAuth2AuthenticationToken);
+				JoinRequireRes joinRequireResponse = JoinRequireRes.from(oAuth2AuthenticationToken);
 				writeRequireRoleResponseToHttpMessage(response, joinRequireResponse);
 				return;
 			}
