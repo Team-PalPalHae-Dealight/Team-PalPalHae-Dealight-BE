@@ -65,12 +65,21 @@ class ItemControllerTest {
 
 	@BeforeEach
 	void setUp() {
+		LocalTime openTime = LocalTime.now();
+		LocalTime closeTime = openTime.plusHours(1);
+
+		if (closeTime.isBefore(openTime)) {
+			LocalTime tempTime = openTime;
+			openTime = closeTime;
+			closeTime = tempTime;
+		}
+
 		store = Store.builder()
 			.name("동네분식")
 			.storeNumber("0000000")
 			.telephone("00000000")
-			.openTime(LocalTime.now())
-			.closeTime(LocalTime.now().plusHours(6))
+			.openTime(openTime)
+			.closeTime(closeTime)
 			.dayOff(Collections.singleton(DayOff.MON))
 			.build();
 
