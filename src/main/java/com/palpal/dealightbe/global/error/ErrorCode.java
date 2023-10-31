@@ -38,6 +38,9 @@ public enum ErrorCode {
 	INVALID_ARRIVAL_TIME("OR002", "예상 도착 시간은 업체 마감 시간 이전이어야 합니다."),
 	INVALID_DEMAND_LENGTH("OR003", "요청 사항은 최대 100자까지 입력할 수 있습니다."),
 
+	//인증, 인가
+	ACCESS_DENIED("AUTH001", "사용자 인증에 실패했습니다."),
+
 	;
 	private final String code;
 	private final String message;
