@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palpal.dealightbe.domain.auth.application.AuthService;
-import com.palpal.dealightbe.domain.auth.application.JoinRequireResponse;
-import com.palpal.dealightbe.domain.auth.application.LoginResponse;
+import com.palpal.dealightbe.domain.auth.application.JoinRequireRes;
+import com.palpal.dealightbe.domain.auth.application.LoginRes;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,10 +32,10 @@ public class CustomOAuth2AuthenticationSuccessHandler extends SavedRequestAwareA
 		Authentication authentication) throws IOException, ServletException {
 		log.info("사용자({})가 소셜 로그인에 성공했습니다.", authentication.toString());
 		if (authentication instanceof OAuth2AuthenticationToken oAuth2AuthenticationToken) {
-			LoginResponse oAuth2Response = authService.login(oAuth2AuthenticationToken);
+			LoginRes oAuth2Response = authService.login(oAuth2AuthenticationToken);
 			if (oAuth2Response == null) {
 				// 사용자 정보 조회에 실패하면 회원가입 페이지로 리다이렉트 하라는 메시지를 전달한다.
-				JoinRequireResponse joinRequireResponse = JoinRequireResponse.of(oAuth2AuthenticationToken);
+				JoinRequireRes joinRequireResponse = JoinRequireRes.of(oAuth2AuthenticationToken);
 				writeRequireRoleResponseToHttpMessage(response, joinRequireResponse);
 				return;
 			}
@@ -47,7 +47,7 @@ public class CustomOAuth2AuthenticationSuccessHandler extends SavedRequestAwareA
 	}
 
 	private void writeLoginSuccessResponseToHttpMessage(HttpServletResponse response,
-		LoginResponse oAuth2Response) throws IOException {
+		LoginRes oAuth2Response) throws IOException {
 		String responseValue = new ObjectMapper().writeValueAsString(oAuth2Response);
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.setContentType("application/json;charset=UTF-8");
@@ -56,7 +56,7 @@ public class CustomOAuth2AuthenticationSuccessHandler extends SavedRequestAwareA
 	}
 
 	private void writeRequireRoleResponseToHttpMessage(HttpServletResponse response,
-		JoinRequireResponse joinRequireResponse) throws IOException {
+		JoinRequireRes joinRequireResponse) throws IOException {
 		String responseValue = new ObjectMapper().writeValueAsString(joinRequireResponse);
 		response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 		response.setContentType("application/json;charset=UTF-8");

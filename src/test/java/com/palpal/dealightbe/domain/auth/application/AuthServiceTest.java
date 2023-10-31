@@ -76,7 +76,7 @@ class AuthServiceTest {
 			.thenReturn(mockRefreshToken);
 
 		// when
-		LoginResponse loginResponse = authService.login(mockOAuth2AuthenticationToken);
+		LoginRes loginResponse = authService.login(mockOAuth2AuthenticationToken);
 
 		// then
 		assertThat(loginResponse.providerId()).isEqualTo(mockProviderId);
@@ -92,7 +92,7 @@ class AuthServiceTest {
 			.thenReturn(Optional.empty());
 
 		// when
-		LoginResponse loginResponse = authService.login(mockOAuth2AuthenticationToken);
+		LoginRes loginResponse = authService.login(mockOAuth2AuthenticationToken);
 
 		// then
 		assertThatThrownBy(() -> loginResponse.providerId())
