@@ -1,6 +1,5 @@
 package com.palpal.dealightbe.domain.member.domain;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
