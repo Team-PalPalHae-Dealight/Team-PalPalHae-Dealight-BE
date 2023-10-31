@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Deprecated
 class OrderTest {
+
 	Address address;
 	Member member;
 	Store store;

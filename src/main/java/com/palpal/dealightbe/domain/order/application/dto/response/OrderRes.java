@@ -6,7 +6,6 @@ import java.time.LocalTime;
 import com.palpal.dealightbe.domain.order.domain.Order;
 
 public record OrderRes(
-
 	Long orderId,
 	Long storeId,
 	Long memberId,
