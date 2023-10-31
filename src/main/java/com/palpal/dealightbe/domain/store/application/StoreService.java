@@ -51,7 +51,7 @@ public class StoreService {
 		return StoreInfoRes.from(store);
 	}
 
-	public StoreInfoRes update(Long memberId, Long storeId, StoreUpdateReq request) {
+	public StoreInfoRes updateInfo(Long memberId, Long storeId, StoreUpdateReq request) {
 		Store store = validateMemberAndStoreOwner(memberId, storeId);
 
 		Store updateStore = StoreUpdateReq.toStore(request);

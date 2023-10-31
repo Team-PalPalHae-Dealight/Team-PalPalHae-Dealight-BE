@@ -216,7 +216,7 @@ class StoreServiceTest {
 			.thenReturn(Optional.of(store));
 
 		//when
-		StoreInfoRes storeUpdatedInfoRes = storeService.update(member.getId(), store.getId(), updateReq);
+		StoreInfoRes storeUpdatedInfoRes = storeService.updateInfo(member.getId(), store.getId(), updateReq);
 
 		//then
 		assertThat(storeUpdatedInfoRes.telephone()).isEqualTo(updateReq.telephone());
