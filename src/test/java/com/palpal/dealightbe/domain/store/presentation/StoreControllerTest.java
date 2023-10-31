@@ -23,6 +23,7 @@ import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -43,7 +44,8 @@ import com.palpal.dealightbe.domain.store.domain.StoreStatus;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 
-@WebMvcTest(value = StoreController.class, excludeAutoConfiguration = SecurityAutoConfiguration.class)
+@WebMvcTest(value = StoreController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class,
+	OAuth2ClientAutoConfiguration.class})
 @AutoConfigureRestDocs
 class StoreControllerTest {
 
@@ -65,9 +67,11 @@ class StoreControllerTest {
 		LocalTime openTime = LocalTime.of(9, 0);
 		LocalTime closeTime = LocalTime.of(23, 0);
 
-		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, Set.of(DayOff.MON));
+		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89,
+			293.2323, openTime, closeTime, Set.of(DayOff.MON));
 		AddressRes addressRes = new AddressRes("서울시 강남구", 67.89, 293.2323);
-		StoreCreateRes storeCreateRes = new StoreCreateRes("888-222-111", "맛짱조개", "01066772291", addressRes, openTime, closeTime, Set.of(DayOff.MON));
+		StoreCreateRes storeCreateRes = new StoreCreateRes("888-222-111", "맛짱조개", "01066772291", addressRes, openTime,
+			closeTime, Set.of(DayOff.MON));
 
 		given(storeService.register(memberId, storeCreateReq))
 			.willReturn(storeCreateRes);
@@ -122,7 +126,8 @@ class StoreControllerTest {
 		LocalTime openTime = LocalTime.of(23, 0);
 		LocalTime closeTime = LocalTime.of(9, 0);
 
-		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, Set.of(DayOff.MON));
+		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89,
+			293.2323, openTime, closeTime, Set.of(DayOff.MON));
 
 		given(storeService.register(memberId, storeCreateReq))
 			.willThrow(new BusinessException(ErrorCode.INVALID_BUSINESS_TIME));
@@ -171,14 +176,16 @@ class StoreControllerTest {
 		Long storeId = 1L;
 		LocalTime openTime = LocalTime.of(9, 0);
 		LocalTime closeTime = LocalTime.of(23, 0);
-		StoreInfoRes storeInfoRes = new StoreInfoRes("123123213", "피나치공", "02123456", "서울시 강남구", openTime, closeTime, Set.of(DayOff.MON, DayOff.TUE), StoreStatus.OPENED, null);
+		StoreInfoRes storeInfoRes = new StoreInfoRes("123123213", "피나치공", "02123456", "서울시 강남구", openTime, closeTime,
+			Set.of(DayOff.MON, DayOff.TUE), StoreStatus.OPENED, null);
 
 		given(storeService.getInfo(memberId, storeId))
 			.willReturn(storeInfoRes);
 
 		//when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/stores/profiles/{memberId}/{storeId}", memberId, storeId)
-				.contentType(APPLICATION_JSON))
+		mockMvc.perform(
+				RestDocumentationRequestBuilders.get("/api/stores/profiles/{memberId}/{storeId}", memberId, storeId)
+					.contentType(APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andDo(print())
 			.andDo(document("store-get-info",
@@ -213,8 +220,9 @@ class StoreControllerTest {
 			.willThrow(new BusinessException(ErrorCode.NOT_MATCH_OWNER_AND_REQUESTER));
 
 		//when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/stores/profiles/{memberId}/{storeId}", invalidMemberId, storeId)
-				.contentType(APPLICATION_JSON))
+		mockMvc.perform(
+				RestDocumentationRequestBuilders.get("/api/stores/profiles/{memberId}/{storeId}", invalidMemberId, storeId)
+					.contentType(APPLICATION_JSON))
 			.andExpect(status().isBadRequest())
 			.andDo(print())
 			.andDo(document("store-get-info-fail-not-match-owner-and-requester",
@@ -243,16 +251,19 @@ class StoreControllerTest {
 		LocalTime openTime = LocalTime.of(19, 0);
 		LocalTime closeTime = LocalTime.of(22, 0);
 
-		StoreUpdateReq updateReq = new StoreUpdateReq("888222111", "부산시", 777.777, 123.123234, openTime, closeTime, Set.of(DayOff.TUE));
-		StoreInfoRes storeInfoRes = new StoreInfoRes("888222111", "맛짱조개", "01066772291", "부산시", openTime, closeTime, Set.of(DayOff.MON), StoreStatus.OPENED, null);
+		StoreUpdateReq updateReq = new StoreUpdateReq("888222111", "부산시", 777.777, 123.123234, openTime, closeTime,
+			Set.of(DayOff.TUE));
+		StoreInfoRes storeInfoRes = new StoreInfoRes("888222111", "맛짱조개", "01066772291", "부산시", openTime, closeTime,
+			Set.of(DayOff.MON), StoreStatus.OPENED, null);
 
 		given(storeService.updateInfo(memberId, storeId, updateReq))
 			.willReturn(storeInfoRes);
 
 		//when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/stores/profiles/{memberId}/{storeId}", memberId, storeId)
-				.contentType(APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(updateReq)))
+		mockMvc.perform(
+				RestDocumentationRequestBuilders.patch("/api/stores/profiles/{memberId}/{storeId}", memberId, storeId)
+					.contentType(APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(updateReq)))
 			.andExpect(status().isOk())
 			.andDo(print())
 			.andDo(document("store-update-info",
