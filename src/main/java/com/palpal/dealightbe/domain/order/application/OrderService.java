@@ -73,7 +73,7 @@ public class OrderService {
 			});
 		int quantity = productReq.quantity();
 
-		item.deductQuantity(quantity);
+		item.deductStock(quantity);
 
 		return OrderItem.builder()
 			.item(item)
