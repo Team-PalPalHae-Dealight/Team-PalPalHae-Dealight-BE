@@ -57,7 +57,12 @@ public class Member extends BaseEntity {
 		this.phoneNumber = phoneNumber;
 	}
 
-	public void setAddress(Address address) {
+	public void updateAddress(Address address) {
 		this.address = address;
+	}
+
+	public void updateInfo(String nickName, String phoneNumber) {
+		this.nickName = nickName;
+		this.phoneNumber = phoneNumber;
 	}
 }
