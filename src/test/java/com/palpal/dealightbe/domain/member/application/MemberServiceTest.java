@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.palpal.dealightbe.domain.address.application.dto.request.AddressReq;
+import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
 import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.member.application.dto.request.MemberUpdateReq;
 import com.palpal.dealightbe.domain.member.application.dto.response.MemberProfileRes;
@@ -124,5 +125,52 @@ class MemberServiceTest {
 		// when & then
 		assertThrows(EntityNotFoundException.class,
 			() -> memberService.updateMemberProfile(nonexistentMemberId, request));
+	}
+
+	@Test
+	@DisplayName("멤버 프로필 주소 수정 성공 테스트")
+	void updateMemberProfileAddressSuccessTest() {
+		//given
+		Long memberId = 1L;
+
+		Address mockAddress = Address.builder()
+			.name("서울")
+			.xCoordinate(37.5665)
+			.yCoordinate(126.9780)
+			.build();
+
+		Member mockMember = Member.builder()
+			.realName("유재석")
+			.nickName("유산슬")
+			.phoneNumber("01012345678")
+			.build();
+
+		mockMember.updateAddress(mockAddress);
+
+		AddressReq newAddress = new AddressReq("부산", 35.1796, 129.0756);
+
+		given(memberRepository.findById(memberId)).willReturn(Optional.of(mockMember));
+
+		//when
+		AddressRes updatedAddressRes = memberService.updateMemberAddress(memberId, newAddress);
+
+		//then
+		assertEquals("부산", updatedAddressRes.name());
+		assertEquals(35.1796, updatedAddressRes.xCoordinate());
+		assertEquals(129.0756, updatedAddressRes.yCoordinate());
+	}
+
+	@Test
+	@DisplayName("멤버 프로필 주소 수정 실패 테스트: 멤버 ID가 존재하지 않는 경우")
+	void updateMemberProfileAddressNotFoundTest() {
+		//given
+		Long nonexistentMemberId = 999L;
+		AddressReq newAddress = new AddressReq("부산", 35.1796, 129.0756);
+
+		given(memberRepository.findById(nonexistentMemberId)).willReturn(Optional.empty());
+
+		//when & then
+		assertThrows(EntityNotFoundException.class,
+			() -> memberService.updateMemberAddress(nonexistentMemberId, newAddress));
 	}
 }
