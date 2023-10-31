@@ -1,6 +1,7 @@
 package com.palpal.dealightbe.domain.member.application;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.palpal.dealightbe.domain.member.application.dto.response.MemberProfileRes;
 import com.palpal.dealightbe.domain.member.domain.Member;

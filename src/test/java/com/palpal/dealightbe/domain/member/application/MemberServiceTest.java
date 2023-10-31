@@ -45,7 +45,7 @@ class MemberServiceTest {
 			.phoneNumber("01012345678")
 			.build();
 
-		mockMember.setAddress(mockAddress);
+		mockMember.updateAddress(mockAddress);
 
 		given(memberRepository.findById(memberId)).willReturn(Optional.of(mockMember));
 
