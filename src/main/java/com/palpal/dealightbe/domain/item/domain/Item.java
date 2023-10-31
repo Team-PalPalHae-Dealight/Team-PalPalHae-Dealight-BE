@@ -69,6 +69,18 @@ public class Item extends BaseEntity {
 		this.store = store;
 	}
 
+	public void update(Item item) {
+		validateDiscountPrice(item.getDiscountPrice(), item.getOriginalPrice());
+
+		this.name = item.getName();
+		this.stock = item.getStock();
+		this.discountPrice = item.getDiscountPrice();
+		this.originalPrice = item.getOriginalPrice();
+		this.description = item.getDescription();
+		this.information = item.getInformation();
+		this.image = item.getImage();
+	}
+
 	private void validateDiscountPrice(int discountPrice, int originalPrice) {
 		if (discountPrice > originalPrice) {
 			log.warn("INVALID_ITEM_DISCOUNT_PRICE : discount price = {}, original price = {}", discountPrice, originalPrice);

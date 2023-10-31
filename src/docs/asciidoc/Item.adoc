@@ -37,7 +37,6 @@ include::{snippets}/item-create-fail-invalid-name/request-parameters.adoc[]
 include::{snippets}/item-create-fail-invalid-name/request-fields.adoc[]
 
 .Response Fail - 입력되지 않은 상품 이름
-
 include::{snippets}/item-create-fail-invalid-name/http-response.adoc[]
 
 include::{snippets}/item-create-fail-invalid-name/response-fields.adoc[]
@@ -53,3 +52,50 @@ include::{snippets}/item-create-fail-invalid-discount-price/request-fields.adoc[
 include::{snippets}/item-create-fail-invalid-discount-price/http-response.adoc[]
 
 include::{snippets}/item-create-fail-invalid-discount-price/response-fields.adoc[]
+
+
+=== 업체 수정
+
+==== /api/items/{id}?memberId={memberId}
+
+.Request - 성공
+include::{snippets}/item-update/http-request.adoc[]
+
+include::{snippets}/item-update/path-parameters.adoc[]
+
+include::{snippets}/item-update/request-parameters.adoc[]
+
+include::{snippets}/item-update/request-fields.adoc[]
+
+.Response
+include::{snippets}/item-update/http-response.adoc[]
+
+include::{snippets}/item-update/response-fields.adoc[]
+
+.Request Fail - 입력되지 않은 상품 이름
+include::{snippets}/item-update-fail-invalid-name/http-request.adoc[]
+
+include::{snippets}/item-update-fail-invalid-name/path-parameters.adoc[]
+
+include::{snippets}/item-update-fail-invalid-name/request-parameters.adoc[]
+
+include::{snippets}/item-update-fail-invalid-name/request-fields.adoc[]
+
+.Response Fail - 입력되지 않은 상품 이름
+include::{snippets}/item-update-fail-invalid-name/http-response.adoc[]
+
+include::{snippets}/item-update-fail-invalid-name/response-fields.adoc[]
+
+.Request Fail - 할인가가 원가보다 큰 경우
+include::{snippets}/item-update-fail-invalid-discount-price/http-request.adoc[]
+
+include::{snippets}/item-update-fail-invalid-discount-price/path-parameters.adoc[]
+
+include::{snippets}/item-update-fail-invalid-discount-price/request-parameters.adoc[]
+
+include::{snippets}/item-update-fail-invalid-discount-price/request-fields.adoc[]
+
+.Response Fail - 할인가가 원가보다 큰 경우
+include::{snippets}/item-update-fail-invalid-discount-price/http-response.adoc[]
+
+include::{snippets}/item-update-fail-invalid-discount-price/response-fields.adoc[]
