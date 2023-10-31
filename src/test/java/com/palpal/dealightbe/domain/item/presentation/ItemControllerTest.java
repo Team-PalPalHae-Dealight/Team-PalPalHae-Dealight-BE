@@ -493,6 +493,7 @@ class ItemControllerTest {
 			.andDo(document("item-update-fail-duplicated-item-name",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
+				pathParameters(parameterWithName("id").description("상품 ID")),
 				requestParameters(parameterWithName("memberId").description("고객 ID")),
 				requestFields(
 					fieldWithPath("name").description("상품 이름"),
