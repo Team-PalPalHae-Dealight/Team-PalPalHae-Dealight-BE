@@ -20,7 +20,8 @@ public enum ErrorCode {
 	INVALID_BUSINESS_TIME("ST001", "마감 시간은 오픈 시간보다 이전일 수 없습니다"),
 	NOT_FOUND_DAY_OFF("ST002", "존재하지 않는 휴무일 입니다."),
 	NOT_FOUND_STORE("ST003", "업체가 존재하지 않습니다."),
-
+	NOT_MATCH_OWNER_AND_REQUESTER("ST004", "업체 소유자와 요청자가 일치하지 않습니다."),
+  
 	//상품
 	INVALID_ITEM_DISCOUNT_PRICE("I001", "상품 할인가는 원가보다 클 수 없습니다."),
 	NOT_FOUND_ITEM("I002", "상품이 존재하지 않습니다."),
