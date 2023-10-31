@@ -60,4 +60,8 @@ public class Member extends BaseEntity {
 		this.providerId = providerId;
 		this.memberRoles = memberRoles;
 	}
+
+	public void updateAddress(Address address) {
+		this.address = address;
+	}
 }
