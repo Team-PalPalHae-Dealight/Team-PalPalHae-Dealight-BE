@@ -27,6 +27,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -45,7 +47,8 @@ import com.palpal.dealightbe.domain.order.application.dto.response.OrderProducts
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderRes;
 
 @AutoConfigureRestDocs
-@WebMvcTest(value = {OrderController.class})
+@WebMvcTest(value = {OrderController.class}, excludeAutoConfiguration = {SecurityAutoConfiguration.class,
+	OAuth2ClientAutoConfiguration.class})
 class OrderControllerTest {
 
 	@Autowired
