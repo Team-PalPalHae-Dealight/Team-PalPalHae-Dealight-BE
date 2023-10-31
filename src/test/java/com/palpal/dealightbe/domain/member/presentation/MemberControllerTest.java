@@ -7,6 +7,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
@@ -23,9 +24,12 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.palpal.dealightbe.domain.address.application.dto.request.AddressReq;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
 import com.palpal.dealightbe.domain.member.application.MemberService;
+import com.palpal.dealightbe.domain.member.application.dto.request.MemberUpdateReq;
 import com.palpal.dealightbe.domain.member.application.dto.response.MemberProfileRes;
+import com.palpal.dealightbe.domain.member.application.dto.response.MemberUpdateRes;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
@@ -50,7 +54,7 @@ class MemberControllerTest {
 		Long memberId = 1L;
 
 		AddressRes addressRes = new AddressRes("서울", 37.5665, 126.9780);
-		MemberProfileRes memberProfileInfo = new MemberProfileRes("유재석", "유산슬", "01012345678", addressRes);
+		MemberProfileRes memberProfileInfo = new MemberProfileRes("유재석", "유산슬", "01012345678", "서울");
 
 		given(memberService.getMemberProfile(memberId))
 			.willReturn(memberProfileInfo);
@@ -70,9 +74,7 @@ class MemberControllerTest {
 					fieldWithPath("realName").description("고객의 실명"),
 					fieldWithPath("nickName").description("고객의 닉네임"),
 					fieldWithPath("phoneNumber").description("고객의 전화번호"),
-					fieldWithPath("address.name").description("고객의 주소명"),
-					fieldWithPath("address.xCoordinate").description("고객의 주소의 X 좌표"),
-					fieldWithPath("address.yCoordinate").description("고객의 주소의 Y 좌표")
+					fieldWithPath("address.name").description("고객의 주소명")
 				)
 			));
 	}
