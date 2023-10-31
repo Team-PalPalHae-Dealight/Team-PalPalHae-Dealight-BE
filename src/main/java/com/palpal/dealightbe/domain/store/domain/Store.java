@@ -84,8 +84,12 @@ public class Store extends BaseEntity {
 		this.member = member;
 	}
 
-	public void updateAddress(Address address) {
-		this.address = address;
+	public void updateInfo(Store store) {
+		this.telephone = store.getTelephone();
+		this.address = store.getAddress();
+		this.openTime = store.getOpenTime();
+		this.closeTime = store.getCloseTime();
+		this.dayOffs = store.getDayOffs();
 	}
 
 	public void updateImage(String image) {
