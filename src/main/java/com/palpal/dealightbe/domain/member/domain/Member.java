@@ -52,7 +52,7 @@ public class Member extends BaseEntity {
 
 	@Builder
 	public Member(String realName, String nickName, String phoneNumber, String provider, Long providerId,
-				  List<MemberRole> memberRoles) {
+		List<MemberRole> memberRoles) {
 		this.realName = realName;
 		this.nickName = nickName;
 		this.phoneNumber = phoneNumber;
