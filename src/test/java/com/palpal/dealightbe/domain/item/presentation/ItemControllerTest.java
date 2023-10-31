@@ -27,6 +27,8 @@ import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 
+import static com.palpal.dealightbe.global.error.ErrorCode.ALREADY_REGISTERED_ITEM_NAME;
+import static com.palpal.dealightbe.global.error.ErrorCode.STORE_HAS_NOT_ITEM;
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -401,6 +403,64 @@ class ItemControllerTest {
 					fieldWithPath("information").description("안내 사항"),
 					fieldWithPath("image").description("상품 이미지")
 				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("예외 코드"),
+					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@DisplayName("상품 삭제 성공 테스트")
+	@Test
+	public void itemDeleteSuccessTest() throws Exception {
+		//given
+		Long itemId = 1L;
+		Long memberId = 1L;
+
+		doNothing().when(itemService).delete(any(), any());
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/items/{id}", itemId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.param("memberId", memberId.toString()))
+			.andExpect(status().isOk())
+			.andDo(print())
+			.andDo(document("item-delete",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(parameterWithName("id").description("상품 ID")),
+				requestParameters(parameterWithName("memberId").description("고객 ID"))
+			));
+	}
+
+	@DisplayName("상품 삭제 실패 테스트 - 요청된 상품이 해당 업체에 등록되지 않은 상품인 경우")
+	@Test
+	public void itemDeleteFailureTest_storeHasNotItem() throws Exception {
+		//given
+		Long itemId = 1L;
+		Long memberId = 1L;
+
+		doThrow(new BusinessException(STORE_HAS_NOT_ITEM)).when(
+			itemService).delete(any(), any());
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/items/{id}", itemId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.param("memberId", memberId.toString()))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("I005"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("요청하신 상품은 해당 업체에 등록되지 않은 상품입니다."))
+			.andDo(print())
+			.andDo(document("item-delete-store-has-not-item",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(parameterWithName("id").description("상품 ID")),
+				requestParameters(parameterWithName("memberId").description("고객 ID")),
 				responseFields(
 					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
 					fieldWithPath("code").type(STRING).description("예외 코드"),
