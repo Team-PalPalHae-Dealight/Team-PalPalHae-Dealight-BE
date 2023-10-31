@@ -49,7 +49,8 @@ public class Jwt {
 		log.debug("Jwt 객체 생성에 성공했습니다.");
 	}
 
-	public String createAccessToken(Long providerId, Member member) {
+	public String createAccessToken(Member member) {
+		Long providerId = member.getProviderId();
 		String subject = String.valueOf(providerId);
 		log.info("AccessToken을 생성하는 유저({})", providerId);
 
@@ -62,6 +63,7 @@ public class Jwt {
 			.map(memberRole -> {
 				Role role = memberRole.getRole();
 				RoleType type = role.getType();
+
 				return type.name();
 			})
 			.collect(Collectors.joining(","));
@@ -77,7 +79,8 @@ public class Jwt {
 			.compact();
 	}
 
-	public String createRefreshToken(Long providerId, Member member) {
+	public String createRefreshToken(Member member) {
+		Long providerId = member.getProviderId();
 		String subject = String.valueOf(providerId);
 		log.info("RefreshToken을 생성하는 유저({})", providerId);
 
@@ -90,6 +93,7 @@ public class Jwt {
 			.map(memberRole -> {
 				Role role = memberRole.getRole();
 				RoleType type = role.getType();
+
 				return type.name();
 			})
 			.collect(Collectors.joining(","));
