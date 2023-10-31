@@ -15,6 +15,8 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestF
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,12 +34,15 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.palpal.dealightbe.config.SecurityConfig;
 import com.palpal.dealightbe.domain.order.application.OrderService;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderCreateReq;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderProductReq;
@@ -47,9 +52,11 @@ import com.palpal.dealightbe.domain.order.application.dto.response.OrderProducts
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderRes;
 
 @AutoConfigureRestDocs
-@WebMvcTest(value = {OrderController.class}, excludeAutoConfiguration = {SecurityAutoConfiguration.class,
-	OAuth2ClientAutoConfiguration.class})
-class OrderControllerTest {
+@WebMvcTest(value = OrderController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class,
+	OAuth2ClientAutoConfiguration.class}, excludeFilters = {
+	@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class)}
+)
+public class OrderControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -106,6 +113,8 @@ class OrderControllerTest {
 			// then
 			mockMvc.perform(
 					post(createApiPath + "/{memberProviderId}", 1)
+						.with(csrf())
+						.with(user("username").roles("MEMBER"))
 						.content(objectMapper.writeValueAsString(orderCreateReq))
 						.contentType(MediaType.APPLICATION_JSON)
 				)
@@ -193,6 +202,8 @@ class OrderControllerTest {
 			// then
 			mockMvc.perform(
 					post(createApiPath + "/{memberProviderId}", 1)
+						.with(csrf())
+						.with(user("username").roles("MEMBER"))
 						.content(objectMapper.writeValueAsString(orderCreateReq))
 						.contentType(MediaType.APPLICATION_JSON)
 				)
@@ -222,6 +233,8 @@ class OrderControllerTest {
 			// then
 			mockMvc.perform(
 					post(createApiPath + "/{memberProviderId}", 1)
+						.with(csrf())
+						.with(user("username").roles("MEMBER"))
 						.content(objectMapper.writeValueAsString(orderCreateReq))
 						.contentType(MediaType.APPLICATION_JSON)
 				)
@@ -251,6 +264,8 @@ class OrderControllerTest {
 			// then
 			mockMvc.perform(
 					post(createApiPath + "/{memberProviderId}", 1)
+						.with(csrf())
+						.with(user("username").roles("MEMBER"))
 						.content(objectMapper.writeValueAsString(orderCreateReq))
 						.contentType(MediaType.APPLICATION_JSON)
 				)
