@@ -163,4 +163,15 @@ class ItemServiceTest {
 			itemService.update(itemId, itemReq, memberId);
 		});
 	}
+
+	@DisplayName("상품 삭제 성공 테스트")
+	@Test
+	void itemDeleteSuccessTest() {
+		//given
+		//when
+		assertDoesNotThrow(() -> itemRepository.delete(item));
+
+		//then
+		verify(itemRepository, times(1)).delete(item);
+	}
 }
