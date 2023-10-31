@@ -34,6 +34,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
 import com.palpal.dealightbe.domain.store.application.StoreService;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
+import com.palpal.dealightbe.domain.store.application.dto.request.StoreUpdateReq;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
@@ -227,6 +228,49 @@ class StoreControllerTest {
 					fieldWithPath("code").type(STRING).description("오류 코드"),
 					fieldWithPath("errors").type(ARRAY).description("오류 목록"),
 					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("업체 마이페이지 정보 수정 성공")
+	void updateInfoSuccessTest() throws Exception {
+
+		//given
+		Long memberId = 1L;
+		Long storeId = 1L;
+		LocalTime openTime = LocalTime.of(19, 0);
+		LocalTime closeTime = LocalTime.of(22, 0);
+
+		StoreUpdateReq updateReq = new StoreUpdateReq("888222111", "부산시", 777.777, 123.123234, openTime, closeTime, Set.of(DayOff.TUE));
+		StoreInfoRes storeInfoRes = new StoreInfoRes("888222111", "맛짱조개", "01066772291", "부산시", openTime, closeTime, Set.of(DayOff.MON), StoreStatus.OPENED, null);
+
+		given(storeService.updateInfo(memberId, storeId, updateReq))
+			.willReturn(storeInfoRes);
+
+		//when -> then
+		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/stores/profiles/{memberId}/{storeId}", memberId, storeId)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(updateReq)))
+			.andExpect(status().isOk())
+			.andDo(print())
+			.andDo(document("store-update-info",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("memberId").description("고객 ID"),
+					parameterWithName("storeId").description("업체 ID")
+				),
+				responseFields(
+					fieldWithPath("storeNumber").description("사업자 등록 번호"),
+					fieldWithPath("name").description("상호명"),
+					fieldWithPath("telephone").description("업체 전화번호"),
+					fieldWithPath("addressName").description("업체 주소"),
+					fieldWithPath("openTime").description("오픈 시간"),
+					fieldWithPath("closeTime").description("마감 시간"),
+					fieldWithPath("dayOff").description("휴무일"),
+					fieldWithPath("storeStatus").description("영업 유무"),
+					fieldWithPath("image").description("이미지 주소")
 				)
 			));
 	}
