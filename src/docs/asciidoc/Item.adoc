@@ -24,7 +24,7 @@ include::{snippets}/item-create/request-parameters.adoc[]
 
 include::{snippets}/item-create/request-fields.adoc[]
 
-.Response
+.Response - 성공
 include::{snippets}/item-create/http-response.adoc[]
 
 include::{snippets}/item-create/response-fields.adoc[]
@@ -67,7 +67,7 @@ include::{snippets}/item-update/request-parameters.adoc[]
 
 include::{snippets}/item-update/request-fields.adoc[]
 
-.Response
+.Response - 성공
 include::{snippets}/item-update/http-response.adoc[]
 
 include::{snippets}/item-update/response-fields.adoc[]
@@ -99,3 +99,32 @@ include::{snippets}/item-update-fail-invalid-discount-price/request-fields.adoc[
 include::{snippets}/item-update-fail-invalid-discount-price/http-response.adoc[]
 
 include::{snippets}/item-update-fail-invalid-discount-price/response-fields.adoc[]
+
+
+=== 업체 삭제
+
+==== /api/items/{id}?memberId={memberId}
+
+.Request - 성공
+include::{snippets}/item-delete/http-request.adoc[]
+
+include::{snippets}/item-delete/path-parameters.adoc[]
+
+include::{snippets}/item-delete/request-parameters.adoc[]
+
+include::{snippets}/item-delete/request-fields.adoc[]
+
+.Response - 성공
+include::{snippets}/item-delete/http-response.adoc[]
+
+.Request Fail - 요청된 상품이 해당 업체에 등록되지 않은 상품인 경우
+include::{snippets}/item-delete-store-has-not-item/http-request.adoc[]
+
+include::{snippets}/item-delete-store-has-not-item/path-parameters.adoc[]
+
+include::{snippets}/item-delete-store-has-not-item/request-parameters.adoc[]
+
+.Response Fail - 요청된 상품이 해당 업체에 등록되지 않은 상품인 경우
+include::{snippets}/item-delete-store-has-not-item/http-response.adoc[]
+
+include::{snippets}/item-delete-store-has-not-item/response-fields.adoc[]
