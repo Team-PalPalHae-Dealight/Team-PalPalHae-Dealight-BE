@@ -1,5 +1,6 @@
 package com.palpal.dealightbe.domain.item.domain;
 
+import javax.persistence.Column;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_QUANTITY;
 
 import javax.persistence.Entity;
@@ -19,7 +20,11 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+import static com.palpal.dealightbe.global.error.ErrorCode.*;
+
+@Slf4j
 @Getter
 @Entity
 @Table(name = "items")
@@ -30,6 +35,7 @@ public class Item extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(length = 50, nullable = false)
 	private String name;
 
 	private int stock;
@@ -38,8 +44,10 @@ public class Item extends BaseEntity {
 
 	private int originalPrice;
 
+	@Column(length = 300)
 	private String description;
 
+	@Column(length = 300)
 	private String information;
 
 	private String image;
@@ -50,7 +58,9 @@ public class Item extends BaseEntity {
 
 	@Builder
 	public Item(String name, int stock, int discountPrice, int originalPrice, String description, String information,
-		String image, Store store) {
+				String image, Store store) {
+		validateDiscountPrice(discountPrice, originalPrice);
+
 		this.name = name;
 		this.stock = stock;
 		this.discountPrice = discountPrice;
@@ -67,5 +77,24 @@ public class Item extends BaseEntity {
 		}
 
 		this.stock -= quantity;
+	}
+
+	public void update(Item item) {
+		validateDiscountPrice(item.getDiscountPrice(), item.getOriginalPrice());
+
+		this.name = item.getName();
+		this.stock = item.getStock();
+		this.discountPrice = item.getDiscountPrice();
+		this.originalPrice = item.getOriginalPrice();
+		this.description = item.getDescription();
+		this.information = item.getInformation();
+		this.image = item.getImage();
+	}
+
+	private void validateDiscountPrice(int discountPrice, int originalPrice) {
+		if (discountPrice > originalPrice) {
+			log.warn("INVALID_ITEM_DISCOUNT_PRICE : discount price = {}, original price = {}", discountPrice, originalPrice);
+			throw new BusinessException(INVALID_ITEM_DISCOUNT_PRICE);
+		}
 	}
 }

@@ -1,0 +1,81 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+
+= REST Docs 업체 API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+[[User-API]]
+== Store API
+
+=== 업체 등록
+
+==== /api/stores/{memberId}
+
+.Request
+include::{snippets}/store/store-register/http-request.adoc[]
+
+include::{snippets}/store/store-register/path-parameters.adoc[]
+
+
+include::{snippets}/store/store-register/request-fields.adoc[]
+
+.Response
+include::{snippets}/store/store-register/http-response.adoc[]
+
+include::{snippets}/store/store-register/response-fields.adoc[]
+
+.Request Fail - 잘못된 영업 시간
+include::{snippets}/store/store-register-fail-invalid-business-time/http-response.adoc[]
+
+include::{snippets}/store/store-register-fail-invalid-business-time/path-parameters.adoc[]
+
+include::{snippets}/store/store-register-fail-invalid-business-time/response-fields.adoc[]
+
+=== 업체 마이 페이지 조회
+
+==== /api/stores/profiles/{memberId}/{storeId}
+
+.Request
+include::{snippets}/store/store-get-info/http-request.adoc[]
+include::{snippets}/store/store-get-info/path-parameters.adoc[]
+
+.Response
+include::{snippets}/store/store-get-info/http-response.adoc[]
+include::{snippets}/store/store-get-info/response-fields.adoc[]
+
+
+=== 업체 마이 페이지 정보 수정
+
+==== /api/stores/profiles/{memberId}/{storeId}
+
+.Request
+include::{snippets}/store/store-update-info/http-request.adoc[]
+include::{snippets}/store/store-update-info/path-parameters.adoc[]
+
+.Response
+include::{snippets}/store/store-update-info/http-response.adoc[]
+include::{snippets}/store/store-update-info/response-fields.adoc[]
+
+=== 업체 소유자와 요청자가 같은 고객이 아닌 경우
+.Request Fail
+include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/http-request.adoc[]
+include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/path-parameters.adoc[]
+.Response
+include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/http-response.adoc[]
+include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/response-fields.adoc[]
+
+// === 서비스 수정
+//
+// ==== /api/v1/main-items/{id}
+// .Request
+// include::{snippets}/mainItem/mainItem-update/http-request.adoc[]
+// include::{snippets}/mainItem/mainItem-update/path-parameters.adoc[]
+// .Response
+// include::{snippets}/mainItem/mainItem-update/htt p-response.adoc[]
+// include::{snippets}/mainItem/mainItem-update/response-fields.adoc[]

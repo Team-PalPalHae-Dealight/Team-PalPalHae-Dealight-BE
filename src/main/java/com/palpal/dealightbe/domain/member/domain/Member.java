@@ -26,6 +26,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "members")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -35,7 +36,9 @@ public class Member extends BaseEntity {
 	private Address address;
 
 	private String realName;
+
 	private String nickName;
+
 	private String phoneNumber;
 
 	private boolean isDeleted = false;
@@ -56,5 +59,9 @@ public class Member extends BaseEntity {
 		this.provider = provider;
 		this.providerId = providerId;
 		this.memberRoles = memberRoles;
+	}
+
+	public void updateAddress(Address address) {
+		this.address = address;
 	}
 }
