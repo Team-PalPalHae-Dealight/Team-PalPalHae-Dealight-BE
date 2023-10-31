@@ -23,6 +23,7 @@ import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
+import com.palpal.dealightbe.domain.store.application.dto.request.StoreUpdateReq;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
@@ -198,5 +199,30 @@ class StoreServiceTest {
 		assertThrows(BusinessException.class, () -> {
 			storeService.getInfo(invalidMember.getId(), store.getId());
 		});
+	}
+
+	@Test
+	@DisplayName("업체 마이페이지 정보 수정 성공")
+	void updateInfoSuccessTest() throws Exception {
+
+		//given
+		LocalTime openTime = LocalTime.of(11, 0);
+		LocalTime closeTime = LocalTime.of(12, 0);
+		StoreUpdateReq updateReq = new StoreUpdateReq("77777", "부산시 수영구", 123.123, 222.333, openTime, closeTime, Set.of(DayOff.TUE));
+
+		when(memberRepository.findById(member.getId()))
+			.thenReturn(Optional.of(member));
+		when(storeRepository.findById(store.getId()))
+			.thenReturn(Optional.of(store));
+
+		//when
+		StoreInfoRes storeUpdatedInfoRes = storeService.updateInfo(member.getId(), store.getId(), updateReq);
+
+		//then
+		assertThat(storeUpdatedInfoRes.telephone()).isEqualTo(updateReq.telephone());
+		assertThat(storeUpdatedInfoRes.addressName()).isEqualTo(updateReq.addressName());
+		assertThat(storeUpdatedInfoRes.dayOff()).isEqualTo(updateReq.dayOff());
+		assertThat(store.getName()).isEqualTo("맛짱고기");
+		assertThat(store.getStoreNumber()).isEqualTo("8888");
 	}
 }
