@@ -62,6 +62,31 @@ public class ItemService {
 		return ItemRes.from(item);
 	}
 
+	public void delete(Long itemId, Long memberId) {
+		Store store = storeRepository.findByMemberId(memberId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_STORE_BY_MEMBER_ID : {}", memberId);
+				return new EntityNotFoundException(NOT_FOUND_STORE);
+			});
+
+		Item item = itemRepository.findById(itemId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", itemId);
+				return new EntityNotFoundException(NOT_FOUND_ITEM);
+			});
+
+		checkStoreHasItem(itemId, store.getId());
+
+		itemRepository.delete(item);
+	}
+
+	private void checkStoreHasItem(Long itemId, Long storeId) {
+		if (!itemRepository.existsByIdAndStoreId(itemId, storeId)) {
+			log.warn("STORE_HAS_NOT_ITEM : itemId = {}, storeId = {}", itemId, storeId);
+			throw new BusinessException(STORE_HAS_NOT_ITEM);
+		}
+	}
+
 	private void checkAlreadyRegisteredItemName(String itemName, Long storeId) {
 		if (itemRepository.existsByNameAndStoreId(itemName, storeId)) {
 			log.warn("ALREADY_REGISTERED_ITEM_NAME : {}", itemName);

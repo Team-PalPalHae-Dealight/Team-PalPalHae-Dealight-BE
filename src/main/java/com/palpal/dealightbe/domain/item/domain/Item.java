@@ -1,7 +1,6 @@
 package com.palpal.dealightbe.domain.item.domain;
 
 import javax.persistence.Column;
-import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_QUANTITY;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
