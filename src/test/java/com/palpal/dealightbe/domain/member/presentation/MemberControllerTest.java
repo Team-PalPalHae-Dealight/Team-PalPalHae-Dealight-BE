@@ -17,6 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -24,16 +25,13 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.palpal.dealightbe.domain.address.application.dto.request.AddressReq;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
 import com.palpal.dealightbe.domain.member.application.MemberService;
-import com.palpal.dealightbe.domain.member.application.dto.request.MemberUpdateReq;
 import com.palpal.dealightbe.domain.member.application.dto.response.MemberProfileRes;
-import com.palpal.dealightbe.domain.member.application.dto.response.MemberUpdateRes;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
-@WebMvcTest(value = MemberController.class)
+@WebMvcTest(value = MemberController.class, excludeAutoConfiguration = SecurityAutoConfiguration.class)
 @AutoConfigureRestDocs
 class MemberControllerTest {
 
