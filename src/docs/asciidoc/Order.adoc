@@ -1,0 +1,32 @@
+ifndef::snippets[]
+:basedir: {docdir}/../../../
+:snippets: build/generated-snippets
+:sources-root: {basedir}/src
+:resources: {sources-root}/main/resources
+:resources-test: {sources-root}/test/resources
+:java: {sources-root}/main/java
+:java-test: {sources-root}/test/java
+endif::[]
+= API Document
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 5
+:sectlinks:
+
+== 주문 관련 API
+
+=== 1. 주문 생성
+
+/orders/{memberProviderId}
+
+==== Request
+.Request
+include::{snippets}/order-success/http-request.adoc[]
+include::{snippets}/order-success/request-fields.adoc[]
+
+==== Response
+.Response
+include::{snippets}/order-success/http-response.adoc[]
+include::{snippets}/order-success/response-fields.adoc[]

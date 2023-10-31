@@ -1,5 +1,7 @@
 package com.palpal.dealightbe.domain.item.domain;
 
+import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_QUANTITY;
+
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -11,6 +13,7 @@ import javax.persistence.Table;
 
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.global.BaseEntity;
+import com.palpal.dealightbe.global.error.exception.BusinessException;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -56,5 +59,12 @@ public class Item extends BaseEntity {
 		this.information = information;
 		this.image = image;
 		this.store = store;
+	}
+
+	public void deductQuantity(int quantity) {
+		if (stock < quantity) {
+			throw new BusinessException(INVALID_ITEM_QUANTITY);
+		}
+		stock -= quantity;
 	}
 }
