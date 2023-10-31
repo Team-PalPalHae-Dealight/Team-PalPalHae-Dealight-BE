@@ -2,12 +2,16 @@ package com.palpal.dealightbe.domain.member.presentation;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.palpal.dealightbe.domain.member.application.MemberService;
+import com.palpal.dealightbe.domain.member.application.dto.request.MemberUpdateReq;
 import com.palpal.dealightbe.domain.member.application.dto.response.MemberProfileRes;
+import com.palpal.dealightbe.domain.member.application.dto.response.MemberUpdateRes;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,4 +30,10 @@ public class MemberController {
 		return ResponseEntity.ok(memberProfileRes);
 	}
 
+	@PatchMapping("/{memberId}")
+	public ResponseEntity<MemberUpdateRes> updateMemberProfile(@PathVariable Long memberId,
+		@RequestBody MemberUpdateReq request) {
+		MemberUpdateRes updatedMember = memberService.updateMemberProfile(memberId, request);
+		return ResponseEntity.ok(updatedMember);
+	}
 }
