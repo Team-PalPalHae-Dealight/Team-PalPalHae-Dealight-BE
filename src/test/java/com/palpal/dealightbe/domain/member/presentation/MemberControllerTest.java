@@ -127,7 +127,7 @@ class MemberControllerTest {
 			.willReturn(updateResponse);
 
 		// when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/members/{memberId}", memberId)
+		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/members/profiles/{memberId}", memberId)
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(updateRequest)))
 			.andExpect(status().isOk())
@@ -168,7 +168,7 @@ class MemberControllerTest {
 			.willThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
 		// when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/members/{memberId}", nonexistentMemberId)
+		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/members/profiles/{memberId}", nonexistentMemberId)
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(updateRequest)))
 			.andExpect(status().isNotFound())
@@ -185,6 +185,80 @@ class MemberControllerTest {
 					fieldWithPath("address.name").description("업데이트하려는 주소명"),
 					fieldWithPath("address.xCoordinate").description("업데이트하려는 주소의 X 좌표"),
 					fieldWithPath("address.yCoordinate").description("업데이트하려는 주소의 Y 좌표")
+				),
+				responseFields(
+					fieldWithPath("message").description("에러 메시지"),
+					fieldWithPath("timestamp").description("오류 발생 시각"),
+					fieldWithPath("code").description("에러 코드"),
+					fieldWithPath("errors").description("추가적인 에러 정보")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("멤버 프로필 주소 업데이트 성공")
+	void updateAddressSuccessTest() throws Exception {
+
+		// given
+		Long memberId = 1L;
+		AddressReq addressReq = new AddressReq("서울", 37.5665, 126.9780);
+		AddressRes addressRes = new AddressRes("서울", 37.5665, 126.9780);
+
+		given(memberService.updateMemberAddress(memberId, addressReq))
+			.willReturn(addressRes);
+
+		// when -> then
+		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/members/address/{memberId}", memberId)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(addressReq)))
+			.andExpect(status().isOk())
+			.andDo(print())
+			.andDo(document("member-update-address",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("memberId").description("업데이트하려는 멤버의 ID")
+				),
+				requestFields(
+					fieldWithPath("name").description("업데이트하려는 주소명"),
+					fieldWithPath("xCoordinate").description("업데이트하려는 주소의 X 좌표"),
+					fieldWithPath("yCoordinate").description("업데이트하려는 주소의 Y 좌표")
+				),
+				responseFields(
+					fieldWithPath("name").description("업데이트된 주소명"),
+					fieldWithPath("xCoordinate").description("업데이트된 주소의 X 좌표"),
+					fieldWithPath("yCoordinate").description("업데이트된 주소의 Y 좌표")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("멤버 프로필 주소 업데이트 실패: 멤버 ID가 존재하지 않는 경우")
+	void updateAddressNotFoundTest() throws Exception {
+
+		// given
+		Long nonexistentMemberId = 999L;
+		AddressReq addressReq = new AddressReq("서울", 37.5665, 126.9780);
+
+		given(memberService.updateMemberAddress(nonexistentMemberId, addressReq))
+			.willThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+
+		// when -> then
+		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/members/address/{memberId}", nonexistentMemberId)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(addressReq)))
+			.andExpect(status().isNotFound())
+			.andDo(print())
+			.andDo(document("member-update-address-not-found",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("memberId").description("업데이트하려는 멤버의 ID")
+				),
+				requestFields(
+					fieldWithPath("name").description("업데이트하려는 주소명"),
+					fieldWithPath("xCoordinate").description("업데이트하려는 주소의 X 좌표"),
+					fieldWithPath("yCoordinate").description("업데이트하려는 주소의 Y 좌표")
 				),
 				responseFields(
 					fieldWithPath("message").description("에러 메시지"),
