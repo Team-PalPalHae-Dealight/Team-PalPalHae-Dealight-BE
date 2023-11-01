@@ -50,8 +50,7 @@ import com.palpal.dealightbe.global.error.exception.BusinessException;
 
 @WebMvcTest(value = StoreController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class,
 	OAuth2ClientAutoConfiguration.class}, excludeFilters = {
-	@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {SecurityConfig.class,
-		JwtAuthenticationFilter.class})})
+	@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class)})
 @AutoConfigureRestDocs
 class StoreControllerTest {
 

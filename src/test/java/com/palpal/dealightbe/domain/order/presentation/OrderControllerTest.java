@@ -55,9 +55,7 @@ import com.palpal.dealightbe.domain.order.application.dto.response.OrderRes;
 @AutoConfigureRestDocs
 @WebMvcTest(value = OrderController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class,
 	OAuth2ClientAutoConfiguration.class}, excludeFilters = {
-	@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {SecurityConfig.class,
-		JwtAuthenticationFilter.class})}
-)
+	@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class)})
 public class OrderControllerTest {
 
 	@Autowired
