@@ -526,7 +526,7 @@ class ItemControllerTest {
 		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/items/{id}", itemId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.param("memberId", memberId.toString()))
-			.andExpect(status().isOk())
+			.andExpect(status().isNoContent())
 			.andDo(print())
 			.andDo(document("item-delete",
 				Preprocessors.preprocessRequest(prettyPrint()),
