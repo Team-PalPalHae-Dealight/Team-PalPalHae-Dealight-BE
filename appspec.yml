@@ -6,8 +6,7 @@ files:
     overwrite: yes
 
 permissions:
-  - object: /
-    pattern: "**"
+  - object: /home/ubuntu/app
     owner: ubuntu
     group: ubuntu
 
