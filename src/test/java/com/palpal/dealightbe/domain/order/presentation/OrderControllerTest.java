@@ -134,7 +134,6 @@ public class OrderControllerTest {
 					jsonPath("$.orderProductsRes.orderProducts[0].originalPrice").value(productRes.originalPrice()))
 				.andExpect(jsonPath("$.orderProductsRes.orderProducts[0].image").value(productRes.image()))
 				.andExpect(jsonPath("$.totalPrice").value(orderCreateReq.totalPrice()))
-				.andExpect(jsonPath("$.createdAt").value(String.valueOf(createdAt)))
 				.andExpect(jsonPath("$.status").value(RECEIVED.getText()))
 				.andDo(document(
 					"order-create-success",

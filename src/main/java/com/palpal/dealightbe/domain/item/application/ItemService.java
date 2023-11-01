@@ -33,7 +33,7 @@ public class ItemService {
 				return new EntityNotFoundException(NOT_FOUND_STORE);
 			});
 
-		checkAlreadyRegisteredItemName(itemReq.name(), store.getId());
+		checkDuplicatedItemName(itemReq.name(), store.getId());
 
 		Item item = ItemReq.toItem(itemReq, store);
 		Item savedItem = itemRepository.save(item);
@@ -48,7 +48,7 @@ public class ItemService {
 				return new EntityNotFoundException(NOT_FOUND_STORE);
 			});
 
-		checkAlreadyRegisteredItemName(itemReq.name(), store.getId());
+		checkDuplicatedItemName(itemReq.name(), store.getId());
 
 		Item item = itemRepository.findById(itemId)
 			.orElseThrow(() -> {
@@ -62,10 +62,28 @@ public class ItemService {
 		return ItemRes.from(item);
 	}
 
-	private void checkAlreadyRegisteredItemName(String itemName, Long storeId) {
+	public void delete(Long itemId, Long memberId) {
+		Store store = storeRepository.findByMemberId(memberId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_STORE_BY_MEMBER_ID : {}", memberId);
+				return new EntityNotFoundException(NOT_FOUND_STORE);
+			});
+
+		Item item = itemRepository.findById(itemId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", itemId);
+				return new EntityNotFoundException(NOT_FOUND_ITEM);
+			});
+
+		item.checkItemInStore(store);
+
+		itemRepository.delete(item);
+	}
+
+	private void checkDuplicatedItemName(String itemName, Long storeId) {
 		if (itemRepository.existsByNameAndStoreId(itemName, storeId)) {
-			log.warn("ALREADY_REGISTERED_ITEM_NAME : {}", itemName);
-			throw new BusinessException(ALREADY_REGISTERED_ITEM_NAME);
+			log.warn("DUPLICATED_ITEM_NAME : {}", itemName);
+			throw new BusinessException(DUPLICATED_ITEM_NAME);
 		}
 	}
 }
