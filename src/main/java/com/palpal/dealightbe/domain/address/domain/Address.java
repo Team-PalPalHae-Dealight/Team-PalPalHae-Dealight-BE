@@ -35,4 +35,14 @@ public class Address extends BaseEntity {
 		this.xCoordinate = xCoordinate;
 		this.yCoordinate = yCoordinate;
 	}
+
+	public static Address defaultAddress() {
+		return new Address("", 0, 0);
+	}
+
+	public void updateInfo(String name, double xCoordinate, double yCoordinate) {
+		this.name = name;
+		this.xCoordinate = xCoordinate;
+		this.yCoordinate = yCoordinate;
+	}
 }
