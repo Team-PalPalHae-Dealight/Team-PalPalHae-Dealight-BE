@@ -42,6 +42,7 @@ public class ItemController {
 	public ResponseEntity<Void> delete(@PathVariable("id") Long itemId, @RequestParam Long memberId) {
 		itemService.delete(itemId, memberId);
 
-		return ResponseEntity.ok(null);
+		return ResponseEntity.noContent()
+			.build();
 	}
 }
