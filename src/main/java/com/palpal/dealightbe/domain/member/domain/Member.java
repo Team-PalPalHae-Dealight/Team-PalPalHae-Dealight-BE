@@ -56,13 +56,20 @@ public class Member extends BaseEntity {
 		this.realName = realName;
 		this.nickName = nickName;
 		this.phoneNumber = phoneNumber;
+		this.address = Address.defaultAddress();
 		this.provider = provider;
 		this.providerId = providerId;
 		this.memberRoles = memberRoles;
 	}
 
+	public void updateInfo(String nickName, String phoneNumber, Address address) {
+		this.nickName = nickName;
+		this.phoneNumber = phoneNumber;
+		updateAddress(address);
+	}
+
 	public void updateAddress(Address address) {
-		this.address = address;
+		this.address.updateInfo(address.getName(), address.getXCoordinate(), address.getYCoordinate());
 	}
 
 	public void changeMemberRoles(List<MemberRole> memberRoles) {

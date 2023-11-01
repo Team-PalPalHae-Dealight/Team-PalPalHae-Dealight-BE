@@ -45,12 +45,21 @@ class ItemServiceTest {
 
 	@BeforeEach
 	void setUp() {
+		LocalTime openTime = LocalTime.now();
+		LocalTime closeTime = openTime.plusHours(1);
+
+		if (closeTime.isBefore(openTime)) {
+			LocalTime tempTime = openTime;
+			openTime = closeTime;
+			closeTime = tempTime;
+		}
+
 		store = Store.builder()
 			.name("동네분식")
 			.storeNumber("0000000")
 			.telephone("00000000")
-			.openTime(LocalTime.now())
-			.closeTime(LocalTime.now().plusHours(6))
+			.openTime(openTime)
+			.closeTime(closeTime)
 			.dayOff(Collections.singleton(DayOff.MON))
 			.build();
 
@@ -162,5 +171,16 @@ class ItemServiceTest {
 		assertThrows(BusinessException.class, () -> {
 			itemService.update(itemId, itemReq, memberId);
 		});
+	}
+
+	@DisplayName("상품 삭제 성공 테스트")
+	@Test
+	void itemDeleteSuccessTest() {
+		//given
+		//when
+		assertDoesNotThrow(() -> itemRepository.delete(item));
+
+		//then
+		verify(itemRepository, times(1)).delete(item);
 	}
 }

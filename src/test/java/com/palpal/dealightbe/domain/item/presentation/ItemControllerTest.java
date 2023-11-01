@@ -31,6 +31,8 @@ import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 
+import static com.palpal.dealightbe.global.error.ErrorCode.DUPLICATED_ITEM_NAME;
+import static com.palpal.dealightbe.global.error.ErrorCode.STORE_HAS_NO_ITEM;
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -68,12 +70,21 @@ class ItemControllerTest {
 
 	@BeforeEach
 	void setUp() {
+		LocalTime openTime = LocalTime.now();
+		LocalTime closeTime = openTime.plusHours(1);
+
+		if (closeTime.isBefore(openTime)) {
+			LocalTime tempTime = openTime;
+			openTime = closeTime;
+			closeTime = tempTime;
+		}
+
 		store = Store.builder()
 			.name("동네분식")
 			.storeNumber("0000000")
 			.telephone("00000000")
-			.openTime(LocalTime.now())
-			.closeTime(LocalTime.now().plusHours(6))
+			.openTime(openTime)
+			.closeTime(closeTime)
 			.dayOff(Collections.singleton(DayOff.MON))
 			.build();
 
@@ -231,6 +242,51 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.message").value("상품 할인가는 원가보다 클 수 없습니다."))
 			.andDo(print())
 			.andDo(document("item-create-fail-invalid-discount-price",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestParameters(parameterWithName("memberId").description("고객 ID")),
+				requestFields(
+					fieldWithPath("name").description("상품 이름"),
+					fieldWithPath("stock").description("재고 수"),
+					fieldWithPath("discountPrice").description("할인가"),
+					fieldWithPath("originalPrice").description("원가"),
+					fieldWithPath("description").description("상세 설명"),
+					fieldWithPath("information").description("안내 사항"),
+					fieldWithPath("image").description("상품 이미지")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("예외 코드"),
+					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@DisplayName("상품 등록 실패 테스트 - 이미 등록된 상품인 경우(이름 중복)")
+	@Test
+	public void itemCreateFailureTest_duplicatedItemName() throws Exception {
+		//given
+		ItemReq itemReq = new ItemReq("떡볶이", 2, 4500, 4000, "기본 떡볶이 입니다.", "통신사 할인 불가능 합니다.", null);
+
+		Long memberId = 1L;
+
+		doThrow(new BusinessException(DUPLICATED_ITEM_NAME)).when(
+			itemService).create(any(), any());
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/items")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(itemReq))
+				.param("memberId", memberId.toString()))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("I003"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("동일한 이름을 가진 상품이 이미 등록되어 있습니다."))
+			.andDo(print())
+			.andDo(document("item-create-fail-duplicated-item-name",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestParameters(parameterWithName("memberId").description("고객 ID")),
@@ -412,6 +468,111 @@ class ItemControllerTest {
 					fieldWithPath("information").description("안내 사항"),
 					fieldWithPath("image").description("상품 이미지")
 				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("예외 코드"),
+					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@DisplayName("상품 수정 실패 테스트 - 이미 등록된 상품인 경우(이름 중복)")
+	@Test
+	public void itemUpdateFailureTest_duplicatedItemName() throws Exception {
+		//given
+		ItemReq itemReq = new ItemReq("떡볶이", 2, 4500, 4000, "기본 떡볶이 입니다.", "통신사 할인 불가능 합니다.", null);
+
+		Long memberId = 1L;
+		Long itemId = 1L;
+
+		doThrow(new BusinessException(DUPLICATED_ITEM_NAME)).when(
+			itemService).update(any(), any(), any());
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/items/{id}", itemId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(itemReq))
+				.param("memberId", memberId.toString()))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("I003"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("동일한 이름을 가진 상품이 이미 등록되어 있습니다."))
+			.andDo(print())
+			.andDo(document("item-update-fail-duplicated-item-name",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(parameterWithName("id").description("상품 ID")),
+				requestParameters(parameterWithName("memberId").description("고객 ID")),
+				requestFields(
+					fieldWithPath("name").description("상품 이름"),
+					fieldWithPath("stock").description("재고 수"),
+					fieldWithPath("discountPrice").description("할인가"),
+					fieldWithPath("originalPrice").description("원가"),
+					fieldWithPath("description").description("상세 설명"),
+					fieldWithPath("information").description("안내 사항"),
+					fieldWithPath("image").description("상품 이미지")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("예외 코드"),
+					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@DisplayName("상품 삭제 성공 테스트")
+	@Test
+	public void itemDeleteSuccessTest() throws Exception {
+		//given
+		Long itemId = 1L;
+		Long memberId = 1L;
+
+		doNothing().when(itemService).delete(any(), any());
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/items/{id}", itemId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.param("memberId", memberId.toString()))
+			.andExpect(status().isNoContent())
+			.andDo(print())
+			.andDo(document("item-delete",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(parameterWithName("id").description("상품 ID")),
+				requestParameters(parameterWithName("memberId").description("고객 ID"))
+			));
+	}
+
+	@DisplayName("상품 삭제 실패 테스트 - 요청된 상품이 해당 업체에 등록되지 않은 상품인 경우")
+	@Test
+	public void itemDeleteFailureTest_storeHasNoItem() throws Exception {
+		//given
+		Long itemId = 1L;
+		Long memberId = 1L;
+
+		doThrow(new BusinessException(STORE_HAS_NO_ITEM)).when(
+			itemService).delete(any(), any());
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/items/{id}", itemId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.param("memberId", memberId.toString()))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("I005"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("요청하신 상품은 해당 업체에 등록되지 않은 상품입니다."))
+			.andDo(print())
+			.andDo(document("item-delete-store-has-no-item",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(parameterWithName("id").description("상품 ID")),
+				requestParameters(parameterWithName("memberId").description("고객 ID")),
 				responseFields(
 					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
 					fieldWithPath("code").type(STRING).description("예외 코드"),
