@@ -45,7 +45,10 @@ public class ItemService {
 	@Transactional(readOnly = true)
 	public ItemRes findById(Long itemId) {
 		Item item = itemRepository.findById(itemId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_ITEM));
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", itemId);
+				return new EntityNotFoundException(NOT_FOUND_ITEM);
+			});
 
 		return ItemRes.from(item);
 	}
