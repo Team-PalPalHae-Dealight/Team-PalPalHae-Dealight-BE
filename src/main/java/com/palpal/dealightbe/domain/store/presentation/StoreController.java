@@ -50,7 +50,7 @@ public class StoreController {
 
 	@PatchMapping("/status/{memberId}/{storeId}")
 	public ResponseEntity<StoreStatusUpdateRes> updateStatus(@PathVariable Long memberId, @PathVariable Long storeId, @RequestBody StoreStatusReq req) {
-		StoreStatusUpdateRes storeStatusUpdateRes = storeService.updateStatus(memberId, storeId,req);
+		StoreStatusUpdateRes storeStatusUpdateRes = storeService.updateStatus(memberId, storeId, req);
 
 		return ResponseEntity.ok(storeStatusUpdateRes);
 	}

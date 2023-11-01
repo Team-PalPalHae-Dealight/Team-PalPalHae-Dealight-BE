@@ -256,7 +256,7 @@ class StoreControllerTest {
 		StoreUpdateReq updateReq = new StoreUpdateReq("888222111", "부산시", 777.777, 123.123234, openTime, closeTime,
 			Set.of(DayOff.TUE));
 		StoreInfoRes storeInfoRes = new StoreInfoRes("888222111", "맛짱조개", "01066772291", "부산시", openTime, closeTime,
-			Set.of(DayOff.MON), StoreStatus.OPENED, null);
+			Set.of(DayOff.TUE), StoreStatus.OPENED, null);
 
 		given(storeService.updateInfo(memberId, storeId, updateReq))
 			.willReturn(storeInfoRes);
