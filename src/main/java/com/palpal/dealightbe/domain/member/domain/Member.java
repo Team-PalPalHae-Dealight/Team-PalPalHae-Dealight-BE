@@ -55,14 +55,16 @@ public class Member extends BaseEntity {
 		this.realName = realName;
 		this.nickName = nickName;
 		this.phoneNumber = phoneNumber;
+		this.address = Address.defaultAddress();
+	}
+
+	public void updateInfo(String nickName, String phoneNumber, Address address) {
+		this.nickName = nickName;
+		this.phoneNumber = phoneNumber;
+		updateAddress(address);
 	}
 
 	public void updateAddress(Address address) {
-		this.address = address;
-	}
-
-	public void updateInfo(String nickName, String phoneNumber) {
-		this.nickName = nickName;
-		this.phoneNumber = phoneNumber;
+		this.address.updateInfo(address.getName(), address.getXCoordinate(), address.getYCoordinate());
 	}
 }
