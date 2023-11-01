@@ -89,9 +89,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
-      # S3에 zip파일을 업로드한다.
+      # S3에 zip파일을 업로드
       - name: Upload to S3
         run: |
           aws s3 cp \
             --region ap-northeast-2 \
             ./delight-spring-build.zip s3://team-08-bucket
+
+      # Code Deploy를 사용
+      - name: Code Deploy
+        run: aws deploy create-deployment --application-name team-08-dev
+          --deployment-config-name CodeDeployDefault.OneAtATime
+          --deployment-group-name team-palpal-dev-deploy
+          --s3-location bucket=team-08-bucket,bundleType=zip,key=delight-spring-build.zip
