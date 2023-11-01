@@ -37,7 +37,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			log.debug("SecurityContextHolder에 이미 인증정보가 존재합니다: {}",
 				SecurityContextHolder.getContext().getAuthentication());
 			filterChain.doFilter(request, response);
-
 			return;
 		}
 
