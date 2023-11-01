@@ -13,7 +13,7 @@ endif::[]
 [[User-API]]
 == Item API
 
-=== 업체 등록
+=== 상품 등록
 
 ==== /api/items?memberId={memberId}
 
@@ -67,7 +67,7 @@ include::{snippets}/item-create-fail-duplicated-item-name/http-response.adoc[]
 include::{snippets}/item-create-fail-duplicated-item-name/response-fields.adoc[]
 
 
-=== 업체 수정
+=== 상품 수정
 
 ==== /api/items/{id}?memberId={memberId}
 
@@ -127,7 +127,7 @@ include::{snippets}/item-update-fail-duplicated-item-name/http-response.adoc[]
 
 include::{snippets}/item-update-fail-duplicated-item-name/response-fields.adoc[]
 
-=== 업체 삭제
+=== 상품 삭제
 
 ==== /api/items/{id}?memberId={memberId}
 
