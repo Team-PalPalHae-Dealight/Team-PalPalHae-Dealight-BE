@@ -1,6 +1,7 @@
 #!/bin/bash
 
 cd /home/ec2-user/app
+sudo docker build -t dealight-api-springboot .
 DOCKER_APP_NAME=dealight-api-springboot
 
 # 실행중인 blue가 있는지
