@@ -84,12 +84,26 @@ public class Store extends BaseEntity {
 		this.member = member;
 	}
 
-	public void updateAddress(Address address) {
-		this.address = address;
+	public void updateInfo(Store store) {
+		this.telephone = store.getTelephone();
+		this.address = store.getAddress();
+		this.openTime = store.getOpenTime();
+		this.closeTime = store.getCloseTime();
+		this.dayOffs = store.getDayOffs();
 	}
 
 	public void updateImage(String image) {
 		this.image = image;
+	}
+
+	public void isSameOwnerAndTheRequester(Member member, Store store) {
+		Long ownerId = store.getMember().getProviderId();
+		Long requesterId = member.getProviderId();
+
+		if (!(ownerId == requesterId)) {
+			log.warn("GET:READ:NOT_MATCH_OWNER_AND_REQUESTER : ownerId => {} memberId => {}", ownerId, requesterId);
+			throw new BusinessException(ErrorCode.NOT_MATCH_OWNER_AND_REQUESTER);
+		}
 	}
 
 	private void validateBusinessTimes(LocalTime openTime, LocalTime closeTime) {

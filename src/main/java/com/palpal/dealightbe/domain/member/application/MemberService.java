@@ -18,10 +18,11 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@Transactional
 @RequiredArgsConstructor
 @Transactional
 public class MemberService {
-	MemberRepository memberRepository;
+	private final MemberRepository memberRepository;
 
 	@Transactional(readOnly = true)
 	public MemberProfileRes getMemberProfile(Long memberId) {

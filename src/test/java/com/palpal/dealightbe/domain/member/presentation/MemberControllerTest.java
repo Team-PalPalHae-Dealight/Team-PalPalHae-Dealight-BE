@@ -17,6 +17,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -33,7 +35,8 @@ import com.palpal.dealightbe.domain.member.application.dto.response.MemberUpdate
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
-@WebMvcTest(value = MemberController.class)
+@WebMvcTest(value = MemberController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class,
+	OAuth2ClientAutoConfiguration.class})
 @AutoConfigureRestDocs
 class MemberControllerTest {
 

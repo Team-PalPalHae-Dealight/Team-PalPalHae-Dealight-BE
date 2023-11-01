@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "member_roles")
+@Table(name = "member_role")
 @Entity
 public class MemberRole {
 
@@ -30,4 +30,9 @@ public class MemberRole {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "role_id")
 	private Role role;
+
+	public MemberRole(Member member, Role role) {
+		this.member = member;
+		this.role = role;
+	}
 }

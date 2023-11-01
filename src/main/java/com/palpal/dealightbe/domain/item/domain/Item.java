@@ -1,6 +1,8 @@
 package com.palpal.dealightbe.domain.item.domain;
 
 import javax.persistence.Column;
+import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_QUANTITY;
+
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -57,9 +59,11 @@ public class Item extends BaseEntity {
 	@Builder
 	public Item(String name, int stock, int discountPrice, int originalPrice, String description, String information,
 				String image, Store store) {
+		validateDiscountPrice(discountPrice, originalPrice);
+
 		this.name = name;
 		this.stock = stock;
-		this.discountPrice = validateDiscountPrice(discountPrice, originalPrice);
+		this.discountPrice = discountPrice;
 		this.originalPrice = originalPrice;
 		this.description = description;
 		this.information = information;
@@ -67,12 +71,30 @@ public class Item extends BaseEntity {
 		this.store = store;
 	}
 
-	private int validateDiscountPrice(int discountPrice, int originalPrice) {
+	public void deductStock(int quantity) {
+		if (this.stock < quantity) {
+			throw new BusinessException(INVALID_ITEM_QUANTITY);
+		}
+
+		this.stock -= quantity;
+	}
+
+	public void update(Item item) {
+		validateDiscountPrice(item.getDiscountPrice(), item.getOriginalPrice());
+
+		this.name = item.getName();
+		this.stock = item.getStock();
+		this.discountPrice = item.getDiscountPrice();
+		this.originalPrice = item.getOriginalPrice();
+		this.description = item.getDescription();
+		this.information = item.getInformation();
+		this.image = item.getImage();
+	}
+
+	private void validateDiscountPrice(int discountPrice, int originalPrice) {
 		if (discountPrice > originalPrice) {
 			log.warn("INVALID_ITEM_DISCOUNT_PRICE : discount price = {}, original price = {}", discountPrice, originalPrice);
 			throw new BusinessException(INVALID_ITEM_DISCOUNT_PRICE);
 		}
-
-		return discountPrice;
 	}
 }
