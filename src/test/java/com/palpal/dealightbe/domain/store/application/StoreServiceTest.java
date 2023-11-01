@@ -23,6 +23,7 @@ import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
+import com.palpal.dealightbe.domain.store.application.dto.request.StoreStatusReq;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreUpdateReq;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
@@ -233,7 +234,7 @@ class StoreServiceTest {
 	void updateStoreStatusSuccessTest() throws Exception {
 
 		//given
-		StoreStatus requestStoreStatus = StoreStatus.OPENED;
+		StoreStatusReq requestStoreStatus = new StoreStatusReq(StoreStatus.OPENED);
 
 		when(memberRepository.findById(member.getId()))
 			.thenReturn(Optional.of(member));
@@ -244,7 +245,7 @@ class StoreServiceTest {
 		StoreStatusUpdateRes storeStatusUpdateRes = storeService.updateStatus(member.getId(), store.getId(), requestStoreStatus);
 
 		//then
-		assertThat(store.getStoreStatus()).isEqualTo(requestStoreStatus);
+		assertThat(store.getStoreStatus()).isEqualTo(requestStoreStatus.storeStatus());
 		assertThat(storeStatusUpdateRes.storeId()).isEqualTo(store.getId());
 	}
 }

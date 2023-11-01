@@ -7,13 +7,13 @@ import com.palpal.dealightbe.domain.address.application.AddressService;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
+import com.palpal.dealightbe.domain.store.application.dto.request.StoreStatusReq;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreUpdateReq;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusUpdateRes;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
-import com.palpal.dealightbe.domain.store.domain.StoreStatus;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
@@ -62,10 +62,11 @@ public class StoreService {
 		return StoreInfoRes.from(store);
 	}
 
-	public StoreStatusUpdateRes updateStatus(Long memberId, Long storeId, StoreStatus storeStatus) {
+	public StoreStatusUpdateRes updateStatus(Long memberId, Long storeId, StoreStatusReq storeStatus) {
 		Store store = validateMemberAndStoreOwner(memberId, storeId);
 
-		store.updateStatus(storeStatus);
+
+		store.updateStatus(storeStatus.storeStatus());
 
 		return StoreStatusUpdateRes.from(store);
 	}

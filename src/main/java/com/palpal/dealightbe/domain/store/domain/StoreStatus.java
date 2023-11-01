@@ -24,7 +24,7 @@ public enum StoreStatus {
 	@JsonCreator
 	public static StoreStatus fromString(String text) {
 		for (StoreStatus status : StoreStatus.values()) {
-			if (status.name.equalsIgnoreCase(text)) {
+			if (status.name.equalsIgnoreCase(text) || status.toString().equalsIgnoreCase(text)) {
 				return status;
 			}
 		}
