@@ -1,4 +1,6 @@
 #!/bin/bash
+sudo find /home/ubuntu/app -type f -exec chmod +x {} \;
+sudo find /home/ubuntu/app -type d -exec chmod +x {} \;
 
 cd /home/ec2-user/app
 sudo docker build -t dealight-api-springboot .
