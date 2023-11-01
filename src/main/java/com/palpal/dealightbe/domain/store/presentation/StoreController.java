@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.palpal.dealightbe.domain.store.application.StoreService;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
+import com.palpal.dealightbe.domain.store.application.dto.request.StoreStatusReq;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreUpdateReq;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
+import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusUpdateRes;
 
 import lombok.RequiredArgsConstructor;
 
@@ -44,5 +46,12 @@ public class StoreController {
 		StoreInfoRes storeInfoRes = storeService.updateInfo(memberId, storeId, updateReq);
 
 		return ResponseEntity.ok(storeInfoRes);
+	}
+
+	@PatchMapping("/status/{memberId}/{storeId}")
+	public ResponseEntity<StoreStatusUpdateRes> updateStatus(@PathVariable Long memberId, @PathVariable Long storeId, @RequestBody StoreStatusReq req) {
+		StoreStatusUpdateRes storeStatusUpdateRes = storeService.updateStatus(memberId, storeId, req);
+
+		return ResponseEntity.ok(storeStatusUpdateRes);
 	}
 }

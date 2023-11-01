@@ -40,9 +40,11 @@ import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
 import com.palpal.dealightbe.domain.auth.filter.JwtAuthenticationFilter;
 import com.palpal.dealightbe.domain.store.application.StoreService;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
+import com.palpal.dealightbe.domain.store.application.dto.request.StoreStatusReq;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreUpdateReq;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
+import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusUpdateRes;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.StoreStatus;
 import com.palpal.dealightbe.global.error.ErrorCode;
@@ -71,10 +73,10 @@ class StoreControllerTest {
 		LocalTime openTime = LocalTime.of(9, 0);
 		LocalTime closeTime = LocalTime.of(23, 0);
 
-		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89,
+		StoreCreateReq storeCreateReq = new StoreCreateReq("888222111", "맛짱조개", "01066772291", "서울시 강남구", 67.89,
 			293.2323, openTime, closeTime, Set.of(DayOff.MON));
 		AddressRes addressRes = new AddressRes("서울시 강남구", 67.89, 293.2323);
-		StoreCreateRes storeCreateRes = new StoreCreateRes("888-222-111", "맛짱조개", "01066772291", addressRes, openTime,
+		StoreCreateRes storeCreateRes = new StoreCreateRes("888222111", "맛짱조개", "01066772291", addressRes, openTime,
 			closeTime, Set.of(DayOff.MON));
 
 		given(storeService.register(memberId, storeCreateReq))
@@ -130,7 +132,7 @@ class StoreControllerTest {
 		LocalTime openTime = LocalTime.of(23, 0);
 		LocalTime closeTime = LocalTime.of(9, 0);
 
-		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89,
+		StoreCreateReq storeCreateReq = new StoreCreateReq("888222111", "맛짱조개", "01066772291", "서울시 강남구", 67.89,
 			293.2323, openTime, closeTime, Set.of(DayOff.MON));
 
 		given(storeService.register(memberId, storeCreateReq))
@@ -258,7 +260,7 @@ class StoreControllerTest {
 		StoreUpdateReq updateReq = new StoreUpdateReq("888222111", "부산시", 777.777, 123.123234, openTime, closeTime,
 			Set.of(DayOff.TUE));
 		StoreInfoRes storeInfoRes = new StoreInfoRes("888222111", "맛짱조개", "01066772291", "부산시", openTime, closeTime,
-			Set.of(DayOff.MON), StoreStatus.OPENED, null);
+			Set.of(DayOff.TUE), StoreStatus.OPENED, null);
 
 		given(storeService.updateInfo(memberId, storeId, updateReq))
 			.willReturn(storeInfoRes);
@@ -287,6 +289,42 @@ class StoreControllerTest {
 					fieldWithPath("dayOff").description("휴무일"),
 					fieldWithPath("storeStatus").description("영업 유무"),
 					fieldWithPath("image").description("이미지 주소")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("업체 영업 상태 변경 성공")
+	void updateStatusSuccessTest() throws Exception {
+
+		//given
+		Long memberId = 1L;
+		Long storeId = 1L;
+
+		StoreStatusReq storeStatusReq = new StoreStatusReq(StoreStatus.OPENED);
+		StoreStatusUpdateRes storeStatusUpdateRes = new StoreStatusUpdateRes(storeId, storeStatusReq.storeStatus());
+
+		given(storeService.updateStatus(memberId, storeId, storeStatusReq))
+			.willReturn(storeStatusUpdateRes);
+
+		//when -> then
+		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/stores/status/{memberId}/{storeId}", memberId, storeId)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(storeStatusReq)))
+			.andExpect(status().isOk())
+			.andDo(print())
+			.andDo(document("store-status-update",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("memberId").description("고객 ID"),
+					parameterWithName("storeId").description("업체 ID")
+				), requestFields(
+					fieldWithPath("storeStatus").description("영업 상태")
+				),
+				responseFields(
+					fieldWithPath("storeId").description("업체 ID"),
+					fieldWithPath("storeStatus").description("영업 상태")
 				)
 			));
 	}

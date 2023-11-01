@@ -23,12 +23,15 @@ import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
+import com.palpal.dealightbe.domain.store.application.dto.request.StoreStatusReq;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreUpdateReq;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
+import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusUpdateRes;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
+import com.palpal.dealightbe.domain.store.domain.StoreStatus;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
@@ -224,5 +227,25 @@ class StoreServiceTest {
 		assertThat(storeUpdatedInfoRes.dayOff()).isEqualTo(updateReq.dayOff());
 		assertThat(store.getName()).isEqualTo("맛짱고기");
 		assertThat(store.getStoreNumber()).isEqualTo("8888");
+	}
+
+	@Test
+	@DisplayName("업체 상태 정보 변경 성공")
+	void updateStoreStatusSuccessTest() throws Exception {
+
+		//given
+		StoreStatusReq requestStoreStatus = new StoreStatusReq(StoreStatus.OPENED);
+
+		when(memberRepository.findById(member.getId()))
+			.thenReturn(Optional.of(member));
+		when(storeRepository.findById(store.getId()))
+			.thenReturn(Optional.of(store));
+
+		//when
+		StoreStatusUpdateRes storeStatusUpdateRes = storeService.updateStatus(member.getId(), store.getId(), requestStoreStatus);
+
+		//then
+		assertThat(store.getStoreStatus()).isEqualTo(requestStoreStatus.storeStatus());
+		assertThat(storeStatusUpdateRes.storeId()).isEqualTo(store.getId());
 	}
 }
