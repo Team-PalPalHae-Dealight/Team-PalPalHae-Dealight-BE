@@ -5,7 +5,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.palpal.dealightbe.domain.address.application.dto.request.AddressReq;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
-import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.member.application.dto.request.MemberUpdateReq;
 import com.palpal.dealightbe.domain.member.application.dto.response.MemberProfileRes;
 import com.palpal.dealightbe.domain.member.application.dto.response.MemberUpdateRes;
@@ -42,23 +41,13 @@ public class MemberService {
 			throw new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
 		});
 
-		member.updateInfo(request.nickname(), request.phoneNumber());
+		member.getAddress().updateInfo(
+			request.address().name(),
+			request.address().xCoordinate(),
+			request.address().yCoordinate()
+		);
 
-		Address address = member.getAddress();
-		if (address != null) {
-			address.updateInfo(
-				request.address().name(),
-				request.address().xCoordinate(),
-				request.address().yCoordinate()
-			);
-		} else {
-			Address newAddress = AddressRes.toAddress(
-				request.address().name(),
-				request.address().xCoordinate(),
-				request.address().yCoordinate()
-			);
-			member.updateAddress(newAddress);
-		}
+		member.updateInfo(request.nickname(), request.phoneNumber(), member.getAddress());
 
 		return MemberUpdateRes.from(member);
 	}
@@ -69,21 +58,11 @@ public class MemberService {
 			throw new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
 		});
 
-		Address address = member.getAddress();
-		if (address != null) {
-			address.updateInfo(
-				request.name(),
-				request.xCoordinate(),
-				request.yCoordinate()
-			);
-		} else {
-			Address newAddress = AddressRes.toAddress(
-				request.name(),
-				request.xCoordinate(),
-				request.yCoordinate()
-			);
-			member.updateAddress(newAddress);
-		}
+		member.getAddress().updateInfo(
+			request.name(),
+			request.xCoordinate(),
+			request.yCoordinate()
+		);
 
 		return AddressRes.from(member.getAddress());
 	}
