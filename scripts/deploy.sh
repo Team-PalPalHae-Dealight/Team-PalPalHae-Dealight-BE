@@ -1,16 +1,28 @@
 #!/bin/bash
-echo "> 현재 실행 중인 Docker 컨테이너 pid 확인" >> /home/ec2-user/deploy.log
-CURRENT_PID=$(sudo docker container ls -q)
-
-if [ -z $CURRENT_PID ]
-then
-  echo "> 현재 구동중인 Docker 컨테이너가 없으므로 종료하지 않습니다." >> /home/ec2-user/deploy.log
-else
-  echo "> sudo docker stop $CURRENT_PID"   # 현재 구동중인 Docker 컨테이너가 있다면 모두 중지
-  sudo docker stop $CURRENT_PID
-  sleep 5
-fi
 
 cd /home/ec2-user/app
-sudo docker build -t dealight-api-springboot .
-sudo docker run -d --rm -p 8080:8080 --name dealight-api-blue dealight-api-springboot
+DOCKER_APP_NAME=dealight-api-springboot
+
+# 실행중인 blue가 있는지
+EXIST_BLUE=$(docker-compose -p ${DOCKER_APP_NAME}-blue -f docker-compose.blue.yml ps | grep running)
+
+# green이 실행중이면 blue up
+if [ -z "$EXIST_BLUE" ]; then
+	echo "Green 컨테이너가 실행 중이므로 Blue 컨테이너를 실행(UP)합니다..."
+	docker-compose -p ${DOCKER_APP_NAME}-blue -f docker-compose.blue.yml up -d --build
+
+	sleep 30
+
+	docker-compose -p ${DOCKER_APP_NAME}-green -f docker-compose.green.yml down
+	docker image prune -af # 사용하지 않는 이미지 삭제
+
+# blue가 실행중이면 green up
+else
+	echo "Blue 컨테이너가 실행 중이므로 Green 컨테이너를 실행(UP)합니다..."
+	docker-compose -p ${DOCKER_APP_NAME}-green -f docker-compose.green.yml up -d --build
+
+	sleep 30
+
+	docker-compose -p ${DOCKER_APP_NAME}-blue -f docker-compose.blue.yml down
+	docker image prune -af
+fi

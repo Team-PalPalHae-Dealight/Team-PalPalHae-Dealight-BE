@@ -78,7 +78,12 @@ jobs:
       - name: Make zip file
         run: |
           mkdir deploy
-          cp ./build/libs/dealight-be-0.0.1-SNAPSHOT.jar ./deploy
+          cp ./docker-compose.blue.yml ./deploy/
+          cp ./docker-compose.green.yml ./deploy/
+          cp ./appspec.yml ./deploy/
+          cp ./Dockerfile-dev ./deploy/
+          cp ./scripts/*.sh ./deploy/
+          cp ./build/libs/dealight-be-0.0.1-SNAPSHOT.jar ./deploy/
           zip -r -qq -j ./delight-spring-build.zip ./deploy
 
       # AWS credentials 값을 가져옴
