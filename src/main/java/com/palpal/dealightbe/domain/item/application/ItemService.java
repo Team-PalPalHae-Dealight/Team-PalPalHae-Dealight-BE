@@ -75,16 +75,9 @@ public class ItemService {
 				return new EntityNotFoundException(NOT_FOUND_ITEM);
 			});
 
-		checkStoreHasItem(itemId, store.getId());
+		item.checkItemInStore(store);
 
 		itemRepository.delete(item);
-	}
-
-	private void checkStoreHasItem(Long itemId, Long storeId) {
-		if (!itemRepository.existsByIdAndStoreId(itemId, storeId)) {
-			log.warn("STORE_HAS_NO_ITEM : itemId = {}, storeId = {}", itemId, storeId);
-			throw new BusinessException(STORE_HAS_NO_ITEM);
-		}
 	}
 
 	private void checkDuplicatedItemName(String itemName, Long storeId) {

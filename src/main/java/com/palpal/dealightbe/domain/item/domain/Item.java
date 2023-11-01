@@ -90,6 +90,13 @@ public class Item extends BaseEntity {
 		this.image = item.getImage();
 	}
 
+	public void checkItemInStore(Store store) {
+		if (!this.store.equals(store)) {
+			log.warn("STORE_HAS_NO_ITEM : itemId = {}, storeId = {}", this.getId(), store.getId());
+			throw new BusinessException(STORE_HAS_NO_ITEM);
+		}
+	}
+
 	private void validateDiscountPrice(int discountPrice, int originalPrice) {
 		if (discountPrice > originalPrice) {
 			log.warn("INVALID_ITEM_DISCOUNT_PRICE : discount price = {}, original price = {}", discountPrice, originalPrice);
