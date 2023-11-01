@@ -1,30 +1,42 @@
 package com.palpal.dealightbe.config;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.palpal.dealightbe.domain.auth.domain.Jwt;
+import com.palpal.dealightbe.domain.auth.filter.JwtAuthenticationFilter;
+import com.palpal.dealightbe.domain.auth.presentation.CustomAuthAccessDeniedHandler;
 import com.palpal.dealightbe.domain.auth.presentation.CustomOAuth2AuthenticationSuccessHandler;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@RequiredArgsConstructor
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
 
 	private final AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository;
 	private final CustomOAuth2AuthenticationSuccessHandler customOAuth2AuthenticationSuccessHandler;
+	private final CustomAuthAccessDeniedHandler customAuthAccessDeniedHandler;
+	private final Jwt jwt;
 
-	public SecurityConfig(AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository,
-		CustomOAuth2AuthenticationSuccessHandler customOAuth2AuthenticationSuccessHandler) {
-		this.authorizationRequestRepository = authorizationRequestRepository;
-		this.customOAuth2AuthenticationSuccessHandler = customOAuth2AuthenticationSuccessHandler;
+	@Bean
+	public WebSecurityCustomizer webSecurityCustomizer() {
+		return web -> web.ignoring()
+			.antMatchers("/h2-console/**")
+			.antMatchers("/**");
 	}
 
 	@Bean
@@ -44,6 +56,9 @@ public class SecurityConfig {
 			.and()
 			.successHandler(customOAuth2AuthenticationSuccessHandler)
 			.and()
+			.exceptionHandling().accessDeniedHandler(customAuthAccessDeniedHandler)
+			.and()
+			.addFilterBefore(new JwtAuthenticationFilter(jwt), UsernamePasswordAuthenticationFilter.class)
 			.build();
 	}
 }

@@ -28,12 +28,16 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.palpal.dealightbe.config.SecurityConfig;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
+import com.palpal.dealightbe.domain.auth.filter.JwtAuthenticationFilter;
 import com.palpal.dealightbe.domain.store.application.StoreService;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreUpdateReq;
@@ -45,7 +49,8 @@ import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 
 @WebMvcTest(value = StoreController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class,
-	OAuth2ClientAutoConfiguration.class})
+	OAuth2ClientAutoConfiguration.class}, excludeFilters = {
+	@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class)})
 @AutoConfigureRestDocs
 class StoreControllerTest {
 
@@ -61,7 +66,6 @@ class StoreControllerTest {
 	@Test
 	@DisplayName("업체 등록 성공")
 	void registerStoreSuccessTest() throws Exception {
-
 		//given
 		Long memberId = 1L;
 		LocalTime openTime = LocalTime.of(9, 0);

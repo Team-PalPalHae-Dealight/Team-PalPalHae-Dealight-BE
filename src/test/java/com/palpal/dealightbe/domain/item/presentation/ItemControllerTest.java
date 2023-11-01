@@ -12,12 +12,16 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.palpal.dealightbe.config.SecurityConfig;
+import com.palpal.dealightbe.domain.auth.filter.JwtAuthenticationFilter;
 import com.palpal.dealightbe.domain.item.application.ItemService;
 import com.palpal.dealightbe.domain.item.application.dto.request.ItemReq;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
@@ -47,7 +51,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = ItemController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class,
-	OAuth2ClientAutoConfiguration.class})
+	OAuth2ClientAutoConfiguration.class}, excludeFilters = {
+	@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class)})
 @AutoConfigureRestDocs
 class ItemControllerTest {
 
@@ -98,7 +103,8 @@ class ItemControllerTest {
 	@Test
 	public void itemCreateSuccessTest() throws Exception {
 		//given
-		ItemReq itemReq = new ItemReq(item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage());
+		ItemReq itemReq = new ItemReq(item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(),
+			item.getDescription(), item.getInformation(), item.getImage());
 		ItemRes itemRes = ItemRes.from(item);
 
 		Long memberId = 1L;
@@ -162,7 +168,8 @@ class ItemControllerTest {
 			.store(store)
 			.build();
 
-		ItemReq itemReq = new ItemReq(item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage());
+		ItemReq itemReq = new ItemReq(item2.getName(), item2.getStock(), item2.getDiscountPrice(),
+			item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage());
 		ItemRes itemRes = ItemRes.from(item2);
 
 		Long memberId = 1L;
@@ -219,7 +226,8 @@ class ItemControllerTest {
 
 		Long memberId = 1L;
 
-		when(itemService.create(any(), anyLong())).thenThrow(new BusinessException(ErrorCode.INVALID_ITEM_DISCOUNT_PRICE));
+		when(itemService.create(any(), anyLong())).thenThrow(
+			new BusinessException(ErrorCode.INVALID_ITEM_DISCOUNT_PRICE));
 
 		//when
 		//then
@@ -308,7 +316,8 @@ class ItemControllerTest {
 		Long memberId = 1L;
 
 		ItemReq itemReq = new ItemReq("치즈 떡볶이", 4, 9900, 14000, "치즈 떡볶이 입니다.", "통신사 할인 가능 합니다.", null);
-		ItemRes itemRes = new ItemRes(itemId, 1L, itemReq.name(), itemReq.stock(), itemReq.discountPrice(), itemReq.originalPrice(), itemReq.description(), itemReq.information(), itemReq.image());
+		ItemRes itemRes = new ItemRes(itemId, 1L, itemReq.name(), itemReq.stock(), itemReq.discountPrice(),
+			itemReq.originalPrice(), itemReq.description(), itemReq.information(), itemReq.image());
 
 		when(itemService.update(any(), any(), any())).thenReturn(itemRes);
 
@@ -372,7 +381,8 @@ class ItemControllerTest {
 			.store(store)
 			.build();
 
-		ItemReq itemReq = new ItemReq(item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage());
+		ItemReq itemReq = new ItemReq(item2.getName(), item2.getStock(), item2.getDiscountPrice(),
+			item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage());
 		ItemRes itemRes = ItemRes.from(item2);
 
 		when(itemService.update(any(), any(), any())).thenReturn(itemRes);
@@ -429,7 +439,8 @@ class ItemControllerTest {
 		Long memberId = 1L;
 		Long itemId = 1L;
 
-		when(itemService.update(any(), any(), any())).thenThrow(new BusinessException(ErrorCode.INVALID_ITEM_DISCOUNT_PRICE));
+		when(itemService.update(any(), any(), any())).thenThrow(
+			new BusinessException(ErrorCode.INVALID_ITEM_DISCOUNT_PRICE));
 
 		//when
 		//then

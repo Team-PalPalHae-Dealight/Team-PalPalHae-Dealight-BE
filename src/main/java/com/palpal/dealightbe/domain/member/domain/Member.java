@@ -71,4 +71,8 @@ public class Member extends BaseEntity {
 	public void updateAddress(Address address) {
 		this.address.updateInfo(address.getName(), address.getXCoordinate(), address.getYCoordinate());
 	}
+
+	public void changeMemberRoles(List<MemberRole> memberRoles) {
+		this.memberRoles = memberRoles;
+	}
 }

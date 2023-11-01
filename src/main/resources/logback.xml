@@ -1,9 +1,13 @@
 <configuration>
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %F, method:%M, %L line : %m%n</pattern>
+            <pattern>%clr(%d{HH:mm:ss.SSS}){magenta} %clr([%thread]){blue} %clr(%-5level){} %clr(%F, method:%M, %L line){cyan} : %m%n
+            </pattern>
         </encoder>
     </appender>
+
     <root level="info">
         <appender-ref ref="STDOUT"/>
     </root>
