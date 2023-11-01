@@ -152,7 +152,7 @@ class ItemServiceTest {
 
 	@DisplayName("상품 상세 정보 조회(단건) 실패 테스트 - 상품이 존재하지 않는 경우")
 	@Test
-	void itemFindByIdFailureTest() {
+	void itemFindByIdFailureTest_notFoundItem() {
 		//given
 		Long itemId = 1L;
 		when(itemRepository.findById(itemId)).thenReturn(Optional.empty());
