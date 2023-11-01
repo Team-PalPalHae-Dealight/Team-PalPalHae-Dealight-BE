@@ -27,8 +27,8 @@ import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 
-import static com.palpal.dealightbe.global.error.ErrorCode.ALREADY_REGISTERED_ITEM_NAME;
-import static com.palpal.dealightbe.global.error.ErrorCode.STORE_HAS_NOT_ITEM;
+import static com.palpal.dealightbe.global.error.ErrorCode.DUPLICATED_ITEM_NAME;
+import static com.palpal.dealightbe.global.error.ErrorCode.STORE_HAS_NO_ITEM;
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -263,7 +263,7 @@ class ItemControllerTest {
 
 		Long memberId = 1L;
 
-		doThrow(new BusinessException(ALREADY_REGISTERED_ITEM_NAME)).when(
+		doThrow(new BusinessException(DUPLICATED_ITEM_NAME)).when(
 			itemService).create(any(), any());
 
 		//when
@@ -475,7 +475,7 @@ class ItemControllerTest {
 		Long memberId = 1L;
 		Long itemId = 1L;
 
-		doThrow(new BusinessException(ALREADY_REGISTERED_ITEM_NAME)).when(
+		doThrow(new BusinessException(DUPLICATED_ITEM_NAME)).when(
 			itemService).update(any(), any(), any());
 
 		//when
@@ -538,12 +538,12 @@ class ItemControllerTest {
 
 	@DisplayName("상품 삭제 실패 테스트 - 요청된 상품이 해당 업체에 등록되지 않은 상품인 경우")
 	@Test
-	public void itemDeleteFailureTest_storeHasNotItem() throws Exception {
+	public void itemDeleteFailureTest_storeHasNoItem() throws Exception {
 		//given
 		Long itemId = 1L;
 		Long memberId = 1L;
 
-		doThrow(new BusinessException(STORE_HAS_NOT_ITEM)).when(
+		doThrow(new BusinessException(STORE_HAS_NO_ITEM)).when(
 			itemService).delete(any(), any());
 
 		//when
@@ -557,7 +557,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.errors").isEmpty())
 			.andExpect(jsonPath("$.message").value("요청하신 상품은 해당 업체에 등록되지 않은 상품입니다."))
 			.andDo(print())
-			.andDo(document("item-delete-store-has-not-item",
+			.andDo(document("item-delete-store-has-no-item",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),

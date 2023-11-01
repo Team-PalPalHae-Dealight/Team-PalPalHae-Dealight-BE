@@ -25,9 +25,9 @@ public enum ErrorCode {
 	//상품
 	INVALID_ITEM_DISCOUNT_PRICE("I001", "상품 할인가는 원가보다 클 수 없습니다."),
 	NOT_FOUND_ITEM("I002", "상품이 존재하지 않습니다."),
-	ALREADY_REGISTERED_ITEM_NAME("I003", "동일한 이름을 가진 상품이 이미 등록되어 있습니다."),
-	INVALID_ITEM_QUANTITY("I004", "상품 재고가 부족합니다"),
-	STORE_HAS_NOT_ITEM("I005", "요청하신 상품은 해당 업체에 등록되지 않은 상품입니다."),
+	DUPLICATED_ITEM_NAME("I003", "동일한 이름을 가진 상품이 이미 등록되어 있습니다."),
+	INVALID_ITEM_QUANTITY(	"I004", "상품 재고가 부족합니다"),
+	STORE_HAS_NO_ITEM("I005", "요청하신 상품은 해당 업체에 등록되지 않은 상품입니다."),
 
 	//파일
 	NOT_FOUND_IMAGE("F001", "존재하지 않는 이미지 입니다."),

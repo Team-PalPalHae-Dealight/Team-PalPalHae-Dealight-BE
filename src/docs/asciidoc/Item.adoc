@@ -144,13 +144,13 @@ include::{snippets}/item-delete/request-fields.adoc[]
 include::{snippets}/item-delete/http-response.adoc[]
 
 .Request Fail - 요청된 상품이 해당 업체에 등록되지 않은 상품인 경우
-include::{snippets}/item-delete-store-has-not-item/http-request.adoc[]
+include::{snippets}/item-delete-store-has-no-item/http-request.adoc[]
 
-include::{snippets}/item-delete-store-has-not-item/path-parameters.adoc[]
+include::{snippets}/item-delete-store-has-no-item/path-parameters.adoc[]
 
-include::{snippets}/item-delete-store-has-not-item/request-parameters.adoc[]
+include::{snippets}/item-delete-store-has-no-item/request-parameters.adoc[]
 
 .Response Fail - 요청된 상품이 해당 업체에 등록되지 않은 상품인 경우
-include::{snippets}/item-delete-store-has-not-item/http-response.adoc[]
+include::{snippets}/item-delete-store-has-no-item/http-response.adoc[]
 
-include::{snippets}/item-delete-store-has-not-item/response-fields.adoc[]
+include::{snippets}/item-delete-store-has-no-item/response-fields.adoc[]

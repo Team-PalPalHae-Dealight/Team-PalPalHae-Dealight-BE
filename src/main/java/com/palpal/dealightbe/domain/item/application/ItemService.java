@@ -33,7 +33,7 @@ public class ItemService {
 				return new EntityNotFoundException(NOT_FOUND_STORE);
 			});
 
-		checkAlreadyRegisteredItemName(itemReq.name(), store.getId());
+		checkDuplicatedItemName(itemReq.name(), store.getId());
 
 		Item item = ItemReq.toItem(itemReq, store);
 		Item savedItem = itemRepository.save(item);
@@ -48,7 +48,7 @@ public class ItemService {
 				return new EntityNotFoundException(NOT_FOUND_STORE);
 			});
 
-		checkAlreadyRegisteredItemName(itemReq.name(), store.getId());
+		checkDuplicatedItemName(itemReq.name(), store.getId());
 
 		Item item = itemRepository.findById(itemId)
 			.orElseThrow(() -> {
@@ -82,15 +82,15 @@ public class ItemService {
 
 	private void checkStoreHasItem(Long itemId, Long storeId) {
 		if (!itemRepository.existsByIdAndStoreId(itemId, storeId)) {
-			log.warn("STORE_HAS_NOT_ITEM : itemId = {}, storeId = {}", itemId, storeId);
-			throw new BusinessException(STORE_HAS_NOT_ITEM);
+			log.warn("STORE_HAS_NO_ITEM : itemId = {}, storeId = {}", itemId, storeId);
+			throw new BusinessException(STORE_HAS_NO_ITEM);
 		}
 	}
 
-	private void checkAlreadyRegisteredItemName(String itemName, Long storeId) {
+	private void checkDuplicatedItemName(String itemName, Long storeId) {
 		if (itemRepository.existsByNameAndStoreId(itemName, storeId)) {
-			log.warn("ALREADY_REGISTERED_ITEM_NAME : {}", itemName);
-			throw new BusinessException(ALREADY_REGISTERED_ITEM_NAME);
+			log.warn("DUPLICATED_ITEM_NAME : {}", itemName);
+			throw new BusinessException(DUPLICATED_ITEM_NAME);
 		}
 	}
 }
