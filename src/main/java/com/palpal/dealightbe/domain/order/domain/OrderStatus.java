@@ -1,5 +1,7 @@
 package com.palpal.dealightbe.domain.order.domain;
 
+import java.util.Arrays;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -12,4 +14,9 @@ public enum OrderStatus {
 	CANCELED("주문 취소");
 
 	private final String text;
+
+	public static boolean isValidStatus(String status) {
+		return Arrays.stream(OrderStatus.values())
+			.anyMatch(orderStatus -> orderStatus.name().equals(status));
+	}
 }
