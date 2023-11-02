@@ -1,7 +1,9 @@
 package com.palpal.dealightbe.domain.item.presentation;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +16,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
@@ -25,6 +30,7 @@ import com.palpal.dealightbe.domain.auth.filter.JwtAuthenticationFilter;
 import com.palpal.dealightbe.domain.item.application.ItemService;
 import com.palpal.dealightbe.domain.item.application.dto.request.ItemReq;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
+import com.palpal.dealightbe.domain.item.application.dto.response.ItemsRes;
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
@@ -40,6 +46,8 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.NULL;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
@@ -375,6 +383,54 @@ class ItemControllerTest {
 					fieldWithPath("code").type(STRING).description("예외 코드"),
 					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
 					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@DisplayName("상품 목록 조회(업체 시점) 성공 테스트")
+	@Test
+	void itemFindAllForStoreSuccessTest() throws Exception {
+		//given
+		Long memberId = 1L;
+
+		int size = 5;
+		int page = 0;
+		PageRequest pageRequest = PageRequest.of(page, size);
+
+		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage());
+		List<ItemRes> itemResList = List.of(itemRes);
+		ItemsRes itemsRes = new ItemsRes(itemResList);
+
+		when(itemService.findAllForStore(any(), eq(pageRequest))).thenReturn(itemsRes);
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/items/stores")
+				.contentType(MediaType.APPLICATION_JSON)
+				.param("memberId", memberId.toString())
+				.param("size", String.valueOf(size))
+				.param("page", String.valueOf(page)))
+			.andExpect(status().isOk())
+			.andDo(print())
+			.andDo(document("item-find-All-for-store",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestParameters(
+					List.of(parameterWithName("memberId").description("고객 ID"),
+						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
+						parameterWithName("page").description("페이지 번호")
+					)),
+				responseFields(
+					fieldWithPath("itemResponses").type(ARRAY).description("상품 목록"),
+					fieldWithPath("itemResponses[0].itemId").type(NUMBER).description("상품 ID"),
+					fieldWithPath("itemResponses[0].storeId").type(NUMBER).description("업체 ID"),
+					fieldWithPath("itemResponses[0].name").description("상품 이름"),
+					fieldWithPath("itemResponses[0].stock").type(NUMBER).description("재고 수"),
+					fieldWithPath("itemResponses[0].discountPrice").type(NUMBER).description("할인가"),
+					fieldWithPath("itemResponses[0].originalPrice").type(NUMBER).description("원가"),
+					fieldWithPath("itemResponses[0].description").type(STRING).description("상세 설명"),
+					fieldWithPath("itemResponses[0].information").type(STRING).description("안내 사항"),
+					fieldWithPath("itemResponses[0].image").type(NULL).description("상품 이미지")
 				)
 			));
 	}
