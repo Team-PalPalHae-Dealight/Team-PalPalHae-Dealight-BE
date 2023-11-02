@@ -4,6 +4,7 @@ import java.net.URI;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -55,5 +56,16 @@ public class OrderController {
 		OrderStatusUpdateRes orderStatusUpdateRes = orderService.updateStatus(orderId, request, memberProviderId);
 
 		return ResponseEntity.ok(orderStatusUpdateRes);
+	}
+
+	@GetMapping("/{orderId}/{memberProviderId}")
+	public ResponseEntity<OrderRes> findById(
+		@PathVariable Long orderId,
+		@PathVariable Long memberProviderId
+	) {
+
+		OrderRes orderRes = orderService.findById(orderId, memberProviderId);
+
+		return ResponseEntity.ok(orderRes);
 	}
 }
