@@ -3,11 +3,14 @@ package com.palpal.dealightbe.domain.item.application;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.palpal.dealightbe.domain.item.application.dto.request.ItemReq;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
+import com.palpal.dealightbe.domain.item.application.dto.response.ItemsRes;
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.store.domain.Store;
@@ -51,6 +54,16 @@ public class ItemService {
 			});
 
 		return ItemRes.from(item);
+	}
+
+	@Transactional(readOnly = true)
+	public ItemsRes findAllForStore(Long memberId) {
+		Store store = storeRepository.findByMemberId(memberId)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_STORE));
+
+		List<Item> items = itemRepository.findAllByStoreId(store.getId());
+
+		return ItemsRes.from(items);
 	}
 
 	public ItemRes update(Long itemId, ItemReq itemReq, Long memberId) {

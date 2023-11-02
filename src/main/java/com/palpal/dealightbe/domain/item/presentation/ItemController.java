@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.palpal.dealightbe.domain.item.application.ItemService;
 import com.palpal.dealightbe.domain.item.application.dto.request.ItemReq;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
+import com.palpal.dealightbe.domain.item.application.dto.response.ItemsRes;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/items")
@@ -37,6 +38,13 @@ public class ItemController {
 		ItemRes itemRes = itemService.findById(itemId);
 
 		return ResponseEntity.ok(itemRes);
+	}
+
+	@GetMapping("/stores")
+	public ResponseEntity<ItemsRes> findAllForStore(@RequestParam Long memberId) {
+		ItemsRes itemsRes = itemService.findAllForStore(memberId);
+
+		return ResponseEntity.ok(itemsRes);
 	}
 
 	@PatchMapping("/{id}")
