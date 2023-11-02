@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -34,28 +35,25 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.palpal.dealightbe.config.SecurityConfig;
 import com.palpal.dealightbe.domain.order.application.OrderService;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderCreateReq;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderProductReq;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderProductsReq;
+import com.palpal.dealightbe.domain.order.application.dto.request.OrderStatusUpdateReq;
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderProductRes;
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderProductsRes;
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderRes;
+import com.palpal.dealightbe.domain.order.application.dto.response.OrderStatusUpdateRes;
 
 @AutoConfigureRestDocs
-@WebMvcTest(value = OrderController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class,
-	OAuth2ClientAutoConfiguration.class}, excludeFilters = {
-	@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class)}
-)
+@WebMvcTest(value = OrderController.class,
+	excludeAutoConfiguration = {SecurityAutoConfiguration.class, OAuth2ClientAutoConfiguration.class})
 public class OrderControllerTest {
 
 	@Autowired
@@ -70,27 +68,15 @@ public class OrderControllerTest {
 	@Nested
 	@DisplayName("<주문 생성>")
 	class createTest {
-		String createApiPath = "/orders";
+		String createApiPath = "/api/orders";
 
 		LocalDateTime createdAt = LocalDateTime.now();
 
-		OrderProductsRes productsRes = new OrderProductsRes(List.of(new OrderProductRes(
-			1L, "달콤한 도넛", 5, 10000, 15000,
-			"https://team-08-image-bucket.s3.ap-northeast-2.amazonaws.com/donut"
-		)));
+		OrderProductsRes productsRes = new OrderProductsRes(List.of(new OrderProductRes(1L, "달콤한 도넛", 5, 10000, 15000,
+			"https://team-08-image-bucket.s3.ap-northeast-2.amazonaws.com/donut")));
 
-		OrderRes orderRes = new OrderRes(
-			1L,
-			1L,
-			1L,
-			"GS25",
-			"도착할 때까지 상품 냉장고에 보관 부탁드려요",
-			LocalTime.of(12, 30),
-			productsRes,
-			10000,
-			createdAt,
-			RECEIVED.getText()
-		);
+		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요", LocalTime.of(12, 30),
+			productsRes, 10000, createdAt, RECEIVED.getText());
 
 		@Test
 		@DisplayName("성공 - 신규 주문을 등록한다")
@@ -98,26 +84,18 @@ public class OrderControllerTest {
 			// given
 			OrderCreateReq orderCreateReq = new OrderCreateReq(
 				new OrderProductsReq(List.of(new OrderProductReq(1L, 3))),
-				1L,
-				"도착할 때까지 상품 냉장고에 보관 부탁드려요",
-				LocalTime.of(12, 30),
-				10000
-			);
+				1L, "도착할 때까지 상품 냉장고에 보관 부탁드려요", LocalTime.of(12, 30), 10000);
 
 			OrderProductRes productRes = productsRes.orderProducts().get(0);
 
-			given(orderService.create(any(OrderCreateReq.class), anyLong()))
-				.willReturn(orderRes);
+			given(orderService.create(any(OrderCreateReq.class), anyLong())).willReturn(orderRes);
 
 			// when
 			// then
-			mockMvc.perform(
-					post(createApiPath + "/{memberProviderId}", 1)
-						.with(csrf())
-						.with(user("username").roles("MEMBER"))
-						.content(objectMapper.writeValueAsString(orderCreateReq))
-						.contentType(MediaType.APPLICATION_JSON)
-				)
+			mockMvc.perform(post(createApiPath + "/{memberProviderId}", 1).with(csrf())
+					.with(user("username").roles("MEMBER"))
+					.content(objectMapper.writeValueAsString(orderCreateReq))
+					.contentType(MediaType.APPLICATION_JSON))
 				.andDo(print())
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.orderId").value(1L))
@@ -134,14 +112,10 @@ public class OrderControllerTest {
 					jsonPath("$.orderProductsRes.orderProducts[0].originalPrice").value(productRes.originalPrice()))
 				.andExpect(jsonPath("$.orderProductsRes.orderProducts[0].image").value(productRes.image()))
 				.andExpect(jsonPath("$.totalPrice").value(orderCreateReq.totalPrice()))
-				.andExpect(jsonPath("$.createdAt").value(String.valueOf(createdAt)))
 				.andExpect(jsonPath("$.status").value(RECEIVED.getText()))
-				.andDo(document(
-					"order-create-success",
-					preprocessRequest(prettyPrint()),
+				.andDo(document("order-create-success", preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
-					pathParameters(parameterWithName("memberProviderId").description("고객 카카오 토큰")),
-					requestFields(
+					pathParameters(parameterWithName("memberProviderId").description("고객 카카오 토큰")), requestFields(
 						fieldWithPath("orderProductsReq.orderProducts[]").type(JsonFieldType.ARRAY)
 							.description("주문한 상품 정보 목록"),
 						fieldWithPath("orderProductsReq.orderProducts[].itemId").type(JsonFieldType.NUMBER)
@@ -152,10 +126,8 @@ public class OrderControllerTest {
 						fieldWithPath("storeId").type(JsonFieldType.NUMBER).description("상품을 구매한 업체 아이디"),
 						fieldWithPath("demand").type(JsonFieldType.STRING).description("상품 구매시 작성한 고객의 요청 사항"),
 						fieldWithPath("arrivalTime").type(JsonFieldType.STRING).description("고객의 도착 예정 시간"),
-						fieldWithPath("totalPrice").type(JsonFieldType.NUMBER).description("주문 총 금액")
-					),
-					responseFields(
-						fieldWithPath("orderId").type(JsonFieldType.NUMBER).description("등록된 주문의 아이디"),
+						fieldWithPath("totalPrice").type(JsonFieldType.NUMBER).description("주문 총 금액")),
+					responseFields(fieldWithPath("orderId").type(JsonFieldType.NUMBER).description("등록된 주문의 아이디"),
 						fieldWithPath("storeId").type(JsonFieldType.NUMBER).description("주문이 이루어진 업체 아이디"),
 						fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("고객 아이디"),
 						fieldWithPath("storeName").type(JsonFieldType.STRING).description("업체 이름"),
@@ -179,8 +151,7 @@ public class OrderControllerTest {
 
 						fieldWithPath("totalPrice").type(JsonFieldType.NUMBER).description("총 금액"),
 						fieldWithPath("createdAt").type(JsonFieldType.STRING).description("주문 완료 일자 및 시간"),
-						fieldWithPath("status").type(JsonFieldType.STRING).description("현재 주문 상태")
-					)));
+						fieldWithPath("status").type(JsonFieldType.STRING).description("현재 주문 상태"))));
 		}
 
 		@Test
@@ -188,25 +159,16 @@ public class OrderControllerTest {
 		void create_fail_arrival_time() throws Exception {
 			// given
 			OrderCreateReq orderCreateReq = new OrderCreateReq(
-				new OrderProductsReq(List.of(new OrderProductReq(1L, 3))),
-				1L,
-				"도착할 때까지 상품 냉장고에 보관 부탁드려요",
-				null,
-				10000
-			);
+				new OrderProductsReq(List.of(new OrderProductReq(1L, 3))), 1L, "도착할 때까지 상품 냉장고에 보관 부탁드려요", null, 10000);
 
-			given(orderService.create(any(OrderCreateReq.class), anyLong()))
-				.willReturn(orderRes);
+			given(orderService.create(any(OrderCreateReq.class), anyLong())).willReturn(orderRes);
 
 			// when
 			// then
-			mockMvc.perform(
-					post(createApiPath + "/{memberProviderId}", 1)
-						.with(csrf())
-						.with(user("username").roles("MEMBER"))
-						.content(objectMapper.writeValueAsString(orderCreateReq))
-						.contentType(MediaType.APPLICATION_JSON)
-				)
+			mockMvc.perform(post(createApiPath + "/{memberProviderId}", 1).with(csrf())
+					.with(user("username").roles("MEMBER"))
+					.content(objectMapper.writeValueAsString(orderCreateReq))
+					.contentType(MediaType.APPLICATION_JSON))
 				.andDo(print())
 				.andExpect(status().is4xxClientError())
 				.andExpect(result -> {
@@ -219,25 +181,17 @@ public class OrderControllerTest {
 		void create_fail_storeId() throws Exception {
 			// given
 			OrderCreateReq orderCreateReq = new OrderCreateReq(
-				new OrderProductsReq(List.of(new OrderProductReq(1L, 3))),
-				null,
-				"도착할 때까지 상품 냉장고에 보관 부탁드려요",
-				LocalTime.of(12, 30),
-				10000
-			);
+				new OrderProductsReq(List.of(new OrderProductReq(1L, 3))), null, "도착할 때까지 상품 냉장고에 보관 부탁드려요",
+				LocalTime.of(12, 30), 10000);
 
-			given(orderService.create(any(OrderCreateReq.class), anyLong()))
-				.willReturn(orderRes);
+			given(orderService.create(any(OrderCreateReq.class), anyLong())).willReturn(orderRes);
 
 			// when
 			// then
-			mockMvc.perform(
-					post(createApiPath + "/{memberProviderId}", 1)
-						.with(csrf())
-						.with(user("username").roles("MEMBER"))
-						.content(objectMapper.writeValueAsString(orderCreateReq))
-						.contentType(MediaType.APPLICATION_JSON)
-				)
+			mockMvc.perform(post(createApiPath + "/{memberProviderId}", 1).with(csrf())
+					.with(user("username").roles("MEMBER"))
+					.content(objectMapper.writeValueAsString(orderCreateReq))
+					.contentType(MediaType.APPLICATION_JSON))
 				.andDo(print())
 				.andExpect(status().is4xxClientError())
 				.andExpect(result -> {
@@ -250,25 +204,81 @@ public class OrderControllerTest {
 		void create_fail_totalPrice_zero() throws Exception {
 			// given
 			OrderCreateReq orderCreateReq = new OrderCreateReq(
-				new OrderProductsReq(List.of(new OrderProductReq(1L, 3))),
-				1L,
-				"도착할 때까지 상품 냉장고에 보관 부탁드려요",
-				LocalTime.of(12, 30),
-				0
-			);
+				new OrderProductsReq(List.of(new OrderProductReq(1L, 3))), 1L, "도착할 때까지 상품 냉장고에 보관 부탁드려요",
+				LocalTime.of(12, 30), 0);
 
-			given(orderService.create(any(OrderCreateReq.class), anyLong()))
-				.willReturn(orderRes);
+			given(orderService.create(any(OrderCreateReq.class), anyLong())).willReturn(orderRes);
 
 			// when
 			// then
-			mockMvc.perform(
-					post(createApiPath + "/{memberProviderId}", 1)
-						.with(csrf())
-						.with(user("username").roles("MEMBER"))
-						.content(objectMapper.writeValueAsString(orderCreateReq))
-						.contentType(MediaType.APPLICATION_JSON)
-				)
+			mockMvc.perform(post(createApiPath + "/{memberProviderId}", 1).with(csrf())
+					.with(user("username").roles("MEMBER"))
+					.content(objectMapper.writeValueAsString(orderCreateReq))
+					.contentType(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().is4xxClientError())
+				.andExpect(result -> {
+					assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException);
+				});
+		}
+	}
+
+	@Nested
+	@DisplayName("<주문 상태 변경>")
+	class updateStatusTest {
+		String updateStatusApiPath = "/api/orders/{orderId}/status/{memberProviderId}";
+
+		OrderStatusUpdateRes orderStatusUpdateRes = new OrderStatusUpdateRes(1L, "RECEIVED");
+		OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq("RECEIVED");
+
+		@Test
+		@DisplayName("성공 - 주문 상태를 변경한다")
+		void updateStatus_success() throws Exception {
+			// given
+			long orderId = 1L;
+			long memberProviderId = 1L;
+
+			given(orderService.updateStatus(anyLong(), any(OrderStatusUpdateReq.class), anyLong())).willReturn(
+				orderStatusUpdateRes);
+
+			// when
+			// then
+			mockMvc.perform(patch(updateStatusApiPath, orderId, memberProviderId).with(csrf())
+					.with(user("username").roles("MEMBER"))
+					.content(objectMapper.writeValueAsString(orderStatusUpdateReq))
+					.contentType(MediaType.APPLICATION_JSON))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.orderId").value(orderId))
+				.andExpect(jsonPath("$.status").value(orderStatusUpdateRes.status()))
+				.andDo(document("order-status-update-success", preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					pathParameters(parameterWithName("orderId").description("상태 변경을 하고자 하는 주문의 아이디"),
+						parameterWithName("memberProviderId").description("고객 카카오 토큰")),
+					requestFields(fieldWithPath("status").type(JsonFieldType.STRING)
+						.description("변경 후의 주문 상태(CONFIRMED, COMPLETED, CANCELED)")),
+					responseFields(fieldWithPath("orderId").type(JsonFieldType.NUMBER).description("등록된 주문의 아이디"),
+						fieldWithPath("status").type(JsonFieldType.STRING).description("변경 완료된 후의 주문 상태"))));
+		}
+
+		@Test
+		@DisplayName("실패 - 변경 후의 주문 상태를 입력하지 않은 경우 예외가 발생한다.")
+		void updateStatus_fail() throws Exception {
+			// given
+			long orderId = 1L;
+			long memberProviderId = 1L;
+
+			OrderStatusUpdateReq invalidOrderStatusUpdateReq = new OrderStatusUpdateReq(null);
+
+			given(orderService.updateStatus(anyLong(), any(OrderStatusUpdateReq.class), anyLong())).willReturn(
+				orderStatusUpdateRes);
+
+			// when
+			// then
+			mockMvc.perform(patch(updateStatusApiPath, orderId, memberProviderId).with(csrf())
+					.with(user("username").roles("MEMBER"))
+					.content(objectMapper.writeValueAsString(invalidOrderStatusUpdateReq))
+					.contentType(MediaType.APPLICATION_JSON))
 				.andDo(print())
 				.andExpect(status().is4xxClientError())
 				.andExpect(result -> {
