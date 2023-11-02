@@ -6,12 +6,9 @@ files:
     overwrite: yes
 
 permissions:
-  - object: /home/ubuntu/app
-    owner: root
-    group: root
+  - object: /
 
 hooks:
   ApplicationStart:
     - location: deploy.sh
       timeout: 60
-      runas: root

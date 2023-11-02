@@ -1,4 +1,5 @@
 #!/bin/bash
+chmod 755 -R /home/ubuntu/app
 cd /home/ubuntu/app
 DOCKER_APP_NAME=dealight
 
