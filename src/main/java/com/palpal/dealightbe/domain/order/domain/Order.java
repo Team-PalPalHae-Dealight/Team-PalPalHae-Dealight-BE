@@ -82,7 +82,7 @@ public class Order extends BaseEntity {
 		Pair.of("CONFIRMED", "CANCELED")
 	);
 
-	private static final Set<Pair<String, String>> OrderStatusSequenceOfStore = Set.of(
+	private static final Set<Pair<String, String>> orderStatusSequenceOfStore = Set.of(
 		Pair.of("RECEIVED", "CONFIRMED"),
 		Pair.of("RECEIVED", "CANCELED"),
 		Pair.of("CONFIRMED", "COMPLETED"),
@@ -101,7 +101,7 @@ public class Order extends BaseEntity {
 	}
 
 	public void addOrderItems(List<OrderItem> orderItems) {
-		if (orderItems.size() > 5) {
+		if (orderItems.size() > MAX_ORDER_ITEMS) {
 			log.warn("POST:WRITE:EXCEEDED_ORDER_ITEMS : {}", orderItems.size());
 			throw new BusinessException(EXCEEDED_ORDER_ITEMS);
 		}
@@ -176,7 +176,7 @@ public class Order extends BaseEntity {
 			log.warn("PATCH:UPDATE:MEMBER:CANNOT_CHANGE_STATUS:{} -> {}", originalStatus, changedStatus);
 			throw new BusinessException(INVALID_ORDER_STATUS);
 		}
-		if (isStoreOwner(updater) && !OrderStatusSequenceOfStore.contains(inputSequence)) {
+		if (isStoreOwner(updater) && !orderStatusSequenceOfStore.contains(inputSequence)) {
 			log.warn("PATCH:UPDATE:STORE:CANNOT_CHANGE_STATUS:{} -> {}", originalStatus, changedStatus);
 			throw new BusinessException(INVALID_ORDER_STATUS);
 		}
