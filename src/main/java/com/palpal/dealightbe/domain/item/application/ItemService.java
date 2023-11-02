@@ -3,8 +3,8 @@ package com.palpal.dealightbe.domain.item.application;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,11 +57,11 @@ public class ItemService {
 	}
 
 	@Transactional(readOnly = true)
-	public ItemsRes findAllForStore(Long memberId) {
+	public ItemsRes findAllForStore(Long memberId, Pageable pageable) {
 		Store store = storeRepository.findByMemberId(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_STORE));
 
-		List<Item> items = itemRepository.findAllByStoreId(store.getId());
+		Page<Item> items = itemRepository.findAllByStoreId(store.getId(), pageable);
 
 		return ItemsRes.from(items);
 	}
