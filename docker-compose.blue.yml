@@ -1,9 +1,8 @@
 # blue
 # blue 컨테이너는 8080으로 포트를 노출해서 실행
-version: '3'
+version: "3"
 services:
-  dealight-api-springboot:
-    container_name: dealight-api-springboot-blue
+  dealight-blue:
     build:
       context: ./
       dockerfile: Dockerfile
