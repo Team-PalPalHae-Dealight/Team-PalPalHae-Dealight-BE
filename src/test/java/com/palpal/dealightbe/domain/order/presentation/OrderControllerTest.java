@@ -113,7 +113,7 @@ public class OrderControllerTest {
 				.andExpect(jsonPath("$.orderProductsRes.orderProducts[0].image").value(productRes.image()))
 				.andExpect(jsonPath("$.totalPrice").value(orderCreateReq.totalPrice()))
 				.andExpect(jsonPath("$.status").value(RECEIVED.getText()))
-				.andDo(document("order-create-success", preprocessRequest(prettyPrint()),
+				.andDo(document("order/order-create-success", preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
 					pathParameters(parameterWithName("memberProviderId").description("고객 카카오 토큰")), requestFields(
 						fieldWithPath("orderProductsReq.orderProducts[]").type(JsonFieldType.ARRAY)
@@ -251,7 +251,7 @@ public class OrderControllerTest {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.orderId").value(orderId))
 				.andExpect(jsonPath("$.status").value(orderStatusUpdateRes.status()))
-				.andDo(document("order-status-update-success", preprocessRequest(prettyPrint()),
+				.andDo(document("order/order-status-update-success", preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
 					pathParameters(parameterWithName("orderId").description("상태 변경을 하고자 하는 주문의 아이디"),
 						parameterWithName("memberProviderId").description("고객 카카오 토큰")),
