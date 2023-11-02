@@ -257,7 +257,7 @@ public class OrderControllerTest {
 						parameterWithName("memberProviderId").description("고객 카카오 토큰")),
 					requestFields(fieldWithPath("status").type(JsonFieldType.STRING)
 						.description("변경 후의 주문 상태(CONFIRMED, COMPLETED, CANCELED)")),
-					responseFields(fieldWithPath("orderId").type(JsonFieldType.NUMBER).description("등록된 주문의 아이디"),
+					responseFields(fieldWithPath("orderId").type(JsonFieldType.NUMBER).description("상태가 변경된 주문의 아이디"),
 						fieldWithPath("status").type(JsonFieldType.STRING).description("변경 완료된 후의 주문 상태"))));
 		}
 
