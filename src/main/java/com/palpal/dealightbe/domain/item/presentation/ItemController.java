@@ -3,6 +3,7 @@ package com.palpal.dealightbe.domain.item.presentation;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -42,7 +43,7 @@ public class ItemController {
 	}
 
 	@GetMapping("/stores")
-	public ResponseEntity<ItemsRes> findAllForStore(@RequestParam Long memberId, Pageable pageable) {
+	public ResponseEntity<ItemsRes> findAllForStore(@RequestParam Long memberId, @PageableDefault(size = 5) Pageable pageable) {
 		ItemsRes itemsRes = itemService.findAllForStore(memberId, pageable);
 
 		return ResponseEntity.ok(itemsRes);
