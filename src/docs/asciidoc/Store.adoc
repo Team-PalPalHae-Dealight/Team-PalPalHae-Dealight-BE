@@ -62,6 +62,30 @@ include::{snippets}/store/store-update-info/path-parameters.adoc[]
 include::{snippets}/store/store-update-info/http-response.adoc[]
 include::{snippets}/store/store-update-info/response-fields.adoc[]
 
+=== 업체 영업 상태 수정
+
+==== /api/stores/status/{memberId}/{storeId}
+
+.Request
+include::{snippets}/store/store-status-update/http-request.adoc[]
+include::{snippets}/store/store-status-update/path-parameters.adoc[]
+include::{snippets}/store/store-status-update/request-fields.adoc[]
+.Response
+include::{snippets}/store/store-status-update/http-response.adoc[]
+include::{snippets}/store/store-status-update/response-fields.adoc[]
+
+=== 업체 이미지 등록
+
+==== /api/stores/images/{memberId}/{storeId}
+
+.Request
+include::{snippets}/store/store-upload-image/http-request.adoc[]
+include::{snippets}/store/store-status-update/path-parameters.adoc[]
+include::{snippets}/store/store-upload-image/request-parts.adoc[]
+.Response
+include::{snippets}/store/store-upload-image/http-response.adoc[]
+include::{snippets}/store/store-upload-image/response-fields.adoc[]
+
 === 업체 소유자와 요청자가 같은 고객이 아닌 경우
 .Request Fail
 include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/http-request.adoc[]
@@ -69,13 +93,3 @@ include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/path
 .Response
 include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/http-response.adoc[]
 include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/response-fields.adoc[]
-
-// === 서비스 수정
-//
-// ==== /api/v1/main-items/{id}
-// .Request
-// include::{snippets}/mainItem/mainItem-update/http-request.adoc[]
-// include::{snippets}/mainItem/mainItem-update/path-parameters.adoc[]
-// .Response
-// include::{snippets}/mainItem/mainItem-update/htt p-response.adoc[]
-// include::{snippets}/mainItem/mainItem-update/response-fields.adoc[]

@@ -1,5 +1,7 @@
 package com.palpal.dealightbe.domain.auth.domain;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -7,6 +9,8 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -17,6 +21,7 @@ import com.palpal.dealightbe.domain.member.domain.MemberRole;
 import com.palpal.dealightbe.domain.member.domain.Role;
 import com.palpal.dealightbe.domain.member.domain.RoleType;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -44,7 +49,8 @@ public class Jwt {
 		log.debug("Jwt 객체 생성에 성공했습니다.");
 	}
 
-	public String createAccessToken(Long providerId, Member member) {
+	public String createAccessToken(Member member) {
+		Long providerId = member.getProviderId();
 		String subject = String.valueOf(providerId);
 		log.info("AccessToken을 생성하는 유저({})", providerId);
 
@@ -53,45 +59,84 @@ public class Jwt {
 		log.info("유저({})의 AccessToken 유효시간({})", providerId, expiryDate);
 
 		List<MemberRole> memberRoles = member.getMemberRoles();
-		String roles = memberRoles.stream()
+		String authorities = memberRoles.stream()
 			.map(memberRole -> {
 				Role role = memberRole.getRole();
 				RoleType type = role.getType();
+
 				return type.name();
 			})
 			.collect(Collectors.joining(","));
-		log.info("유저({})의 권한({})", providerId, roles);
+		log.info("유저({})의 권한({})", providerId, authorities);
 
 		return Jwts.builder()
 			.setSubject(subject)
 			.setIssuer(issuer)
 			.setIssuedAt(now)
 			.setExpiration(expiryDate)
-			.claim("authorities", roles)
+			.claim("Authorities", authorities)
 			.signWith(SignatureAlgorithm.HS256, tokenSecret)
 			.compact();
 	}
 
-	public String createRefreshToken(Long providerId) {
+	public String createRefreshToken(Member member) {
+		Long providerId = member.getProviderId();
 		String subject = String.valueOf(providerId);
+		log.info("RefreshToken을 생성하는 유저({})", providerId);
+
 		Date now = new Date();
 		Date expiryDate = new Date(now.getTime() + refreshTokenExpiry);
+		log.info("유저({})의 RefreshToken 유효시간({})", providerId, expiryDate);
+
+		List<MemberRole> memberRoles = member.getMemberRoles();
+		String authorities = memberRoles.stream()
+			.map(memberRole -> {
+				Role role = memberRole.getRole();
+				RoleType type = role.getType();
+
+				return type.name();
+			})
+			.collect(Collectors.joining(","));
+		log.info("유저({})의 권한({})", providerId, authorities);
 
 		return Jwts.builder()
 			.setSubject(subject)
 			.setIssuer(issuer)
 			.setIssuedAt(now)
 			.setExpiration(expiryDate)
+			.claim("Authorities", authorities)
 			.signWith(SignatureAlgorithm.HS256, tokenSecret)
 			.compact();
 	}
 
-	public String parseTokenFromHttpRequest(HttpServletRequest request) {
-		String jwtWithBearer = request.getHeader(HttpHeaders.AUTHORIZATION);
-		if (validateTokenFromRequest(jwtWithBearer)) {
-			return null;
-		}
-		return jwtWithBearer.substring(7);
+	public String getSubject(String jwt) {
+		log.info("Jwt(value: {})로부터 Subject를 가져옵니다...", jwt);
+		Claims claims = Jwts.parserBuilder()
+			.setSigningKey(tokenSecret)
+			.build()
+			.parseClaimsJws(jwt)
+			.getBody();
+
+		String subject = claims.getSubject();
+		log.info("Subject({})를 가져오는데 성공했습니다.", subject);
+		return subject;
+	}
+
+	public Collection<? extends GrantedAuthority> getAuthorities(String jwt) {
+		log.info("Jwt(value: {})로부터 Authority를 가져옵니다...", jwt);
+		Claims claims = Jwts.parserBuilder()
+			.setSigningKey(tokenSecret)
+			.build()
+			.parseClaimsJws(jwt)
+			.getBody();
+
+		String authoritiesFromToken = claims.get("Authorities", String.class);
+		List<SimpleGrantedAuthority> authorities = Arrays.stream(authoritiesFromToken.split(","))
+			.map(SimpleGrantedAuthority::new)
+			.toList();
+		log.info("Authorities({})를 가져오는데 성공했습니다.", authorities);
+
+		return authorities;
 	}
 
 	public boolean validateToken(String jwt) {
@@ -122,25 +167,16 @@ public class Jwt {
 
 	private void validateJwtProperties(JwtConfig jwtConfig) {
 		log.debug("Jwt 설정 값 검증을 시작합니다...");
-
 		log.debug("Issuer : {}", jwtConfig.getIssuer());
 		Assert.hasText(jwtConfig.getIssuer(), "Issuer 정보가 없습니다.");
-
 		log.debug("AccessTokenSecret : {}", jwtConfig.getTokenSecret());
 		Assert.hasText(jwtConfig.getTokenSecret(), "Token Secret 정보가 없습니다.");
-
 		log.debug("AccessTokenExpiry : {}", jwtConfig.getAccessTokenExpiry());
 		Assert.isInstanceOf(Long.class, jwtConfig.getAccessTokenExpiry(),
 			"Access Token 만료시간이 올바르지 않습니다.");
-
 		log.debug("RefreshTokenExpiry : {}", jwtConfig.getRefreshTokenExpiry());
 		Assert.isInstanceOf(Long.class, jwtConfig.getRefreshTokenExpiry(),
 			"Refresh Token 만료시간이 올바르지 않습니다.");
-
 		log.debug("JwtConfig 설정 값 검증에 성공했습니다.");
-	}
-
-	private boolean validateTokenFromRequest(String jwtWithBearer) {
-		return StringUtils.hasText(jwtWithBearer) && jwtWithBearer.startsWith("Bearer ");
 	}
 }

@@ -20,6 +20,7 @@ import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
+import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
@@ -45,12 +46,21 @@ class ItemServiceTest {
 
 	@BeforeEach
 	void setUp() {
+		LocalTime openTime = LocalTime.now();
+		LocalTime closeTime = openTime.plusHours(1);
+
+		if (closeTime.isBefore(openTime)) {
+			LocalTime tempTime = openTime;
+			openTime = closeTime;
+			closeTime = tempTime;
+		}
+
 		store = Store.builder()
 			.name("동네분식")
 			.storeNumber("0000000")
 			.telephone("00000000")
-			.openTime(LocalTime.now())
-			.closeTime(LocalTime.now().plusHours(6))
+			.openTime(openTime)
+			.closeTime(closeTime)
 			.dayOff(Collections.singleton(DayOff.MON))
 			.build();
 
@@ -121,6 +131,39 @@ class ItemServiceTest {
 		});
 	}
 
+	@DisplayName("상품 상세 정보 조회(단건) 성공 테스트")
+	@Test
+	void itemFindByIdSuccessTest() {
+		//given
+		Long itemId = 1L;
+		when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
+
+		//when
+		ItemRes itemRes = itemService.findById(itemId);
+
+		//then
+		assertThat(itemRes.name()).isEqualTo(item.getName());
+		assertThat(itemRes.stock()).isEqualTo(item.getStock());
+		assertThat(itemRes.discountPrice()).isEqualTo(item.getDiscountPrice());
+		assertThat(itemRes.originalPrice()).isEqualTo(item.getOriginalPrice());
+		assertThat(itemRes.description()).isEqualTo(item.getDescription());
+		assertThat(itemRes.information()).isEqualTo(item.getInformation());
+	}
+
+	@DisplayName("상품 상세 정보 조회(단건) 실패 테스트 - 상품이 존재하지 않는 경우")
+	@Test
+	void itemFindByIdFailureTest_notFoundItem() {
+		//given
+		Long itemId = 1L;
+		when(itemRepository.findById(itemId)).thenReturn(Optional.empty());
+
+		//when
+		//then
+		assertThrows(EntityNotFoundException.class,
+			() -> itemService.findById(itemId)
+		);
+	}
+
 	@DisplayName("상품 수정 성공 테스트")
 	@Test
 	void itemUpdateSuccessTest() {
@@ -162,5 +205,16 @@ class ItemServiceTest {
 		assertThrows(BusinessException.class, () -> {
 			itemService.update(itemId, itemReq, memberId);
 		});
+	}
+
+	@DisplayName("상품 삭제 성공 테스트")
+	@Test
+	void itemDeleteSuccessTest() {
+		//given
+		//when
+		assertDoesNotThrow(() -> itemRepository.delete(item));
+
+		//then
+		verify(itemRepository, times(1)).delete(item);
 	}
 }
