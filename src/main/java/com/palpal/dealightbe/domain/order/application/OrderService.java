@@ -2,6 +2,7 @@ package com.palpal.dealightbe.domain.order.application;
 
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_MEMBER;
+import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ORDER;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_STORE;
 
 import java.util.List;
@@ -15,7 +16,9 @@ import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderCreateReq;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderProductReq;
+import com.palpal.dealightbe.domain.order.application.dto.request.OrderStatusUpdateReq;
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderRes;
+import com.palpal.dealightbe.domain.order.application.dto.response.OrderStatusUpdateRes;
 import com.palpal.dealightbe.domain.order.domain.Order;
 import com.palpal.dealightbe.domain.order.domain.OrderItem;
 import com.palpal.dealightbe.domain.order.domain.OrderRepository;
@@ -41,13 +44,13 @@ public class OrderService {
 		Member member = memberRepository.findMemberByProviderId(memberProviderId)
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_ID : {}", memberProviderId);
-				throw new EntityNotFoundException(NOT_FOUND_MEMBER);
+				return new EntityNotFoundException(NOT_FOUND_MEMBER);
 			});
 
 		Store store = storeRepository.findById(orderCreateReq.storeId())
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_STORE_BY_ID : {}", orderCreateReq.storeId());
-				throw new EntityNotFoundException(NOT_FOUND_STORE);
+				return new EntityNotFoundException(NOT_FOUND_STORE);
 			});
 
 		Order order = OrderCreateReq.toOrder(orderCreateReq, member, store);
@@ -69,7 +72,7 @@ public class OrderService {
 		Item item = itemRepository.findById(productReq.itemId())
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", productReq.itemId());
-				throw new EntityNotFoundException(NOT_FOUND_ITEM);
+				return new EntityNotFoundException(NOT_FOUND_ITEM);
 			});
 		int quantity = productReq.quantity();
 
@@ -80,5 +83,27 @@ public class OrderService {
 			.order(order)
 			.quantity(quantity)
 			.build();
+	}
+
+	public OrderStatusUpdateRes updateStatus(Long orderId, OrderStatusUpdateReq orderStatusUpdateReq,
+		Long memberProviderId) {
+		Member member = memberRepository.findMemberByProviderId(memberProviderId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_PROVIDER_ID : {}", memberProviderId);
+				return new EntityNotFoundException(NOT_FOUND_MEMBER);
+			});
+
+		Order order = orderRepository.findById(orderId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_ORDER_BY_ID : {}", orderId);
+				return new EntityNotFoundException(NOT_FOUND_ORDER);
+			});
+
+		String originalStatus = order.getOrderStatus().name();
+		String changedStatus = orderStatusUpdateReq.status();
+
+		order.changeStatus(member, originalStatus, changedStatus);
+
+		return OrderStatusUpdateRes.from(order);
 	}
 }
