@@ -2,7 +2,7 @@
 name: CI/CD using Actions & S3 & Code Deploy & Docker
 
 # event trigger
-# 테스트용 브랜치에 push가 되었을 때 실행
+# develop 브랜치에 push가 되었을 때 실행
 on:
   push:
     branches: [ "feature/#64" ]
@@ -41,9 +41,9 @@ jobs:
         if: |
           contains(github.ref, 'feature/#64')
         run: |
-          cd ./src/main/resources # resources 폴더로 이동
-          touch ./application.yml # application.yml 생성
-          echo "${{ secrets.YML_DEV }}" > ./application.yml # github actions에서 설정한 값을 application.yml 파일에 쓰기
+          cd ./src/main/resources
+          touch ./application.yml
+          echo "${{ secrets.YML_DEV_MAIN }}" > ./application.yml
         shell: bash
 
       # application-oauth.yml 생성
