@@ -26,3 +26,7 @@ spring:
       hibernate:
         format_sql: false
         dialect: org.hibernate.dialect.H2Dialect
+    defer-datasource-initialization: true
+
+server:
+  port: 8081

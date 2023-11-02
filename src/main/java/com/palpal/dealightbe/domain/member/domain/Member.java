@@ -3,6 +3,7 @@ package com.palpal.dealightbe.domain.member.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -13,8 +14,13 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.global.BaseEntity;
+import com.palpal.dealightbe.global.error.ErrorCode;
+import com.palpal.dealightbe.global.error.exception.BusinessException;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -31,7 +37,7 @@ public class Member extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "address_id")
 	private Address address;
 
@@ -47,7 +53,7 @@ public class Member extends BaseEntity {
 
 	private Long providerId;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "member")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL)
 	private List<MemberRole> memberRoles = new ArrayList<>();
 
 	@Builder
@@ -72,7 +78,26 @@ public class Member extends BaseEntity {
 		this.address.updateInfo(address.getName(), address.getXCoordinate(), address.getYCoordinate());
 	}
 
-	public void changeMemberRoles(List<MemberRole> memberRoles) {
+	public void updateMemberRoles(List<MemberRole> memberRoles) {
+		if (memberRoles.isEmpty()) {
+			throw new BusinessException(ErrorCode.INVALID_ROLE_UPDATE);
+		}
+
 		this.memberRoles = memberRoles;
+		memberRoles.forEach(memberRole -> {
+			memberRole.updateMember(this);
+		});
+	}
+
+	@Override
+	public String toString() {
+		return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+			.append("realName", realName)
+			.append("nickName", nickName)
+			.append("phoneNumber", phoneNumber)
+			.append("isDeleted", isDeleted)
+			.append("provider", provider)
+			.append("providerId", providerId)
+			.toString();
 	}
 }

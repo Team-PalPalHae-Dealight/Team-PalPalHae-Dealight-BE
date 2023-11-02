@@ -27,7 +27,7 @@ public enum ErrorCode {
 	INVALID_ITEM_DISCOUNT_PRICE("I001", "상품 할인가는 원가보다 클 수 없습니다."),
 	NOT_FOUND_ITEM("I002", "상품이 존재하지 않습니다."),
 	DUPLICATED_ITEM_NAME("I003", "동일한 이름을 가진 상품이 이미 등록되어 있습니다."),
-	INVALID_ITEM_QUANTITY(	"I004", "상품 재고가 부족합니다"),
+	INVALID_ITEM_QUANTITY("I004", "상품 재고가 부족합니다"),
 	STORE_HAS_NO_ITEM("I005", "요청하신 상품은 해당 업체에 등록되지 않은 상품입니다."),
 
 	//파일
@@ -42,6 +42,11 @@ public enum ErrorCode {
 
 	//인증, 인가
 	ACCESS_DENIED("AUTH001", "사용자 인증에 실패했습니다."),
+	ALREADY_EXIST_MEMBER("AUTH002", "이미 가입된 사용자입니다."),
+	INVALID_ROLE_TYPE("AUTH003", "유효하지 않은 권한이 입력됐습니다."),
+	NOT_FOUND_ROLE("AUTH004", "존재하지 않는 역할입니다."),
+	INVALID_ROLE_UPDATE("AUTH005", "적어도 하나의 역할이 필요합니다."),
+	INVALID_TOKEN("AUTH006", "인증토큰이 올바르지 않습니다.")
 
 	;
 

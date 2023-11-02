@@ -1,7 +1,5 @@
 package com.palpal.dealightbe.config;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -36,12 +34,15 @@ public class SecurityConfig {
 	public WebSecurityCustomizer webSecurityCustomizer() {
 		return web -> web.ignoring()
 			.antMatchers("/h2-console/**")
-			.antMatchers("/**");
+			.antMatchers("/api/auth/signup");
 	}
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
+			.authorizeRequests()
+			.antMatchers("/**").permitAll()
+			.and()
 			.headers().disable()
 			.csrf().disable()
 			.httpBasic().disable()

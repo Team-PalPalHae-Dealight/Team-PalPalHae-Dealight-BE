@@ -21,15 +21,16 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
+import com.palpal.dealightbe.domain.auth.application.dto.response.LoginRes;
 import com.palpal.dealightbe.domain.auth.domain.Jwt;
-import com.palpal.dealightbe.domain.auth.infra.AuthRepository;
 import com.palpal.dealightbe.domain.member.domain.Member;
+import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
 
 	@Mock
-	private AuthRepository authRepository;
+	private MemberRepository memberRepository;
 
 	@Mock
 	private Jwt jwt;
@@ -68,7 +69,7 @@ class AuthServiceTest {
 		String mockAccessToken = "MOCK_ACCESS_TOKEN";
 		String mockRefreshToken = "MOCK_REFRESH_TOKEN";
 
-		when(authRepository.findByProviderAndProviderId(member.getProvider(), member.getProviderId()))
+		when(memberRepository.findByProviderAndProviderId(member.getProvider(), member.getProviderId()))
 			.thenReturn(Optional.of(member));
 		when(jwt.createAccessToken(member))
 			.thenReturn(mockAccessToken);
@@ -88,7 +89,7 @@ class AuthServiceTest {
 	@Test
 	void loginFailIfNotRegisteredMember() {
 		// given
-		when(authRepository.findByProviderAndProviderId(member.getProvider(), member.getProviderId()))
+		when(memberRepository.findByProviderAndProviderId(member.getProvider(), member.getProviderId()))
 			.thenReturn(Optional.empty());
 
 		// when
