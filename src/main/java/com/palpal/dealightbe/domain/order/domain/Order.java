@@ -173,15 +173,15 @@ public class Order extends BaseEntity {
 		}
 	}
 
-	private boolean isMember(Member updater) {
-		long updaterId = updater.getProviderId();
+	public boolean isMember(Member requester) {
+		long updaterId = requester.getProviderId();
 		long orderedMemberId = this.member.getProviderId();
 
 		return updaterId == orderedMemberId;
 	}
 
-	private boolean isStoreOwner(Member updater) {
-		long updaterId = updater.getProviderId();
+	public boolean isStoreOwner(Member requester) {
+		long updaterId = requester.getProviderId();
 		long storeOwnerId = store.getMember().getProviderId();
 
 		return updaterId == storeOwnerId;
