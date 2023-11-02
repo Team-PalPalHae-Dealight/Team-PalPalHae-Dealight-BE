@@ -1,12 +1,19 @@
 package com.palpal.dealightbe.domain.order.domain;
 
+import static com.palpal.dealightbe.domain.order.domain.OrderStatus.CANCELED;
+import static com.palpal.dealightbe.domain.order.domain.OrderStatus.COMPLETED;
 import static com.palpal.dealightbe.domain.order.domain.OrderStatus.RECEIVED;
+import static com.palpal.dealightbe.global.error.ErrorCode.EXCEEDED_ORDER_ITEMS;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ARRIVAL_TIME;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_DEMAND_LENGTH;
+import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ORDER_STATUS;
+import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ORDER_STATUS_UPDATER;
+import static com.palpal.dealightbe.global.error.ErrorCode.UNCHANGEABLE_ORDER_STATUS;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -19,7 +26,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.Size;
+
+import org.springframework.data.util.Pair;
 
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.store.domain.Store;
@@ -30,11 +38,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter
 @Entity
 @Table(name = "orders")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Slf4j
 public class Order extends BaseEntity {
 
 	@Id
@@ -57,16 +67,31 @@ public class Order extends BaseEntity {
 	private OrderStatus orderStatus = RECEIVED;
 
 	@OneToMany(mappedBy = "order")
-	@Size(min = 1, max = 5, message = "한 번에 5개 종류의 상품까지만 주문할 수 있습니다.")
 	private List<OrderItem> orderItems = new ArrayList<>();
 
 	private int totalPrice;
 
 	private static final int MAX_DEMAND_LENGTH = 100;
 
+	private static final int MAX_ORDER_ITEMS = 5;
+
+	private static final Set<OrderStatus> UNCHANGEABLE_STATUS = Set.of(COMPLETED, CANCELED);
+
+	private static final Set<Pair<String, String>> orderStatusSequenceOfMember = Set.of(
+		Pair.of("RECEIVED", "CANCELED"),
+		Pair.of("CONFIRMED", "CANCELED")
+	);
+
+	private static final Set<Pair<String, String>> OrderStatusSequenceOfStore = Set.of(
+		Pair.of("RECEIVED", "CONFIRMED"),
+		Pair.of("RECEIVED", "CANCELED"),
+		Pair.of("CONFIRMED", "COMPLETED"),
+		Pair.of("CONFIRMED", "CANCELED")
+	);
+
 	@Builder
 	public Order(Member member, Store store, LocalTime arrivalTime, String demand, int totalPrice) {
-		validateArrivalTime(arrivalTime);
+		validateArrivalTime(store, arrivalTime);
 		validateDemand(demand);
 		this.member = member;
 		this.store = store;
@@ -75,13 +100,52 @@ public class Order extends BaseEntity {
 		this.totalPrice = totalPrice;
 	}
 
+	public void addOrderItems(List<OrderItem> orderItems) {
+		if (orderItems.size() > 5) {
+			throw new BusinessException(EXCEEDED_ORDER_ITEMS);
+		}
+
+		this.orderItems = orderItems;
+	}
+
+	public void validateOrderUpdater(Member updater) {
+		Long storeOwnerId = store.getMember().getProviderId();
+		Long memberId = member.getProviderId();
+		Long updaterId = updater.getProviderId();
+
+		if (!(updaterId.equals(storeOwnerId) || updaterId.equals(memberId))) {
+			throw new BusinessException(INVALID_ORDER_STATUS_UPDATER);
+		}
+	}
+
+	public void changeStatus(Member updater, String originalStatus, String changedStatus) {
+		validateStatusRequest(changedStatus);
+		validateOrderUpdater(updater);
+		validateUpdaterAuthority(updater, originalStatus, changedStatus);
+
+		this.orderStatus = OrderStatus.valueOf(changedStatus);
+	}
+
+	public void validateStatusRequest(String changedStatus) {
+		if (!OrderStatus.isValidStatus(changedStatus)) {
+			throw new BusinessException(INVALID_ORDER_STATUS);
+		}
+
+		OrderStatus currentStatus = OrderStatus.valueOf(orderStatus.name());
+
+		if (isUnchangeableStatus(currentStatus)) {
+			log.warn(currentStatus.getText());
+			throw new BusinessException(UNCHANGEABLE_ORDER_STATUS);
+		}
+	}
+
 	private void validateDemand(String demand) {
 		if (demand.length() > MAX_DEMAND_LENGTH) {
 			throw new BusinessException(INVALID_DEMAND_LENGTH);
 		}
 	}
 
-	private void validateArrivalTime(LocalTime arrivalTime) {
+	private void validateArrivalTime(Store store, LocalTime arrivalTime) {
 		LocalTime storeCloseTime = store.getCloseTime();
 		LocalTime storeOpenTime = store.getOpenTime();
 
@@ -94,7 +158,32 @@ public class Order extends BaseEntity {
 		}
 	}
 
-	public void addOrderItems(List<OrderItem> orderItems) {
-		this.orderItems = orderItems;
+	private boolean isUnchangeableStatus(OrderStatus status) {
+		return UNCHANGEABLE_STATUS.contains(status);
+	}
+
+	private void validateUpdaterAuthority(Member updater, String originalStatus, String changedStatus) {
+		Pair<String, String> inputSequence = Pair.of(originalStatus, changedStatus);
+
+		if (isMember(updater) && !orderStatusSequenceOfMember.contains(inputSequence)) { //고객인 경우
+			throw new BusinessException(INVALID_ORDER_STATUS);
+		}
+		if (isStoreOwner(updater) && !OrderStatusSequenceOfStore.contains(inputSequence)) {
+			throw new BusinessException(INVALID_ORDER_STATUS);
+		}
+	}
+
+	private boolean isMember(Member updater) {
+		long updaterId = updater.getProviderId();
+		long orderedMemberId = this.member.getProviderId();
+
+		return updaterId == orderedMemberId;
+	}
+
+	private boolean isStoreOwner(Member updater) {
+		long updaterId = updater.getProviderId();
+		long storeOwnerId = store.getMember().getProviderId();
+
+		return updaterId == storeOwnerId;
 	}
 }
