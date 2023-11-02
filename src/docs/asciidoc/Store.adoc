@@ -74,6 +74,18 @@ include::{snippets}/store/store-status-update/request-fields.adoc[]
 include::{snippets}/store/store-status-update/http-response.adoc[]
 include::{snippets}/store/store-status-update/response-fields.adoc[]
 
+=== 업체 이미지 등록
+
+==== /api/stores/images/{memberId}/{storeId}
+
+.Request
+include::{snippets}/store/store-upload-image/http-request.adoc[]
+include::{snippets}/store/store-status-update/path-parameters.adoc[]
+include::{snippets}/store/store-upload-image/request-parts.adoc[]
+.Response
+include::{snippets}/store/store-upload-image/http-response.adoc[]
+include::{snippets}/store/store-upload-image/response-fields.adoc[]
+
 === 업체 소유자와 요청자가 같은 고객이 아닌 경우
 .Request Fail
 include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/http-request.adoc[]

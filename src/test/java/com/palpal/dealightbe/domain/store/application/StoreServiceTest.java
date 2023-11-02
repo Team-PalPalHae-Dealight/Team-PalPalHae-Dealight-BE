@@ -16,10 +16,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 
 import com.palpal.dealightbe.domain.address.application.AddressService;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
 import com.palpal.dealightbe.domain.address.domain.Address;
+import com.palpal.dealightbe.domain.image.ImageService;
+import com.palpal.dealightbe.domain.image.application.dto.request.ImageUploadReq;
+import com.palpal.dealightbe.domain.image.application.dto.response.ImageRes;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
@@ -46,6 +50,9 @@ class StoreServiceTest {
 
 	@Mock
 	private AddressService addressService;
+
+	@Mock
+	private ImageService imageService;
 
 	@InjectMocks
 	private StoreService storeService;
@@ -247,5 +254,27 @@ class StoreServiceTest {
 		//then
 		assertThat(store.getStoreStatus()).isEqualTo(requestStoreStatus.storeStatus());
 		assertThat(storeStatusUpdateRes.storeId()).isEqualTo(store.getId());
+	}
+
+	@Test
+	@DisplayName("업체 이미지 등록 성공")
+	void uploadImageSuccessTest() throws Exception {
+
+		//given
+		MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "Spring Framework".getBytes());
+		ImageUploadReq request = new ImageUploadReq(file);
+		String imageUrl = "http://fakeimageurl.com/image.jpg";
+
+		when(memberRepository.findById(member.getId()))
+			.thenReturn(Optional.of(member));
+		when(storeRepository.findById(store.getId()))
+			.thenReturn(Optional.of(store));
+		when(imageService.store(file)).thenReturn(imageUrl);
+
+		//when
+		ImageRes imageRes = storeService.uploadImage(member.getId(), store.getId(), request);
+
+		//then
+		assertThat(imageRes.imageUrl()).isEqualTo(imageUrl);
 	}
 }
