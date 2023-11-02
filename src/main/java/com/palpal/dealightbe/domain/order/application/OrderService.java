@@ -62,31 +62,7 @@ public class OrderService {
 		return OrderRes.from(order);
 	}
 
-	private List<OrderItem> createOrderItems(Order order, List<OrderProductReq> orderProductsReq) {
-		return orderProductsReq.stream()
-			.map(productReq -> createOrderItem(order, productReq))
-			.toList();
-	}
-
-	private OrderItem createOrderItem(Order order, OrderProductReq productReq) {
-		Item item = itemRepository.findById(productReq.itemId())
-			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", productReq.itemId());
-				return new EntityNotFoundException(NOT_FOUND_ITEM);
-			});
-		int quantity = productReq.quantity();
-
-		item.deductStock(quantity);
-
-		return OrderItem.builder()
-			.item(item)
-			.order(order)
-			.quantity(quantity)
-			.build();
-	}
-
-	public OrderStatusUpdateRes updateStatus(Long orderId, OrderStatusUpdateReq orderStatusUpdateReq,
-		Long memberProviderId) {
+	public OrderStatusUpdateRes updateStatus(Long orderId, OrderStatusUpdateReq request, Long memberProviderId) {
 		Member member = memberRepository.findMemberByProviderId(memberProviderId)
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_PROVIDER_ID : {}", memberProviderId);
@@ -100,10 +76,34 @@ public class OrderService {
 			});
 
 		String originalStatus = order.getOrderStatus().name();
-		String changedStatus = orderStatusUpdateReq.status();
+		String changedStatus = request.status();
 
 		order.changeStatus(member, originalStatus, changedStatus);
 
 		return OrderStatusUpdateRes.from(order);
 	}
+
+	private List<OrderItem> createOrderItems(Order order, List<OrderProductReq> orderProductsReq) {
+		return orderProductsReq.stream()
+			.map(productReq -> createOrderItem(order, productReq))
+			.toList();
+	}
+
+	private OrderItem createOrderItem(Order order, OrderProductReq request) {
+		Item item = itemRepository.findById(request.itemId())
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", request.itemId());
+				return new EntityNotFoundException(NOT_FOUND_ITEM);
+			});
+		int quantity = request.quantity();
+
+		item.deductStock(quantity);
+
+		return OrderItem.builder()
+			.item(item)
+			.order(order)
+			.quantity(quantity)
+			.build();
+	}
+
 }

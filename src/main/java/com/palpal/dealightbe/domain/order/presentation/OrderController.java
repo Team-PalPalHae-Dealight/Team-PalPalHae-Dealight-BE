@@ -29,11 +29,11 @@ public class OrderController {
 
 	@PostMapping("/{memberProviderId}")
 	public ResponseEntity<OrderRes> create(
-		@Validated @RequestBody OrderCreateReq orderCreateReq,
+		@Validated @RequestBody OrderCreateReq request,
 		@PathVariable Long memberProviderId
 	) {
 
-		OrderRes orderRes = orderService.create(orderCreateReq, memberProviderId);
+		OrderRes orderRes = orderService.create(request, memberProviderId);
 
 		URI uri = ServletUriComponentsBuilder
 			.fromCurrentRequest()
@@ -47,15 +47,13 @@ public class OrderController {
 
 	@PatchMapping("/{orderId}/status/{memberProviderId}")
 	public ResponseEntity<OrderStatusUpdateRes> updateStatus(
-		@Validated @RequestBody OrderStatusUpdateReq orderStatusUpdateReq,
+		@Validated @RequestBody OrderStatusUpdateReq request,
 		@PathVariable Long orderId,
 		@PathVariable Long memberProviderId
 	) {
 
-		OrderStatusUpdateRes orderStatusUpdateRes = orderService.updateStatus(orderId, orderStatusUpdateReq,
-			memberProviderId);
+		OrderStatusUpdateRes orderStatusUpdateRes = orderService.updateStatus(orderId, request, memberProviderId);
 
 		return ResponseEntity.ok(orderStatusUpdateRes);
 	}
-
 }
