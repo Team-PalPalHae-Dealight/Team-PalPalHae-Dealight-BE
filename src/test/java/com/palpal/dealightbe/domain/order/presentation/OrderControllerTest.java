@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
@@ -72,6 +73,10 @@ public class OrderControllerTest {
 
 		LocalDateTime createdAt = LocalDateTime.now();
 
+		OrderCreateReq orderCreateReq = new OrderCreateReq(
+			new OrderProductsReq(List.of(new OrderProductReq(1L, 3))),
+			1L, "도착할 때까지 상품 냉장고에 보관 부탁드려요", LocalTime.of(12, 30), 10000);
+
 		OrderProductsRes productsRes = new OrderProductsRes(List.of(new OrderProductRes(1L, "달콤한 도넛", 5, 10000, 15000,
 			"https://team-08-image-bucket.s3.ap-northeast-2.amazonaws.com/donut")));
 
@@ -82,17 +87,19 @@ public class OrderControllerTest {
 		@DisplayName("성공 - 신규 주문을 등록한다")
 		void create_success() throws Exception {
 			// given
-			OrderCreateReq orderCreateReq = new OrderCreateReq(
-				new OrderProductsReq(List.of(new OrderProductReq(1L, 3))),
-				1L, "도착할 때까지 상품 냉장고에 보관 부탁드려요", LocalTime.of(12, 30), 10000);
+			// OrderCreateReq orderCreateReq = new OrderCreateReq(
+			// 	new OrderProductsReq(List.of(new OrderProductReq(1L, 3))),
+			// 	1L, "도착할 때까지 상품 냉장고에 보관 부탁드려요", LocalTime.of(12, 30), 10000);
 
 			OrderProductRes productRes = productsRes.orderProducts().get(0);
 
-			given(orderService.create(any(OrderCreateReq.class), anyLong())).willReturn(orderRes);
+			given(orderService.create(any(OrderCreateReq.class), anyLong()))
+				.willReturn(orderRes);
 
 			// when
 			// then
-			mockMvc.perform(post(createApiPath + "/{memberProviderId}", 1).with(csrf())
+			mockMvc.perform(post(createApiPath + "/{memberProviderId}", 1)
+					.with(csrf())
 					.with(user("username").roles("MEMBER"))
 					.content(objectMapper.writeValueAsString(orderCreateReq))
 					.contentType(MediaType.APPLICATION_JSON))
@@ -127,7 +134,9 @@ public class OrderControllerTest {
 						fieldWithPath("demand").type(JsonFieldType.STRING).description("상품 구매시 작성한 고객의 요청 사항"),
 						fieldWithPath("arrivalTime").type(JsonFieldType.STRING).description("고객의 도착 예정 시간"),
 						fieldWithPath("totalPrice").type(JsonFieldType.NUMBER).description("주문 총 금액")),
-					responseFields(fieldWithPath("orderId").type(JsonFieldType.NUMBER).description("등록된 주문의 아이디"),
+
+					responseFields(
+						fieldWithPath("orderId").type(JsonFieldType.NUMBER).description("등록된 주문의 아이디"),
 						fieldWithPath("storeId").type(JsonFieldType.NUMBER).description("주문이 이루어진 업체 아이디"),
 						fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("고객 아이디"),
 						fieldWithPath("storeName").type(JsonFieldType.STRING).description("업체 이름"),
@@ -286,4 +295,90 @@ public class OrderControllerTest {
 				});
 		}
 	}
+
+	@Nested
+	@DisplayName("<주문 상세 정보 조회>")
+	class detailedInfoTest {
+		String findByIdApiPath = "/api/orders/{orderId}/{memberProviderId}";
+
+		LocalDateTime createdAt = LocalDateTime.now();
+
+		OrderCreateReq orderCreateReq = new OrderCreateReq(
+			new OrderProductsReq(List.of(new OrderProductReq(1L, 3))), 1L, "도착할 때까지 상품 냉장고에 보관 부탁드려요",
+			LocalTime.of(12, 30), 10000);
+
+		OrderProductsRes productsRes = new OrderProductsRes(List.of(new OrderProductRes(1L, "달콤한 도넛", 5, 10000, 15000,
+			"https://team-08-image-bucket.s3.ap-northeast-2.amazonaws.com/donut")));
+
+		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요", LocalTime.of(12, 30),
+			productsRes, 10000, createdAt, RECEIVED.getText());
+
+		OrderProductRes productRes = productsRes.orderProducts().get(0);
+
+		@Test
+		@DisplayName("성공 - 주문 상세 정보를 조회한다")
+		void findById_success() throws Exception {
+			// given
+			long orderId = 1L;
+			long memberProviderId = 1L;
+
+			given(orderService.findById(anyLong(), anyLong()))
+				.willReturn(orderRes);
+
+			// when
+			// then
+			mockMvc.perform(get(findByIdApiPath, orderId, memberProviderId)
+					.with(csrf())
+					.with(user("username").roles("MEMBER")))
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.orderId").value(1L))
+				.andExpect(jsonPath("$.storeId").value(1L))
+				.andExpect(jsonPath("$.memberId").value(1L))
+				.andExpect(jsonPath("$.storeName").value("GS25"))
+				.andExpect(jsonPath("$.demand").value(orderCreateReq.demand()))
+				.andExpect(jsonPath("$.orderProductsRes.orderProducts[0].itemId").value(productRes.itemId()))
+				.andExpect(jsonPath("$.orderProductsRes.orderProducts[0].name").value(productRes.name()))
+				.andExpect(jsonPath("$.orderProductsRes.orderProducts[0].stock").value(productRes.stock()))
+				.andExpect(
+					jsonPath("$.orderProductsRes.orderProducts[0].discountPrice").value(productRes.discountPrice()))
+				.andExpect(
+					jsonPath("$.orderProductsRes.orderProducts[0].originalPrice").value(productRes.originalPrice()))
+				.andExpect(jsonPath("$.orderProductsRes.orderProducts[0].image").value(productRes.image()))
+				.andExpect(jsonPath("$.totalPrice").value(orderCreateReq.totalPrice()))
+				.andExpect(jsonPath("$.status").value(RECEIVED.getText()))
+				.andDo(document("order-find-by-id-success", preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					pathParameters(
+						parameterWithName("orderId").description("상세 조회 하고자 하는 주문의 아이디"),
+						parameterWithName("memberProviderId").description("고객 카카오 토큰")),
+					responseFields(
+						fieldWithPath("orderId").type(JsonFieldType.NUMBER).description("등록된 주문의 아이디"),
+						fieldWithPath("storeId").type(JsonFieldType.NUMBER).description("주문이 이루어진 업체 아이디"),
+						fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("고객 아이디"),
+						fieldWithPath("storeName").type(JsonFieldType.STRING).description("업체 이름"),
+						fieldWithPath("demand").type(JsonFieldType.STRING).description("고객의 요구 사항"),
+						fieldWithPath("arrivalTime").type(JsonFieldType.STRING).description("고객의 도착 예정 시간"),
+
+						fieldWithPath("orderProductsRes.orderProducts[]").type(JsonFieldType.ARRAY)
+							.description("주문한 상품 목록"),
+						fieldWithPath("orderProductsRes.orderProducts[].itemId").type(JsonFieldType.NUMBER)
+							.description("상품 아이디"),
+						fieldWithPath("orderProductsRes.orderProducts[].name").type(JsonFieldType.STRING)
+							.description("상품명"),
+						fieldWithPath("orderProductsRes.orderProducts[].stock").type(JsonFieldType.NUMBER)
+							.description("상품 재고"),
+						fieldWithPath("orderProductsRes.orderProducts[].discountPrice").type(JsonFieldType.NUMBER)
+							.description("상품의 할인된 금액"),
+						fieldWithPath("orderProductsRes.orderProducts[].originalPrice").type(JsonFieldType.NUMBER)
+							.description("상품 원가"),
+						fieldWithPath("orderProductsRes.orderProducts[].image").type(JsonFieldType.STRING)
+							.description("상품 이미지"),
+
+						fieldWithPath("totalPrice").type(JsonFieldType.NUMBER).description("총 금액"),
+						fieldWithPath("createdAt").type(JsonFieldType.STRING).description("주문 완료 일자 및 시간"),
+						fieldWithPath("status").type(JsonFieldType.STRING).description("현재 주문 상태"))));
+		}
+	}
+
 }
