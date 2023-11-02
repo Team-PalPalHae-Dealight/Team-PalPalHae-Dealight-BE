@@ -1,4 +1,5 @@
 #!/bin/bash
+# 미완성 스크립트라 다시 손봐야 함
 cd /home/ubuntu/app
 DOCKER_APP_NAME=dealight
 
