@@ -2,8 +2,10 @@
 # green 컨테이너는 8081으로 포트를 노출해서 실행
 version: '3'
 services:
-  dealight-api:
-    build: .
+  dealight-api-springboot:
+    container_name: dealight-api-springboot-green
+    build:
+      context: ./
+      dockerfile: Dockerfile
     ports:
       - "8081:8080"
-    container_name: dealight-api-springboot-green
