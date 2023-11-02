@@ -115,7 +115,7 @@ class ItemControllerTest {
 		//given
 		ItemReq itemReq = new ItemReq(item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(),
 			item.getDescription(), item.getInformation(), item.getImage());
-		ItemRes itemRes = ItemRes.from(item);
+		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage());
 
 		Long memberId = 1L;
 
@@ -151,15 +151,15 @@ class ItemControllerTest {
 					fieldWithPath("image").description("상품 이미지")
 				),
 				responseFields(
-					fieldWithPath("itemId").description("상품 ID"),
-					fieldWithPath("storeId").description("업체 ID"),
-					fieldWithPath("name").description("상품 이름"),
-					subsectionWithPath("stock").description("재고 수"),
-					fieldWithPath("discountPrice").description("할인가"),
-					fieldWithPath("originalPrice").description("원가"),
-					fieldWithPath("description").description("상세 설명"),
-					fieldWithPath("information").description("안내 사항"),
-					fieldWithPath("image").description("상품 이미지")
+					fieldWithPath("itemId").type(NUMBER).description("상품 ID"),
+					fieldWithPath("storeId").type(NUMBER).description("업체 ID"),
+					fieldWithPath("name").type(STRING).description("상품 이름"),
+					subsectionWithPath("stock").type(NUMBER).description("재고 수"),
+					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
+					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
+					fieldWithPath("description").type(STRING).description("상세 설명"),
+					fieldWithPath("information").type(STRING).description("안내 사항"),
+					fieldWithPath("image").type(NULL).description("상품 이미지")
 				)
 			));
 	}
@@ -180,7 +180,7 @@ class ItemControllerTest {
 
 		ItemReq itemReq = new ItemReq(item2.getName(), item2.getStock(), item2.getDiscountPrice(),
 			item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage());
-		ItemRes itemRes = ItemRes.from(item2);
+		ItemRes itemRes = new ItemRes(1L, 1L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage());
 
 		Long memberId = 1L;
 
@@ -323,7 +323,7 @@ class ItemControllerTest {
 	public void itemFindByIdSuccessTest() throws Exception {
 		//given
 		Long itemId = 1L;
-		ItemRes itemRes = ItemRes.from(item);
+		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage());
 
 		when(itemService.findById(any())).thenReturn(itemRes);
 
@@ -347,15 +347,15 @@ class ItemControllerTest {
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),
 				responseFields(
-					fieldWithPath("itemId").description("상품 ID"),
-					fieldWithPath("storeId").description("업체 ID"),
-					fieldWithPath("name").description("상품 이름"),
-					subsectionWithPath("stock").description("재고 수"),
-					fieldWithPath("discountPrice").description("할인가"),
-					fieldWithPath("originalPrice").description("원가"),
-					fieldWithPath("description").description("상세 설명"),
-					fieldWithPath("information").description("안내 사항"),
-					fieldWithPath("image").description("상품 이미지")
+					fieldWithPath("itemId").type(NUMBER).description("상품 ID"),
+					fieldWithPath("storeId").type(NUMBER).description("업체 ID"),
+					fieldWithPath("name").type(STRING).description("상품 이름"),
+					subsectionWithPath("stock").type(NUMBER).description("재고 수"),
+					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
+					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
+					fieldWithPath("description").type(STRING).description("상세 설명"),
+					fieldWithPath("information").type(STRING).description("안내 사항"),
+					fieldWithPath("image").type(NULL).description("상품 이미지")
 				)
 			));
 	}
@@ -478,15 +478,15 @@ class ItemControllerTest {
 					fieldWithPath("image").description("상품 이미지")
 				),
 				responseFields(
-					fieldWithPath("itemId").description("상품 ID"),
-					fieldWithPath("storeId").description("업체 ID"),
-					fieldWithPath("name").description("상품 이름"),
-					subsectionWithPath("stock").description("재고 수"),
-					fieldWithPath("discountPrice").description("할인가"),
-					fieldWithPath("originalPrice").description("원가"),
-					fieldWithPath("description").description("상세 설명"),
-					fieldWithPath("information").description("안내 사항"),
-					fieldWithPath("image").description("상품 이미지")
+					fieldWithPath("itemId").type(NUMBER).description("상품 ID"),
+					fieldWithPath("storeId").type(NUMBER).description("업체 ID"),
+					fieldWithPath("name").type(STRING).description("상품 이름"),
+					subsectionWithPath("stock").type(NUMBER).description("재고 수"),
+					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
+					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
+					fieldWithPath("description").type(STRING).description("상세 설명"),
+					fieldWithPath("information").type(STRING).description("안내 사항"),
+					fieldWithPath("image").type(NULL).description("상품 이미지")
 				)
 			));
 	}
@@ -510,7 +510,8 @@ class ItemControllerTest {
 
 		ItemReq itemReq = new ItemReq(item2.getName(), item2.getStock(), item2.getDiscountPrice(),
 			item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage());
-		ItemRes itemRes = ItemRes.from(item2);
+		ItemRes itemRes = new ItemRes(itemId, 1L, itemReq.name(), itemReq.stock(), itemReq.discountPrice(),
+			itemReq.originalPrice(), itemReq.description(), itemReq.information(), itemReq.image());
 
 		when(itemService.update(any(), any(), any())).thenReturn(itemRes);
 
@@ -659,6 +660,7 @@ class ItemControllerTest {
 		Long memberId = 1L;
 
 		doNothing().when(itemService).delete(any(), any());
+
 		//when
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/items/{id}", itemId)
