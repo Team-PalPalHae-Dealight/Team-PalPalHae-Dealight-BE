@@ -132,7 +132,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.information").value(itemRes.information()))
 			.andExpect(jsonPath("$.image").value(itemRes.image()))
 			.andDo(print())
-			.andDo(document("item-create",
+			.andDo(document("item/item-create",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestParameters(parameterWithName("memberId").description("고객 ID")
@@ -199,7 +199,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.errors[1].reason").isNotEmpty())
 			.andExpect(jsonPath("$.message").value("잘못된 값을 입력하셨습니다."))
 			.andDo(print())
-			.andDo(document("item-create-fail-invalid-name",
+			.andDo(document("item/item-create-fail-invalid-name",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestParameters(parameterWithName("memberId").description("고객 ID")),
@@ -247,7 +247,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.errors").isEmpty())
 			.andExpect(jsonPath("$.message").value("상품 할인가는 원가보다 클 수 없습니다."))
 			.andDo(print())
-			.andDo(document("item-create-fail-invalid-discount-price",
+			.andDo(document("item/item-create-fail-invalid-discount-price",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestParameters(parameterWithName("memberId").description("고객 ID")),
@@ -292,7 +292,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.errors").isEmpty())
 			.andExpect(jsonPath("$.message").value("동일한 이름을 가진 상품이 이미 등록되어 있습니다."))
 			.andDo(print())
-			.andDo(document("item-create-fail-duplicated-item-name",
+			.andDo(document("item/item-create-fail-duplicated-item-name",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestParameters(parameterWithName("memberId").description("고객 ID")),
@@ -338,7 +338,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.information").value(itemRes.information()))
 			.andExpect(jsonPath("$.image").value(itemRes.image()))
 			.andDo(print())
-			.andDo(document("item-find-by-id",
+			.andDo(document("item/item-find-by-id",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),
@@ -370,7 +370,7 @@ class ItemControllerTest {
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNotFound())
 			.andDo(print())
-			.andDo(document("item-find-by-id-fail-not-found-item",
+			.andDo(document("item/item-find-by-id-fail-not-found-item",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),
@@ -459,7 +459,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.information").value(itemRes.information()))
 			.andExpect(jsonPath("$.image").value(itemRes.image()))
 			.andDo(print())
-			.andDo(document("item-update",
+			.andDo(document("item/item-update",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),
@@ -528,7 +528,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.errors[1].reason").isNotEmpty())
 			.andExpect(jsonPath("$.message").value("잘못된 값을 입력하셨습니다."))
 			.andDo(print())
-			.andDo(document("item-update-fail-invalid-name",
+			.andDo(document("item/item-update-fail-invalid-name",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),
@@ -578,7 +578,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.errors").isEmpty())
 			.andExpect(jsonPath("$.message").value("상품 할인가는 원가보다 클 수 없습니다."))
 			.andDo(print())
-			.andDo(document("item-update-fail-invalid-discount-price",
+			.andDo(document("item/item-update-fail-invalid-discount-price",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),
@@ -625,7 +625,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.errors").isEmpty())
 			.andExpect(jsonPath("$.message").value("동일한 이름을 가진 상품이 이미 등록되어 있습니다."))
 			.andDo(print())
-			.andDo(document("item-update-fail-duplicated-item-name",
+			.andDo(document("item/item-update-fail-duplicated-item-name",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),
@@ -664,7 +664,7 @@ class ItemControllerTest {
 				.param("memberId", memberId.toString()))
 			.andExpect(status().isNoContent())
 			.andDo(print())
-			.andDo(document("item-delete",
+			.andDo(document("item/item-delete",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),
@@ -693,7 +693,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.errors").isEmpty())
 			.andExpect(jsonPath("$.message").value("요청하신 상품은 해당 업체에 등록되지 않은 상품입니다."))
 			.andDo(print())
-			.andDo(document("item-delete-store-has-no-item",
+			.andDo(document("item/item-delete-store-has-no-item",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),

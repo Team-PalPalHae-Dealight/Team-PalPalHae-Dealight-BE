@@ -1,0 +1,14 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /home/ubuntu/app
+    overwrite: yes
+
+permissions:
+  - object: /
+
+hooks:
+  ApplicationStart:
+    - location: deploy.sh
+      timeout: 60
