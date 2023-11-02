@@ -4,6 +4,7 @@ import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_MEMBER;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ORDER;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_STORE;
+import static com.palpal.dealightbe.global.error.ErrorCode.UNAUTHORIZED_REQUEST;
 
 import java.util.List;
 
@@ -24,6 +25,7 @@ import com.palpal.dealightbe.domain.order.domain.OrderItem;
 import com.palpal.dealightbe.domain.order.domain.OrderRepository;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
+import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -66,12 +68,14 @@ public class OrderService {
 		Member member = memberRepository.findMemberByProviderId(memberProviderId)
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_PROVIDER_ID : {}", memberProviderId);
+
 				return new EntityNotFoundException(NOT_FOUND_MEMBER);
 			});
 
 		Order order = orderRepository.findById(orderId)
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_ORDER_BY_ID : {}", orderId);
+
 				return new EntityNotFoundException(NOT_FOUND_ORDER);
 			});
 
@@ -81,6 +85,32 @@ public class OrderService {
 		order.changeStatus(member, originalStatus, changedStatus);
 
 		return OrderStatusUpdateRes.from(order);
+	}
+
+	@Transactional(readOnly = true)
+	public OrderRes findById(Long orderId, Long memberProviderId) {
+		Order order = orderRepository.findById(orderId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_ORDER_BY_ID : {}", orderId);
+
+				return new EntityNotFoundException(NOT_FOUND_ORDER);
+			});
+
+		Member member = memberRepository.findMemberByProviderId(memberProviderId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_PROVIDER_ID : {}", memberProviderId);
+
+				return new EntityNotFoundException(NOT_FOUND_MEMBER);
+			});
+
+		if (!(order.isMember(member) || order.isStoreOwner(member))) {
+			log.warn("GET:READ:UNAUTHORIZED: ORDERED_MEMBER {}, STORE_OWNER {}, REQUESTER {}",
+				member, order.getStore().getMember().getProviderId(), memberProviderId);
+
+			throw new BusinessException(UNAUTHORIZED_REQUEST);
+		}
+
+		return OrderRes.from(order);
 	}
 
 	private List<OrderItem> createOrderItems(Order order, List<OrderProductReq> orderProductsReq) {
@@ -93,8 +123,10 @@ public class OrderService {
 		Item item = itemRepository.findById(request.itemId())
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", request.itemId());
+
 				return new EntityNotFoundException(NOT_FOUND_ITEM);
 			});
+
 		int quantity = request.quantity();
 
 		item.deductStock(quantity);
@@ -105,5 +137,4 @@ public class OrderService {
 			.quantity(quantity)
 			.build();
 	}
-
 }
