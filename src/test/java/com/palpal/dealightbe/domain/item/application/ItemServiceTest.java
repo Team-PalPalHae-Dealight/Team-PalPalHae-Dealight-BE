@@ -2,7 +2,9 @@ package com.palpal.dealightbe.domain.item.application;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -12,9 +14,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import com.palpal.dealightbe.domain.item.application.dto.request.ItemReq;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
+import com.palpal.dealightbe.domain.item.application.dto.response.ItemsRes;
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
@@ -162,6 +168,42 @@ class ItemServiceTest {
 		assertThrows(EntityNotFoundException.class,
 			() -> itemService.findById(itemId)
 		);
+	}
+
+	@DisplayName("상품 목록 조회(업체 시점) 성공 테스트")
+	@Test
+	void itemFindAllForStoreSuccessTest() {
+		//given
+		Item item2 = Item.builder()
+			.name("김밥")
+			.stock(3)
+			.discountPrice(5000)
+			.originalPrice(5500)
+			.description("김밥 입니다.")
+			.information("통신사 할인 불가능 합니다.")
+			.store(store)
+			.build();
+
+		Long memberId = 1L;
+
+		int page = 0;
+		int size = 5;
+		PageRequest pageRequest = PageRequest.of(page, size);
+
+		List<Item> items = new ArrayList<>();
+		items.add(item);
+		items.add(item2);
+
+		Page<Item> ItemPage = new PageImpl<>(items, pageRequest, items.size());
+
+		when(storeRepository.findByMemberId(any())).thenReturn(Optional.of(store));
+		when(itemRepository.findAllByStoreId(any(), eq(PageRequest.of(page, size)))).thenReturn(ItemPage);
+
+		//when
+		ItemsRes itemsRes = itemService.findAllForStore(memberId, pageRequest);
+
+		//then
+		assertThat(itemsRes.itemResponses()).hasSize(items.size());
 	}
 
 	@DisplayName("상품 수정 성공 테스트")
