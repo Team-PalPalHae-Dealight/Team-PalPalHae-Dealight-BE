@@ -12,6 +12,7 @@ public enum ErrorCode {
 
 	//공용
 	INVALID_INPUT_VALUE("C001", "잘못된 값을 입력하셨습니다."),
+	UNAUTHORIZED_REQUEST("C002", "해당 요청을 수행할 권한이 없습니다."),
 
 	//멤버
 	NOT_FOUND_MEMBER("M001", "고객을 찾을 수 없습니다."),
