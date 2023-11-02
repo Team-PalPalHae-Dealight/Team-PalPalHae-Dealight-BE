@@ -1,5 +1,5 @@
 # github repository actions 페이지에 나타날 이름
-name: CI/CD using github actions & docker
+name: CI/CD using Actions & S3 & Code Deploy & Docker
 
 # event trigger
 # develop 브랜치에 push가 되었을 때 실행
@@ -13,21 +13,16 @@ permissions:
 jobs:
   CI-CD:
     runs-on: ubuntu-latest
+
     steps:
+      - uses: actions/checkout@v3
 
       # JDK setting - github actions에서 사용할 JDK 설정 (프로젝트나 AWS의 java 버전과 달라도 무방)
-      - uses: actions/checkout@v3
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'adopt'
-          
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Build with Gradle
-        run: ./gradlew clean build
 
       # gradle caching - 빌드 시간 향상
       - name: Gradle Caching
@@ -40,50 +35,65 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # 환경별 yml 파일 생성(1) - application.yml
-      - name: make application.yml
+      # 서비스에 필요한 yml 파일 생성
+      # application-oauth.yml 생성
+      - name: Make application-oauth.yml
         if: |
           contains(github.ref, 'develop')
         run: |
-          cd ./src/main/resources # resources 폴더로 이동
-          touch ./application.yml # application.yml 생성
-          echo "${{ secrets.YML }}" > ./application.yml # github actions에서 설정한 값을 application.yml 파일에 쓰기
+          cd ./src/main/resources
+          touch ./application-oauth.yml
+          echo "${{ secrets.YML_DEV_OAUTH }}" > ./application-oauth.yml
         shell: bash
 
-      # 환경별 yml 파일 생성(2) - dev
-      - name: make application-dev.yml
-        if: contains(github.ref, 'develop')
+      # application-aws.yml 생성
+      - name: Make application-aws.yml
+        if: |
+          contains(github.ref, 'develop')
         run: |
           cd ./src/main/resources
-          touch ./application-dev.yml
-          echo "${{ secrets.YML_DEV }}" > ./application-dev.yml
+          touch ./application-aws.yml
+          echo "${{ secrets.YML_DEV_AWS }}" > ./application-aws.yml
         shell: bash
 
-      # gradle build
+      # Gradle에 실행 권한을 부여
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # Gradle로 clean build
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew clean build
 
-      # docker build & push to develop
-      - name: Docker build & push to dev
-        if: contains(github.ref, 'develop')
+      # S3에 업로드하기 위해 zip파일로 만듦
+      - name: Make zip file
         run: |
-          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker build -f Dockerfile-dev -t ${{ secrets.DOCKER_USERNAME }}/docker-test-dev .
-          docker push ${{ secrets.DOCKER_USERNAME }}/docker-test-dev
+          mkdir deploy
+          cp ./docker-compose.blue.yml ./deploy/
+          cp ./docker-compose.green.yml ./deploy/
+          cp ./appspec.yml ./deploy/
+          cp ./Dockerfile ./deploy/
+          cp ./scripts/*.sh ./deploy/
+          cp ./build/libs/dealight-be-0.0.1-SNAPSHOT.jar ./deploy/
+          zip -r -qq -j ./delight-spring-build.zip ./deploy
 
-      ## deploy to develop
-      - name: Deploy to dev
-        uses: appleboy/ssh-action@master
-        id: deploy-dev
-        if: contains(github.ref, 'develop')
+      # AWS credentials 값을 가져옴
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          host: ${{ secrets.HOST_DEV }} # EC2 퍼블릭 IPv4 DNS
-          username: ${{ secrets.USERNAME }} # ubuntu
-          password: ${{ secrets.PASSWORD }}
-          port: 22
-          key: ${{ secrets.PRIVATE_KEY }}
-          script: |
-            sudo docker ps
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/docker-test-dev
-            sudo docker run -d -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/docker-test-dev
-            sudo docker image prune -f
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      # S3에 zip파일을 업로드
+      - name: Upload to S3
+        run: |
+          aws s3 cp \
+            --region ap-northeast-2 \
+            ./delight-spring-build.zip s3://team-08-bucket
+
+      # Code Deploy를 사용
+      - name: Code Deploy
+        run: aws deploy create-deployment --application-name team-08-dev
+          --deployment-config-name CodeDeployDefault.OneAtATime
+          --deployment-group-name team-palpal-dev-deploy
+          --s3-location bucket=team-08-bucket,bundleType=zip,key=delight-spring-build.zip
