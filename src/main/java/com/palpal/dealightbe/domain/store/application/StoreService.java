@@ -4,6 +4,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.palpal.dealightbe.domain.address.application.AddressService;
+import com.palpal.dealightbe.domain.image.ImageService;
+import com.palpal.dealightbe.domain.image.application.dto.request.ImageUploadReq;
+import com.palpal.dealightbe.domain.image.application.dto.response.ImageRes;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
@@ -29,6 +32,7 @@ public class StoreService {
 	private final StoreRepository storeRepository;
 	private final MemberRepository memberRepository;
 	private final AddressService addressService;
+	private final ImageService imageService;
 
 	public StoreCreateRes register(Long memberId, StoreCreateReq req) {
 		Member member = memberRepository.findById(memberId)
@@ -69,6 +73,15 @@ public class StoreService {
 		store.updateStatus(storeStatus.storeStatus());
 
 		return StoreStatusUpdateRes.from(store);
+	}
+
+	public ImageRes uploadImage(Long memberId, Long storeId, ImageUploadReq request) {
+		Store store = validateMemberAndStoreOwner(memberId, storeId);
+
+		String imageUrl = imageService.store(request.file());
+
+		store.updateImage(imageUrl);
+		return ImageRes.from(store);
 	}
 
 	private Store validateMemberAndStoreOwner(Long memberId, Long storeId) {
