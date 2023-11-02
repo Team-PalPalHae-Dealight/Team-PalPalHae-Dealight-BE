@@ -1,5 +1,29 @@
 package com.palpal.dealightbe.domain.item.presentation;
 
+import static com.palpal.dealightbe.global.error.ErrorCode.DUPLICATED_ITEM_NAME;
+import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
+import static com.palpal.dealightbe.global.error.ErrorCode.STORE_HAS_NO_ITEM;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.STRING;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import java.time.LocalTime;
 import java.util.Collections;
 
@@ -21,7 +45,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palpal.dealightbe.config.SecurityConfig;
-import com.palpal.dealightbe.domain.auth.filter.JwtAuthenticationFilter;
 import com.palpal.dealightbe.domain.item.application.ItemService;
 import com.palpal.dealightbe.domain.item.application.dto.request.ItemReq;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
@@ -31,26 +54,6 @@ import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
-
-import static com.palpal.dealightbe.global.error.ErrorCode.DUPLICATED_ITEM_NAME;
-import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
-import static com.palpal.dealightbe.global.error.ErrorCode.STORE_HAS_NO_ITEM;
-import static org.mockito.Mockito.*;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
-import static org.springframework.restdocs.payload.JsonFieldType.STRING;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = ItemController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class,
 	OAuth2ClientAutoConfiguration.class}, excludeFilters = {
@@ -128,7 +131,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.information").value(itemRes.information()))
 			.andExpect(jsonPath("$.image").value(itemRes.image()))
 			.andDo(print())
-			.andDo(document("item-create",
+			.andDo(document("item/item-create",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestParameters(parameterWithName("memberId").description("고객 ID")
@@ -195,7 +198,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.errors[1].reason").isNotEmpty())
 			.andExpect(jsonPath("$.message").value("잘못된 값을 입력하셨습니다."))
 			.andDo(print())
-			.andDo(document("item-create-fail-invalid-name",
+			.andDo(document("item/item-create-fail-invalid-name",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestParameters(parameterWithName("memberId").description("고객 ID")),
@@ -243,7 +246,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.errors").isEmpty())
 			.andExpect(jsonPath("$.message").value("상품 할인가는 원가보다 클 수 없습니다."))
 			.andDo(print())
-			.andDo(document("item-create-fail-invalid-discount-price",
+			.andDo(document("item/item-create-fail-invalid-discount-price",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestParameters(parameterWithName("memberId").description("고객 ID")),
@@ -288,7 +291,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.errors").isEmpty())
 			.andExpect(jsonPath("$.message").value("동일한 이름을 가진 상품이 이미 등록되어 있습니다."))
 			.andDo(print())
-			.andDo(document("item-create-fail-duplicated-item-name",
+			.andDo(document("item/item-create-fail-duplicated-item-name",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestParameters(parameterWithName("memberId").description("고객 ID")),
@@ -334,7 +337,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.information").value(itemRes.information()))
 			.andExpect(jsonPath("$.image").value(itemRes.image()))
 			.andDo(print())
-			.andDo(document("item-find-by-id",
+			.andDo(document("item/item-find-by-id",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),
@@ -366,7 +369,7 @@ class ItemControllerTest {
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNotFound())
 			.andDo(print())
-			.andDo(document("item-find-by-id-fail-not-found-item",
+			.andDo(document("item/item-find-by-id-fail-not-found-item",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),
@@ -407,7 +410,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.information").value(itemRes.information()))
 			.andExpect(jsonPath("$.image").value(itemRes.image()))
 			.andDo(print())
-			.andDo(document("item-update",
+			.andDo(document("item/item-update",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),
@@ -475,7 +478,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.errors[1].reason").isNotEmpty())
 			.andExpect(jsonPath("$.message").value("잘못된 값을 입력하셨습니다."))
 			.andDo(print())
-			.andDo(document("item-update-fail-invalid-name",
+			.andDo(document("item/item-update-fail-invalid-name",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),
@@ -525,7 +528,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.errors").isEmpty())
 			.andExpect(jsonPath("$.message").value("상품 할인가는 원가보다 클 수 없습니다."))
 			.andDo(print())
-			.andDo(document("item-update-fail-invalid-discount-price",
+			.andDo(document("item/item-update-fail-invalid-discount-price",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),
@@ -572,7 +575,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.errors").isEmpty())
 			.andExpect(jsonPath("$.message").value("동일한 이름을 가진 상품이 이미 등록되어 있습니다."))
 			.andDo(print())
-			.andDo(document("item-update-fail-duplicated-item-name",
+			.andDo(document("item/item-update-fail-duplicated-item-name",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),
@@ -610,7 +613,7 @@ class ItemControllerTest {
 				.param("memberId", memberId.toString()))
 			.andExpect(status().isNoContent())
 			.andDo(print())
-			.andDo(document("item-delete",
+			.andDo(document("item/item-delete",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),
@@ -639,7 +642,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.errors").isEmpty())
 			.andExpect(jsonPath("$.message").value("요청하신 상품은 해당 업체에 등록되지 않은 상품입니다."))
 			.andDo(print())
-			.andDo(document("item-delete-store-has-no-item",
+			.andDo(document("item/item-delete-store-has-no-item",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),

@@ -100,7 +100,7 @@ class StoreControllerTest {
 			.andExpect(jsonPath("$.closeTime").value(storeCreateRes.closeTime().toString()))
 			.andExpect(jsonPath("$.dayOff[0]").value(DayOff.MON.getName()))
 			.andDo(print())
-			.andDo(document("store-register",
+			.andDo(document("store/store-register",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("memberId").description("고객 ID")
@@ -153,7 +153,7 @@ class StoreControllerTest {
 			.andExpect(jsonPath("$.errors").isEmpty())
 			.andExpect(jsonPath("$.message").value("마감 시간은 오픈 시간보다 이전일 수 없습니다"))
 			.andDo(print())
-			.andDo(document("store-register-fail-invalid-business-time",
+			.andDo(document("store/store-register-fail-invalid-business-time",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("memberId").description("고객 ID")
@@ -199,7 +199,7 @@ class StoreControllerTest {
 					.contentType(APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andDo(print())
-			.andDo(document("store-get-info",
+			.andDo(document("store/store-get-info",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
@@ -236,7 +236,7 @@ class StoreControllerTest {
 					.contentType(APPLICATION_JSON))
 			.andExpect(status().isBadRequest())
 			.andDo(print())
-			.andDo(document("store-get-info-fail-not-match-owner-and-requester",
+			.andDo(document("store/store-get-info-fail-not-match-owner-and-requester",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
@@ -277,7 +277,7 @@ class StoreControllerTest {
 					.content(objectMapper.writeValueAsString(updateReq)))
 			.andExpect(status().isOk())
 			.andDo(print())
-			.andDo(document("store-update-info",
+			.andDo(document("store/store-update-info",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
@@ -313,12 +313,13 @@ class StoreControllerTest {
 			.willReturn(storeStatusUpdateRes);
 
 		//when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/stores/status/{memberId}/{storeId}", memberId, storeId)
-				.contentType(APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(storeStatusReq)))
+		mockMvc.perform(
+				RestDocumentationRequestBuilders.patch("/api/stores/status/{memberId}/{storeId}", memberId, storeId)
+					.contentType(APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(storeStatusReq)))
 			.andExpect(status().isOk())
 			.andDo(print())
-			.andDo(document("store-status-update",
+			.andDo(document("store/store-status-update",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
@@ -356,7 +357,7 @@ class StoreControllerTest {
 					.contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
 			.andExpect(status().isOk())
 			.andDo(print())
-			.andDo(document("store-upload-image",
+			.andDo(document("store/store-upload-image",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(

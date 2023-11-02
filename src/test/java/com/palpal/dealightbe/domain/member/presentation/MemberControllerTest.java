@@ -31,7 +31,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palpal.dealightbe.config.SecurityConfig;
 import com.palpal.dealightbe.domain.address.application.dto.request.AddressReq;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
-import com.palpal.dealightbe.domain.auth.filter.JwtAuthenticationFilter;
 import com.palpal.dealightbe.domain.member.application.MemberService;
 import com.palpal.dealightbe.domain.member.application.dto.request.MemberUpdateReq;
 import com.palpal.dealightbe.domain.member.application.dto.response.MemberProfileRes;
@@ -72,7 +71,7 @@ class MemberControllerTest {
 				.contentType(APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andDo(print())
-			.andDo(document("member-get-profile",
+			.andDo(document("member/member-get-profile",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
@@ -103,7 +102,7 @@ class MemberControllerTest {
 				.contentType(APPLICATION_JSON))
 			.andExpect(status().isNotFound())
 			.andDo(print())
-			.andDo(document("member-get-profile-not-found",
+			.andDo(document("member/member-get-profile-not-found",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
@@ -140,7 +139,7 @@ class MemberControllerTest {
 				.content(objectMapper.writeValueAsString(updateRequest)))
 			.andExpect(status().isOk())
 			.andDo(print())
-			.andDo(document("member-update-profile",
+			.andDo(document("member/member-update-profile",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
@@ -181,7 +180,7 @@ class MemberControllerTest {
 				.content(objectMapper.writeValueAsString(updateRequest)))
 			.andExpect(status().isNotFound())
 			.andDo(print())
-			.andDo(document("member-update-profile-not-found",
+			.andDo(document("member/member-update-profile-not-found",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
@@ -221,7 +220,7 @@ class MemberControllerTest {
 				.content(objectMapper.writeValueAsString(addressReq)))
 			.andExpect(status().isOk())
 			.andDo(print())
-			.andDo(document("member-update-address",
+			.andDo(document("member/member-update-address",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
@@ -257,7 +256,7 @@ class MemberControllerTest {
 				.content(objectMapper.writeValueAsString(addressReq)))
 			.andExpect(status().isNotFound())
 			.andDo(print())
-			.andDo(document("member-update-address-not-found",
+			.andDo(document("member/member-update-address-not-found",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
