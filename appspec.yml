@@ -7,8 +7,8 @@ files:
 
 permissions:
   - object: /home/ubuntu/app
-    owner: ubuntu
-    group: ubuntu
+    owner: root
+    group: root
 
 hooks:
   ApplicationStart:
