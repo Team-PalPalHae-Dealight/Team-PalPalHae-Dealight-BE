@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +28,13 @@ public class ItemController {
 	@PostMapping
 	public ResponseEntity<ItemRes> create(@Validated @RequestBody ItemReq itemReq, @RequestParam Long memberId) {
 		ItemRes itemRes = itemService.create(itemReq, memberId);
+
+		return ResponseEntity.ok(itemRes);
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<ItemRes> findById(@PathVariable("id") Long itemId) {
+		ItemRes itemRes = itemService.findById(itemId);
 
 		return ResponseEntity.ok(itemRes);
 	}

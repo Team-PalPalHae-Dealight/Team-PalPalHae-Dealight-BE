@@ -12,6 +12,7 @@ import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
+import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
@@ -39,6 +40,17 @@ public class ItemService {
 		Item savedItem = itemRepository.save(item);
 
 		return ItemRes.from(savedItem);
+	}
+
+	@Transactional(readOnly = true)
+	public ItemRes findById(Long itemId) {
+		Item item = itemRepository.findById(itemId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", itemId);
+				return new EntityNotFoundException(NOT_FOUND_ITEM);
+			});
+
+		return ItemRes.from(item);
 	}
 
 	public ItemRes update(Long itemId, ItemReq itemReq, Long memberId) {

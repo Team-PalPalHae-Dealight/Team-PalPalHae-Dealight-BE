@@ -5,6 +5,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
 	boolean existsByNameAndStoreId(String name, Long storeId);
-
-	boolean existsByIdAndStoreId(Long id, Long storeId);
 }

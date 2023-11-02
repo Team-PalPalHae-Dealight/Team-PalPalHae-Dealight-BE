@@ -30,8 +30,10 @@ import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
+import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
 import static com.palpal.dealightbe.global.error.ErrorCode.DUPLICATED_ITEM_NAME;
+import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.STORE_HAS_NO_ITEM;
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -299,6 +301,75 @@ class ItemControllerTest {
 					fieldWithPath("information").description("안내 사항"),
 					fieldWithPath("image").description("상품 이미지")
 				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("예외 코드"),
+					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@DisplayName("상품 상세 정보 조회(단건) 성공 테스트")
+	@Test
+	public void itemFindByIdSuccessTest() throws Exception {
+		//given
+		Long itemId = 1L;
+		ItemRes itemRes = ItemRes.from(item);
+
+		when(itemService.findById(any())).thenReturn(itemRes);
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/items/{id}", itemId)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.itemId").value(itemRes.itemId()))
+			.andExpect(jsonPath("$.storeId").value(itemRes.storeId()))
+			.andExpect(jsonPath("$.name").value(itemRes.name()))
+			.andExpect(jsonPath("$.stock").value(itemRes.stock()))
+			.andExpect(jsonPath("$.discountPrice").value(itemRes.discountPrice()))
+			.andExpect(jsonPath("$.originalPrice").value(itemRes.originalPrice()))
+			.andExpect(jsonPath("$.description").value(itemRes.description()))
+			.andExpect(jsonPath("$.information").value(itemRes.information()))
+			.andExpect(jsonPath("$.image").value(itemRes.image()))
+			.andDo(print())
+			.andDo(document("item-find-by-id",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(parameterWithName("id").description("상품 ID")),
+				responseFields(
+					fieldWithPath("itemId").description("상품 ID"),
+					fieldWithPath("storeId").description("업체 ID"),
+					fieldWithPath("name").description("상품 이름"),
+					subsectionWithPath("stock").description("재고 수"),
+					fieldWithPath("discountPrice").description("할인가"),
+					fieldWithPath("originalPrice").description("원가"),
+					fieldWithPath("description").description("상세 설명"),
+					fieldWithPath("information").description("안내 사항"),
+					fieldWithPath("image").description("상품 이미지")
+				)
+			));
+	}
+
+	@DisplayName("상품 상세 정보 조회(단건) 실패 테스트 - 상품이 존재하지 않는 경우")
+	@Test
+	public void itemFindByIdFailureTest_notFoundItem() throws Exception {
+		//given
+		Long itemId = 1L;
+		doThrow(new EntityNotFoundException(NOT_FOUND_ITEM)).when(
+			itemService).findById(any());
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/items/{id}", itemId)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isNotFound())
+			.andDo(print())
+			.andDo(document("item-find-by-id-fail-not-found-item",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(parameterWithName("id").description("상품 ID")),
 				responseFields(
 					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
 					fieldWithPath("code").type(STRING).description("예외 코드"),
