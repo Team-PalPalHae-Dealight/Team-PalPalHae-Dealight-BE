@@ -37,8 +37,13 @@ public enum ErrorCode {
 	NOT_FOUND_ORDER("OR001", "존재하지 않는 주문입니다."),
 	INVALID_ARRIVAL_TIME("OR002", "예상 도착 시간은 업체 마감 시간 이전이어야 합니다."),
 	INVALID_DEMAND_LENGTH("OR003", "요청 사항은 최대 100자까지 입력할 수 있습니다."),
+	INVALID_ORDER_STATUS("OR004", "유효하지 않은 주문 상태입니다."),
+	INVALID_ORDER_STATUS_UPDATER("OR005", "주문을 받은 업체만 주문 상태를 변경할 수 있습니다."),
+	EXCEEDED_ORDER_ITEMS("OR006", "한 번에 5개 종류의 상품까지만 주문할 수 있습니다."),
+	UNCHANGEABLE_ORDER_STATUS("OR007", "주문 완료 또는 주문 취소 상태에서는 상태 변경이 불가능합니다."),
 
 	;
+
 	private final String code;
 	private final String message;
 }
