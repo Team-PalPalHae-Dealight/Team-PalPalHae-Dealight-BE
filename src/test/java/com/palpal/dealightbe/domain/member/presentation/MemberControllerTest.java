@@ -339,6 +339,23 @@ class MemberControllerTest {
 					updateRequest.setMethod("PATCH");
 					return updateRequest;
 				}))
-			.andExpect(status().isNotFound());
+			.andExpect(status().isNotFound())
+			.andDo(print())
+			.andDo(document("member-upload-image-not-found",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("memberId").description("이미지를 업로드하려는 멤버의 ID")
+				),
+				requestParts(
+					partWithName("file").description("업로드하려는 이미지 파일")
+				),
+				responseFields(
+					fieldWithPath("message").description("에러 메시지"),
+					fieldWithPath("timestamp").description("오류 발생 시각"),
+					fieldWithPath("code").description("에러 코드"),
+					fieldWithPath("errors").description("추가적인 에러 정보")
+				)
+			));
 	}
 }
