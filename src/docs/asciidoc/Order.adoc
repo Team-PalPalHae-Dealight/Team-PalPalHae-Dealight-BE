@@ -19,14 +19,32 @@ endif::[]
 
 === 1. 주문 생성
 
-/orders/{memberProviderId}
+api/orders/{memberProviderId}
 
 ==== Request
+
 .Request
-include::{snippets}/order-success/http-request.adoc[]
-include::{snippets}/order-success/request-fields.adoc[]
+include::{snippets}/order-create-success/http-request.adoc[]
+include::{snippets}/order-create-success/request-fields.adoc[]
 
 ==== Response
+
 .Response
-include::{snippets}/order-success/http-response.adoc[]
-include::{snippets}/order-success/response-fields.adoc[]
+include::{snippets}/order-create-success/http-response.adoc[]
+include::{snippets}/order-create-success/response-fields.adoc[]
+
+=== 2. 주문 상태 변경
+
+/api/orders/{orderId}/status/{memberProviderId}
+
+==== Request
+
+.Request
+include::{snippets}/order-status-update-success/http-request.adoc[]
+include::{snippets}/order-status-update-success/request-fields.adoc[]
+
+==== Response
+
+.Response
+include::{snippets}/order-status-update-success/http-response.adoc[]
+include::{snippets}/order-status-update-success/response-fields.adoc[]
