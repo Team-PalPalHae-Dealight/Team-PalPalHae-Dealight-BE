@@ -194,10 +194,10 @@ class ItemServiceTest {
 		items.add(item);
 		items.add(item2);
 
-		Page<Item> ItemPage = new PageImpl<>(items, pageRequest, items.size());
+		Page<Item> itemPage = new PageImpl<>(items, pageRequest, items.size());
 
 		when(storeRepository.findByMemberId(any())).thenReturn(Optional.of(store));
-		when(itemRepository.findAllByStoreId(any(), eq(PageRequest.of(page, size)))).thenReturn(ItemPage);
+		when(itemRepository.findAllByStoreId(any(), eq(PageRequest.of(page, size)))).thenReturn(itemPage);
 
 		//when
 		ItemsRes itemsRes = itemService.findAllForStore(memberId, pageRequest);
