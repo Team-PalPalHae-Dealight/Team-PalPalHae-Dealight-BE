@@ -19,11 +19,13 @@ endif::[]
 
 === 1. 주문 생성
 
-api/orders/{memberProviderId}
+
 
 ==== Request
 
 .Request
+include::{snippets}/order-create-success/path-parameters.adoc[]
+
 include::{snippets}/order-create-success/http-request.adoc[]
 include::{snippets}/order-create-success/request-fields.adoc[]
 
@@ -40,6 +42,8 @@ include::{snippets}/order-create-success/response-fields.adoc[]
 ==== Request
 
 .Request
+include::{snippets}/order-status-update-success/path-parameters.adoc[]
+
 include::{snippets}/order-status-update-success/http-request.adoc[]
 include::{snippets}/order-status-update-success/request-fields.adoc[]
 
