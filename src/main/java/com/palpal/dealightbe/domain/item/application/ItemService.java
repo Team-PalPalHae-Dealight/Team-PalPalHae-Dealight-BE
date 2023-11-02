@@ -59,7 +59,10 @@ public class ItemService {
 	@Transactional(readOnly = true)
 	public ItemsRes findAllForStore(Long memberId, Pageable pageable) {
 		Store store = storeRepository.findByMemberId(memberId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_STORE));
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_STORE_BY_MEMBER_ID : {}", memberId);
+				return new EntityNotFoundException(NOT_FOUND_STORE);
+			});
 
 		Page<Item> items = itemRepository.findAllByStoreId(store.getId(), pageable);
 
