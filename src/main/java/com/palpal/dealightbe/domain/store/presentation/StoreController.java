@@ -19,7 +19,7 @@ import com.palpal.dealightbe.domain.store.application.dto.request.StoreStatusReq
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreUpdateReq;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
-import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusUpdateRes;
+import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusRes;
 
 import lombok.RequiredArgsConstructor;
 
@@ -52,10 +52,17 @@ public class StoreController {
 	}
 
 	@PatchMapping("/status/{memberId}/{storeId}")
-	public ResponseEntity<StoreStatusUpdateRes> updateStatus(@PathVariable Long memberId, @PathVariable Long storeId, @RequestBody StoreStatusReq req) {
-		StoreStatusUpdateRes storeStatusUpdateRes = storeService.updateStatus(memberId, storeId, req);
+	public ResponseEntity<StoreStatusRes> updateStatus(@PathVariable Long memberId, @PathVariable Long storeId, @RequestBody StoreStatusReq req) {
+		StoreStatusRes storeStatusRes = storeService.updateStatus(memberId, storeId, req);
 
-		return ResponseEntity.ok(storeStatusUpdateRes);
+		return ResponseEntity.ok(storeStatusRes);
+	}
+
+	@GetMapping("/status/{memberId}/{storeId}")
+	public ResponseEntity<StoreStatusRes> getStatus(@PathVariable Long memberId, @PathVariable Long storeId) {
+		StoreStatusRes status = storeService.getStatus(memberId, storeId);
+
+		return ResponseEntity.ok(status);
 	}
 
 	@PostMapping("/images/{memberId}/{storeId}")

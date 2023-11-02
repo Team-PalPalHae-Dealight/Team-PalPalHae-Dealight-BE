@@ -31,7 +31,7 @@ import com.palpal.dealightbe.domain.store.application.dto.request.StoreStatusReq
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreUpdateReq;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
-import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusUpdateRes;
+import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusRes;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
@@ -249,11 +249,11 @@ class StoreServiceTest {
 			.thenReturn(Optional.of(store));
 
 		//when
-		StoreStatusUpdateRes storeStatusUpdateRes = storeService.updateStatus(member.getId(), store.getId(), requestStoreStatus);
+		StoreStatusRes storeStatusRes = storeService.updateStatus(member.getId(), store.getId(), requestStoreStatus);
 
 		//then
 		assertThat(store.getStoreStatus()).isEqualTo(requestStoreStatus.storeStatus());
-		assertThat(storeStatusUpdateRes.storeId()).isEqualTo(store.getId());
+		assertThat(storeStatusRes.storeId()).isEqualTo(store.getId());
 	}
 
 	@Test

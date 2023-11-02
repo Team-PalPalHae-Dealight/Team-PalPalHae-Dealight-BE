@@ -49,7 +49,7 @@ import com.palpal.dealightbe.domain.store.application.dto.request.StoreStatusReq
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreUpdateReq;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
-import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusUpdateRes;
+import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusRes;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.StoreStatus;
 import com.palpal.dealightbe.global.error.ErrorCode;
@@ -307,10 +307,10 @@ class StoreControllerTest {
 		Long storeId = 1L;
 
 		StoreStatusReq storeStatusReq = new StoreStatusReq(StoreStatus.OPENED);
-		StoreStatusUpdateRes storeStatusUpdateRes = new StoreStatusUpdateRes(storeId, storeStatusReq.storeStatus());
+		StoreStatusRes storeStatusRes = new StoreStatusRes(storeId, storeStatusReq.storeStatus());
 
 		given(storeService.updateStatus(memberId, storeId, storeStatusReq))
-			.willReturn(storeStatusUpdateRes);
+			.willReturn(storeStatusRes);
 
 		//when -> then
 		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/stores/status/{memberId}/{storeId}", memberId, storeId)
