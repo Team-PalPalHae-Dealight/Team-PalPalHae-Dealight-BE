@@ -1,5 +1,8 @@
 package com.palpal.dealightbe.domain.member.presentation;
 
+import static org.hamcrest.Matchers.is;
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -10,8 +13,11 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.DisplayName;
@@ -22,12 +28,15 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palpal.dealightbe.domain.address.application.dto.request.AddressReq;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
+import com.palpal.dealightbe.domain.image.dto.request.ImageUploadReq;
+import com.palpal.dealightbe.domain.image.dto.response.ImageRes;
 import com.palpal.dealightbe.domain.member.application.MemberService;
 import com.palpal.dealightbe.domain.member.application.dto.request.MemberUpdateReq;
 import com.palpal.dealightbe.domain.member.application.dto.response.MemberProfileRes;
@@ -270,5 +279,66 @@ class MemberControllerTest {
 					fieldWithPath("errors").description("추가적인 에러 정보")
 				)
 			));
+	}
+
+	@Test
+	@DisplayName("멤버 이미지 업로드 성공")
+	void uploadImageSuccessTest() throws Exception {
+
+		// given
+		Long memberId = 1L;
+		MockMultipartFile file = new MockMultipartFile("file", "profile.png", "image/png",
+			"sample-image-content".getBytes());
+
+		ImageUploadReq request = new ImageUploadReq(file);
+		ImageRes imageRes = new ImageRes("http://sample.com/profile.png");
+
+		given(memberService.updateMemberImage(eq(memberId), any())).willReturn(imageRes);
+
+		// when -> then
+		mockMvc.perform(RestDocumentationRequestBuilders.fileUpload("/api/members/images/{memberId}", memberId)
+				.file(file)
+				.with(updateRequest -> {
+					updateRequest.setMethod("PATCH");
+					return updateRequest;
+				}))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.imageUrl", is("http://sample.com/profile.png")))
+			.andDo(print())
+			.andDo(document("member-upload-image",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("memberId").description("이미지를 업로드하려는 멤버의 ID")
+				),
+				requestParts(
+					partWithName("file").description("업로드하려는 이미지 파일")
+				),
+				responseFields(
+					fieldWithPath("imageUrl").description("업로드된 이미지의 URL")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("멤버 이미지 업로드 실패 - 유효하지 않은 memberId")
+	void uploadImageFailDueToInvalidMemberIdTest() throws Exception {
+
+		// given
+		Long invalidMemberId = 9999L;
+		MockMultipartFile file = new MockMultipartFile("file", "profile.png", "image/png",
+			"sample-image-content".getBytes());
+
+		given(memberService.updateMemberImage(eq(invalidMemberId), any()))
+			.willThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+
+		// when -> then
+		mockMvc.perform(RestDocumentationRequestBuilders.fileUpload("/api/members/images/{memberId}", invalidMemberId)
+				.file(file)
+				.with(updateRequest -> {
+					updateRequest.setMethod("PATCH");
+					return updateRequest;
+				}))
+			.andExpect(status().isNotFound());
 	}
 }
