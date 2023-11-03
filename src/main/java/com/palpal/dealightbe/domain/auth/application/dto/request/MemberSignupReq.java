@@ -1,15 +1,28 @@
 package com.palpal.dealightbe.domain.auth.application.dto.request;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import com.palpal.dealightbe.domain.member.domain.Member;
 
 public record MemberSignupReq(
+	@NotBlank(message = "Provider는 비어있을 수 없습니다.")
 	String provider,
+
+	@NotNull(message = "ProviderId는 비어있을 수 없습니다.")
 	Long providerId,
+	@NotBlank(message = "사용자 이름은 필수 입력값입니다.")
 	String realName,
+
+	@NotBlank(message = "닉네임은 필수 입력값입니다.")
 	String nickName,
+
+	@NotBlank(message = "사용자 전화번호는 필수 입력값입니다.")
+	@Pattern(regexp = "\\d+")
 	String phoneNumber,
 	String role
 ) {
