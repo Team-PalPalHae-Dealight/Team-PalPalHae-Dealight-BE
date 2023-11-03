@@ -26,3 +26,4 @@ spring:
       hibernate:
         format_sql: false
         dialect: org.hibernate.dialect.H2Dialect
+    defer-datasource-initialization: true

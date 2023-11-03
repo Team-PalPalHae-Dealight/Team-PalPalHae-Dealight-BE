@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palpal.dealightbe.domain.auth.application.AuthService;
-import com.palpal.dealightbe.domain.auth.application.JoinRequireRes;
-import com.palpal.dealightbe.domain.auth.application.LoginRes;
+import com.palpal.dealightbe.domain.auth.application.dto.response.JoinRequireRes;
+import com.palpal.dealightbe.domain.auth.application.dto.response.LoginRes;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

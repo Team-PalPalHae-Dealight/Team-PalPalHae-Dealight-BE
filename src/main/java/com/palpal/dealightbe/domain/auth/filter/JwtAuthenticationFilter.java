@@ -12,13 +12,15 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palpal.dealightbe.domain.auth.domain.Jwt;
 import com.palpal.dealightbe.domain.auth.domain.JwtAuthentication;
 import com.palpal.dealightbe.domain.auth.domain.JwtAuthenticationToken;
+import com.palpal.dealightbe.global.error.ErrorCode;
+import com.palpal.dealightbe.global.error.ErrorResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +53,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				log.warn("Jwt 처리에 실패했습니다: {}", e.getMessage());
 			}
 			filterChain.doFilter(request, response);
+			return;
 		}
+
+		// 유효하지 않은 토큰일 경우 예외메시지를 던지는 것이 필요하다.
+		log.warn("Jwt({})가 유효하지 않습니다.", jwt);
+		ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.INVALID_TOKEN);
+		ObjectMapper objectMapper = new ObjectMapper();
+		String accessDenialResponse = objectMapper.writeValueAsString(errorResponse);
+		response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+		response.setContentType("application/json;charset=UTF-8");
+		response.getWriter().write(accessDenialResponse);
+		response.getWriter().flush();
+		response.getWriter().close();
 	}
 
 	private String parseTokenFromHttpRequest(HttpServletRequest request) {
@@ -64,7 +78,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 
 		log.info("Authorization({}) 값을 가져오는데 성공했습니다.", jwtWithBearer);
-		String jwt = jwtWithBearer.substring(7);
+		String jwt = jwtWithBearer.substring(8);
 		log.info("Jwt({})를 가져오는데 성공했습니다.", jwt);
 
 		return jwt;

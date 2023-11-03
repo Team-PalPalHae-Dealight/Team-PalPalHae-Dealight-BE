@@ -1,5 +1,6 @@
 package com.palpal.dealightbe.domain.address.domain;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;

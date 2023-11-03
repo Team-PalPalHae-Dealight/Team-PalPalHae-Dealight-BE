@@ -1,4 +1,4 @@
-package com.palpal.dealightbe.domain.auth.application;
+package com.palpal.dealightbe.domain.auth.application.dto.response;
 
 import java.util.Map;
 

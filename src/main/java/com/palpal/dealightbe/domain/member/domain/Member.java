@@ -14,6 +14,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.global.BaseEntity;
 import com.palpal.dealightbe.global.error.ErrorCode;
@@ -52,7 +55,7 @@ public class Member extends BaseEntity {
 
 	private String image;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "member")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL)
 	private List<MemberRole> memberRoles = new ArrayList<>();
 
 	@Builder
@@ -94,7 +97,25 @@ public class Member extends BaseEntity {
 		this.image = imageUrl;
 	}
 
-	public void changeMemberRoles(List<MemberRole> memberRoles) {
+	public void updateMemberRoles(List<MemberRole> memberRoles) {
+		if (memberRoles.isEmpty()) {
+			throw new BusinessException(ErrorCode.INVALID_ROLE_UPDATE);
+		}
+
 		this.memberRoles = memberRoles;
+		memberRoles.forEach(memberRole -> {
+			memberRole.updateMember(this);
+		});
+	}
+
+	@Override
+	public String toString() {
+		return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+			.append("realName", realName)
+			.append("nickName", nickName)
+			.append("phoneNumber", phoneNumber)
+			.append("provider", provider)
+			.append("providerId", providerId)
+			.toString();
 	}
 }
