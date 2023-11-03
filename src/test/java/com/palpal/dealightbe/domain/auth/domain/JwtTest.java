@@ -45,7 +45,7 @@ class JwtTest {
 			.providerId(123L)
 			.provider("test")
 			.build();
-		Role role = new Role(RoleType.ROLE_MEMBER);
+		Role role = new Role(1L, RoleType.ROLE_MEMBER);
 		memberRoles = new ArrayList<>();
 		MemberRole memberRole = new MemberRole(testMember, role);
 		memberRoles.add(memberRole);

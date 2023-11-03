@@ -12,6 +12,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,7 +29,9 @@ public class Role {
 	@Enumerated(EnumType.STRING)
 	private RoleType type;
 
-	public Role(RoleType type) {
+	@Builder
+	public Role(Long id, RoleType type) {
+		this.id = id;
 		this.type = type;
 	}
 

@@ -67,7 +67,7 @@ public class AuthService {
 		List<MemberRole> assignableMemberRoles = createMemberRoles(request, savedMember);
 		List<MemberRole> savedMemberRoles = memberRoleRepository.saveAll(assignableMemberRoles);
 
-		requestMember.updateMemberRoles(savedMemberRoles);
+		savedMember.updateMemberRoles(savedMemberRoles);
 
 		return createMemberSignupResponse(savedMember);
 	}
@@ -105,14 +105,6 @@ public class AuthService {
 		return roleType;
 	}
 
-	private MemberSignupRes createMemberSignupResponse(Member savedMember) {
-		String accessToken = jwt.createAccessToken(savedMember);
-		String refreshToken = jwt.createRefreshToken(savedMember);
-		String nickName = savedMember.getNickName();
-
-		return new MemberSignupRes(nickName, accessToken, refreshToken);
-	}
-
 	private List<MemberRole> createMemberRoles(Member member, Role role) {
 		MemberRole memberRole = new MemberRole(member, role);
 		List<MemberRole> memberRoles = new ArrayList<>();
@@ -121,9 +113,11 @@ public class AuthService {
 		return memberRoles;
 	}
 
-	@Transactional(readOnly = true)
-	public Member findMemberByProviderId(Long providerId) {
-		return memberRepository.findMemberByProviderId(providerId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+	private MemberSignupRes createMemberSignupResponse(Member savedMember) {
+		String accessToken = jwt.createAccessToken(savedMember);
+		String refreshToken = jwt.createRefreshToken(savedMember);
+		String nickName = savedMember.getNickName();
+
+		return new MemberSignupRes(nickName, accessToken, refreshToken);
 	}
 }

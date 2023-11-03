@@ -1,11 +1,14 @@
 package com.palpal.dealightbe.domain.auth.application;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -13,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -21,17 +25,30 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
+import com.palpal.dealightbe.domain.address.domain.Address;
+import com.palpal.dealightbe.domain.auth.application.dto.request.MemberSignupReq;
 import com.palpal.dealightbe.domain.auth.application.dto.response.LoginRes;
+import com.palpal.dealightbe.domain.auth.application.dto.response.MemberSignupRes;
 import com.palpal.dealightbe.domain.auth.domain.Jwt;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
+import com.palpal.dealightbe.domain.member.domain.MemberRole;
+import com.palpal.dealightbe.domain.member.domain.MemberRoleRepository;
+import com.palpal.dealightbe.domain.member.domain.Role;
+import com.palpal.dealightbe.domain.member.domain.RoleRepository;
+import com.palpal.dealightbe.domain.member.domain.RoleType;
+import com.palpal.dealightbe.global.error.exception.BusinessException;
+import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
 
 	@Mock
 	private MemberRepository memberRepository;
-
+	@Mock
+	private MemberRoleRepository memberRoleRepository;
+	@Mock
+	private RoleRepository roleRepository;
 	@Mock
 	private Jwt jwt;
 
@@ -147,5 +164,117 @@ class AuthServiceTest {
 		// when -> then
 		assertThatThrownBy(() -> new DefaultOAuth2User(mockAuthorities, mockAttributes, "id"))
 			.isInstanceOf(IllegalArgumentException.class);
+	}
+
+	@DisplayName("회원가입에 성공하면 토큰을 반환한다")
+	@Test
+	void returnTokensIfSignupSuccess() {
+		// given
+		MemberSignupReq memberSignupReq = new MemberSignupReq(
+			"test",
+			123L,
+			"테스터",
+			"tester",
+			"01012341234",
+			"member");
+
+		Address mockAddress = Address.builder()
+			.xCoordinate(0)
+			.yCoordinate(0)
+			.build();
+		Member mockMember = MemberSignupReq.toMember(memberSignupReq);
+		mockMember.updateAddress(mockAddress);
+
+		Role mockRole = Role.builder()
+			.id(1L)
+			.type(RoleType.ROLE_MEMBER)
+			.build();
+		MemberRole memberRole = new MemberRole(mockMember, mockRole);
+		List<MemberRole> mockMemberRoles = Collections.singletonList(memberRole);
+
+		given(memberRepository.findByProviderAndProviderId(any(String.class), any(Long.class)))
+			.willReturn(Optional.empty());
+		given(roleRepository.findByRoleType(RoleType.ROLE_MEMBER))
+			.willReturn(Optional.of(mockRole));
+		given(memberRepository.save(any(Member.class)))
+			.willReturn(mockMember);
+		given(memberRoleRepository.saveAll(any()))
+			.willReturn(mockMemberRoles);
+		mockMember.updateMemberRoles(mockMemberRoles);
+
+		given(jwt.createAccessToken(mockMember))
+			.willReturn("MOCK_ACCESS_TOKEN");
+		given(jwt.createRefreshToken(mockMember))
+			.willReturn("MOCK_REFRESH_TOKEN");
+
+		// when
+		MemberSignupRes response = authService.signup(memberSignupReq);
+
+		// then
+		assertThat(response.accessToken()).isEqualTo("MOCK_ACCESS_TOKEN");
+		assertThat(response.refreshToken()).isEqualTo("MOCK_REFRESH_TOKEN");
+		assertThat(response.nickName()).isEqualTo("tester");
+	}
+
+	@DisplayName("이미 존재하는 회원인 경우 회원가입 실패")
+	@Test
+	void throwExceptionIfAlreadyExistMember() {
+		// given
+		MemberSignupReq request = new MemberSignupReq(
+			"tester",
+			123L,
+			"고예성",
+			"요송송",
+			"01012341234",
+			"member");
+		Member duplicatedMember = MemberSignupReq.toMember(request);
+		given(memberRepository.findByProviderAndProviderId("tester", 123L))
+			.willReturn(Optional.of(duplicatedMember));
+
+		// when -> then
+		assertThatThrownBy(() -> authService.signup(request))
+			.isInstanceOf(BusinessException.class);
+	}
+
+	@DisplayName("존재하지 않는 Role로 회원가입을 요청하는 경우 실패")
+	@Test
+	void throwExceptionIFNotFoundRole() {
+		// given
+		MemberSignupReq request = new MemberSignupReq(
+			"tester",
+			123L,
+			"고예성",
+			"요송송",
+			"01012341234",
+			"genius");
+
+		given(memberRepository.findByProviderAndProviderId(request.provider(), request.providerId()))
+			.willReturn(Optional.empty());
+
+		// when -> then
+		assertThatThrownBy(() -> authService.signup(request))
+			.isInstanceOf(BusinessException.class);
+	}
+
+	@DisplayName("데이터베이스에 Role이 존재하지 않으면 회원가입 실패")
+	@Test
+	void throwExceptionIfNotFoundRoleInDb() {
+		// given
+		MemberSignupReq request = new MemberSignupReq(
+			"tester",
+			123L,
+			"고예성",
+			"요송송",
+			"01012341234",
+			"member");
+
+		given(memberRepository.findByProviderAndProviderId(request.provider(), request.providerId()))
+			.willReturn(Optional.empty());
+		given(roleRepository.findByRoleType(RoleType.ROLE_MEMBER))
+			.willReturn(Optional.empty());
+
+		// when -> then
+		assertThatThrownBy(() -> authService.signup(request))
+			.isInstanceOf(EntityNotFoundException.class);
 	}
 }

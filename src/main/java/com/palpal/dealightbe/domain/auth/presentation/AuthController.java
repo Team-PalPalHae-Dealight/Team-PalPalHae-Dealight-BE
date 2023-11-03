@@ -32,13 +32,4 @@ public class AuthController {
 			.status(HttpStatus.CREATED)
 			.body(response);
 	}
-
-	@ProviderId
-	@GetMapping("/test")
-	public ResponseEntity<String> test(Long providerId) {
-		Member memberByProviderId = authService.findMemberByProviderId(providerId);
-
-		return ResponseEntity
-			.ok(memberByProviderId.toString());
-	}
 }
