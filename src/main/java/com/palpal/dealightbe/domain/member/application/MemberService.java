@@ -21,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-@Transactional
 @RequiredArgsConstructor
 @Transactional
 public class MemberService {
@@ -69,7 +68,10 @@ public class MemberService {
 		String imageUrl = imageService.store(request.file());
 
 		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+			.orElseThrow(() -> {
+				log.warn("PATCH:UPDATE:NOT_FOUND_MEMBER_BY_ID : {}", memberId);
+				return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
+			});
 
 		member.updateImage(imageUrl);
 
