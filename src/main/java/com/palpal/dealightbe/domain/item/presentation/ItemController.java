@@ -43,7 +43,7 @@ public class ItemController {
 	}
 
 	@GetMapping("/stores")
-	public ResponseEntity<ItemsRes> findAllForStore(@RequestParam Long memberId, @PageableDefault(size = 5) Pageable pageable) {
+	public ResponseEntity<ItemsRes> findAllForStore(@RequestParam Long memberId, @PageableDefault(size = 5, page = 0) Pageable pageable) {
 		ItemsRes itemsRes = itemService.findAllForStore(memberId, pageable);
 
 		return ResponseEntity.ok(itemsRes);
