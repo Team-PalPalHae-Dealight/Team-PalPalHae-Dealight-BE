@@ -46,8 +46,6 @@ public class Member extends BaseEntity {
 
 	private String phoneNumber;
 
-	private final boolean isDeleted = false;
-
 	private String provider;
 
 	private Long providerId;
@@ -64,10 +62,14 @@ public class Member extends BaseEntity {
 		this.realName = realName;
 		this.nickName = nickName;
 		this.phoneNumber = phoneNumber;
-		this.address = address != null ? address : Address.defaultAddress();
+		this.address = getValidAddress(address);
 		this.provider = provider;
 		this.providerId = providerId;
 		this.memberRoles = memberRoles;
+	}
+
+	private Address getValidAddress(Address address) {
+		return address != null ? address : Address.defaultAddress();
 	}
 
 	public void updateInfo(Member member) {
