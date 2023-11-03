@@ -6,6 +6,8 @@ import static org.mockito.BDDMockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -82,7 +84,7 @@ class AuthControllerTest {
 				.andExpect(jsonPath("$.accessToken").value("MOCK_ACCESS_TOKEN"))
 				.andExpect(jsonPath("$.refreshToken").value("MOCK_REFRESH_TOKEN"))
 				.andDo(document(
-					"member-signup-success",
+					"auth-signup-success",
 					preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
 					requestFields(
@@ -127,7 +129,32 @@ class AuthControllerTest {
 				.andDo(print())
 				.andExpect(status().is4xxClientError())
 				.andExpect(result -> assertThat(result.getResolvedException())
-					.isInstanceOf(BusinessException.class));
+					.isInstanceOf(BusinessException.class))
+				.andDo(document(
+					"auth-signup-fail-already-exist",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestFields(
+						fieldWithPath("provider").type(JsonFieldType.STRING)
+							.description("OAuth 서버 이름"),
+						fieldWithPath("providerId").type(JsonFieldType.NUMBER)
+							.description("OAuth 서버로부터 받은 회원 아이디"),
+						fieldWithPath("realName").type(JsonFieldType.STRING)
+							.description("회원의 본명"),
+						fieldWithPath("nickName").type(JsonFieldType.STRING)
+							.description("회원의 닉네임"),
+						fieldWithPath("phoneNumber").type(JsonFieldType.STRING)
+							.description("회원 전화번호"),
+						fieldWithPath("role").type(JsonFieldType.STRING)
+							.description("가입하는 회원의 권한")
+					),
+					responseFields(
+						fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+						fieldWithPath("code").type(STRING).description("오류 코드"),
+						fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+						fieldWithPath("message").type(STRING).description("오류 메시지")
+					)
+				));
 		}
 
 		@DisplayName("ProviderId가 없다면 회원가입 실패")
@@ -157,7 +184,32 @@ class AuthControllerTest {
 				.andExpect(status().is5xxServerError())
 				.andExpect(result -> {
 					assertTrue(result.getResolvedException() instanceof IllegalArgumentException);
-				});
+				})
+				.andDo(document(
+					"auth-signup-fail-no-providerId",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestFields(
+						fieldWithPath("provider").type(JsonFieldType.STRING)
+							.description("OAuth 서버 이름"),
+						fieldWithPath("providerId").type(JsonFieldType.NULL)
+							.description("OAuth 서버로부터 받은 회원 아이디"),
+						fieldWithPath("realName").type(JsonFieldType.STRING)
+							.description("회원의 본명"),
+						fieldWithPath("nickName").type(JsonFieldType.STRING)
+							.description("회원의 닉네임"),
+						fieldWithPath("phoneNumber").type(JsonFieldType.STRING)
+							.description("회원 전화번호"),
+						fieldWithPath("role").type(JsonFieldType.STRING)
+							.description("가입하는 회원의 권한")
+					),
+					responseFields(
+						fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+						fieldWithPath("code").type(STRING).description("오류 코드"),
+						fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+						fieldWithPath("message").type(STRING).description("오류 메시지")
+					)
+				));
 		}
 
 		@DisplayName("Provider 정보가 없다면 회원가입 실패")
@@ -187,7 +239,32 @@ class AuthControllerTest {
 				.andExpect(status().is5xxServerError())
 				.andExpect(result -> {
 					assertTrue(result.getResolvedException() instanceof IllegalArgumentException);
-				});
+				})
+				.andDo(document(
+					"auth-signup-fail-no-provider",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestFields(
+						fieldWithPath("provider").type(JsonFieldType.NULL)
+							.description("OAuth 서버 이름"),
+						fieldWithPath("providerId").type(JsonFieldType.NUMBER)
+							.description("OAuth 서버로부터 받은 회원 아이디"),
+						fieldWithPath("realName").type(JsonFieldType.STRING)
+							.description("회원의 본명"),
+						fieldWithPath("nickName").type(JsonFieldType.STRING)
+							.description("회원의 닉네임"),
+						fieldWithPath("phoneNumber").type(JsonFieldType.STRING)
+							.description("회원 전화번호"),
+						fieldWithPath("role").type(JsonFieldType.STRING)
+							.description("가입하는 회원의 권한")
+					),
+					responseFields(
+						fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+						fieldWithPath("code").type(STRING).description("오류 코드"),
+						fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+						fieldWithPath("message").type(STRING).description("오류 메시지")
+					)
+				));
 		}
 
 		@DisplayName("잘못된 Role이 들어온다면 회원가입 실패")
@@ -217,7 +294,32 @@ class AuthControllerTest {
 				.andExpect(status().is4xxClientError())
 				.andExpect(result -> {
 					assertTrue(result.getResolvedException() instanceof BusinessException);
-				});
+				})
+				.andDo(document(
+					"auth-signup-fail-invalid-role-request",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestFields(
+						fieldWithPath("provider").type(JsonFieldType.STRING)
+							.description("OAuth 서버 이름"),
+						fieldWithPath("providerId").type(JsonFieldType.NUMBER)
+							.description("OAuth 서버로부터 받은 회원 아이디"),
+						fieldWithPath("realName").type(JsonFieldType.STRING)
+							.description("회원의 본명"),
+						fieldWithPath("nickName").type(JsonFieldType.STRING)
+							.description("회원의 닉네임"),
+						fieldWithPath("phoneNumber").type(JsonFieldType.STRING)
+							.description("회원 전화번호"),
+						fieldWithPath("role").type(JsonFieldType.STRING)
+							.description("가입하는 회원의 권한")
+					),
+					responseFields(
+						fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+						fieldWithPath("code").type(STRING).description("오류 코드"),
+						fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+						fieldWithPath("message").type(STRING).description("오류 메시지")
+					)
+				));
 		}
 	}
 }
