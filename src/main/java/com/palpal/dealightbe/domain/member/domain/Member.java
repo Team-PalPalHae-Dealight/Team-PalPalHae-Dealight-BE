@@ -47,8 +47,6 @@ public class Member extends BaseEntity {
 
 	private String phoneNumber;
 
-	private boolean isDeleted = false;
-
 	private String provider;
 
 	private Long providerId;
@@ -95,7 +93,6 @@ public class Member extends BaseEntity {
 			.append("realName", realName)
 			.append("nickName", nickName)
 			.append("phoneNumber", phoneNumber)
-			.append("isDeleted", isDeleted)
 			.append("provider", provider)
 			.append("providerId", providerId)
 			.toString();
