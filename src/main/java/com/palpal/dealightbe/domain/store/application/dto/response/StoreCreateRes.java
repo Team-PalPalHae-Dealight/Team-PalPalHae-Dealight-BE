@@ -9,6 +9,7 @@ import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
 
 public record StoreCreateRes(
+	Long id,
 	String storeNumber,
 	String name,
 	String telephone,
@@ -25,7 +26,7 @@ public record StoreCreateRes(
 
 	public static StoreCreateRes from(Store store) {
 		return new StoreCreateRes(
-			store.getStoreNumber(), store.getName(), store.getTelephone(), AddressRes.from(store.getAddress()),
-			store.getOpenTime(), store.getCloseTime(), store.getDayOffs());
+			store.getId(), store.getStoreNumber(), store.getName(), store.getTelephone(),
+			AddressRes.from(store.getAddress()), store.getOpenTime(), store.getCloseTime(), store.getDayOffs());
 	}
 }

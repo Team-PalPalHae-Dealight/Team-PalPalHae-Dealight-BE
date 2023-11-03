@@ -81,7 +81,7 @@ class StoreControllerTest {
 		StoreCreateReq storeCreateReq = new StoreCreateReq("888222111", "맛짱조개", "01066772291", "서울시 강남구", 67.89,
 			293.2323, openTime, closeTime, Set.of(DayOff.MON));
 		AddressRes addressRes = new AddressRes("서울시 강남구", 67.89, 293.2323);
-		StoreCreateRes storeCreateRes = new StoreCreateRes("888222111", "맛짱조개", "01066772291", addressRes, openTime,
+		StoreCreateRes storeCreateRes = new StoreCreateRes(1L, "888222111", "맛짱조개", "01066772291", addressRes, openTime,
 			closeTime, Set.of(DayOff.MON));
 
 		given(storeService.register(memberId, storeCreateReq))
@@ -117,6 +117,7 @@ class StoreControllerTest {
 					fieldWithPath("dayOff").description("휴무일")
 				),
 				responseFields(
+					fieldWithPath("id").description("업체 ID"),
 					fieldWithPath("storeNumber").description("사업자 등록 번호"),
 					fieldWithPath("name").description("상호명"),
 					fieldWithPath("telephone").description("업체 전화번호"),
