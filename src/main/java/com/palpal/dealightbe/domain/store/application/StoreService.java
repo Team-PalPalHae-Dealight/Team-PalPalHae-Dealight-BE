@@ -87,6 +87,7 @@ public class StoreService {
 		String imageUrl = imageService.store(request.file());
 
 		store.updateImage(imageUrl);
+
 		return ImageRes.from(store);
 	}
 
