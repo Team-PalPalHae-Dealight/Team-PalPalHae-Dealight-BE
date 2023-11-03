@@ -20,10 +20,11 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 	private QItem item = QItem.item;
 
 	@Override
-	public Page<Item> findAllByStoreId(Long storeId, Pageable pageable) {
+	public Page<Item> findAllByStoreIdOrderByUpdatedAtDesc(Long storeId, Pageable pageable) {
 		List<Item> items = queryFactory.select(item)
 			.from(item)
 			.where(item.store.id.eq(storeId))
+			.orderBy(item.updatedAt.desc())
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
 			.fetch();

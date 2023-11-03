@@ -5,5 +5,5 @@ import org.springframework.data.domain.Pageable;
 
 public interface ItemRepositoryCustom {
 
-	Page<Item> findAllByStoreId(Long storeId, Pageable pageable);
+	Page<Item> findAllByStoreIdOrderByUpdatedAtDesc(Long storeId, Pageable pageable);
 }

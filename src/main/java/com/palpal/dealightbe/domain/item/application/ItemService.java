@@ -15,7 +15,6 @@ import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
-import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
@@ -64,7 +63,7 @@ public class ItemService {
 				return new EntityNotFoundException(NOT_FOUND_STORE);
 			});
 
-		Page<Item> items = itemRepository.findAllByStoreId(store.getId(), pageable);
+		Page<Item> items = itemRepository.findAllByStoreIdOrderByUpdatedAtDesc(store.getId(), pageable);
 
 		return ItemsRes.from(items);
 	}
