@@ -1,31 +1,8 @@
 package com.palpal.dealightbe.domain.item.presentation;
 
-import static com.palpal.dealightbe.global.error.ErrorCode.DUPLICATED_ITEM_NAME;
-import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
-import static com.palpal.dealightbe.global.error.ErrorCode.STORE_HAS_NO_ITEM;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
-import static org.springframework.restdocs.payload.JsonFieldType.STRING;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.time.LocalTime;
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
@@ -48,12 +26,35 @@ import com.palpal.dealightbe.config.SecurityConfig;
 import com.palpal.dealightbe.domain.item.application.ItemService;
 import com.palpal.dealightbe.domain.item.application.dto.request.ItemReq;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
+import com.palpal.dealightbe.domain.item.application.dto.response.ItemsRes;
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
+
+import static com.palpal.dealightbe.global.error.ErrorCode.DUPLICATED_ITEM_NAME;
+import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
+import static com.palpal.dealightbe.global.error.ErrorCode.STORE_HAS_NO_ITEM;
+import static org.mockito.Mockito.*;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.NULL;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
+import static org.springframework.restdocs.payload.JsonFieldType.STRING;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = ItemController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class,
 	OAuth2ClientAutoConfiguration.class}, excludeFilters = {
@@ -110,7 +111,7 @@ class ItemControllerTest {
 		//given
 		ItemReq itemReq = new ItemReq(item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(),
 			item.getDescription(), item.getInformation(), item.getImage());
-		ItemRes itemRes = ItemRes.from(item);
+		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage());
 
 		Long memberId = 1L;
 
@@ -146,15 +147,15 @@ class ItemControllerTest {
 					fieldWithPath("image").description("상품 이미지")
 				),
 				responseFields(
-					fieldWithPath("itemId").description("상품 ID"),
-					fieldWithPath("storeId").description("업체 ID"),
-					fieldWithPath("name").description("상품 이름"),
-					subsectionWithPath("stock").description("재고 수"),
-					fieldWithPath("discountPrice").description("할인가"),
-					fieldWithPath("originalPrice").description("원가"),
-					fieldWithPath("description").description("상세 설명"),
-					fieldWithPath("information").description("안내 사항"),
-					fieldWithPath("image").description("상품 이미지")
+					fieldWithPath("itemId").type(NUMBER).description("상품 ID"),
+					fieldWithPath("storeId").type(NUMBER).description("업체 ID"),
+					fieldWithPath("name").type(STRING).description("상품 이름"),
+					subsectionWithPath("stock").type(NUMBER).description("재고 수"),
+					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
+					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
+					fieldWithPath("description").type(STRING).description("상세 설명"),
+					fieldWithPath("information").type(STRING).description("안내 사항"),
+					fieldWithPath("image").type(NULL).description("상품 이미지")
 				)
 			));
 	}
@@ -175,7 +176,7 @@ class ItemControllerTest {
 
 		ItemReq itemReq = new ItemReq(item2.getName(), item2.getStock(), item2.getDiscountPrice(),
 			item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage());
-		ItemRes itemRes = ItemRes.from(item2);
+		ItemRes itemRes = new ItemRes(1L, 1L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage());
 
 		Long memberId = 1L;
 
@@ -318,7 +319,7 @@ class ItemControllerTest {
 	public void itemFindByIdSuccessTest() throws Exception {
 		//given
 		Long itemId = 1L;
-		ItemRes itemRes = ItemRes.from(item);
+		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage());
 
 		when(itemService.findById(any())).thenReturn(itemRes);
 
@@ -342,15 +343,15 @@ class ItemControllerTest {
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),
 				responseFields(
-					fieldWithPath("itemId").description("상품 ID"),
-					fieldWithPath("storeId").description("업체 ID"),
-					fieldWithPath("name").description("상품 이름"),
-					subsectionWithPath("stock").description("재고 수"),
-					fieldWithPath("discountPrice").description("할인가"),
-					fieldWithPath("originalPrice").description("원가"),
-					fieldWithPath("description").description("상세 설명"),
-					fieldWithPath("information").description("안내 사항"),
-					fieldWithPath("image").description("상품 이미지")
+					fieldWithPath("itemId").type(NUMBER).description("상품 ID"),
+					fieldWithPath("storeId").type(NUMBER).description("업체 ID"),
+					fieldWithPath("name").type(STRING).description("상품 이름"),
+					subsectionWithPath("stock").type(NUMBER).description("재고 수"),
+					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
+					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
+					fieldWithPath("description").type(STRING).description("상세 설명"),
+					fieldWithPath("information").type(STRING).description("안내 사항"),
+					fieldWithPath("image").type(NULL).description("상품 이미지")
 				)
 			));
 	}
@@ -378,6 +379,54 @@ class ItemControllerTest {
 					fieldWithPath("code").type(STRING).description("예외 코드"),
 					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
 					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@DisplayName("상품 목록 조회(업체 시점) 성공 테스트")
+	@Test
+	void itemFindAllForStoreSuccessTest() throws Exception {
+		//given
+		Long memberId = 1L;
+
+		int size = 5;
+		int page = 0;
+		PageRequest pageRequest = PageRequest.of(page, size);
+
+		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage());
+		List<ItemRes> itemResList = List.of(itemRes);
+		ItemsRes itemsRes = new ItemsRes(itemResList);
+
+		when(itemService.findAllForStore(any(), eq(pageRequest))).thenReturn(itemsRes);
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/items/stores")
+				.contentType(MediaType.APPLICATION_JSON)
+				.param("memberId", memberId.toString())
+				.param("size", String.valueOf(size))
+				.param("page", String.valueOf(page)))
+			.andExpect(status().isOk())
+			.andDo(print())
+			.andDo(document("item-find-All-for-store",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestParameters(
+					List.of(parameterWithName("memberId").description("고객 ID"),
+						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
+						parameterWithName("page").description("페이지 번호")
+					)),
+				responseFields(
+					fieldWithPath("itemResponses").type(ARRAY).description("상품 목록"),
+					fieldWithPath("itemResponses[0].itemId").type(NUMBER).description("상품 ID"),
+					fieldWithPath("itemResponses[0].storeId").type(NUMBER).description("업체 ID"),
+					fieldWithPath("itemResponses[0].name").description("상품 이름"),
+					fieldWithPath("itemResponses[0].stock").type(NUMBER).description("재고 수"),
+					fieldWithPath("itemResponses[0].discountPrice").type(NUMBER).description("할인가"),
+					fieldWithPath("itemResponses[0].originalPrice").type(NUMBER).description("원가"),
+					fieldWithPath("itemResponses[0].description").type(STRING).description("상세 설명"),
+					fieldWithPath("itemResponses[0].information").type(STRING).description("안내 사항"),
+					fieldWithPath("itemResponses[0].image").type(NULL).description("상품 이미지")
 				)
 			));
 	}
@@ -425,15 +474,15 @@ class ItemControllerTest {
 					fieldWithPath("image").description("상품 이미지")
 				),
 				responseFields(
-					fieldWithPath("itemId").description("상품 ID"),
-					fieldWithPath("storeId").description("업체 ID"),
-					fieldWithPath("name").description("상품 이름"),
-					subsectionWithPath("stock").description("재고 수"),
-					fieldWithPath("discountPrice").description("할인가"),
-					fieldWithPath("originalPrice").description("원가"),
-					fieldWithPath("description").description("상세 설명"),
-					fieldWithPath("information").description("안내 사항"),
-					fieldWithPath("image").description("상품 이미지")
+					fieldWithPath("itemId").type(NUMBER).description("상품 ID"),
+					fieldWithPath("storeId").type(NUMBER).description("업체 ID"),
+					fieldWithPath("name").type(STRING).description("상품 이름"),
+					subsectionWithPath("stock").type(NUMBER).description("재고 수"),
+					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
+					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
+					fieldWithPath("description").type(STRING).description("상세 설명"),
+					fieldWithPath("information").type(STRING).description("안내 사항"),
+					fieldWithPath("image").type(NULL).description("상품 이미지")
 				)
 			));
 	}
@@ -457,7 +506,8 @@ class ItemControllerTest {
 
 		ItemReq itemReq = new ItemReq(item2.getName(), item2.getStock(), item2.getDiscountPrice(),
 			item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage());
-		ItemRes itemRes = ItemRes.from(item2);
+		ItemRes itemRes = new ItemRes(itemId, 1L, itemReq.name(), itemReq.stock(), itemReq.discountPrice(),
+			itemReq.originalPrice(), itemReq.description(), itemReq.information(), itemReq.image());
 
 		when(itemService.update(any(), any(), any())).thenReturn(itemRes);
 
@@ -606,6 +656,7 @@ class ItemControllerTest {
 		Long memberId = 1L;
 
 		doNothing().when(itemService).delete(any(), any());
+
 		//when
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/items/{id}", itemId)
