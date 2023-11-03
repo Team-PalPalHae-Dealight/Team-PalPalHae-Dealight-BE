@@ -12,6 +12,7 @@ import com.palpal.dealightbe.domain.store.domain.Store;
 
 public record StoreCreateReq(
 	@NotBlank(message = "사업자 등록 번호는 필수 입력값입니다.")
+	@Pattern(regexp = "\\d+")
 	String storeNumber,
 
 	@NotBlank(message = "상호명은 필수 입력값입니다.")

@@ -4,12 +4,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.palpal.dealightbe.domain.address.application.AddressService;
+import com.palpal.dealightbe.domain.image.ImageService;
+import com.palpal.dealightbe.domain.image.application.dto.request.ImageUploadReq;
+import com.palpal.dealightbe.domain.image.application.dto.response.ImageRes;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
+import com.palpal.dealightbe.domain.store.application.dto.request.StoreStatusReq;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreUpdateReq;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
+import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusUpdateRes;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.ErrorCode;
@@ -27,6 +32,7 @@ public class StoreService {
 	private final StoreRepository storeRepository;
 	private final MemberRepository memberRepository;
 	private final AddressService addressService;
+	private final ImageService imageService;
 
 	public StoreCreateRes register(Long memberId, StoreCreateReq req) {
 		Member member = memberRepository.findById(memberId)
@@ -58,6 +64,24 @@ public class StoreService {
 		store.updateInfo(updateStore);
 
 		return StoreInfoRes.from(store);
+	}
+
+	public StoreStatusUpdateRes updateStatus(Long memberId, Long storeId, StoreStatusReq storeStatus) {
+		Store store = validateMemberAndStoreOwner(memberId, storeId);
+
+
+		store.updateStatus(storeStatus.storeStatus());
+
+		return StoreStatusUpdateRes.from(store);
+	}
+
+	public ImageRes uploadImage(Long memberId, Long storeId, ImageUploadReq request) {
+		Store store = validateMemberAndStoreOwner(memberId, storeId);
+
+		String imageUrl = imageService.store(request.file());
+
+		store.updateImage(imageUrl);
+		return ImageRes.from(store);
 	}
 
 	private Store validateMemberAndStoreOwner(Long memberId, Long storeId) {

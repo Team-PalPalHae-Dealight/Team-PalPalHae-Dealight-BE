@@ -1,0 +1,28 @@
+spring:
+  config:
+    import:
+      - classpath:application-oauth.yml
+      - classpath:application-aws.yml
+
+  datasource:
+    url: "jdbc:h2:mem:spring_security;MODE=MYSQL;DB_CLOSE_DELAY=-1"
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  h2:
+    console:
+      enabled: true
+
+  jpa:
+    database: h2
+    open-in-view: false
+    hibernate:
+      ddl-auto: create
+      naming:
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.H2Dialect

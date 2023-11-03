@@ -93,4 +93,8 @@ public class Member extends BaseEntity {
 	public void updateImage(String imageUrl) {
 		this.image = imageUrl;
 	}
+
+	public void changeMemberRoles(List<MemberRole> memberRoles) {
+		this.memberRoles = memberRoles;
+	}
 }

@@ -45,7 +45,8 @@ import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
 @WebMvcTest(value = MemberController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class,
-	OAuth2ClientAutoConfiguration.class})
+	OAuth2ClientAutoConfiguration.class}, excludeFilters = {
+	@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class)})
 @AutoConfigureRestDocs
 class MemberControllerTest {
 
@@ -76,7 +77,7 @@ class MemberControllerTest {
 				.contentType(APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andDo(print())
-			.andDo(document("member-get-profile",
+			.andDo(document("member/member-get-profile",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
@@ -107,7 +108,7 @@ class MemberControllerTest {
 				.contentType(APPLICATION_JSON))
 			.andExpect(status().isNotFound())
 			.andDo(print())
-			.andDo(document("member-get-profile-not-found",
+			.andDo(document("member/member-get-profile-not-found",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
@@ -144,7 +145,7 @@ class MemberControllerTest {
 				.content(objectMapper.writeValueAsString(updateRequest)))
 			.andExpect(status().isOk())
 			.andDo(print())
-			.andDo(document("member-update-profile",
+			.andDo(document("member/member-update-profile",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
@@ -185,7 +186,7 @@ class MemberControllerTest {
 				.content(objectMapper.writeValueAsString(updateRequest)))
 			.andExpect(status().isNotFound())
 			.andDo(print())
-			.andDo(document("member-update-profile-not-found",
+			.andDo(document("member/member-update-profile-not-found",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
@@ -225,7 +226,7 @@ class MemberControllerTest {
 				.content(objectMapper.writeValueAsString(addressReq)))
 			.andExpect(status().isOk())
 			.andDo(print())
-			.andDo(document("member-update-address",
+			.andDo(document("member/member-update-address",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
@@ -261,7 +262,7 @@ class MemberControllerTest {
 				.content(objectMapper.writeValueAsString(addressReq)))
 			.andExpect(status().isNotFound())
 			.andDo(print())
-			.andDo(document("member-update-address-not-found",
+			.andDo(document("member/member-update-address-not-found",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(

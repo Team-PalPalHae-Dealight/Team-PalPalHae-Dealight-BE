@@ -1,7 +1,6 @@
 package com.palpal.dealightbe.domain.item.domain;
 
 import javax.persistence.Column;
-import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_QUANTITY;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -89,6 +88,13 @@ public class Item extends BaseEntity {
 		this.description = item.getDescription();
 		this.information = item.getInformation();
 		this.image = item.getImage();
+	}
+
+	public void checkItemInStore(Store store) {
+		if (!this.store.equals(store)) {
+			log.warn("STORE_HAS_NO_ITEM : itemId = {}, storeId = {}", this.getId(), store.getId());
+			throw new BusinessException(STORE_HAS_NO_ITEM);
+		}
 	}
 
 	private void validateDiscountPrice(int discountPrice, int originalPrice) {

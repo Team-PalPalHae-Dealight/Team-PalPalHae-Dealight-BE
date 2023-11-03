@@ -27,8 +27,8 @@ public class AuthService {
 		return authRepository.findByProviderAndProviderId(provider, providerId)
 			.map(member -> {
 				log.info("사용자(provider: {}, providerId: {})의 로그인을 진행합니다.", provider, providerId);
-				String accessToken = jwt.createAccessToken(providerId, member);
-				String refreshToken = jwt.createRefreshToken(providerId);
+				String accessToken = jwt.createAccessToken(member);
+				String refreshToken = jwt.createRefreshToken(member);
 
 				return new LoginRes(providerId, accessToken, refreshToken);
 			})

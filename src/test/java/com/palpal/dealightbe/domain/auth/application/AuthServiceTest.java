@@ -70,9 +70,9 @@ class AuthServiceTest {
 
 		when(authRepository.findByProviderAndProviderId(member.getProvider(), member.getProviderId()))
 			.thenReturn(Optional.of(member));
-		when(jwt.createAccessToken(member.getProviderId(), member))
+		when(jwt.createAccessToken(member))
 			.thenReturn(mockAccessToken);
-		when(jwt.createRefreshToken(member.getProviderId()))
+		when(jwt.createRefreshToken(member))
 			.thenReturn(mockRefreshToken);
 
 		// when
