@@ -299,6 +299,37 @@ class StoreControllerTest {
 	}
 
 	@Test
+	@DisplayName("업체 영업 상태 조회 성공")
+	void getStatusSuccessTest() throws Exception {
+
+		//given
+		Long memberId = 1L;
+		Long storeId = 1L;
+
+		StoreStatusRes storeStatusRes = new StoreStatusRes(storeId, StoreStatus.OPENED);
+
+		given(storeService.getStatus(memberId, storeId))
+			.willReturn(storeStatusRes);
+
+		//when -> then
+		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/stores/status/{memberId}/{storeId}", memberId, storeId)
+				.contentType(APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andDo(print())
+			.andDo(document("store/store-get-status",
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("memberId").description("고객 ID"),
+					parameterWithName("storeId").description("업체 ID")
+				),
+				responseFields(
+					fieldWithPath("storeId").description("업체 ID"),
+					fieldWithPath("storeStatus").description("영업 상태")
+				)
+			));
+	}
+
+	@Test
 	@DisplayName("업체 영업 상태 변경 성공")
 	void updateStatusSuccessTest() throws Exception {
 
