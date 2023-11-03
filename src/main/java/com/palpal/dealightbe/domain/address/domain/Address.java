@@ -41,9 +41,9 @@ public class Address extends BaseEntity {
 		return new Address("", 0, 0);
 	}
 
-	public void updateInfo(String name, double xCoordinate, double yCoordinate) {
-		this.name = name;
-		this.xCoordinate = xCoordinate;
-		this.yCoordinate = yCoordinate;
+	public void updateInfo(Address address) {
+		this.name = address.getName();
+		this.xCoordinate = address.getXCoordinate();
+		this.yCoordinate = address.getYCoordinate();
 	}
 }

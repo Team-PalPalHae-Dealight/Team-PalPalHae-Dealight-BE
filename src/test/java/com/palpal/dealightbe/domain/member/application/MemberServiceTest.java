@@ -3,6 +3,7 @@ package com.palpal.dealightbe.domain.member.application;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 import java.util.Optional;
 
@@ -12,10 +13,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.palpal.dealightbe.domain.address.application.dto.request.AddressReq;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
 import com.palpal.dealightbe.domain.address.domain.Address;
+import com.palpal.dealightbe.domain.image.ImageService;
+import com.palpal.dealightbe.domain.image.dto.request.ImageUploadReq;
+import com.palpal.dealightbe.domain.image.dto.response.ImageRes;
 import com.palpal.dealightbe.domain.member.application.dto.request.MemberUpdateReq;
 import com.palpal.dealightbe.domain.member.application.dto.response.MemberProfileRes;
 import com.palpal.dealightbe.domain.member.application.dto.response.MemberUpdateRes;
@@ -31,6 +36,9 @@ class MemberServiceTest {
 
 	@InjectMocks
 	private MemberService memberService;
+
+	@Mock
+	private ImageService imageService;
 
 	@Test
 	@DisplayName("멤버 프로필 조회 성공 테스트")
@@ -172,5 +180,46 @@ class MemberServiceTest {
 		//when & then
 		assertThrows(EntityNotFoundException.class,
 			() -> memberService.updateMemberAddress(nonexistentMemberId, newAddress));
+	}
+
+	@Test
+	@DisplayName("멤버 이미지 업로드 성공 테스트")
+	void updateMemberImageSuccessTest() {
+		// given
+		Long memberId = 1L;
+		String mockImageUrl = "https://example.com/image.jpg";
+
+		MultipartFile mockFile = mock(MultipartFile.class);
+		ImageUploadReq imageUploadReq = new ImageUploadReq(mockFile);
+		Member mockMember = Member.builder()
+			.realName("유재석")
+			.nickName("유산슬")
+			.phoneNumber("01012345678")
+			.build();
+
+		given(imageService.store(mockFile)).willReturn(mockImageUrl);
+		given(memberRepository.findById(memberId)).willReturn(Optional.of(mockMember));
+
+		// when
+		ImageRes imageRes = memberService.updateMemberImage(memberId, imageUploadReq);
+
+		// then
+		assertEquals(mockImageUrl, imageRes.imageUrl());
+	}
+
+	@Test
+	@DisplayName("멤버 이미지 업로드 실패 테스트: 멤버 ID가 존재하지 않는 경우")
+	void updateMemberImageNotFoundTest() {
+		// given
+		Long nonexistentMemberId = 999L;
+
+		MultipartFile mockFile = mock(MultipartFile.class);
+		ImageUploadReq imageUploadReq = new ImageUploadReq(mockFile);
+
+		given(memberRepository.findById(nonexistentMemberId)).willReturn(Optional.empty());
+
+		// when & then
+		assertThrows(EntityNotFoundException.class,
+			() -> memberService.updateMemberImage(nonexistentMemberId, imageUploadReq));
 	}
 }

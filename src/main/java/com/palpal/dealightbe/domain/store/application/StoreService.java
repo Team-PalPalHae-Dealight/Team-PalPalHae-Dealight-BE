@@ -4,6 +4,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.palpal.dealightbe.domain.address.application.AddressService;
+import com.palpal.dealightbe.domain.image.ImageService;
+import com.palpal.dealightbe.domain.image.application.dto.request.ImageUploadReq;
+import com.palpal.dealightbe.domain.image.application.dto.response.ImageRes;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
@@ -11,7 +14,7 @@ import com.palpal.dealightbe.domain.store.application.dto.request.StoreStatusReq
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreUpdateReq;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
-import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusUpdateRes;
+import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusRes;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.ErrorCode;
@@ -26,9 +29,12 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class StoreService {
 
+	public static final String DEFAULT_PATH = "https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/image/free-store-icon.png";
+
 	private final StoreRepository storeRepository;
 	private final MemberRepository memberRepository;
 	private final AddressService addressService;
+	private final ImageService imageService;
 
 	public StoreCreateRes register(Long memberId, StoreCreateReq req) {
 		Member member = memberRepository.findById(memberId)
@@ -41,6 +47,7 @@ public class StoreService {
 
 		Store store = StoreCreateReq.toStore(req);
 		store.updateMember(member);
+		store.updateImage(DEFAULT_PATH);
 		storeRepository.save(store);
 
 		return StoreCreateRes.from(store);
@@ -62,13 +69,29 @@ public class StoreService {
 		return StoreInfoRes.from(store);
 	}
 
-	public StoreStatusUpdateRes updateStatus(Long memberId, Long storeId, StoreStatusReq storeStatus) {
+	public StoreStatusRes updateStatus(Long memberId, Long storeId, StoreStatusReq storeStatus) {
 		Store store = validateMemberAndStoreOwner(memberId, storeId);
-
 
 		store.updateStatus(storeStatus.storeStatus());
 
-		return StoreStatusUpdateRes.from(store);
+		return StoreStatusRes.from(store);
+	}
+
+	@Transactional(readOnly = true)
+	public StoreStatusRes getStatus(Long memberId, Long storeId) {
+		Store store = validateMemberAndStoreOwner(memberId, storeId);
+
+		return StoreStatusRes.from(store);
+	}
+
+	public ImageRes uploadImage(Long memberId, Long storeId, ImageUploadReq request) {
+		Store store = validateMemberAndStoreOwner(memberId, storeId);
+
+		String imageUrl = imageService.store(request.file());
+
+		store.updateImage(imageUrl);
+
+		return ImageRes.from(store);
 	}
 
 	private Store validateMemberAndStoreOwner(Long memberId, Long storeId) {

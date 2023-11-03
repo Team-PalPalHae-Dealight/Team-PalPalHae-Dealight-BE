@@ -26,11 +26,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter
 @Entity
 @Table(name = "members")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Slf4j
 public class Member extends BaseEntity {
 
 	@Id
@@ -51,29 +53,48 @@ public class Member extends BaseEntity {
 
 	private Long providerId;
 
+	private String image;
+
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL)
 	private List<MemberRole> memberRoles = new ArrayList<>();
 
 	@Builder
-	public Member(String realName, String nickName, String phoneNumber, String provider, Long providerId,
+	public Member(String realName, String nickName, String phoneNumber, Address address, String provider,
+		Long providerId,
 		List<MemberRole> memberRoles) {
 		this.realName = realName;
 		this.nickName = nickName;
 		this.phoneNumber = phoneNumber;
-		this.address = Address.defaultAddress();
+		this.address = getValidAddress(address);
 		this.provider = provider;
 		this.providerId = providerId;
 		this.memberRoles = memberRoles;
 	}
 
-	public void updateInfo(String nickName, String phoneNumber, Address address) {
-		this.nickName = nickName;
-		this.phoneNumber = phoneNumber;
-		updateAddress(address);
+	private Address getValidAddress(Address address) {
+		return address != null ? address : Address.defaultAddress();
+	}
+
+	public void updateInfo(Member member) {
+		if (member == null) {
+			log.warn("UPDATE_FAILED: Invalid member data provided.");
+			throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
+		}
+		this.nickName = member.getNickName();
+		this.phoneNumber = member.getPhoneNumber();
+		updateAddress(member.getAddress());
 	}
 
 	public void updateAddress(Address address) {
-		this.address.updateInfo(address.getName(), address.getXCoordinate(), address.getYCoordinate());
+		if (address == null) {
+			log.warn("UPDATE_FAILED: Invalid address data provided.");
+			throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
+		}
+		this.address.updateInfo(address);
+	}
+
+	public void updateImage(String imageUrl) {
+		this.image = imageUrl;
 	}
 
 	public void updateMemberRoles(List<MemberRole> memberRoles) {

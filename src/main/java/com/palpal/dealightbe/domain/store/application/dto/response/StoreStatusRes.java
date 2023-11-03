@@ -3,12 +3,12 @@ package com.palpal.dealightbe.domain.store.application.dto.response;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreStatus;
 
-public record StoreStatusUpdateRes(
+public record StoreStatusRes(
 	Long storeId,
 	StoreStatus storeStatus
 ) {
 
-	public static StoreStatusUpdateRes from(Store store) {
-		return new StoreStatusUpdateRes(store.getId(), store.getStoreStatus());
+	public static StoreStatusRes from(Store store) {
+		return new StoreStatusRes(store.getId(), store.getStoreStatus());
 	}
 }

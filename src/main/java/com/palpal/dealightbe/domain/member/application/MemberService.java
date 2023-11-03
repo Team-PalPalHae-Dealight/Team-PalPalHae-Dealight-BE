@@ -5,6 +5,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.palpal.dealightbe.domain.address.application.dto.request.AddressReq;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
+import com.palpal.dealightbe.domain.image.ImageService;
+import com.palpal.dealightbe.domain.image.dto.request.ImageUploadReq;
+import com.palpal.dealightbe.domain.image.dto.response.ImageRes;
 import com.palpal.dealightbe.domain.member.application.dto.request.MemberUpdateReq;
 import com.palpal.dealightbe.domain.member.application.dto.response.MemberProfileRes;
 import com.palpal.dealightbe.domain.member.application.dto.response.MemberUpdateRes;
@@ -18,11 +21,11 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-@Transactional
 @RequiredArgsConstructor
 public class MemberService {
 
 	private final MemberRepository memberRepository;
+	private final ImageService imageService;
 
 	@Transactional(readOnly = true)
 	public MemberProfileRes getMemberProfile(Long memberId) {
@@ -42,13 +45,8 @@ public class MemberService {
 			throw new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
 		});
 
-		member.getAddress().updateInfo(
-			request.address().name(),
-			request.address().xCoordinate(),
-			request.address().yCoordinate()
-		);
-
-		member.updateInfo(request.nickname(), request.phoneNumber(), member.getAddress());
+		Member memberFromRequest = MemberUpdateReq.toMember(request);
+		member.updateInfo(memberFromRequest);
 
 		return MemberUpdateRes.from(member);
 	}
@@ -60,11 +58,25 @@ public class MemberService {
 		});
 
 		member.getAddress().updateInfo(
-			request.name(),
-			request.xCoordinate(),
-			request.yCoordinate()
+			AddressReq.toAddress(request)
 		);
 
 		return AddressRes.from(member.getAddress());
+	}
+
+	public ImageRes updateMemberImage(Long memberId, ImageUploadReq request) {
+		String imageUrl = imageService.store(request.file());
+
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> {
+				log.warn("PATCH:UPDATE:NOT_FOUND_MEMBER_BY_ID : {}", memberId);
+				return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
+			});
+
+		member.updateImage(imageUrl);
+
+		memberRepository.save(member);
+
+		return ImageRes.from(member.getImage());
 	}
 }

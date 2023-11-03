@@ -12,7 +12,9 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestF
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -30,6 +32,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,14 +41,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palpal.dealightbe.config.SecurityConfig;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
-import com.palpal.dealightbe.domain.auth.filter.JwtAuthenticationFilter;
+import com.palpal.dealightbe.domain.image.application.dto.request.ImageUploadReq;
+import com.palpal.dealightbe.domain.image.application.dto.response.ImageRes;
 import com.palpal.dealightbe.domain.store.application.StoreService;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreStatusReq;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreUpdateReq;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
-import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusUpdateRes;
+import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusRes;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.StoreStatus;
 import com.palpal.dealightbe.global.error.ErrorCode;
@@ -65,6 +70,8 @@ class StoreControllerTest {
 	@MockBean
 	StoreService storeService;
 
+	public static final String DEFAULT_PATH = "https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/image/free-store-icon.png";
+
 	@Test
 	@DisplayName("업체 등록 성공")
 	void registerStoreSuccessTest() throws Exception {
@@ -76,8 +83,8 @@ class StoreControllerTest {
 		StoreCreateReq storeCreateReq = new StoreCreateReq("888222111", "맛짱조개", "01066772291", "서울시 강남구", 67.89,
 			293.2323, openTime, closeTime, Set.of(DayOff.MON));
 		AddressRes addressRes = new AddressRes("서울시 강남구", 67.89, 293.2323);
-		StoreCreateRes storeCreateRes = new StoreCreateRes("888222111", "맛짱조개", "01066772291", addressRes, openTime,
-			closeTime, Set.of(DayOff.MON));
+		StoreCreateRes storeCreateRes = new StoreCreateRes(1L, "888222111", "맛짱조개", "01066772291", addressRes, openTime,
+			closeTime, Set.of(DayOff.MON), DEFAULT_PATH);
 
 		given(storeService.register(memberId, storeCreateReq))
 			.willReturn(storeCreateRes);
@@ -95,7 +102,7 @@ class StoreControllerTest {
 			.andExpect(jsonPath("$.closeTime").value(storeCreateRes.closeTime().toString()))
 			.andExpect(jsonPath("$.dayOff[0]").value(DayOff.MON.getName()))
 			.andDo(print())
-			.andDo(document("store-register",
+			.andDo(document("store/store-register",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("memberId").description("고객 ID")
@@ -112,13 +119,15 @@ class StoreControllerTest {
 					fieldWithPath("dayOff").description("휴무일")
 				),
 				responseFields(
+					fieldWithPath("id").description("업체 ID"),
 					fieldWithPath("storeNumber").description("사업자 등록 번호"),
 					fieldWithPath("name").description("상호명"),
 					fieldWithPath("telephone").description("업체 전화번호"),
 					subsectionWithPath("addressRes").description("주소 정보"),
 					fieldWithPath("openTime").description("오픈 시간"),
 					fieldWithPath("closeTime").description("마감 시간"),
-					fieldWithPath("dayOff").description("휴무일")
+					fieldWithPath("dayOff").description("휴무일"),
+					fieldWithPath("imageUrl").description("이미지 경로")
 				)
 			));
 	}
@@ -148,7 +157,7 @@ class StoreControllerTest {
 			.andExpect(jsonPath("$.errors").isEmpty())
 			.andExpect(jsonPath("$.message").value("마감 시간은 오픈 시간보다 이전일 수 없습니다"))
 			.andDo(print())
-			.andDo(document("store-register-fail-invalid-business-time",
+			.andDo(document("store/store-register-fail-invalid-business-time",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("memberId").description("고객 ID")
@@ -194,7 +203,7 @@ class StoreControllerTest {
 					.contentType(APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andDo(print())
-			.andDo(document("store-get-info",
+			.andDo(document("store/store-get-info",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
@@ -231,7 +240,7 @@ class StoreControllerTest {
 					.contentType(APPLICATION_JSON))
 			.andExpect(status().isBadRequest())
 			.andDo(print())
-			.andDo(document("store-get-info-fail-not-match-owner-and-requester",
+			.andDo(document("store/store-get-info-fail-not-match-owner-and-requester",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
@@ -272,7 +281,7 @@ class StoreControllerTest {
 					.content(objectMapper.writeValueAsString(updateReq)))
 			.andExpect(status().isOk())
 			.andDo(print())
-			.andDo(document("store-update-info",
+			.andDo(document("store/store-update-info",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
@@ -294,6 +303,37 @@ class StoreControllerTest {
 	}
 
 	@Test
+	@DisplayName("업체 영업 상태 조회 성공")
+	void getStatusSuccessTest() throws Exception {
+
+		//given
+		Long memberId = 1L;
+		Long storeId = 1L;
+
+		StoreStatusRes storeStatusRes = new StoreStatusRes(storeId, StoreStatus.OPENED);
+
+		given(storeService.getStatus(memberId, storeId))
+			.willReturn(storeStatusRes);
+
+		//when -> then
+		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/stores/status/{memberId}/{storeId}", memberId, storeId)
+				.contentType(APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andDo(print())
+			.andDo(document("store/store-get-status",
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("memberId").description("고객 ID"),
+					parameterWithName("storeId").description("업체 ID")
+				),
+				responseFields(
+					fieldWithPath("storeId").description("업체 ID"),
+					fieldWithPath("storeStatus").description("영업 상태")
+				)
+			));
+	}
+
+	@Test
 	@DisplayName("업체 영업 상태 변경 성공")
 	void updateStatusSuccessTest() throws Exception {
 
@@ -302,18 +342,19 @@ class StoreControllerTest {
 		Long storeId = 1L;
 
 		StoreStatusReq storeStatusReq = new StoreStatusReq(StoreStatus.OPENED);
-		StoreStatusUpdateRes storeStatusUpdateRes = new StoreStatusUpdateRes(storeId, storeStatusReq.storeStatus());
+		StoreStatusRes storeStatusRes = new StoreStatusRes(storeId, storeStatusReq.storeStatus());
 
 		given(storeService.updateStatus(memberId, storeId, storeStatusReq))
-			.willReturn(storeStatusUpdateRes);
+			.willReturn(storeStatusRes);
 
 		//when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/stores/status/{memberId}/{storeId}", memberId, storeId)
-				.contentType(APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(storeStatusReq)))
+		mockMvc.perform(
+				RestDocumentationRequestBuilders.patch("/api/stores/status/{memberId}/{storeId}", memberId, storeId)
+					.contentType(APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(storeStatusReq)))
 			.andExpect(status().isOk())
 			.andDo(print())
-			.andDo(document("store-status-update",
+			.andDo(document("store/store-status-update",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
@@ -327,5 +368,43 @@ class StoreControllerTest {
 					fieldWithPath("storeStatus").description("영업 상태")
 				)
 			));
+	}
+
+	@Test
+	@DisplayName("업체 이미지 등록 성공")
+	void uploadImageSuccessTest() throws Exception {
+
+		//given
+		Long memberId = 1L;
+		Long storeId = 1L;
+		MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "Spring Framework".getBytes());
+		ImageUploadReq request = new ImageUploadReq(file);
+		String imageUrl = "http://fakeimageurl.com/image.jpg";
+		ImageRes imageRes = new ImageRes(imageUrl);
+
+		given(storeService.uploadImage(memberId, storeId, request))
+			.willReturn(imageRes);
+
+		//when -> then
+		mockMvc.perform(
+				RestDocumentationRequestBuilders.multipart("/api/stores/images/{memberId}/{storeId}", memberId, storeId)
+					.file(file)
+					.contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
+			.andExpect(status().isOk())
+			.andDo(print())
+			.andDo(document("store/store-upload-image",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("memberId").description("고객 ID"),
+					parameterWithName("storeId").description("업체 ID")),
+				requestParts(
+					partWithName("file").description("등록할 이미지 URL")
+				),
+				responseFields(
+					fieldWithPath("imageUrl").description("등록된 이미지 URL")
+				)
+			));
+
 	}
 }
