@@ -33,16 +33,24 @@ public class SecurityConfig {
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
 		return web -> web.ignoring()
-			.antMatchers("/h2-console/**")
-			.antMatchers("/api/auth/signup");
+			// .antMatchers("/api/**")
+			.antMatchers("/api/auth/signup")
+			.antMatchers("/h2-console/**");
 	}
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
-			.authorizeRequests()
-			.antMatchers("/**").permitAll()
-			.and()
+			// .authorizeRequests()
+			// .antMatchers("/api/address/**").permitAll()
+			// .antMatchers("/api/auth/**").permitAll()
+			// .antMatchers("/api/image/**").permitAll()
+			// .antMatchers("/api/item/**").permitAll()
+			// .antMatchers("/api/member/**").permitAll()
+			// .antMatchers("/api/order/**").permitAll()
+			// .antMatchers("/api/review/**").permitAll()
+			// .antMatchers("/api/store/**").permitAll()
+			// .and()
 			.headers().disable()
 			.csrf().disable()
 			.httpBasic().disable()
