@@ -29,6 +29,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class StoreService {
 
+	public static final String DEFAULT_PATH = "https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/image/free-store-icon.png";
+
 	private final StoreRepository storeRepository;
 	private final MemberRepository memberRepository;
 	private final AddressService addressService;
@@ -45,6 +47,7 @@ public class StoreService {
 
 		Store store = StoreCreateReq.toStore(req);
 		store.updateMember(member);
+		store.updateImage(DEFAULT_PATH);
 		storeRepository.save(store);
 
 		return StoreCreateRes.from(store);
