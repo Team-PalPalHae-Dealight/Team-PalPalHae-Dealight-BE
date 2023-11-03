@@ -21,12 +21,13 @@ public record StoreCreateRes(
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
 	LocalTime closeTime,
 
-	Set<DayOff> dayOff
+	Set<DayOff> dayOff,
+	String imageUrl
 ) {
 
 	public static StoreCreateRes from(Store store) {
 		return new StoreCreateRes(
 			store.getId(), store.getStoreNumber(), store.getName(), store.getTelephone(),
-			AddressRes.from(store.getAddress()), store.getOpenTime(), store.getCloseTime(), store.getDayOffs());
+			AddressRes.from(store.getAddress()), store.getOpenTime(), store.getCloseTime(), store.getDayOffs(), store.getImage());
 	}
 }

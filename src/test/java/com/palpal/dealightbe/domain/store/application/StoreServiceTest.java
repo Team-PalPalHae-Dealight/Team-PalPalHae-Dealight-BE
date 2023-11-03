@@ -57,6 +57,7 @@ class StoreServiceTest {
 	@InjectMocks
 	private StoreService storeService;
 
+	public static final String DEFAULT_PATH = "https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/image/free-store-icon.png";
 	private Member member;
 	private Store store;
 	private Address address;
@@ -108,6 +109,7 @@ class StoreServiceTest {
 		//then
 		assertThat(storeCreateRes.name()).isEqualTo(storeCreateReq.name());
 		assertThat(storeCreateRes.addressRes().name()).isEqualTo(storeCreateReq.addressName());
+		assertThat(storeCreateRes.imageUrl()).isEqualTo(DEFAULT_PATH);
 	}
 
 	@DisplayName("업체 등록 성공 - 가게가 저녁에 문을 열고 새벽에 닫아도 성공")

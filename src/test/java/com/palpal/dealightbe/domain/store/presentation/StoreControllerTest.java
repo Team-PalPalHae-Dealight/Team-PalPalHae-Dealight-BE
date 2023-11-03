@@ -70,6 +70,8 @@ class StoreControllerTest {
 	@MockBean
 	StoreService storeService;
 
+	public static final String DEFAULT_PATH = "https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/image/free-store-icon.png";
+
 	@Test
 	@DisplayName("업체 등록 성공")
 	void registerStoreSuccessTest() throws Exception {
@@ -82,7 +84,7 @@ class StoreControllerTest {
 			293.2323, openTime, closeTime, Set.of(DayOff.MON));
 		AddressRes addressRes = new AddressRes("서울시 강남구", 67.89, 293.2323);
 		StoreCreateRes storeCreateRes = new StoreCreateRes(1L, "888222111", "맛짱조개", "01066772291", addressRes, openTime,
-			closeTime, Set.of(DayOff.MON));
+			closeTime, Set.of(DayOff.MON), DEFAULT_PATH);
 
 		given(storeService.register(memberId, storeCreateReq))
 			.willReturn(storeCreateRes);
@@ -124,7 +126,8 @@ class StoreControllerTest {
 					subsectionWithPath("addressRes").description("주소 정보"),
 					fieldWithPath("openTime").description("오픈 시간"),
 					fieldWithPath("closeTime").description("마감 시간"),
-					fieldWithPath("dayOff").description("휴무일")
+					fieldWithPath("dayOff").description("휴무일"),
+					fieldWithPath("imageUrl").description("이미지 경로")
 				)
 			));
 	}
