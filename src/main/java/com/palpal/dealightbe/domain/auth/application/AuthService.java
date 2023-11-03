@@ -32,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class AuthService {
 
+	private static final String MEMBER_DEFAULT_IMAGE_PATH = "https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/image/member-default-image.png";
 	private final MemberRepository memberRepository;
 	private final RoleRepository roleRepository;
 	private final MemberRoleRepository memberRoleRepository;
@@ -62,6 +63,7 @@ public class AuthService {
 			});
 
 		Member requestMember = createRequestMember(request);
+		requestMember.updateImage(MEMBER_DEFAULT_IMAGE_PATH);
 		Member savedMember = memberRepository.save(requestMember);
 
 		List<MemberRole> assignableMemberRoles = createMemberRoles(request, savedMember);

@@ -13,6 +13,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palpal.dealightbe.domain.auth.application.AuthService;
@@ -170,9 +172,6 @@ class AuthControllerTest {
 				"store"
 			);
 
-			given(authService.signup(invalidSignupReq))
-				.willThrow(new IllegalArgumentException());
-
 			// when -> then
 			mockMvc.perform(post(signupApiPath)
 					.with(csrf())
@@ -181,9 +180,9 @@ class AuthControllerTest {
 					.content(objectMapper.writeValueAsString(invalidSignupReq))
 				)
 				.andDo(print())
-				.andExpect(status().is5xxServerError())
+				.andExpect(status().is4xxClientError())
 				.andExpect(result -> {
-					assertTrue(result.getResolvedException() instanceof IllegalArgumentException);
+					assertThat(result.getResolvedException()).isInstanceOf(MethodArgumentNotValidException.class);
 				})
 				.andDo(document(
 					"auth-signup-fail-no-providerId",
@@ -206,7 +205,9 @@ class AuthControllerTest {
 					responseFields(
 						fieldWithPath("timestamp").type(STRING).description("예외 시간"),
 						fieldWithPath("code").type(STRING).description("오류 코드"),
-						fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+						fieldWithPath("errors[].field").type(STRING).description("DTO 검증 오류 필드"),
+						fieldWithPath("errors[].value").type(STRING).description("DTO 검증 오류 값"),
+						fieldWithPath("errors[].reason").type(STRING).description("DTO 오류 원인"),
 						fieldWithPath("message").type(STRING).description("오류 메시지")
 					)
 				));
@@ -225,9 +226,6 @@ class AuthControllerTest {
 				"store"
 			);
 
-			given(authService.signup(invalidSignupReq))
-				.willThrow(new IllegalArgumentException());
-
 			// when -> then
 			mockMvc.perform(post(signupApiPath)
 					.with(csrf())
@@ -236,9 +234,9 @@ class AuthControllerTest {
 					.content(objectMapper.writeValueAsString(invalidSignupReq))
 				)
 				.andDo(print())
-				.andExpect(status().is5xxServerError())
+				.andExpect(status().is4xxClientError())
 				.andExpect(result -> {
-					assertTrue(result.getResolvedException() instanceof IllegalArgumentException);
+					assertThat(result.getResolvedException()).isInstanceOf(MethodArgumentNotValidException.class);
 				})
 				.andDo(document(
 					"auth-signup-fail-no-provider",
@@ -261,7 +259,9 @@ class AuthControllerTest {
 					responseFields(
 						fieldWithPath("timestamp").type(STRING).description("예외 시간"),
 						fieldWithPath("code").type(STRING).description("오류 코드"),
-						fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+						fieldWithPath("errors[].field").type(STRING).description("DTO 검증 오류 필드"),
+						fieldWithPath("errors[].value").type(STRING).description("DTO 검증 오류 값"),
+						fieldWithPath("errors[].reason").type(STRING).description("DTO 오류 원인"),
 						fieldWithPath("message").type(STRING).description("오류 메시지")
 					)
 				));
