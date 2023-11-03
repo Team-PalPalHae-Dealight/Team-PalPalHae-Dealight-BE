@@ -14,7 +14,7 @@ import com.palpal.dealightbe.domain.store.application.dto.request.StoreStatusReq
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreUpdateReq;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
-import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusUpdateRes;
+import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusRes;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.ErrorCode;
@@ -66,13 +66,19 @@ public class StoreService {
 		return StoreInfoRes.from(store);
 	}
 
-	public StoreStatusUpdateRes updateStatus(Long memberId, Long storeId, StoreStatusReq storeStatus) {
+	public StoreStatusRes updateStatus(Long memberId, Long storeId, StoreStatusReq storeStatus) {
 		Store store = validateMemberAndStoreOwner(memberId, storeId);
-
 
 		store.updateStatus(storeStatus.storeStatus());
 
-		return StoreStatusUpdateRes.from(store);
+		return StoreStatusRes.from(store);
+	}
+
+	@Transactional(readOnly = true)
+	public StoreStatusRes getStatus(Long memberId, Long storeId) {
+		Store store = validateMemberAndStoreOwner(memberId, storeId);
+
+		return StoreStatusRes.from(store);
 	}
 
 	public ImageRes uploadImage(Long memberId, Long storeId, ImageUploadReq request) {
@@ -81,6 +87,7 @@ public class StoreService {
 		String imageUrl = imageService.store(request.file());
 
 		store.updateImage(imageUrl);
+
 		return ImageRes.from(store);
 	}
 
