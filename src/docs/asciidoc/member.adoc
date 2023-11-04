@@ -13,6 +13,8 @@
 
 include::{snippets}/member-get-profile/http-request.adoc[]
 
+include::{snippets}/member-get-profile/path-parameters.adoc[]
+
 === Response
 
 include::{snippets}/member-get-profile/http-response.adoc[]
@@ -26,3 +28,84 @@ include::{snippets}/member-get-profile-not-found/http-request.adoc[]
 === Response
 
 include::{snippets}/member-get-profile-not-found/http-response.adoc[]
+
+== 멤버 프로필 수정 성공
+
+=== /api/members/profiles/{memberId} [PATCH]
+
+=== Request
+
+include::{snippets}/member-update-profile/path-parameters.adoc[]
+include::{snippets}/member-update-profile/http-request.adoc[]
+include::{snippets}/member-update-profile/request-fields.adoc[]
+
+=== Response
+
+include::{snippets}/member-update-profile/http-response.adoc[]
+include::{snippets}/member-update-profile/response-fields.adoc[]
+
+== 멤버 프로필 수정 실패: 멤버 ID가 존재하지 않는 경우
+
+=== Request
+
+include::{snippets}/member-update-profile-not-found/http-request.adoc[]
+include::{snippets}/member-update-profile-not-found/request-fields.adoc[]
+
+=== Response
+
+include::{snippets}/member-update-profile-not-found/http-response.adoc[]
+
+== 멤버 프로필 주소 수정 성공
+
+=== /api/members/address/{memberId} [PATCH]
+
+=== Request
+
+include::{snippets}/member-update-address/path-parameters.adoc[]
+include::{snippets}/member-update-address/http-request.adoc[]
+include::{snippets}/member-update-address/request-fields.adoc[]
+
+=== Response
+
+include::{snippets}/member-update-address/http-response.adoc[]
+include::{snippets}/member-update-address/response-fields.adoc[]
+
+== 멤버 프로필 주소 수정 실패: 멤버 ID가 존재하지 않는 경우
+
+=== Request
+
+include::{snippets}/member-update-address-not-found/http-request.adoc[]
+include::{snippets}/member-update-address-not-found/request-fields.adoc[]
+
+=== Response
+
+include::{snippets}/member-update-address-not-found/http-response.adoc[]
+
+== 멤버 이미지 업로드 성공
+
+=== /api/members/images/{memberId} [PATCH]
+
+==== Request
+
+include::{snippets}/member-upload-image/http-request.adoc[]
+include::{snippets}/member-upload-image/path-parameters.adoc[]
+include::{snippets}/member-upload-image/request-parts.adoc[]
+
+==== Response
+
+include::{snippets}/member-upload-image/http-response.adoc[]
+include::{snippets}/member-upload-image/response-fields.adoc[]
+
+== 멤버 이미지 업로드 실패 - 유효하지 않은 memberId
+
+=== /api/members/images/{memberId} [PATCH]
+
+==== Request
+
+include::{snippets}/member-upload-image-not-found/http-request.adoc[]
+include::{snippets}/member-upload-image-not-found/path-parameters.adoc[]
+include::{snippets}/member-upload-image-not-found/request-parts.adoc[]
+
+==== Response
+
+include::{snippets}/member-upload-image-not-found/http-response.adoc[]

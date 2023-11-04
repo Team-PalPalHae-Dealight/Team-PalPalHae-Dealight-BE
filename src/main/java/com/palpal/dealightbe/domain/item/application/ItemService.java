@@ -3,11 +3,14 @@ package com.palpal.dealightbe.domain.item.application;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.palpal.dealightbe.domain.item.application.dto.request.ItemReq;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
+import com.palpal.dealightbe.domain.item.application.dto.response.ItemsRes;
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.store.domain.Store;
@@ -33,12 +36,36 @@ public class ItemService {
 				return new EntityNotFoundException(NOT_FOUND_STORE);
 			});
 
-		checkAlreadyRegisteredItemName(itemReq.name(), store.getId());
+		checkDuplicatedItemName(itemReq.name(), store.getId());
 
 		Item item = ItemReq.toItem(itemReq, store);
 		Item savedItem = itemRepository.save(item);
 
 		return ItemRes.from(savedItem);
+	}
+
+	@Transactional(readOnly = true)
+	public ItemRes findById(Long itemId) {
+		Item item = itemRepository.findById(itemId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", itemId);
+				return new EntityNotFoundException(NOT_FOUND_ITEM);
+			});
+
+		return ItemRes.from(item);
+	}
+
+	@Transactional(readOnly = true)
+	public ItemsRes findAllForStore(Long memberId, Pageable pageable) {
+		Store store = storeRepository.findByMemberId(memberId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_STORE_BY_MEMBER_ID : {}", memberId);
+				return new EntityNotFoundException(NOT_FOUND_STORE);
+			});
+
+		Page<Item> items = itemRepository.findAllByStoreIdOrderByUpdatedAtDesc(store.getId(), pageable);
+
+		return ItemsRes.from(items);
 	}
 
 	public ItemRes update(Long itemId, ItemReq itemReq, Long memberId) {
@@ -48,7 +75,7 @@ public class ItemService {
 				return new EntityNotFoundException(NOT_FOUND_STORE);
 			});
 
-		checkAlreadyRegisteredItemName(itemReq.name(), store.getId());
+		checkDuplicatedItemName(itemReq.name(), store.getId());
 
 		Item item = itemRepository.findById(itemId)
 			.orElseThrow(() -> {
@@ -62,10 +89,28 @@ public class ItemService {
 		return ItemRes.from(item);
 	}
 
-	private void checkAlreadyRegisteredItemName(String itemName, Long storeId) {
+	public void delete(Long itemId, Long memberId) {
+		Store store = storeRepository.findByMemberId(memberId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_STORE_BY_MEMBER_ID : {}", memberId);
+				return new EntityNotFoundException(NOT_FOUND_STORE);
+			});
+
+		Item item = itemRepository.findById(itemId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", itemId);
+				return new EntityNotFoundException(NOT_FOUND_ITEM);
+			});
+
+		item.checkItemInStore(store);
+
+		itemRepository.delete(item);
+	}
+
+	private void checkDuplicatedItemName(String itemName, Long storeId) {
 		if (itemRepository.existsByNameAndStoreId(itemName, storeId)) {
-			log.warn("ALREADY_REGISTERED_ITEM_NAME : {}", itemName);
-			throw new BusinessException(ALREADY_REGISTERED_ITEM_NAME);
+			log.warn("DUPLICATED_ITEM_NAME : {}", itemName);
+			throw new BusinessException(DUPLICATED_ITEM_NAME);
 		}
 	}
 }

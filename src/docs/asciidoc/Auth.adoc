@@ -1,0 +1,69 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+
+= REST Docs 상품 API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+[[User-API]]
+== AUTH API
+
+=== 회원 가입
+
+==== /api/auth/signup
+
+.Request Success - 회원 가입 요청
+include::{snippets}/auth-signup-success/http-request.adoc[]
+
+include::{snippets}/auth-signup-success/request-fields.adoc[]
+
+.Response Success - 회원 가입 응답
+include::{snippets}/auth-signup-success/http-response.adoc[]
+
+include::{snippets}/auth-signup-success/response-fields.adoc[]
+
+.Request Fail - provider 정보가 없는 회원 가입 요청
+include::{snippets}/auth-signup-fail-no-provider/http-request.adoc[]
+
+include::{snippets}/auth-signup-fail-no-provider/request-fields.adoc[]
+
+.Response Fail - provider 정보가 없는 회원 가입 응답
+include::{snippets}/auth-signup-fail-no-provider/http-response.adoc[]
+
+include::{snippets}/auth-signup-fail-no-provider/response-fields.adoc[]
+
+.Request Fail - providerId 정보가 없는 회원 가입 요청
+include::{snippets}/auth-signup-fail-no-providerId/http-request.adoc[]
+
+include::{snippets}/auth-signup-fail-no-providerId/request-fields.adoc[]
+
+.Response Fail - providerId 정보가 없는 회원 가입 응답
+include::{snippets}/auth-signup-fail-no-providerId/http-response.adoc[]
+
+include::{snippets}/auth-signup-fail-no-providerId/response-fields.adoc[]
+
+
+.Request Fail - 중복 회원 가입 요청
+include::{snippets}/auth-signup-fail-already-exist/http-request.adoc[]
+
+include::{snippets}/auth-signup-fail-already-exist/request-fields.adoc[]
+
+.Response Fail - 중복 회원 가입 응답
+include::{snippets}/auth-signup-fail-already-exist/http-response.adoc[]
+
+include::{snippets}/auth-signup-fail-already-exist/response-fields.adoc[]
+
+.Request Fail - 잘못된 역할로 회원 가입 요청
+include::{snippets}/auth-signup-fail-invalid-role-request/http-request.adoc[]
+
+include::{snippets}/auth-signup-fail-invalid-role-request/request-fields.adoc[]
+
+.Response Fail - 잘못된 역할로 회원 가입 응답
+include::{snippets}/auth-signup-fail-invalid-role-request/http-response.adoc[]
+
+include::{snippets}/auth-signup-fail-invalid-role-request/response-fields.adoc[]

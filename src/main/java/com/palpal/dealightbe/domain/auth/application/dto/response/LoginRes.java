@@ -1,11 +1,10 @@
-package com.palpal.dealightbe.domain.auth.application;
+package com.palpal.dealightbe.domain.auth.application.dto.response;
 
 import java.util.Map;
 
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 
 public record LoginRes(
-
 	Long providerId,
 	String accessToken,
 	String refreshToken

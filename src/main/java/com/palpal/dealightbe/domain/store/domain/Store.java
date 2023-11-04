@@ -106,6 +106,10 @@ public class Store extends BaseEntity {
 		}
 	}
 
+	public void updateStatus(StoreStatus storeStatus) {
+		this.storeStatus = storeStatus;
+	}
+
 	private void validateBusinessTimes(LocalTime openTime, LocalTime closeTime) {
 		if (openTime.isAfter(closeTime)) {
 			if (openTime.isAfter(LocalTime.of(0, 0)) && closeTime.isBefore(LocalTime.of(5, 0))) {

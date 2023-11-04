@@ -3,7 +3,14 @@ package com.palpal.dealightbe.domain.member.application;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.palpal.dealightbe.domain.address.application.dto.request.AddressReq;
+import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
+import com.palpal.dealightbe.domain.image.ImageService;
+import com.palpal.dealightbe.domain.image.dto.request.ImageUploadReq;
+import com.palpal.dealightbe.domain.image.dto.response.ImageRes;
+import com.palpal.dealightbe.domain.member.application.dto.request.MemberUpdateReq;
 import com.palpal.dealightbe.domain.member.application.dto.response.MemberProfileRes;
+import com.palpal.dealightbe.domain.member.application.dto.response.MemberUpdateRes;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.global.error.ErrorCode;
@@ -14,10 +21,11 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-@Transactional
 @RequiredArgsConstructor
 public class MemberService {
+
 	private final MemberRepository memberRepository;
+	private final ImageService imageService;
 
 	@Transactional(readOnly = true)
 	public MemberProfileRes getMemberProfile(Long memberId) {
@@ -29,5 +37,46 @@ public class MemberService {
 
 		return MemberProfileRes.from(member);
 
+	}
+
+	public MemberUpdateRes updateMemberProfile(Long memberId, MemberUpdateReq request) {
+		Member member = memberRepository.findById(memberId).orElseThrow(() -> {
+			log.warn("PATCH:UPDATE:NOT_FOUND_MEMBER_BY_ID : {}", memberId);
+			throw new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
+		});
+
+		Member memberFromRequest = MemberUpdateReq.toMember(request);
+		member.updateInfo(memberFromRequest);
+
+		return MemberUpdateRes.from(member);
+	}
+
+	public AddressRes updateMemberAddress(Long memberId, AddressReq request) {
+		Member member = memberRepository.findById(memberId).orElseThrow(() -> {
+			log.warn("PATCH:UPDATE:NOT_FOUND_MEMBER_BY_ID : {}", memberId);
+			throw new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
+		});
+
+		member.getAddress().updateInfo(
+			AddressReq.toAddress(request)
+		);
+
+		return AddressRes.from(member.getAddress());
+	}
+
+	public ImageRes updateMemberImage(Long memberId, ImageUploadReq request) {
+		String imageUrl = imageService.store(request.file());
+
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> {
+				log.warn("PATCH:UPDATE:NOT_FOUND_MEMBER_BY_ID : {}", memberId);
+				return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
+			});
+
+		member.updateImage(imageUrl);
+
+		memberRepository.save(member);
+
+		return ImageRes.from(member.getImage());
 	}
 }

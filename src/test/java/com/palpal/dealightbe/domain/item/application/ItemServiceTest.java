@@ -1,8 +1,9 @@
 package com.palpal.dealightbe.domain.item.application;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -12,9 +13,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import com.palpal.dealightbe.domain.item.application.dto.request.ItemReq;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
+import com.palpal.dealightbe.domain.item.application.dto.response.ItemsRes;
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
@@ -45,12 +50,21 @@ class ItemServiceTest {
 
 	@BeforeEach
 	void setUp() {
+		LocalTime openTime = LocalTime.now();
+		LocalTime closeTime = openTime.plusHours(1);
+
+		if (closeTime.isBefore(openTime)) {
+			LocalTime tempTime = openTime;
+			openTime = closeTime;
+			closeTime = tempTime;
+		}
+
 		store = Store.builder()
 			.name("동네분식")
 			.storeNumber("0000000")
 			.telephone("00000000")
-			.openTime(LocalTime.now())
-			.closeTime(LocalTime.now().plusHours(6))
+			.openTime(openTime)
+			.closeTime(closeTime)
 			.dayOff(Collections.singleton(DayOff.MON))
 			.build();
 
@@ -121,6 +135,75 @@ class ItemServiceTest {
 		});
 	}
 
+	@DisplayName("상품 상세 정보 조회(단건) 성공 테스트")
+	@Test
+	void itemFindByIdSuccessTest() {
+		//given
+		Long itemId = 1L;
+		when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
+
+		//when
+		ItemRes itemRes = itemService.findById(itemId);
+
+		//then
+		assertThat(itemRes.name()).isEqualTo(item.getName());
+		assertThat(itemRes.stock()).isEqualTo(item.getStock());
+		assertThat(itemRes.discountPrice()).isEqualTo(item.getDiscountPrice());
+		assertThat(itemRes.originalPrice()).isEqualTo(item.getOriginalPrice());
+		assertThat(itemRes.description()).isEqualTo(item.getDescription());
+		assertThat(itemRes.information()).isEqualTo(item.getInformation());
+	}
+
+	@DisplayName("상품 상세 정보 조회(단건) 실패 테스트 - 상품이 존재하지 않는 경우")
+	@Test
+	void itemFindByIdFailureTest_notFoundItem() {
+		//given
+		Long itemId = 1L;
+		when(itemRepository.findById(itemId)).thenReturn(Optional.empty());
+
+		//when
+		//then
+		assertThrows(EntityNotFoundException.class,
+			() -> itemService.findById(itemId)
+		);
+	}
+
+	@DisplayName("상품 목록 조회(업체 시점) 성공 테스트")
+	@Test
+	void itemFindAllForStoreSuccessTest() {
+		//given
+		Item item2 = Item.builder()
+			.name("김밥")
+			.stock(3)
+			.discountPrice(5000)
+			.originalPrice(5500)
+			.description("김밥 입니다.")
+			.information("통신사 할인 불가능 합니다.")
+			.store(store)
+			.build();
+
+		Long memberId = 1L;
+
+		int page = 0;
+		int size = 5;
+		PageRequest pageRequest = PageRequest.of(page, size);
+
+		List<Item> items = new ArrayList<>();
+		items.add(item);
+		items.add(item2);
+
+		Page<Item> itemPage = new PageImpl<>(items, pageRequest, items.size());
+
+		when(storeRepository.findByMemberId(any())).thenReturn(Optional.of(store));
+		when(itemRepository.findAllByStoreIdOrderByUpdatedAtDesc(any(), eq(PageRequest.of(page, size)))).thenReturn(itemPage);
+
+		//when
+		ItemsRes itemsRes = itemService.findAllForStore(memberId, pageRequest);
+
+		//then
+		assertThat(itemsRes.itemResponses()).hasSize(items.size());
+	}
+
 	@DisplayName("상품 수정 성공 테스트")
 	@Test
 	void itemUpdateSuccessTest() {
@@ -162,5 +245,16 @@ class ItemServiceTest {
 		assertThrows(BusinessException.class, () -> {
 			itemService.update(itemId, itemReq, memberId);
 		});
+	}
+
+	@DisplayName("상품 삭제 성공 테스트")
+	@Test
+	void itemDeleteSuccessTest() {
+		//given
+		//when
+		assertDoesNotThrow(() -> itemRepository.delete(item));
+
+		//then
+		verify(itemRepository, times(1)).delete(item);
 	}
 }

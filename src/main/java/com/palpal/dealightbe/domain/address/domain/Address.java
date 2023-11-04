@@ -1,5 +1,6 @@
 package com.palpal.dealightbe.domain.address.domain;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -34,5 +35,15 @@ public class Address extends BaseEntity {
 		this.name = name;
 		this.xCoordinate = xCoordinate;
 		this.yCoordinate = yCoordinate;
+	}
+
+	public static Address defaultAddress() {
+		return new Address("", 0, 0);
+	}
+
+	public void updateInfo(Address address) {
+		this.name = address.getName();
+		this.xCoordinate = address.getXCoordinate();
+		this.yCoordinate = address.getYCoordinate();
 	}
 }

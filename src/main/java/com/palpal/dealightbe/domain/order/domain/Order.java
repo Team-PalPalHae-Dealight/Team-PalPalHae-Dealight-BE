@@ -82,7 +82,7 @@ public class Order extends BaseEntity {
 		Pair.of("CONFIRMED", "CANCELED")
 	);
 
-	private static final Set<Pair<String, String>> OrderStatusSequenceOfStore = Set.of(
+	private static final Set<Pair<String, String>> orderStatusSequenceOfStore = Set.of(
 		Pair.of("RECEIVED", "CONFIRMED"),
 		Pair.of("RECEIVED", "CANCELED"),
 		Pair.of("CONFIRMED", "COMPLETED"),
@@ -101,7 +101,8 @@ public class Order extends BaseEntity {
 	}
 
 	public void addOrderItems(List<OrderItem> orderItems) {
-		if (orderItems.size() > 5) {
+		if (orderItems.size() > MAX_ORDER_ITEMS) {
+			log.warn("POST:WRITE:EXCEEDED_ORDER_ITEMS : {}", orderItems.size());
 			throw new BusinessException(EXCEEDED_ORDER_ITEMS);
 		}
 
@@ -114,6 +115,8 @@ public class Order extends BaseEntity {
 		Long updaterId = updater.getProviderId();
 
 		if (!(updaterId.equals(storeOwnerId) || updaterId.equals(memberId))) {
+			log.warn("GET:READ:NO_AUTHORITY_TO_UPDATE_ORDER_STATUS: STORE_OWNER{} MEMBER{} UPDATER{}", storeOwnerId,
+				memberId, updaterId);
 			throw new BusinessException(INVALID_ORDER_STATUS_UPDATER);
 		}
 	}
@@ -128,13 +131,14 @@ public class Order extends BaseEntity {
 
 	public void validateStatusRequest(String changedStatus) {
 		if (!OrderStatus.isValidStatus(changedStatus)) {
+			log.warn("GET:READ:NOT_EXISTED_ORDER_STATUS: {}", changedStatus);
 			throw new BusinessException(INVALID_ORDER_STATUS);
 		}
 
 		OrderStatus currentStatus = OrderStatus.valueOf(orderStatus.name());
 
 		if (isUnchangeableStatus(currentStatus)) {
-			log.warn(currentStatus.getText());
+			log.warn("GET:READ:CAN_NOT_CHANGE_STATUS: CURRENT_STATUS{}", currentStatus.getText());
 			throw new BusinessException(UNCHANGEABLE_ORDER_STATUS);
 		}
 	}
@@ -155,6 +159,7 @@ public class Order extends BaseEntity {
 
 	private void validateDemand(String demand) {
 		if (demand.length() > MAX_DEMAND_LENGTH) {
+			log.warn("POST:WRITE:TOO_LONG_DEMAND:LENGTH {}", demand.length());
 			throw new BusinessException(INVALID_DEMAND_LENGTH);
 		}
 	}
@@ -168,6 +173,8 @@ public class Order extends BaseEntity {
 		}
 
 		if (arrivalTime.isBefore(storeOpenTime) && arrivalTime.isAfter(storeCloseTime)) {
+			log.warn("POST:WRITE:INVALID_ARRIVAL_TIME:STORE_OPEN {}, STORE_CLOSE {}, ARRIVAL_TIME {}", storeOpenTime,
+				storeCloseTime, arrivalTime);
 			throw new BusinessException(INVALID_ARRIVAL_TIME);
 		}
 	}
@@ -179,10 +186,12 @@ public class Order extends BaseEntity {
 	private void validateUpdaterAuthority(Member updater, String originalStatus, String changedStatus) {
 		Pair<String, String> inputSequence = Pair.of(originalStatus, changedStatus);
 
-		if (isMember(updater) && !orderStatusSequenceOfMember.contains(inputSequence)) { //고객인 경우
+		if (isMember(updater) && !orderStatusSequenceOfMember.contains(inputSequence)) {
+			log.warn("PATCH:UPDATE:MEMBER:CANNOT_CHANGE_STATUS:{} -> {}", originalStatus, changedStatus);
 			throw new BusinessException(INVALID_ORDER_STATUS);
 		}
-		if (isStoreOwner(updater) && !OrderStatusSequenceOfStore.contains(inputSequence)) {
+		if (isStoreOwner(updater) && !orderStatusSequenceOfStore.contains(inputSequence)) {
+			log.warn("PATCH:UPDATE:STORE:CANNOT_CHANGE_STATUS:{} -> {}", originalStatus, changedStatus);
 			throw new BusinessException(INVALID_ORDER_STATUS);
 		}
 	}
