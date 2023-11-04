@@ -56,10 +56,10 @@ class OrderServiceTest {
 	@InjectMocks
 	private OrderService orderService;
 
-	public static Member member;
-	public static Member storeOwner;
-	public static Store store;
-	public static Order order;
+	public Member member;
+	public Member storeOwner;
+	public Store store;
+	public Order order;
 
 	public static final long MEMBER_ID = 1234L;
 	public static final long STORE_OWNER_ID = 1235L;
@@ -383,6 +383,7 @@ class OrderServiceTest {
 				Assertions.assertThat(result.orders().get(0))
 					.usingRecursiveComparison()
 					.isEqualTo(OrderRes.from(order1));
+
 				Assertions.assertThat(result.orders().get(1))
 					.usingRecursiveComparison()
 					.isEqualTo(OrderRes.from(order2));
@@ -407,6 +408,49 @@ class OrderServiceTest {
 				// then
 				assertThrows(BusinessException.class, () ->
 					orderService.findAllByStoreId(storeId, requesterId, null, null));
+			}
+		}
+	}
+
+	@Nested
+	@DisplayName("<고객의 주문 목록 조회>")
+	class findAllByMemberProviderIdTest {
+		@Nested
+		@DisplayName("성공")
+		class Success {
+			@DisplayName("주문 이력을 조회할 수 있다")
+			@Test
+			void findAllByMember_success() {
+				// given
+				long memberProviderId = 1L;
+
+				Order order1 = createOrder(LocalTime.of(18, 30), 30000);
+				Order order2 = createOrder(LocalTime.of(22, 0), 10000);
+
+				Slice<Order> ordersSlice = new SliceImpl<>(
+					Arrays.asList(order1, order2), PageRequest.of(0, 10), true
+				);
+
+				when(orderRepository.findAllByMemberProviderId(anyLong(), any(), any()))
+					.thenReturn(ordersSlice);
+
+				when(memberRepository.findMemberByProviderId(memberProviderId))
+					.thenReturn(Optional.ofNullable(member));
+
+				// when
+				OrdersRes result = orderService.findAllByMemberProviderId(memberProviderId, null,
+					PageRequest.of(0, 10));
+
+				// then
+				assertThat(result.orders(), hasSize(2));
+				assertThat(result.hasNext(), is(true));
+
+				Assertions.assertThat(result.orders().get(0))
+					.usingRecursiveComparison()
+					.isEqualTo(OrderRes.from(order1));
+				Assertions.assertThat(result.orders().get(1))
+					.usingRecursiveComparison()
+					.isEqualTo(OrderRes.from(order2));
 			}
 		}
 	}
