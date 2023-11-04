@@ -73,7 +73,7 @@ include::{snippets}/order/order-find-by-id-success/response-fields.adoc[]
 
 ---
 
-=== 4. 주문 조회 - 업체
+=== 4. 주문 조회 (다건) - 업체
 
 ==== Request
 
