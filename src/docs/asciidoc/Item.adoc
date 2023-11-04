@@ -18,53 +18,53 @@ endif::[]
 ==== /api/items?memberId={memberId}
 
 .Request - 성공
-include::{snippets}/item-create/http-request.adoc[]
+include::{snippets}/item/item-create/http-request.adoc[]
 
-include::{snippets}/item-create/request-parameters.adoc[]
+include::{snippets}/item/item-create/request-parameters.adoc[]
 
-include::{snippets}/item-create/request-fields.adoc[]
+include::{snippets}/item/item-create/request-fields.adoc[]
 
 .Response - 성공
-include::{snippets}/item-create/http-response.adoc[]
+include::{snippets}/item/item-create/http-response.adoc[]
 
-include::{snippets}/item-create/response-fields.adoc[]
+include::{snippets}/item/item-create/response-fields.adoc[]
 
 .Request Fail - 입력되지 않은 상품 이름
-include::{snippets}/item-create-fail-invalid-name/http-request.adoc[]
+include::{snippets}/item/item-create-fail-invalid-name/http-request.adoc[]
 
-include::{snippets}/item-create-fail-invalid-name/request-parameters.adoc[]
+include::{snippets}/item/item-create-fail-invalid-name/request-parameters.adoc[]
 
-include::{snippets}/item-create-fail-invalid-name/request-fields.adoc[]
+include::{snippets}/item/item-create-fail-invalid-name/request-fields.adoc[]
 
 .Response Fail - 입력되지 않은 상품 이름
-include::{snippets}/item-create-fail-invalid-name/http-response.adoc[]
+include::{snippets}/item/item-create-fail-invalid-name/http-response.adoc[]
 
-include::{snippets}/item-create-fail-invalid-name/response-fields.adoc[]
+include::{snippets}/item/item-create-fail-invalid-name/response-fields.adoc[]
 
 .Request Fail - 할인가가 원가보다 큰 경우
-include::{snippets}/item-create-fail-invalid-discount-price/http-request.adoc[]
+include::{snippets}/item/item-create-fail-invalid-discount-price/http-request.adoc[]
 
-include::{snippets}/item-create-fail-invalid-discount-price/request-parameters.adoc[]
+include::{snippets}/item/item-create-fail-invalid-discount-price/request-parameters.adoc[]
 
-include::{snippets}/item-create-fail-invalid-discount-price/request-fields.adoc[]
+include::{snippets}/item/item-create-fail-invalid-discount-price/request-fields.adoc[]
 
 .Response Fail - 할인가가 원가보다 큰 경우
-include::{snippets}/item-create-fail-invalid-discount-price/http-response.adoc[]
+include::{snippets}/item/item-create-fail-invalid-discount-price/http-response.adoc[]
 
-include::{snippets}/item-create-fail-invalid-discount-price/response-fields.adoc[]
+include::{snippets}/item/item-create-fail-invalid-discount-price/response-fields.adoc[]
 
 
 .Request Fail - 이미 등록된 상품인 경우(이름 중복)
-include::{snippets}/item-create-fail-duplicated-item-name/http-request.adoc[]
+include::{snippets}/item/item-create-fail-duplicated-item-name/http-request.adoc[]
 
-include::{snippets}/item-create-fail-duplicated-item-name/request-parameters.adoc[]
+include::{snippets}/item/item-create-fail-duplicated-item-name/request-parameters.adoc[]
 
-include::{snippets}/item-create-fail-duplicated-item-name/request-fields.adoc[]
+include::{snippets}/item/item-create-fail-duplicated-item-name/request-fields.adoc[]
 
 .Response Fail - 이미 등록된 상품인 경우(이름 중복)
-include::{snippets}/item-create-fail-duplicated-item-name/http-response.adoc[]
+include::{snippets}/item/item-create-fail-duplicated-item-name/http-response.adoc[]
 
-include::{snippets}/item-create-fail-duplicated-item-name/response-fields.adoc[]
+include::{snippets}/item/item-create-fail-duplicated-item-name/response-fields.adoc[]
 
 
 === 상품 상세 정보 조회(단건)
@@ -72,24 +72,24 @@ include::{snippets}/item-create-fail-duplicated-item-name/response-fields.adoc[]
 ==== /api/items/{id}
 
 .Request - 성공
-include::{snippets}/item-find-by-id/http-request.adoc[]
+include::{snippets}/item/item-find-by-id/http-request.adoc[]
 
-include::{snippets}/item-find-by-id/path-parameters.adoc[]
+include::{snippets}/item/item-find-by-id/path-parameters.adoc[]
 
 .Response - 성공
-include::{snippets}/item-find-by-id/http-response.adoc[]
+include::{snippets}/item/item-find-by-id/http-response.adoc[]
 
-include::{snippets}/item-find-by-id/response-fields.adoc[]
+include::{snippets}/item/item-find-by-id/response-fields.adoc[]
 
 .Request Fail - 상품이 존재하지 않는 경우
-include::{snippets}/item-find-by-id-fail-not-found-item/http-request.adoc[]
+include::{snippets}/item/item-find-by-id-fail-not-found-item/http-request.adoc[]
 
-include::{snippets}/item-find-by-id-fail-not-found-item/path-parameters.adoc[]
+include::{snippets}/item/item-find-by-id-fail-not-found-item/path-parameters.adoc[]
 
 .Response Fail - 상품이 존재하지 않는 경우
-include::{snippets}/item-find-by-id-fail-not-found-item/http-response.adoc[]
+include::{snippets}/item/item-find-by-id-fail-not-found-item/http-response.adoc[]
 
-include::{snippets}/item-find-by-id-fail-not-found-item/response-fields.adoc[]
+include::{snippets}/item/item-find-by-id-fail-not-found-item/response-fields.adoc[]
 
 
 === 상품 목록 조회(업체 시점)
@@ -97,14 +97,14 @@ include::{snippets}/item-find-by-id-fail-not-found-item/response-fields.adoc[]
 ==== /api/items/store?memberId={memberId}&size={size}&page={page}
 
 .Request - 성공
-include::{snippets}/item-find-All-for-store/http-request.adoc[]
+include::{snippets}/item/item-find-All-for-store/http-request.adoc[]
 
-include::{snippets}/item-find-All-for-store/request-parameters.adoc[]
+include::{snippets}/item/item-find-All-for-store/request-parameters.adoc[]
 
 .Response - 성공
-include::{snippets}/item-find-All-for-store/http-response.adoc[]
+include::{snippets}/item/item-find-All-for-store/http-response.adoc[]
 
-include::{snippets}/item-find-All-for-store/response-fields.adoc[]
+include::{snippets}/item/item-find-All-for-store/response-fields.adoc[]
 
 
 === 상품 수정
@@ -112,83 +112,83 @@ include::{snippets}/item-find-All-for-store/response-fields.adoc[]
 ==== /api/items/{id}?memberId={memberId}
 
 .Request - 성공
-include::{snippets}/item-update/http-request.adoc[]
+include::{snippets}/item/item-update/http-request.adoc[]
 
-include::{snippets}/item-update/path-parameters.adoc[]
+include::{snippets}/item/item-update/path-parameters.adoc[]
 
-include::{snippets}/item-update/request-parameters.adoc[]
+include::{snippets}/item/item-update/request-parameters.adoc[]
 
-include::{snippets}/item-update/request-fields.adoc[]
+include::{snippets}/item/item-update/request-fields.adoc[]
 
 .Response - 성공
-include::{snippets}/item-update/http-response.adoc[]
+include::{snippets}/item/item-update/http-response.adoc[]
 
-include::{snippets}/item-update/response-fields.adoc[]
+include::{snippets}/item/item-update/response-fields.adoc[]
 
 .Request Fail - 입력되지 않은 상품 이름
-include::{snippets}/item-update-fail-invalid-name/http-request.adoc[]
+include::{snippets}/item/item-update-fail-invalid-name/http-request.adoc[]
 
-include::{snippets}/item-update-fail-invalid-name/path-parameters.adoc[]
+include::{snippets}/item/item-update-fail-invalid-name/path-parameters.adoc[]
 
-include::{snippets}/item-update-fail-invalid-name/request-parameters.adoc[]
+include::{snippets}/item/item-update-fail-invalid-name/request-parameters.adoc[]
 
-include::{snippets}/item-update-fail-invalid-name/request-fields.adoc[]
+include::{snippets}/item/item-update-fail-invalid-name/request-fields.adoc[]
 
 .Response Fail - 입력되지 않은 상품 이름
-include::{snippets}/item-update-fail-invalid-name/http-response.adoc[]
+include::{snippets}/item/item-update-fail-invalid-name/http-response.adoc[]
 
-include::{snippets}/item-update-fail-invalid-name/response-fields.adoc[]
+include::{snippets}/item/item-update-fail-invalid-name/response-fields.adoc[]
 
 .Request Fail - 할인가가 원가보다 큰 경우
-include::{snippets}/item-update-fail-invalid-discount-price/http-request.adoc[]
+include::{snippets}/item/item-update-fail-invalid-discount-price/http-request.adoc[]
 
-include::{snippets}/item-update-fail-invalid-discount-price/path-parameters.adoc[]
+include::{snippets}/item/item-update-fail-invalid-discount-price/path-parameters.adoc[]
 
-include::{snippets}/item-update-fail-invalid-discount-price/request-parameters.adoc[]
+include::{snippets}/item/item-update-fail-invalid-discount-price/request-parameters.adoc[]
 
-include::{snippets}/item-update-fail-invalid-discount-price/request-fields.adoc[]
+include::{snippets}/item/item-update-fail-invalid-discount-price/request-fields.adoc[]
 
 .Response Fail - 할인가가 원가보다 큰 경우
-include::{snippets}/item-update-fail-invalid-discount-price/http-response.adoc[]
+include::{snippets}/item/item-update-fail-invalid-discount-price/http-response.adoc[]
 
-include::{snippets}/item-update-fail-invalid-discount-price/response-fields.adoc[]
+include::{snippets}/item/item-update-fail-invalid-discount-price/response-fields.adoc[]
 
 .Request Fail - 이미 등록된 상품인 경우(이름 중복)
-include::{snippets}/item-update-fail-duplicated-item-name/http-request.adoc[]
+include::{snippets}/item/item-update-fail-duplicated-item-name/http-request.adoc[]
 
-include::{snippets}/item-update-fail-duplicated-item-name/path-parameters.adoc[]
+include::{snippets}/item/item-update-fail-duplicated-item-name/path-parameters.adoc[]
 
-include::{snippets}/item-update-fail-duplicated-item-name/request-parameters.adoc[]
+include::{snippets}/item/item-update-fail-duplicated-item-name/request-parameters.adoc[]
 
-include::{snippets}/item-update-fail-duplicated-item-name/request-fields.adoc[]
+include::{snippets}/item/item-update-fail-duplicated-item-name/request-fields.adoc[]
 
 .Response Fail - 이미 등록된 상품인 경우(이름 중복)
-include::{snippets}/item-update-fail-duplicated-item-name/http-response.adoc[]
+include::{snippets}/item/item-update-fail-duplicated-item-name/http-response.adoc[]
 
-include::{snippets}/item-update-fail-duplicated-item-name/response-fields.adoc[]
+include::{snippets}/item/item-update-fail-duplicated-item-name/response-fields.adoc[]
 
 === 상품 삭제
 
 ==== /api/items/{id}?memberId={memberId}
 
 .Request - 성공
-include::{snippets}/item-delete/http-request.adoc[]
+include::{snippets}/item/item-delete/http-request.adoc[]
 
-include::{snippets}/item-delete/path-parameters.adoc[]
+include::{snippets}/item/item-delete/path-parameters.adoc[]
 
-include::{snippets}/item-delete/request-parameters.adoc[]
+include::{snippets}/item/item-delete/request-parameters.adoc[]
 
 .Response - 성공
-include::{snippets}/item-delete/http-response.adoc[]
+include::{snippets}/item/item-delete/http-response.adoc[]
 
 .Request Fail - 요청된 상품이 해당 업체에 등록되지 않은 상품인 경우
-include::{snippets}/item-delete-store-has-no-item/http-request.adoc[]
+include::{snippets}/item/item-delete-store-has-no-item/http-request.adoc[]
 
-include::{snippets}/item-delete-store-has-no-item/path-parameters.adoc[]
+include::{snippets}/item/item-delete-store-has-no-item/path-parameters.adoc[]
 
-include::{snippets}/item-delete-store-has-no-item/request-parameters.adoc[]
+include::{snippets}/item/item-delete-store-has-no-item/request-parameters.adoc[]
 
 .Response Fail - 요청된 상품이 해당 업체에 등록되지 않은 상품인 경우
-include::{snippets}/item-delete-store-has-no-item/http-response.adoc[]
+include::{snippets}/item/item-delete-store-has-no-item/http-response.adoc[]
 
-include::{snippets}/item-delete-store-has-no-item/response-fields.adoc[]
+include::{snippets}/item/item-delete-store-has-no-item/response-fields.adoc[]
