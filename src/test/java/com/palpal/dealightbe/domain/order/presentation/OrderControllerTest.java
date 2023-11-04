@@ -78,7 +78,7 @@ public class OrderControllerTest {
 			1L, "도착할 때까지 상품 냉장고에 보관 부탁드려요", LocalTime.of(12, 30), 10000);
 
 		OrderProductsRes productsRes = new OrderProductsRes(List.of(new OrderProductRes(1L, "달콤한 도넛", 5, 10000, 15000,
-			"https://team-08-image-bucket.s3.ap-northeast-2.amazonaws.com/donut")));
+			"https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/donut")));
 
 		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요", LocalTime.of(12, 30),
 			productsRes, 10000, createdAt, RECEIVED.getText());
@@ -308,7 +308,7 @@ public class OrderControllerTest {
 			LocalTime.of(12, 30), 10000);
 
 		OrderProductsRes productsRes = new OrderProductsRes(List.of(new OrderProductRes(1L, "달콤한 도넛", 5, 10000, 15000,
-			"https://team-08-image-bucket.s3.ap-northeast-2.amazonaws.com/donut")));
+			"https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/donut")));
 
 		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요", LocalTime.of(12, 30),
 			productsRes, 10000, createdAt, RECEIVED.getText());
