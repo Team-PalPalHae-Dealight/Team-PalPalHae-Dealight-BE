@@ -16,6 +16,7 @@ public enum ErrorCode {
 
 	//멤버
 	NOT_FOUND_MEMBER("M001", "고객을 찾을 수 없습니다."),
+	DEFAULT_IMAGE_ALREADY_SET("M002", "기본 이미지로 설정된 이미지는 삭제할 수 없습니다."),
 
 	//업체
 	INVALID_BUSINESS_TIME("ST001", "마감 시간은 오픈 시간보다 이전일 수 없습니다"),
