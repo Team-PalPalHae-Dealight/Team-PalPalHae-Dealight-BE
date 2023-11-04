@@ -106,6 +106,12 @@ public class Store extends BaseEntity {
 		}
 	}
 
+	public boolean isSameOwnerAndTheRequester(long requesterId) {
+		long ownerId = getMember().getProviderId();
+
+		return (ownerId == requesterId);
+	}
+
 	public void updateStatus(StoreStatus storeStatus) {
 		this.storeStatus = storeStatus;
 	}
