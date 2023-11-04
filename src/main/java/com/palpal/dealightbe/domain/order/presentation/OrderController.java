@@ -75,10 +75,11 @@ public class OrderController {
 
 		return ResponseEntity.ok(orderRes);
 	}
-	@GetMapping("/{memberProviderId}")
+
+	@GetMapping("/{memberProviderId}/stores")
 	public ResponseEntity<OrdersRes> findAllByStoreId(
 		@PathVariable Long memberProviderId,
-		@RequestParam Long storeId,
+		@RequestParam Long id,
 		@RequestParam(required = false) String status,
 		@RequestParam(required = false, defaultValue = "0") int page,
 		@RequestParam(required = false, defaultValue = DEFAULT_PAGING_SIZE) int size
@@ -86,7 +87,22 @@ public class OrderController {
 
 		Pageable pageable = PageRequest.of(page, size, Sort.by("created_at").descending());
 
-		OrdersRes ordersRes = orderService.findAllByStoreId(storeId, memberProviderId, status, pageable);
+		OrdersRes ordersRes = orderService.findAllByStoreId(id, memberProviderId, status, pageable);
+
+		return ResponseEntity.ok(ordersRes);
+	}
+
+	@GetMapping("/{memberProviderId}")
+	public ResponseEntity<OrdersRes> findAllByMemberProviderId(
+		@PathVariable Long memberProviderId,
+		@RequestParam(required = false) String status,
+		@RequestParam(required = false, defaultValue = "0") int page,
+		@RequestParam(required = false, defaultValue = DEFAULT_PAGING_SIZE) int size
+	) {
+
+		Pageable pageable = PageRequest.of(page, size, Sort.by("created_at").descending());
+
+		OrdersRes ordersRes = orderService.findAllByMemberProviderId(memberProviderId, status, pageable);
 
 		return ResponseEntity.ok(ordersRes);
 	}
