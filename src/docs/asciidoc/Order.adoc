@@ -23,32 +23,50 @@ endif::[]
 
 ==== Request
 
-.Request
-include::{snippets}/order-create-success/path-parameters.adoc[]
+- URL ->
+include::{snippets}/order/order-create-success/path-parameters.adoc[]
 
-include::{snippets}/order-create-success/http-request.adoc[]
-include::{snippets}/order-create-success/request-fields.adoc[]
+- Request Body
+include::{snippets}/order/order-create-success/http-request.adoc[]
+include::{snippets}/order/order-create-success/request-fields.adoc[]
 
 ==== Response
 
-.Response
-include::{snippets}/order-create-success/http-response.adoc[]
-include::{snippets}/order-create-success/response-fields.adoc[]
+include::{snippets}/order/order-create-success/http-response.adoc[]
+include::{snippets}/order/order-create-success/response-fields.adoc[]
 
-=== 2. 주문 상태 변경
+=== 3. 주문 상태 변경
 
 /api/orders/{orderId}/status/{memberProviderId}
 
 ==== Request
 
-.Request
-include::{snippets}/order-status-update-success/path-parameters.adoc[]
+- URL ->
+include::{snippets}/order/order-status-update-success/path-parameters.adoc[]
 
-include::{snippets}/order-status-update-success/http-request.adoc[]
-include::{snippets}/order-status-update-success/request-fields.adoc[]
+- Request Body
+include::{snippets}/order/order-status-update-success/http-request.adoc[]
+include::{snippets}/order/order-status-update-success/request-fields.adoc[]
 
 ==== Response
 
-.Response
-include::{snippets}/order-status-update-success/http-response.adoc[]
-include::{snippets}/order-status-update-success/response-fields.adoc[]
+include::{snippets}/order/order-status-update-success/http-response.adoc[]
+include::{snippets}/order/order-status-update-success/response-fields.adoc[]
+
+---
+
+=== 4. 주문 조회 - 업체
+
+==== Request
+
+- URL ->
+include::{snippets}/order/order-find-by-store-id-success/path-parameters.adoc[]
+
+- Query String
+include::{snippets}/order/order-find-by-store-id-success/request-parameters.adoc[]
+include::{snippets}/order/order-find-by-store-id-success/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/order/order-find-by-store-id-success/http-response.adoc[]
+include::{snippets}/order/order-find-by-store-id-success/response-fields.adoc[]
