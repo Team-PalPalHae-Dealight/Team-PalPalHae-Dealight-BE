@@ -118,10 +118,10 @@ public class Order extends BaseEntity {
 		}
 	}
 
-	public void changeStatus(Member updater, String originalStatus, String changedStatus) {
+	public void changeStatus(Member updater, String changedStatus) {
 		validateStatusRequest(changedStatus);
 		validateOrderUpdater(updater);
-		validateUpdaterAuthority(updater, originalStatus, changedStatus);
+		validateUpdaterAuthority(updater, orderStatus.name(), changedStatus);
 
 		this.orderStatus = OrderStatus.valueOf(changedStatus);
 	}
@@ -137,6 +137,20 @@ public class Order extends BaseEntity {
 			log.warn(currentStatus.getText());
 			throw new BusinessException(UNCHANGEABLE_ORDER_STATUS);
 		}
+	}
+
+	public boolean isMember(Member requester) {
+		long updaterId = requester.getProviderId();
+		long orderedMemberId = this.member.getProviderId();
+
+		return updaterId == orderedMemberId;
+	}
+
+	public boolean isStoreOwner(Member requester) {
+		long updaterId = requester.getProviderId();
+		long storeOwnerId = store.getMember().getProviderId();
+
+		return updaterId == storeOwnerId;
 	}
 
 	private void validateDemand(String demand) {
@@ -171,19 +185,5 @@ public class Order extends BaseEntity {
 		if (isStoreOwner(updater) && !OrderStatusSequenceOfStore.contains(inputSequence)) {
 			throw new BusinessException(INVALID_ORDER_STATUS);
 		}
-	}
-
-	public boolean isMember(Member requester) {
-		long updaterId = requester.getProviderId();
-		long orderedMemberId = this.member.getProviderId();
-
-		return updaterId == orderedMemberId;
-	}
-
-	public boolean isStoreOwner(Member requester) {
-		long updaterId = requester.getProviderId();
-		long storeOwnerId = store.getMember().getProviderId();
-
-		return updaterId == storeOwnerId;
 	}
 }

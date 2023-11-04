@@ -65,43 +65,20 @@ public class OrderService {
 	}
 
 	public OrderStatusUpdateRes updateStatus(Long orderId, OrderStatusUpdateReq request, Long memberProviderId) {
-		Member member = memberRepository.findMemberByProviderId(memberProviderId)
-			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_PROVIDER_ID : {}", memberProviderId);
+		Member member = getMember(memberProviderId);
+		Order order = getOrder(orderId);
 
-				return new EntityNotFoundException(NOT_FOUND_MEMBER);
-			});
-
-		Order order = orderRepository.findById(orderId)
-			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_ORDER_BY_ID : {}", orderId);
-
-				return new EntityNotFoundException(NOT_FOUND_ORDER);
-			});
-
-		String originalStatus = order.getOrderStatus().name();
 		String changedStatus = request.status();
-
-		order.changeStatus(member, originalStatus, changedStatus);
+		order.changeStatus(member, changedStatus);
 
 		return OrderStatusUpdateRes.from(order);
 	}
 
 	@Transactional(readOnly = true)
 	public OrderRes findById(Long orderId, Long memberProviderId) {
-		Order order = orderRepository.findById(orderId)
-			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_ORDER_BY_ID : {}", orderId);
+		Order order = getOrder(orderId);
 
-				return new EntityNotFoundException(NOT_FOUND_ORDER);
-			});
-
-		Member member = memberRepository.findMemberByProviderId(memberProviderId)
-			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_PROVIDER_ID : {}", memberProviderId);
-
-				return new EntityNotFoundException(NOT_FOUND_MEMBER);
-			});
+		Member member = getMember(memberProviderId);
 
 		if (!(order.isMember(member) || order.isStoreOwner(member))) {
 			log.warn("GET:READ:UNAUTHORIZED: ORDERED_MEMBER {}, STORE_OWNER {}, REQUESTER {}",
@@ -136,5 +113,23 @@ public class OrderService {
 			.order(order)
 			.quantity(quantity)
 			.build();
+	}
+
+	private Order getOrder(Long orderId) {
+		return orderRepository.findById(orderId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_ORDER_BY_ID : {}", orderId);
+
+				return new EntityNotFoundException(NOT_FOUND_ORDER);
+			});
+	}
+
+	private Member getMember(Long memberProviderId) {
+		return memberRepository.findMemberByProviderId(memberProviderId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_PROVIDER_ID : {}", memberProviderId);
+
+				return new EntityNotFoundException(NOT_FOUND_MEMBER);
+			});
 	}
 }
