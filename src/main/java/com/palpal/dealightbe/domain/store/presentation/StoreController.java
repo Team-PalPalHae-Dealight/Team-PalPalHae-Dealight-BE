@@ -20,6 +20,7 @@ import com.palpal.dealightbe.domain.store.application.dto.request.StoreUpdateReq
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusRes;
+import com.palpal.dealightbe.global.aop.ProviderId;
 
 import lombok.RequiredArgsConstructor;
 
@@ -69,6 +70,15 @@ public class StoreController {
 	public ResponseEntity<ImageRes> uploadImage(@PathVariable Long memberId, @PathVariable Long storeId, MultipartFile file) {
 		ImageUploadReq imageUploadReq = new ImageUploadReq(file);
 		ImageRes imageRes = storeService.uploadImage(memberId, storeId, imageUploadReq);
+
+		return ResponseEntity.ok(imageRes);
+	}
+
+	@PatchMapping("/images/{memberId}/{storeId}")
+	public ResponseEntity<ImageRes> updateImage(@PathVariable Long memberId, @PathVariable Long storeId, MultipartFile file) {
+		ImageUploadReq imageUpdateReq = new ImageUploadReq(file);
+
+		ImageRes imageRes = storeService.updateImage(memberId, storeId, imageUpdateReq);
 
 		return ResponseEntity.ok(imageRes);
 	}

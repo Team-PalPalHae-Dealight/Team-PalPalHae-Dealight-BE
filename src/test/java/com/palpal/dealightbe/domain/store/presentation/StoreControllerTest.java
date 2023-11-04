@@ -3,6 +3,7 @@ package com.palpal.dealightbe.domain.store.presentation;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
@@ -35,7 +36,6 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -103,7 +103,7 @@ class StoreControllerTest {
 			.andExpect(jsonPath("$.dayOff[0]").value(DayOff.MON.getName()))
 			.andDo(print())
 			.andDo(document("store/store-register",
-				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("memberId").description("고객 ID")
 				),
@@ -158,7 +158,7 @@ class StoreControllerTest {
 			.andExpect(jsonPath("$.message").value("마감 시간은 오픈 시간보다 이전일 수 없습니다"))
 			.andDo(print())
 			.andDo(document("store/store-register-fail-invalid-business-time",
-				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("memberId").description("고객 ID")
 				),
@@ -204,7 +204,7 @@ class StoreControllerTest {
 			.andExpect(status().isOk())
 			.andDo(print())
 			.andDo(document("store/store-get-info",
-				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
 					parameterWithName("memberId").description("고객 ID"),
@@ -241,7 +241,7 @@ class StoreControllerTest {
 			.andExpect(status().isBadRequest())
 			.andDo(print())
 			.andDo(document("store/store-get-info-fail-not-match-owner-and-requester",
-				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
 					parameterWithName("memberId").description("고객 ID"),
@@ -282,7 +282,7 @@ class StoreControllerTest {
 			.andExpect(status().isOk())
 			.andDo(print())
 			.andDo(document("store/store-update-info",
-				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
 					parameterWithName("memberId").description("고객 ID"),
@@ -355,7 +355,7 @@ class StoreControllerTest {
 			.andExpect(status().isOk())
 			.andDo(print())
 			.andDo(document("store/store-status-update",
-				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
 					parameterWithName("memberId").description("고객 ID"),
@@ -393,7 +393,7 @@ class StoreControllerTest {
 			.andExpect(status().isOk())
 			.andDo(print())
 			.andDo(document("store/store-upload-image",
-				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
 					parameterWithName("memberId").description("고객 ID"),
@@ -405,6 +405,44 @@ class StoreControllerTest {
 					fieldWithPath("imageUrl").description("등록된 이미지 URL")
 				)
 			));
+	}
 
+	@Test
+	@DisplayName("업체 이미지 수정 성공")
+	void updateImageSuccessTest() throws Exception {
+
+		//given
+		Long memberId = 1L;
+		Long storeId = 1L;
+		MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "Spring Framework".getBytes());
+		ImageUploadReq request = new ImageUploadReq(file);
+		String imageUrl = "http://fakeimageurl.com/image.jpg";
+		ImageRes imageRes = new ImageRes(imageUrl);
+
+		given(storeService.updateImage(memberId, storeId, request))
+			.willReturn(imageRes);
+
+		//when -> then
+		mockMvc.perform(RestDocumentationRequestBuilders.fileUpload("/api/stores/images/{memberId}/{storeId}", memberId, storeId)
+				.file(file)
+				.with(updateRequest -> {
+					updateRequest.setMethod("PATCH");
+					return updateRequest;
+				}))
+			.andExpect(status().isOk())
+			.andDo(print())
+			.andDo(document("store/store-update-image",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("memberId").description("고객 ID"),
+					parameterWithName("storeId").description("업체 ID")),
+				requestParts(
+					partWithName("file").description("수정할 이미지 URL")
+				),
+				responseFields(
+					fieldWithPath("imageUrl").description("수정된 이미지 URL")
+				)
+			));
 	}
 }
