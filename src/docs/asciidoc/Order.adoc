@@ -88,3 +88,21 @@ include::{snippets}/order/order-find-by-store-id-success/http-request.adoc[]
 
 include::{snippets}/order/order-find-by-store-id-success/http-response.adoc[]
 include::{snippets}/order/order-find-by-store-id-success/response-fields.adoc[]
+
+---
+
+=== 5. 주문 조회 (다건) - 고객
+
+==== Request
+
+- URL ->
+include::{snippets}/order/order-find-by-member-success/path-parameters.adoc[]
+
+- Query String
+include::{snippets}/order/order-find-by-member-success/request-parameters.adoc[]
+include::{snippets}/order/order-find-by-member-success/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/order/order-find-by-member-success/http-response.adoc[]
+include::{snippets}/order/order-find-by-member-success/response-fields.adoc[]
