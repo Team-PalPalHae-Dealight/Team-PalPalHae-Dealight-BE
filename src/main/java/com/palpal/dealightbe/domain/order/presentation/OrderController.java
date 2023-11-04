@@ -2,6 +2,9 @@ package com.palpal.dealightbe.domain.order.presentation;
 
 import java.net.URI;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -18,6 +22,7 @@ import com.palpal.dealightbe.domain.order.application.dto.request.OrderCreateReq
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderStatusUpdateReq;
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderRes;
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderStatusUpdateRes;
+import com.palpal.dealightbe.domain.order.application.dto.response.OrdersRes;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +32,8 @@ import lombok.RequiredArgsConstructor;
 public class OrderController {
 
 	private final OrderService orderService;
+
+	private static final String DEFAULT_PAGING_SIZE = "10";
 
 	@PostMapping("/{memberProviderId}")
 	public ResponseEntity<OrderRes> create(
@@ -67,5 +74,20 @@ public class OrderController {
 		OrderRes orderRes = orderService.findById(orderId, memberProviderId);
 
 		return ResponseEntity.ok(orderRes);
+	}
+	@GetMapping("/{memberProviderId}")
+	public ResponseEntity<OrdersRes> findAllByStoreId(
+		@PathVariable Long memberProviderId,
+		@RequestParam Long storeId,
+		@RequestParam(required = false) String status,
+		@RequestParam(required = false, defaultValue = "0") int page,
+		@RequestParam(required = false, defaultValue = DEFAULT_PAGING_SIZE) int size
+	) {
+
+		Pageable pageable = PageRequest.of(page, size, Sort.by("created_at").descending());
+
+		OrdersRes ordersRes = orderService.findAllByStoreId(storeId, memberProviderId, status, pageable);
+
+		return ResponseEntity.ok(ordersRes);
 	}
 }

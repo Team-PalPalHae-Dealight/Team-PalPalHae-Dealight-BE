@@ -8,6 +8,8 @@ import static com.palpal.dealightbe.global.error.ErrorCode.UNAUTHORIZED_REQUEST;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,7 @@ import com.palpal.dealightbe.domain.order.application.dto.request.OrderProductRe
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderStatusUpdateReq;
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderRes;
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderStatusUpdateRes;
+import com.palpal.dealightbe.domain.order.application.dto.response.OrdersRes;
 import com.palpal.dealightbe.domain.order.domain.Order;
 import com.palpal.dealightbe.domain.order.domain.OrderItem;
 import com.palpal.dealightbe.domain.order.domain.OrderRepository;
@@ -131,5 +134,23 @@ public class OrderService {
 
 				return new EntityNotFoundException(NOT_FOUND_MEMBER);
 			});
+	}
+
+	@Transactional(readOnly = true)
+	public OrdersRes findAllByStoreId(Long storeId, Long memberProviderId, String status, Pageable pageable) {
+		Store store = storeRepository.findById(storeId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_STORE_BY_ID : {}", storeId);
+				return new EntityNotFoundException(NOT_FOUND_STORE);
+			});
+
+		if (!store.isSameOwnerAndTheRequester(memberProviderId)) {
+			throw new BusinessException(UNAUTHORIZED_REQUEST);
+		}
+
+		Slice<Order> orders = orderRepository.findAllByStoreId(storeId, status, pageable);
+
+		return OrdersRes.from(orders);
+
 	}
 }
