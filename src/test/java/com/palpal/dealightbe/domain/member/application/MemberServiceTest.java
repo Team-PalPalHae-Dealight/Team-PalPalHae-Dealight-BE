@@ -2,8 +2,11 @@ package com.palpal.dealightbe.domain.member.application;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import java.util.Optional;
 
@@ -18,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.palpal.dealightbe.domain.address.application.dto.request.AddressReq;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
 import com.palpal.dealightbe.domain.address.domain.Address;
+import com.palpal.dealightbe.domain.auth.application.AuthService;
 import com.palpal.dealightbe.domain.image.ImageService;
 import com.palpal.dealightbe.domain.image.dto.request.ImageUploadReq;
 import com.palpal.dealightbe.domain.image.dto.response.ImageRes;
@@ -26,6 +30,9 @@ import com.palpal.dealightbe.domain.member.application.dto.response.MemberProfil
 import com.palpal.dealightbe.domain.member.application.dto.response.MemberUpdateRes;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
+import com.palpal.dealightbe.domain.store.application.StoreService;
+import com.palpal.dealightbe.global.error.ErrorCode;
+import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -221,5 +228,68 @@ class MemberServiceTest {
 		// when & then
 		assertThrows(EntityNotFoundException.class,
 			() -> memberService.updateMemberImage(nonexistentMemberId, imageUploadReq));
+	}
+
+	@Test
+	@DisplayName("멤버 이미지 삭제 성공 테스트")
+	void deleteMemberImageSuccessTest() {
+		// given
+		Long memberId = 1L;
+		String mockImageUrl = "https://foo.com/image.jpg";
+
+		Member mockMember = Member.builder()
+			.realName("유재석")
+			.nickName("유산슬")
+			.phoneNumber("01012345678")
+			.build();
+
+		mockMember.updateImage(mockImageUrl);
+
+		given(memberRepository.findById(memberId)).willReturn(Optional.of(mockMember));
+		doNothing().when(imageService).delete(anyString());
+
+		// when
+		memberService.deleteMemberImage(memberId);
+
+		// then
+		verify(imageService).delete(mockImageUrl);
+		verify(memberRepository).save(mockMember);
+		assertEquals(StoreService.DEFAULT_PATH, mockMember.getImage());
+	}
+
+	@Test
+	@DisplayName("멤버 이미지 삭제 실패 테스트: 멤버 ID가 존재하지 않는 경우")
+	void deleteMemberImageNotFoundTest() {
+		// given
+		Long nonexistentMemberId = 999L;
+
+		given(memberRepository.findById(nonexistentMemberId)).willReturn(Optional.empty());
+
+		// when & then
+		assertThrows(EntityNotFoundException.class,
+			() -> memberService.deleteMemberImage(nonexistentMemberId));
+	}
+
+	@Test
+	@DisplayName("멤버 이미지 삭제 실패 테스트: 이미 기본 이미지가 설정된 경우")
+	void deleteMemberImageDefaultImageAlreadySetTest() {
+		// given
+		Long memberId = 1L;
+		String defaultImageUrl = AuthService.MEMBER_DEFAULT_IMAGE_PATH;
+
+		Member mockMember = Member.builder()
+			.realName("유재석")
+			.nickName("유산슬")
+			.phoneNumber("01012345678")
+			.build();
+
+		mockMember.updateImage(defaultImageUrl);
+
+		given(memberRepository.findById(memberId)).willReturn(Optional.of(mockMember));
+
+		// when & then
+		BusinessException thrown = assertThrows(BusinessException.class,
+			() -> memberService.deleteMemberImage(memberId));
+		assertEquals(ErrorCode.DEFAULT_IMAGE_ALREADY_SET, thrown.getErrorCode());
 	}
 }
