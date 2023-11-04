@@ -19,13 +19,12 @@ endif::[]
 
 === 1. 주문 생성
 
-
+api/orders/{memberProviderId}
 
 ==== Request
 
 .Request
 include::{snippets}/order-create-success/path-parameters.adoc[]
-
 include::{snippets}/order-create-success/http-request.adoc[]
 include::{snippets}/order-create-success/request-fields.adoc[]
 
@@ -35,7 +34,23 @@ include::{snippets}/order-create-success/request-fields.adoc[]
 include::{snippets}/order-create-success/http-response.adoc[]
 include::{snippets}/order-create-success/response-fields.adoc[]
 
-=== 2. 주문 상태 변경
+=== 2. 주문 상세 내용 조회
+
+/api/orders/{orderId}/{memberProviderId}
+
+==== Request
+
+.Request
+include::{snippets}/order-find-by-id-success/path-parameters.adoc[]
+include::{snippets}/order-find-by-id-success/http-request.adoc[]
+
+==== Response
+
+.Response
+include::{snippets}/order-find-by-id-success/http-response.adoc[]
+include::{snippets}/order-find-by-id-success/response-fields.adoc[]
+
+=== 3. 주문 상태 변경
 
 /api/orders/{orderId}/status/{memberProviderId}
 
@@ -43,7 +58,6 @@ include::{snippets}/order-create-success/response-fields.adoc[]
 
 .Request
 include::{snippets}/order-status-update-success/path-parameters.adoc[]
-
 include::{snippets}/order-status-update-success/http-request.adoc[]
 include::{snippets}/order-status-update-success/request-fields.adoc[]
 
