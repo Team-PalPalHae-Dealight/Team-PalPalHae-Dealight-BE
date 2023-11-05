@@ -33,4 +33,16 @@ public interface ItemRepository extends JpaRepository<Item, Long>, ItemRepositor
 		"       + SIN(RADIANS(:yCoordinate)) * SIN(RADIANS(s.address.yCoordinate)))) < 3" +
 		"ORDER BY (i.originalPrice - i.discountPrice) * 1.0 / i.originalPrice DESC, i.updatedAt DESC")
 	Page<Item> findAllByDiscountRate(@Param("xCoordinate") double xCoordinate, @Param("yCoordinate") double yCoordinate, Pageable pageable);
+
+	@Query("SELECT i FROM Item i JOIN i.store s " +
+		"WHERE s.storeStatus = 'OPENED'" +
+		"AND (6371 * ACOS(COS(RADIANS(:yCoordinate)) " +
+		"    	* COS(RADIANS(s.address.yCoordinate)) " +
+		"		* COS(RADIANS(s.address.xCoordinate) - RADIANS(:xCoordinate)) " +
+		"       + SIN(RADIANS(:yCoordinate)) * SIN(RADIANS(s.address.yCoordinate)))) < 3" +
+		"ORDER BY (6371 * ACOS(COS(RADIANS(:yCoordinate)) " +
+		"    	* COS(RADIANS(s.address.yCoordinate)) " +
+		"		* COS(RADIANS(s.address.xCoordinate) - RADIANS(:xCoordinate)) " +
+		"       + SIN(RADIANS(:yCoordinate)) * SIN(RADIANS(s.address.yCoordinate)))) ASC, i.updatedAt DESC")
+	Page<Item> findAllByDistance(@Param("xCoordinate") double xCoordinate, @Param("yCoordinate") double yCoordinate, Pageable pageable); //할인율 순
 }
