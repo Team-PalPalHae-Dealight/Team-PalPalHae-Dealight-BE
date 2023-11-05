@@ -13,8 +13,14 @@ spring:
   h2:
     console:
       enabled: true
-      settings:
-        web-allow-others: true
+
+  sql:
+    init:
+      platform: h2
+      schema-locations: classpath:org/springframework/security/oauth2/client/oauth2-client-schema.sql
+      encoding: UTF-8
+      data-locations: classpath:data.sql
+      mode: always
 
   jpa:
     database: h2
