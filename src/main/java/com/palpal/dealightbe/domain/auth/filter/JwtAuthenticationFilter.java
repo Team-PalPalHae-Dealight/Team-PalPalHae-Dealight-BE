@@ -56,7 +56,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			return;
 		}
 
-		// 유효하지 않은 토큰일 경우 예외메시지를 던지는 것이 필요하다.
+		// 유효하지 않은 토큰일 경우(null, 형식이 잘못된 경우) 예외메시지를 던지는 것이 필요하다.
 		log.warn("Jwt({})가 유효하지 않습니다.", jwt);
 		ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.INVALID_TOKEN);
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -71,14 +71,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private String parseTokenFromHttpRequest(HttpServletRequest request) {
 		log.info("요청 메시지로부터 Authorization 헤더 값을 가져옵니다...");
 		String jwtWithBearer = request.getHeader(HttpHeaders.AUTHORIZATION);
-		if (validateTokenFromRequest(jwtWithBearer)) {
+		log.info("jwtWithBearer: {}", jwtWithBearer);
+		boolean isValidToken = validateTokenFromRequest(jwtWithBearer);
+		log.info("isValidToken: {}", isValidToken);
+		if (!isValidToken) {
 			log.warn("Authorization에 값이 존재하지 않습니다.");
 
 			return null;
 		}
 
 		log.info("Authorization({}) 값을 가져오는데 성공했습니다.", jwtWithBearer);
-		String jwt = jwtWithBearer.substring(8);
+		String jwt = jwtWithBearer.substring(7);
 		log.info("Jwt({})를 가져오는데 성공했습니다.", jwt);
 
 		return jwt;

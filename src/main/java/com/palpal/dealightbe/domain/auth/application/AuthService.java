@@ -76,9 +76,9 @@ public class AuthService {
 
 	private Member createRequestMember(MemberSignupReq request) {
 		log.info("요청 정보({})로 Member 객체를 만듭니다...", request);
-		Address newAddress = new Address(null, 0, 0);
+		Address defaultAddress = new Address();
 		Member requestMember = MemberSignupReq.toMember(request);
-		requestMember.updateAddress(newAddress);
+		requestMember.updateAddress(defaultAddress);
 		log.info("Member({}) 객체를 만드는데 성공했습니다.", requestMember);
 
 		return requestMember;

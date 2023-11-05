@@ -53,14 +53,18 @@ public class CustomOAuth2AuthenticationSuccessHandler extends SavedRequestAwareA
 		response.setContentType("application/json;charset=UTF-8");
 		response.setContentLength(responseValue.getBytes(StandardCharsets.UTF_8).length);
 		response.getWriter().write(responseValue);
+		response.getWriter().flush();
+		response.getWriter().close();
 	}
 
 	private void writeRequireRoleResponseToHttpMessage(HttpServletResponse response,
 		JoinRequireRes joinRequireResponse) throws IOException {
 		String responseValue = new ObjectMapper().writeValueAsString(joinRequireResponse);
-		response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		response.setContentType("application/json;charset=UTF-8");
 		response.setContentLength(responseValue.getBytes(StandardCharsets.UTF_8).length);
 		response.getWriter().write(responseValue);
+		response.getWriter().flush();
+		response.getWriter().close();
 	}
 }
