@@ -19,16 +19,4 @@ endif::[]
 
 === 1. 리뷰 등록
 
-==== Request
-
-- URL ->
-include::{snippets}/review/review-create-success/path-parameters.adoc[]
-
-- Request Body
-include::{snippets}/review/review-create-success/http-request.adoc[]
-include::{snippets}/review/review-create-success/request-fields.adoc[]
-
-==== Response
-
-include::{snippets}/review/review-create-success/http-response.adoc[]
-include::{snippets}/review/review-create-success/response-fields.adoc[]
+operation::review/review-create-success[]
