@@ -3,16 +3,18 @@ package com.palpal.dealightbe.domain.item.application;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.palpal.dealightbe.domain.item.application.dto.request.ItemReq;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
+import com.palpal.dealightbe.domain.item.application.dto.response.ItemsRes;
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
-import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
@@ -51,6 +53,19 @@ public class ItemService {
 			});
 
 		return ItemRes.from(item);
+	}
+
+	@Transactional(readOnly = true)
+	public ItemsRes findAllForStore(Long memberId, Pageable pageable) {
+		Store store = storeRepository.findByMemberId(memberId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_STORE_BY_MEMBER_ID : {}", memberId);
+				return new EntityNotFoundException(NOT_FOUND_STORE);
+			});
+
+		Page<Item> items = itemRepository.findAllByStoreIdOrderByUpdatedAtDesc(store.getId(), pageable);
+
+		return ItemsRes.from(items);
 	}
 
 	public ItemRes update(Long itemId, ItemReq itemReq, Long memberId) {

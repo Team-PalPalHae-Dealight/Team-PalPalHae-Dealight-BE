@@ -94,6 +94,18 @@ public class StoreService {
 		return ImageRes.from(store);
 	}
 
+	public ImageRes updateImage(Long memberId, Long storeId, ImageUploadReq req) {
+		Store store = validateMemberAndStoreOwner(memberId, storeId);
+
+		String image = store.getImage();
+		imageService.delete(image);
+
+		String updateImage = imageService.store(req.file());
+		store.updateImage(updateImage);
+
+		return ImageRes.from(store);
+	}
+
 	private Store validateMemberAndStoreOwner(Long memberId, Long storeId) {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> {

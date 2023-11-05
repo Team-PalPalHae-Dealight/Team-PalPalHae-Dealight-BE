@@ -18,7 +18,7 @@ endif::[]
 ==== /api/auth/signup
 
 .Request Success - 회원 가입 요청
-include::{snippets}/auth-signup-success/http-request.adoc
+include::{snippets}/auth-signup-success/http-request.adoc[]
 
 include::{snippets}/auth-signup-success/request-fields.adoc[]
 

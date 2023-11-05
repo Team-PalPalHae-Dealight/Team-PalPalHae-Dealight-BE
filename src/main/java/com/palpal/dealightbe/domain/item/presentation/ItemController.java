@@ -2,6 +2,8 @@ package com.palpal.dealightbe.domain.item.presentation;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.palpal.dealightbe.domain.item.application.ItemService;
 import com.palpal.dealightbe.domain.item.application.dto.request.ItemReq;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
+import com.palpal.dealightbe.domain.item.application.dto.response.ItemsRes;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/items")
@@ -37,6 +40,13 @@ public class ItemController {
 		ItemRes itemRes = itemService.findById(itemId);
 
 		return ResponseEntity.ok(itemRes);
+	}
+
+	@GetMapping("/stores")
+	public ResponseEntity<ItemsRes> findAllForStore(@RequestParam Long memberId, @PageableDefault(size = 5, page = 0) Pageable pageable) {
+		ItemsRes itemsRes = itemService.findAllForStore(memberId, pageable);
+
+		return ResponseEntity.ok(itemsRes);
 	}
 
 	@PatchMapping("/{id}")
