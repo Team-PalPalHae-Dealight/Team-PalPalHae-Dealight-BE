@@ -107,6 +107,51 @@ include::{snippets}/item-find-All-for-store/http-response.adoc[]
 include::{snippets}/item-find-All-for-store/response-fields.adoc[]
 
 
+=== 상품 목록 조회(고객 시점) - 마감순 정렬
+
+==== /api/items/members?xCoordinate={xCoordinate}&yCoordinate={yCoordinate}&sortBy={sortBy}&size={size}&page={page}
+
+.Request - 성공
+include::{snippets}/item/item-find-All-for-member-sort-by-deadline/http-request.adoc[]
+
+include::{snippets}/item/item-find-All-for-member-sort-by-deadline/request-parameters.adoc[]
+
+.Response - 성공
+include::{snippets}/item/item-find-All-for-member-sort-by-deadline/http-response.adoc[]
+
+include::{snippets}/item/item-find-All-for-member-sort-by-deadline/response-fields.adoc[]
+
+
+=== 상품 목록 조회(고객 시점) - 할인율순 정렬
+
+==== /api/items/members?xCoordinate={xCoordinate}&yCoordinate={yCoordinate}&sortBy={sortBy}&size={size}&page={page}
+
+.Request - 성공
+include::{snippets}/item/item-find-All-for-member-sort-by-discount-rate/http-request.adoc[]
+
+include::{snippets}/item/item-find-All-for-member-sort-by-discount-rate/request-parameters.adoc[]
+
+.Response - 성공
+include::{snippets}/item/item-find-All-for-member-sort-by-discount-rate/http-response.adoc[]
+
+include::{snippets}/item/item-find-All-for-member-sort-by-discount-rate/response-fields.adoc[]
+
+
+=== 상품 목록 조회(고객 시점) - 거리순 정렬
+
+==== /api/items/members?xCoordinate={xCoordinate}&yCoordinate={yCoordinate}&sortBy={sortBy}&size={size}&page={page}
+
+.Request - 성공
+include::{snippets}/item/item-find-All-for-member-sort-by-distance/http-request.adoc[]
+
+include::{snippets}/item/item-find-All-for-member-sort-by-distance/request-parameters.adoc[]
+
+.Response - 성공
+include::{snippets}/item/item-find-All-for-member-sort-by-distance/http-response.adoc[]
+
+include::{snippets}/item/item-find-All-for-member-sort-by-distance/response-fields.adoc[]
+
+
 === 상품 수정
 
 ==== /api/items/{id}?memberId={memberId}
