@@ -8,6 +8,8 @@ import static com.palpal.dealightbe.global.error.ErrorCode.UNAUTHORIZED_REQUEST;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,7 @@ import com.palpal.dealightbe.domain.order.application.dto.request.OrderProductRe
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderStatusUpdateReq;
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderRes;
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderStatusUpdateRes;
+import com.palpal.dealightbe.domain.order.application.dto.response.OrdersRes;
 import com.palpal.dealightbe.domain.order.domain.Order;
 import com.palpal.dealightbe.domain.order.domain.OrderItem;
 import com.palpal.dealightbe.domain.order.domain.OrderRepository;
@@ -43,17 +46,9 @@ public class OrderService {
 	private final ItemRepository itemRepository;
 
 	public OrderRes create(OrderCreateReq orderCreateReq, Long memberProviderId) {
-		Member member = memberRepository.findMemberByProviderId(memberProviderId)
-			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_ID : {}", memberProviderId);
-				return new EntityNotFoundException(NOT_FOUND_MEMBER);
-			});
-
-		Store store = storeRepository.findById(orderCreateReq.storeId())
-			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_STORE_BY_ID : {}", orderCreateReq.storeId());
-				return new EntityNotFoundException(NOT_FOUND_STORE);
-			});
+		long storeId = orderCreateReq.storeId();
+		Member member = getMember(memberProviderId);
+		Store store = getStore(storeId);
 
 		Order order = OrderCreateReq.toOrder(orderCreateReq, member, store);
 		orderRepository.save(order);
@@ -62,6 +57,14 @@ public class OrderService {
 		order.addOrderItems(orderItems);
 
 		return OrderRes.from(order);
+	}
+
+	private Store getStore(Long storeId) {
+		return storeRepository.findById(storeId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_STORE_BY_ID : {}", storeId);
+				return new EntityNotFoundException(NOT_FOUND_STORE);
+			});
 	}
 
 	public OrderStatusUpdateRes updateStatus(Long orderId, OrderStatusUpdateReq request, Long memberProviderId) {
@@ -90,6 +93,48 @@ public class OrderService {
 		return OrderRes.from(order);
 	}
 
+	@Transactional(readOnly = true)
+	public OrdersRes findAllByStoreId(Long storeId, Long memberProviderId, String status, Pageable pageable) {
+		Store store = storeRepository.findById(storeId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_STORE_BY_ID : {}", storeId);
+				return new EntityNotFoundException(NOT_FOUND_STORE);
+			});
+
+		if (!store.isSameOwnerAndTheRequester(memberProviderId)) {
+			throw new BusinessException(UNAUTHORIZED_REQUEST);
+		}
+
+		Slice<Order> orders = orderRepository.findAllByStoreId(storeId, status, pageable);
+
+		return OrdersRes.from(orders);
+	}
+
+	@Transactional(readOnly = true)
+	public OrdersRes findAllByMemberProviderId(Long memberProviderId, String status, Pageable pageable) {
+		Slice<Order> orders = orderRepository.findAllByMemberProviderId(memberProviderId, status, pageable);
+
+		return OrdersRes.from(orders);
+	}
+
+	private Order getOrder(Long orderId) {
+		return orderRepository.findById(orderId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_ORDER_BY_ID : {}", orderId);
+
+				return new EntityNotFoundException(NOT_FOUND_ORDER);
+			});
+	}
+
+	private Member getMember(Long memberProviderId) {
+		return memberRepository.findMemberByProviderId(memberProviderId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_PROVIDER_ID : {}", memberProviderId);
+
+				return new EntityNotFoundException(NOT_FOUND_MEMBER);
+			});
+	}
+
 	private List<OrderItem> createOrderItems(Order order, List<OrderProductReq> orderProductsReq) {
 		return orderProductsReq.stream()
 			.map(productReq -> createOrderItem(order, productReq))
@@ -113,23 +158,5 @@ public class OrderService {
 			.order(order)
 			.quantity(quantity)
 			.build();
-	}
-
-	private Order getOrder(Long orderId) {
-		return orderRepository.findById(orderId)
-			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_ORDER_BY_ID : {}", orderId);
-
-				return new EntityNotFoundException(NOT_FOUND_ORDER);
-			});
-	}
-
-	private Member getMember(Long memberProviderId) {
-		return memberRepository.findMemberByProviderId(memberProviderId)
-			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_PROVIDER_ID : {}", memberProviderId);
-
-				return new EntityNotFoundException(NOT_FOUND_MEMBER);
-			});
 	}
 }
