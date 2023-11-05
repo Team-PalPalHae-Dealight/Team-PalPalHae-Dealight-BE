@@ -8,6 +8,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -42,6 +43,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palpal.dealightbe.domain.review.application.ReviewService;
 import com.palpal.dealightbe.domain.review.application.dto.request.ReviewCreateReq;
 import com.palpal.dealightbe.domain.review.application.dto.response.ReviewCreateRes;
+import com.palpal.dealightbe.domain.review.application.dto.response.ReviewRes;
+import com.palpal.dealightbe.domain.review.application.dto.response.ReviewsRes;
 
 @AutoConfigureRestDocs
 @WebMvcTest(
@@ -93,9 +96,6 @@ class ReviewControllerTest {
 				.andDo(document("review/review-create-success",
 						preprocessRequest(prettyPrint()),
 						preprocessResponse(prettyPrint()),
-						// pathParameters(
-						// 	parameterWithName("memberProviderId").description("고객 카카오 토큰")
-						// ),
 						requestHeaders(
 							headerWithName("Authorization").description("Access Token")
 						),
@@ -133,6 +133,62 @@ class ReviewControllerTest {
 				.andExpect(result -> {
 					assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException);
 				});
+		}
+
+	}
+
+	@Nested
+	@DisplayName("<업체별 리뷰 조회>")
+	class findByStoreIdTest {
+		String findByStoreIdPath = "/api/reviews/stores";
+
+		long storeId = 1L;
+
+		ReviewsRes reviewsRes = new ReviewsRes(storeId,
+			List.of(new ReviewRes("사장님이 친절해요", 2), new ReviewRes("가격이 저렴해요", 4)));
+
+		@Test
+		@DisplayName("성공 - 업체별 리뷰 통계를 조회한다.")
+		void findByStoreId_success() throws Exception {
+			// given
+			given(reviewService.findByStoreId(anyLong(), any()))
+				.willReturn(reviewsRes);
+
+			// when
+			// then
+			mockMvc.perform(
+					get(findByStoreIdPath)
+						.with(csrf().asHeader())
+						.with(user("username").roles("MEMBER"))
+						.header("Authorization", "Bearer {ACCESS_TOKEN}")
+						.contentType(APPLICATION_JSON)
+						.param("id", "1")
+				)
+				.andDo(print())
+				.andExpect(status().isOk())
+
+				.andExpect(jsonPath("$.storeId").value(storeId))
+				.andExpect(jsonPath("$.reviews[0].content").value(reviewsRes.reviews().get(0).content()))
+				.andExpect(jsonPath("$.reviews[0].count").value(reviewsRes.reviews().get(0).count()))
+				.andExpect(jsonPath("$.reviews[1].content").value(reviewsRes.reviews().get(1).content()))
+				.andExpect(jsonPath("$.reviews[1].count").value(reviewsRes.reviews().get(1).count()))
+				.andDo(document("review/review-find-by-store-id-success",
+						preprocessRequest(prettyPrint()),
+						preprocessResponse(prettyPrint()),
+						requestHeaders(
+							headerWithName("Authorization").description("Access Token")
+						),
+						requestParameters(
+							parameterWithName("id").description("업체 아이디")
+						),
+						responseFields(
+							fieldWithPath("storeId").type(JsonFieldType.NUMBER).description("업체 아이디"),
+							fieldWithPath("reviews[]").type(JsonFieldType.ARRAY).description("각 리뷰별 메시지와 개수"),
+							fieldWithPath("reviews[].content").type(JsonFieldType.STRING).description("리뷰 메시지"),
+							fieldWithPath("reviews[].count").type(JsonFieldType.NUMBER).description("개수")
+						)
+					)
+				);
 		}
 
 	}
