@@ -101,6 +101,5 @@ public class MemberService {
 
 		imageService.delete(imageUrl);
 		member.updateImage(StoreService.DEFAULT_PATH);
-		memberRepository.save(member);
 	}
 }
