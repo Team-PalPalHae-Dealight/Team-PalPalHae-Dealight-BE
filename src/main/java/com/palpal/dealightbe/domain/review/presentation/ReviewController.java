@@ -19,9 +19,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/reviews")
 public class ReviewController {
+
 	private final ReviewService reviewService;
 
-	@PostMapping("orders")
+	@PostMapping("/orders")
 	@ProviderId
 	public ResponseEntity<ReviewCreateRes> create(
 		Long providerId,
@@ -33,5 +34,4 @@ public class ReviewController {
 
 		return ResponseEntity.ok(reviewCreateRes);
 	}
-
 }
