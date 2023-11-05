@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/reviews")
 public class ReviewController {
+
 	private final ReviewService reviewService;
 
 	@PostMapping("orders")
@@ -33,5 +34,4 @@ public class ReviewController {
 
 		return ResponseEntity.ok(reviewCreateRes);
 	}
-
 }
