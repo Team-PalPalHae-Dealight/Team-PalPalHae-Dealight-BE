@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.palpal.dealightbe.domain.review.application.ReviewService;
 import com.palpal.dealightbe.domain.review.application.dto.request.ReviewCreateReq;
 import com.palpal.dealightbe.domain.review.application.dto.response.ReviewCreateRes;
-import com.palpal.dealightbe.domain.review.application.dto.response.ReviewsRes;
+import com.palpal.dealightbe.domain.review.application.dto.response.ReviewRes;
+import com.palpal.dealightbe.domain.review.application.dto.response.StoreReviewsRes;
 import com.palpal.dealightbe.global.aop.ProviderId;
 
 import lombok.RequiredArgsConstructor;
@@ -39,13 +40,25 @@ public class ReviewController {
 
 	@GetMapping("/stores")
 	@ProviderId
-	public ResponseEntity<ReviewsRes> findByStoreId(
+	public ResponseEntity<StoreReviewsRes> findByStoreId(
 		Long providerId,
 		@RequestParam Long id
 	) {
 
-		ReviewsRes reviewsRes = reviewService.findByStoreId(id, providerId);
+		StoreReviewsRes storeReviewsRes = reviewService.findByStoreId(id, providerId);
 
-		return ResponseEntity.ok(reviewsRes);
+		return ResponseEntity.ok(storeReviewsRes);
+	}
+
+	@GetMapping("/orders")
+	@ProviderId
+	public ResponseEntity<ReviewRes> findByOrderId(
+		Long providerId,
+		@RequestParam Long id
+	) {
+
+		ReviewRes reviewRes = reviewService.findByOrderId(id, providerId);
+
+		return ResponseEntity.ok(reviewRes);
 	}
 }
