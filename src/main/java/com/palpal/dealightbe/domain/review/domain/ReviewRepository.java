@@ -22,4 +22,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 			 	group by reviews.content
 			""")
 	List<ReviewStatistics> selectStatisticsByStoreId(Long storeId);
+
+	List<Review> findAllByOrderId(Long id);
 }
