@@ -274,7 +274,7 @@ class MemberServiceTest {
 	void deleteMemberImageDefaultImageAlreadySetTest() {
 		// given
 		Long memberId = 1L;
-		String defaultImageUrl = AuthService.MEMBER_DEFAULT_IMAGE_PATH;
+		String defaultImageUrl = "https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/image/member-default-image.png";
 
 		Member mockMember = Member.builder()
 			.realName("유재석")
