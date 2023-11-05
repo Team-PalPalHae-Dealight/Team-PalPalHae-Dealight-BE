@@ -16,7 +16,7 @@ import com.palpal.dealightbe.domain.order.domain.OrderRepository;
 import com.palpal.dealightbe.domain.review.application.dto.request.ReviewCreateReq;
 import com.palpal.dealightbe.domain.review.application.dto.response.ReviewCreateRes;
 import com.palpal.dealightbe.domain.review.application.dto.response.ReviewStatistics;
-import com.palpal.dealightbe.domain.review.application.dto.response.ReviewsRes;
+import com.palpal.dealightbe.domain.review.application.dto.response.StoreReviewsRes;
 import com.palpal.dealightbe.domain.review.domain.Review;
 import com.palpal.dealightbe.domain.review.domain.ReviewRepository;
 import com.palpal.dealightbe.domain.store.domain.Store;
@@ -56,7 +56,7 @@ public class ReviewService {
 		return ReviewCreateRes.from(reviews);
 	}
 
-	public ReviewsRes findByStoreId(Long id, Long providerId) {
+	public StoreReviewsRes findByStoreId(Long id, Long providerId) {
 		Store store = getStore(id);
 
 		if (!store.isSameOwnerAndTheRequester(providerId)) {
@@ -67,7 +67,7 @@ public class ReviewService {
 
 		List<ReviewStatistics> reviews = reviewRepository.selectStatisticsByStoreId(id);
 
-		return ReviewsRes.of(id, reviews);
+		return StoreReviewsRes.of(id, reviews);
 	}
 
 	private Order getOrder(Long orderId) {

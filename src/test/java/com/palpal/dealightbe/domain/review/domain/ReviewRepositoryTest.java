@@ -18,7 +18,7 @@ import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.order.domain.Order;
 import com.palpal.dealightbe.domain.order.domain.OrderRepository;
 import com.palpal.dealightbe.domain.review.application.dto.response.ReviewStatistics;
-import com.palpal.dealightbe.domain.review.application.dto.response.ReviewsRes;
+import com.palpal.dealightbe.domain.review.application.dto.response.StoreReviewsRes;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
@@ -86,10 +86,10 @@ class ReviewRepositoryTest {
 		// when
 
 		List<ReviewStatistics> reviewStatistics = reviewRepository.selectStatisticsByStoreId(storeId);
-		ReviewsRes reviewsRes = ReviewsRes.of(storeId, reviewStatistics);
+		StoreReviewsRes storeReviewsRes = StoreReviewsRes.of(storeId, reviewStatistics);
 
 		// then
-		assertThat(reviewsRes.reviews()).hasSize(2)
+		assertThat(storeReviewsRes.reviews()).hasSize(2)
 			.extracting("content", "count")
 			.containsExactlyInAnyOrder(
 				tuple("사장님이 친절해요", 3),

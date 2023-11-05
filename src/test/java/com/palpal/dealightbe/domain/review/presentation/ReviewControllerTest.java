@@ -43,8 +43,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palpal.dealightbe.domain.review.application.ReviewService;
 import com.palpal.dealightbe.domain.review.application.dto.request.ReviewCreateReq;
 import com.palpal.dealightbe.domain.review.application.dto.response.ReviewCreateRes;
-import com.palpal.dealightbe.domain.review.application.dto.response.ReviewRes;
-import com.palpal.dealightbe.domain.review.application.dto.response.ReviewsRes;
+import com.palpal.dealightbe.domain.review.application.dto.response.StoreReviewRes;
+import com.palpal.dealightbe.domain.review.application.dto.response.StoreReviewsRes;
 
 @AutoConfigureRestDocs
 @WebMvcTest(
@@ -144,15 +144,15 @@ class ReviewControllerTest {
 
 		long storeId = 1L;
 
-		ReviewsRes reviewsRes = new ReviewsRes(storeId,
-			List.of(new ReviewRes("사장님이 친절해요", 2), new ReviewRes("가격이 저렴해요", 4)));
+		StoreReviewsRes storeReviewsRes = new StoreReviewsRes(storeId,
+			List.of(new StoreReviewRes("사장님이 친절해요", 2), new StoreReviewRes("가격이 저렴해요", 4)));
 
 		@Test
 		@DisplayName("성공 - 업체별 리뷰 통계를 조회한다.")
 		void findByStoreId_success() throws Exception {
 			// given
 			given(reviewService.findByStoreId(anyLong(), any()))
-				.willReturn(reviewsRes);
+				.willReturn(storeReviewsRes);
 
 			// when
 			// then
@@ -168,10 +168,10 @@ class ReviewControllerTest {
 				.andExpect(status().isOk())
 
 				.andExpect(jsonPath("$.storeId").value(storeId))
-				.andExpect(jsonPath("$.reviews[0].content").value(reviewsRes.reviews().get(0).content()))
-				.andExpect(jsonPath("$.reviews[0].count").value(reviewsRes.reviews().get(0).count()))
-				.andExpect(jsonPath("$.reviews[1].content").value(reviewsRes.reviews().get(1).content()))
-				.andExpect(jsonPath("$.reviews[1].count").value(reviewsRes.reviews().get(1).count()))
+				.andExpect(jsonPath("$.reviews[0].content").value(storeReviewsRes.reviews().get(0).content()))
+				.andExpect(jsonPath("$.reviews[0].count").value(storeReviewsRes.reviews().get(0).count()))
+				.andExpect(jsonPath("$.reviews[1].content").value(storeReviewsRes.reviews().get(1).content()))
+				.andExpect(jsonPath("$.reviews[1].count").value(storeReviewsRes.reviews().get(1).count()))
 				.andDo(document("review/review-find-by-store-id-success",
 						preprocessRequest(prettyPrint()),
 						preprocessResponse(prettyPrint()),
