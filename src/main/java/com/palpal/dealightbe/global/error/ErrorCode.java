@@ -14,8 +14,9 @@ public enum ErrorCode {
 	//공용
 	INVALID_INPUT_VALUE("C001", "잘못된 값을 입력하셨습니다."),
 	UNAUTHORIZED_REQUEST("C002", "해당 요청을 수행할 권한이 없습니다."),
-
+	DEFAULT_IMAGE_ALREADY_SET("C003", "기본 이미지로 설정된 이미지는 삭제할 수 없습니다."),
 	//멤버
+
 	NOT_FOUND_MEMBER("M001", "고객을 찾을 수 없습니다."),
 
 	//업체
@@ -53,9 +54,7 @@ public enum ErrorCode {
 	INVALID_ROLE_TYPE("AUTH003", "유효하지 않은 권한이 입력됐습니다."),
 	NOT_FOUND_ROLE("AUTH004", "존재하지 않는 역할입니다."),
 	INVALID_ROLE_UPDATE("AUTH005", "적어도 하나의 역할이 필요합니다."),
-	INVALID_TOKEN("AUTH006", "인증토큰이 올바르지 않습니다.")
-
-	;
+	INVALID_TOKEN("AUTH006", "인증토큰이 올바르지 않습니다.");
 
 	private final String code;
 	private final String message;
