@@ -57,6 +57,7 @@ public class ReviewService {
 		return ReviewCreateRes.from(reviews);
 	}
 
+	@Transactional(readOnly = true)
 	public StoreReviewsRes findByStoreId(Long id, Long providerId) {
 		Store store = getStore(id);
 
@@ -71,6 +72,7 @@ public class ReviewService {
 		return StoreReviewsRes.of(id, reviews);
 	}
 
+	@Transactional(readOnly = true)
 	public ReviewRes findByOrderId(Long id, Long providerId) {
 		Order order = getOrder(id);
 
