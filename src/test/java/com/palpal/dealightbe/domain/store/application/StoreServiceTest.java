@@ -279,4 +279,26 @@ class StoreServiceTest {
 		//then
 		assertThat(imageRes.imageUrl()).isEqualTo(imageUrl);
 	}
+
+	@Test
+	@DisplayName("업체 이미지 수정 성공")
+	void updateImageSuccessTest() throws Exception {
+		//given
+		MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "Updated Image Content".getBytes());
+		ImageUploadReq request = new ImageUploadReq(file);
+		String updatedImageUrl = "http://updatedfakeimageurl.com/updated_image.jpg";
+
+		when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
+		when(storeRepository.findById(store.getId())).thenReturn(Optional.of(store));
+
+		String initialImage = "http://initialfakeimageurl.com/initial_image.jpg";
+		store.updateImage(initialImage);
+		when(imageService.store(file)).thenReturn(updatedImageUrl);
+
+		//when
+		ImageRes imageRes = storeService.updateImage(member.getId(), store.getId(), request);
+
+		//then
+		assertThat(imageRes.imageUrl()).isEqualTo(updatedImageUrl);
+	}
 }
