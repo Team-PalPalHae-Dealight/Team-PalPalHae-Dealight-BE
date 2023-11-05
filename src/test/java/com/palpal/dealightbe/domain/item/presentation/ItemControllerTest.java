@@ -423,7 +423,8 @@ class ItemControllerTest {
 		PageRequest pageRequest = PageRequest.of(page, size);
 
 		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage());
-		List<ItemRes> itemResList = List.of(itemRes);
+		ItemRes itemRes2 = new ItemRes(2L, 2L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage());
+		List<ItemRes> itemResList = List.of(itemRes, itemRes2);
 		ItemsRes itemsRes = new ItemsRes(itemResList);
 
 		when(itemService.findAllForStore(any(), eq(pageRequest))).thenReturn(itemsRes);
