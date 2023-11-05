@@ -53,9 +53,12 @@ public enum ErrorCode {
 	INVALID_ROLE_TYPE("AUTH003", "유효하지 않은 권한이 입력됐습니다."),
 	NOT_FOUND_ROLE("AUTH004", "존재하지 않는 역할입니다."),
 	INVALID_ROLE_UPDATE("AUTH005", "적어도 하나의 역할이 필요합니다."),
-	INVALID_TOKEN("AUTH006", "인증토큰이 올바르지 않습니다.")
+	INVALID_TOKEN("AUTH006", "인증토큰이 올바르지 않습니다."),
 
-	;
+	//리뷰
+	NOT_FOUND_REVIEW("R001", "존재하지 않는 리뷰입니다."),
+	INVALID_REVIEW_CREATOR("R001", "리뷰는 상품을 주문한 고객 본인만 작성할 수 있습니다."),
+	ILLEGAL_REVIEW_REQUEST("R002", "완료된 주문에 대해서만 리뷰를 작성할 수 있습니다.");
 
 	private final String code;
 	private final String message;
