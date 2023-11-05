@@ -44,5 +44,5 @@ public interface ItemRepository extends JpaRepository<Item, Long>, ItemRepositor
 		"    	* COS(RADIANS(s.address.yCoordinate)) " +
 		"		* COS(RADIANS(s.address.xCoordinate) - RADIANS(:xCoordinate)) " +
 		"       + SIN(RADIANS(:yCoordinate)) * SIN(RADIANS(s.address.yCoordinate)))) ASC, i.updatedAt DESC")
-	Page<Item> findAllByDistance(@Param("xCoordinate") double xCoordinate, @Param("yCoordinate") double yCoordinate, Pageable pageable); //할인율 순
+	Page<Item> findAllByDistance(@Param("xCoordinate") double xCoordinate, @Param("yCoordinate") double yCoordinate, Pageable pageable);
 }
