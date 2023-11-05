@@ -43,6 +43,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palpal.dealightbe.domain.review.application.ReviewService;
 import com.palpal.dealightbe.domain.review.application.dto.request.ReviewCreateReq;
 import com.palpal.dealightbe.domain.review.application.dto.response.ReviewCreateRes;
+import com.palpal.dealightbe.domain.review.application.dto.response.ReviewRes;
 import com.palpal.dealightbe.domain.review.application.dto.response.StoreReviewRes;
 import com.palpal.dealightbe.domain.review.application.dto.response.StoreReviewsRes;
 
@@ -191,5 +192,52 @@ class ReviewControllerTest {
 				);
 		}
 
+		@Nested
+		@DisplayName("<주문별 리뷰 조회>")
+		class findByOrderIdTest {
+			String findByOrderIdPath = "/api/reviews/orders";
+
+			long storeId = 1L;
+
+			ReviewRes reviewRes = new ReviewRes(List.of("사장님이 친절해요", "가격이 저렴해요"));
+
+			@Test
+			@DisplayName("성공 - 주문에 작성된 리뷰를 조회한다.")
+			void findByStoreId_success() throws Exception {
+				// given
+				given(reviewService.findByOrderId(anyLong(), any()))
+					.willReturn(reviewRes);
+
+				// when
+				// then
+				mockMvc.perform(
+						get(findByOrderIdPath)
+							.with(csrf().asHeader())
+							.with(user("username").roles("MEMBER"))
+							.header("Authorization", "Bearer {ACCESS_TOKEN}")
+							.contentType(APPLICATION_JSON)
+							.param("id", "1")
+					)
+					.andDo(print())
+					.andExpect(status().isOk())
+
+					.andExpect(jsonPath("$.messages[0]").value(reviewRes.messages().get(0)))
+					.andExpect(jsonPath("$.messages[1]").value(reviewRes.messages().get(1)))
+					.andDo(document("review/review-find-by-order-id-success",
+							preprocessRequest(prettyPrint()),
+							preprocessResponse(prettyPrint()),
+							requestHeaders(
+								headerWithName("Authorization").description("Access Token")
+							),
+							requestParameters(
+								parameterWithName("id").description("주문 아이디")
+							),
+							responseFields(
+								fieldWithPath("messages[]").type(JsonFieldType.ARRAY).description("해당 주문에 작성된 리뷰 메시지")
+							)
+						)
+					);
+			}
+		}
 	}
 }
