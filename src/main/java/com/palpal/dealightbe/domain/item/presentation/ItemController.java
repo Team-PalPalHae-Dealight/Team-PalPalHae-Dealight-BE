@@ -49,6 +49,13 @@ public class ItemController {
 		return ResponseEntity.ok(itemsRes);
 	}
 
+	@GetMapping("/members")
+	public ResponseEntity<ItemsRes> findAllForMember(@RequestParam double xCoordinate, @RequestParam double yCoordinate, @RequestParam String sortBy, @PageableDefault(size = 5, page = 0) Pageable pageable) {
+		ItemsRes itemsRes = itemService.findAllForMember(xCoordinate, yCoordinate, sortBy, pageable);
+
+		return ResponseEntity.ok(itemsRes);
+	}
+
 	@PatchMapping("/{id}")
 	public ResponseEntity<ItemRes> update(@PathVariable("id") Long itemId, @Validated @RequestBody ItemReq itemReq, @RequestParam Long memberId) {
 		ItemRes itemRes = itemService.update(itemId, itemReq, memberId);

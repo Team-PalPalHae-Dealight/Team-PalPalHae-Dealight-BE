@@ -68,6 +68,17 @@ public class ItemService {
 		return ItemsRes.from(items);
 	}
 
+	@Transactional(readOnly = true)
+	public ItemsRes findAllForMember(double xCoordinate, double yCoordinate, String sortBy, Pageable pageable) {
+		Page<Item> items = Page.empty();
+
+		switch (sortBy) {
+			case "deadline" -> items = itemRepository.findAllByDeadline(xCoordinate, yCoordinate, pageable);
+		}
+
+		return ItemsRes.from(items);
+	}
+
 	public ItemRes update(Long itemId, ItemReq itemReq, Long memberId) {
 		Store store = storeRepository.findByMemberId(memberId)
 			.orElseThrow(() -> {
