@@ -74,6 +74,7 @@ public class ItemService {
 
 		switch (sortBy) {
 			case "deadline" -> items = itemRepository.findAllByDeadline(xCoordinate, yCoordinate, pageable);
+			case "discountRate" -> items = itemRepository.findAllByDiscountRate(xCoordinate, yCoordinate, pageable);
 		}
 
 		return ItemsRes.from(items);
