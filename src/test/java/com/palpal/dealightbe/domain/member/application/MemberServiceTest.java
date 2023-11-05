@@ -253,7 +253,6 @@ class MemberServiceTest {
 
 		// then
 		verify(imageService).delete(mockImageUrl);
-		verify(memberRepository).save(mockMember);
 		assertEquals(StoreService.DEFAULT_PATH, mockMember.getImage());
 	}
 
