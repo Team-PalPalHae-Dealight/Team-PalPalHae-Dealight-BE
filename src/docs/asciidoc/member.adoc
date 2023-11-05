@@ -109,3 +109,29 @@ include::{snippets}/member-upload-image-not-found/request-parts.adoc[]
 ==== Response
 
 include::{snippets}/member-upload-image-not-found/http-response.adoc[]
+
+== 멤버 이미지 삭제 성공
+
+=== /api/members/images/{memberId} [DELETE]
+
+==== Request
+
+include::{snippets}/member-delete-image-success/http-request.adoc[]
+include::{snippets}/member-delete-image-success/path-parameters.adoc[]
+
+==== Response
+
+include::{snippets}/member-delete-image-success/http-response.adoc[]
+
+== 멤버 이미지 삭제 실패: 멤버 ID가 존재하지 않는 경우
+
+=== /api/members/images/{memberId} [DELETE]
+
+==== Request
+
+include::{snippets}/member-delete-image-not-found/http-request.adoc[]
+include::{snippets}/member-delete-image-not-found/path-parameters.adoc[]
+
+==== Response
+
+include::{snippets}/member-delete-image-not-found/http-response.adoc[]

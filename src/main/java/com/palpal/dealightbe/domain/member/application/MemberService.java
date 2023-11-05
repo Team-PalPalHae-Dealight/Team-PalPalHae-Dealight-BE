@@ -1,10 +1,13 @@
 package com.palpal.dealightbe.domain.member.application;
 
+import java.util.Objects;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.palpal.dealightbe.domain.address.application.dto.request.AddressReq;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
+import com.palpal.dealightbe.domain.auth.application.AuthService;
 import com.palpal.dealightbe.domain.image.ImageService;
 import com.palpal.dealightbe.domain.image.dto.request.ImageUploadReq;
 import com.palpal.dealightbe.domain.image.dto.response.ImageRes;
@@ -13,7 +16,9 @@ import com.palpal.dealightbe.domain.member.application.dto.response.MemberProfil
 import com.palpal.dealightbe.domain.member.application.dto.response.MemberUpdateRes;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
+import com.palpal.dealightbe.domain.store.application.StoreService;
 import com.palpal.dealightbe.global.error.ErrorCode;
+import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -78,5 +83,23 @@ public class MemberService {
 		memberRepository.save(member);
 
 		return ImageRes.from(member.getImage());
+	}
+
+	public void deleteMemberImage(Long memberId) {
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> {
+				log.warn("DELETE:DELETE:NOT_FOUND_MEMBER_BY_ID : {}", memberId);
+				return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
+			});
+
+		String imageUrl = member.getImage();
+
+		if (Objects.equals(imageUrl, AuthService.MEMBER_DEFAULT_IMAGE_PATH)) {
+			log.warn("DELETE:DELETE:DEFAULT_IMAGE_ALREADY_SET : {}", memberId);
+			throw new BusinessException(ErrorCode.DEFAULT_IMAGE_ALREADY_SET);
+		}
+
+		imageService.delete(imageUrl);
+		member.updateImage(StoreService.DEFAULT_PATH);
 	}
 }
