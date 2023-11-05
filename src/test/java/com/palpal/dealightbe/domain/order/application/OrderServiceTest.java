@@ -434,9 +434,6 @@ class OrderServiceTest {
 				when(orderRepository.findAllByMemberProviderId(anyLong(), any(), any()))
 					.thenReturn(ordersSlice);
 
-				when(memberRepository.findMemberByProviderId(memberProviderId))
-					.thenReturn(Optional.ofNullable(member));
-
 				// when
 				OrdersRes result = orderService.findAllByMemberProviderId(memberProviderId, null,
 					PageRequest.of(0, 10));
