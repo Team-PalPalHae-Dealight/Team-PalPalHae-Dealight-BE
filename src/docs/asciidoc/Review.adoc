@@ -20,3 +20,7 @@ endif::[]
 === 1. 리뷰 등록
 
 operation::review/review-create-success[]
+
+=== 2. 리뷰 통계 조회 - 업체별
+
+operation::review/review-find-by-store-id-success[]
