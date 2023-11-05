@@ -94,7 +94,8 @@ public class MemberService {
 
 		String imageUrl = member.getImage();
 
-		if (Objects.equals(imageUrl, AuthService.MEMBER_DEFAULT_IMAGE_PATH)) {
+		if (Objects.equals(imageUrl,
+			"https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/image/member-default-image.png")) {
 			log.warn("DELETE:DELETE:DEFAULT_IMAGE_ALREADY_SET : {}", memberId);
 			throw new BusinessException(ErrorCode.DEFAULT_IMAGE_ALREADY_SET);
 		}
