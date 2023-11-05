@@ -15,6 +15,7 @@ import com.palpal.dealightbe.domain.order.domain.Order;
 import com.palpal.dealightbe.domain.order.domain.OrderRepository;
 import com.palpal.dealightbe.domain.review.application.dto.request.ReviewCreateReq;
 import com.palpal.dealightbe.domain.review.application.dto.response.ReviewCreateRes;
+import com.palpal.dealightbe.domain.review.application.dto.response.ReviewRes;
 import com.palpal.dealightbe.domain.review.application.dto.response.ReviewStatistics;
 import com.palpal.dealightbe.domain.review.application.dto.response.StoreReviewsRes;
 import com.palpal.dealightbe.domain.review.domain.Review;
@@ -68,6 +69,20 @@ public class ReviewService {
 		List<ReviewStatistics> reviews = reviewRepository.selectStatisticsByStoreId(id);
 
 		return StoreReviewsRes.of(id, reviews);
+	}
+
+	public ReviewRes findByOrderId(Long id, Long providerId) {
+		Order order = getOrder(id);
+
+		if (!order.isMember(providerId)) {
+			log.warn("GET:REVIEW:UNAUTHORIZED: REVIEW_WRITER {}, REQUESTER {}",
+				order.getMember().getId(), providerId);
+			throw new BusinessException(UNAUTHORIZED_REQUEST);
+		}
+
+		List<Review> reviews = reviewRepository.findAllByOrderId(id);
+
+		return ReviewRes.from(reviews);
 	}
 
 	private Order getOrder(Long orderId) {
