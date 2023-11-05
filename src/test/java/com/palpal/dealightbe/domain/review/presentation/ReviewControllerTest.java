@@ -93,9 +93,6 @@ class ReviewControllerTest {
 				.andDo(document("review/review-create-success",
 						preprocessRequest(prettyPrint()),
 						preprocessResponse(prettyPrint()),
-						// pathParameters(
-						// 	parameterWithName("memberProviderId").description("고객 카카오 토큰")
-						// ),
 						requestHeaders(
 							headerWithName("Authorization").description("Access Token")
 						),
