@@ -224,7 +224,7 @@ class ItemServiceTest {
 
 	@DisplayName("상품 목록 조회(고객 시점) - 마감순 성공 테스트")
 	@Test
-	void itemFindAllForStoreSuccessSortByDeadlineTest() {
+	void itemFindAllForMemberSuccessSortByDeadlineTest() {
 		//given
 		int page = 0;
 		int size = 5;
@@ -250,7 +250,7 @@ class ItemServiceTest {
 
 	@DisplayName("상품 목록 조회(고객 시점) - 할인율순 성공 테스트")
 	@Test
-	void itemFindAllForStoreSuccessSortByDiscountRateTest() {
+	void itemFindAllForMemberSuccessSortByDiscountRateTest() {
 		//given
 		int page = 0;
 		int size = 5;
@@ -276,7 +276,7 @@ class ItemServiceTest {
 
 	@DisplayName("상품 목록 조회(고객 시점) - 거리순 성공 테스트")
 	@Test
-	void itemFindAllForStoreSuccessSortByDistanceTest() {
+	void itemFindAllForMemberSuccessSortByDistanceTest() {
 		//given
 		int page = 0;
 		int size = 5;
