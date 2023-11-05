@@ -26,6 +26,7 @@ import com.palpal.dealightbe.domain.order.domain.OrderRepository;
 import com.palpal.dealightbe.domain.order.domain.OrderStatus;
 import com.palpal.dealightbe.domain.review.application.dto.request.ReviewCreateReq;
 import com.palpal.dealightbe.domain.review.application.dto.response.ReviewCreateRes;
+import com.palpal.dealightbe.domain.review.application.dto.response.ReviewRes;
 import com.palpal.dealightbe.domain.review.domain.Review;
 import com.palpal.dealightbe.domain.review.domain.ReviewRepository;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
@@ -157,6 +158,74 @@ class ReviewServiceIntegrationTest {
 		}
 	}
 
+	@Nested
+	@DisplayName("<리뷰 조회>")
+	class findTest {
+		@Nested
+		@DisplayName("성공")
+		class Success {
+
+			@DisplayName("고객은 각 주문에 대해 작성한 리뷰를 조회할 수 있다.")
+			@Test
+			void findByOrderId() {
+				// given
+				Member member = createMember();
+				Store store = createStore();
+				Order order = createOrder(member, store);
+
+				List<Review> reviewReq = List.of(
+					createReview(order, "사장님이 친절해요"),
+					createReview(order, "가격이 저렴해요")
+				);
+
+				reviewRepository.saveAll(reviewReq);
+
+				long orderId = order.getId();
+
+				// when
+				ReviewRes reviewRes = reviewService.findByOrderId(orderId, member.getProviderId());
+
+				// then
+				assertThat(reviewRes.messages(), hasSize(reviewReq.size()));
+
+				Assertions.assertThat(reviewRes.messages())
+					.usingRecursiveComparison()
+					.isEqualTo(reviewReq.stream().map(Review::getContent).toList());
+
+			}
+		}
+
+		@Nested
+		@DisplayName("실패")
+		class Fail {
+			@DisplayName("리뷰 작성한 고객 외에 다른 고객이나 업체는 각 주문별 리뷰를 조회할 수 없다.")
+			@Test
+			void findByOrderId_by_others() {
+				// given
+				Member member = createMember();
+				Store store = createStore();
+				Order order = createOrder(member, store);
+
+				List<Review> reviewReq = List.of(
+					createReview(order, "사장님이 친절해요"),
+					createReview(order, "가격이 저렴해요")
+				);
+
+				reviewRepository.saveAll(reviewReq);
+
+				long orderId = order.getId();
+				long storeOwnerId = store.getMember().getProviderId();
+
+				// when
+				// then
+				assertThrows(
+					BusinessException.class,
+					() -> reviewService.findByOrderId(orderId, storeOwnerId)
+				);
+			}
+		}
+	}
+
 	private Order createOrder(Member member, Store store) {
 		Order order = Order.builder()
 			.demand("도착할 때까지 상품 냉장고에 보관 부탁드려요")
@@ -198,6 +267,13 @@ class ReviewServiceIntegrationTest {
 		memberRepository.save(member);
 
 		return member;
+	}
+
+	private Review createReview(Order order, String content) {
+		return Review.builder()
+			.content(content)
+			.order(order)
+			.build();
 	}
 
 }
