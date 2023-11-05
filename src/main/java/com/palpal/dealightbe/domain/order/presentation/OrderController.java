@@ -34,6 +34,7 @@ public class OrderController {
 	private final OrderService orderService;
 
 	private static final String DEFAULT_PAGING_SIZE = "10";
+	private static final String DEFAULT_SORTING = "created_at";
 
 	@PostMapping("/{memberProviderId}")
 	public ResponseEntity<OrderRes> create(
@@ -85,7 +86,7 @@ public class OrderController {
 		@RequestParam(required = false, defaultValue = DEFAULT_PAGING_SIZE) int size
 	) {
 
-		Pageable pageable = PageRequest.of(page, size, Sort.by("created_at").descending());
+		Pageable pageable = PageRequest.of(page, size, Sort.by(DEFAULT_SORTING).descending());
 
 		OrdersRes ordersRes = orderService.findAllByStoreId(id, memberProviderId, status, pageable);
 
@@ -100,7 +101,7 @@ public class OrderController {
 		@RequestParam(required = false, defaultValue = DEFAULT_PAGING_SIZE) int size
 	) {
 
-		Pageable pageable = PageRequest.of(page, size, Sort.by("created_at").descending());
+		Pageable pageable = PageRequest.of(page, size, Sort.by(DEFAULT_SORTING).descending());
 
 		OrdersRes ordersRes = orderService.findAllByMemberProviderId(memberProviderId, status, pageable);
 

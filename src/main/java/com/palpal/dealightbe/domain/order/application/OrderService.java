@@ -112,9 +112,7 @@ public class OrderService {
 
 	@Transactional(readOnly = true)
 	public OrdersRes findAllByMemberProviderId(Long memberProviderId, String status, Pageable pageable) {
-		Member member = getMember(memberProviderId);
-
-		Slice<Order> orders = orderRepository.findAllByMemberProviderId(member.getProviderId(), status, pageable);
+		Slice<Order> orders = orderRepository.findAllByMemberProviderId(memberProviderId, status, pageable);
 
 		return OrdersRes.from(orders);
 	}
