@@ -5,6 +5,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
@@ -14,7 +16,6 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -61,7 +62,7 @@ class ReviewControllerTest {
 	@Nested
 	@DisplayName("<리뷰 생성>")
 	class createTest {
-		String createApiPath = "/api/reviews/{memberProviderId}/orders";
+		String createApiPath = "/api/reviews/orders";
 
 		ReviewCreateReq reviewCreateReq = new ReviewCreateReq(List.of("사장님이 친절해요", "가격이 저렴해요"));
 
@@ -71,15 +72,16 @@ class ReviewControllerTest {
 		@DisplayName("성공 - 리뷰를 등록한다")
 		void create_success() throws Exception {
 			// given
-			given(reviewService.create(anyLong(), any(ReviewCreateReq.class), anyLong()))
+			given(reviewService.create(anyLong(), any(ReviewCreateReq.class), any()))
 				.willReturn(reviewCreateRes);
 
 			// when
 			// then
 			mockMvc.perform(
-					post(createApiPath, 1)
+					post(createApiPath, 1L)
 						.with(csrf().asHeader())
 						.with(user("username").roles("MEMBER"))
+						.header("Authorization", "Bearer {ACCESS_TOKEN}")
 						.content(objectMapper.writeValueAsString(reviewCreateReq))
 						.contentType(APPLICATION_JSON)
 						.param("id", "2")
@@ -91,8 +93,11 @@ class ReviewControllerTest {
 				.andDo(document("review/review-create-success",
 						preprocessRequest(prettyPrint()),
 						preprocessResponse(prettyPrint()),
-						pathParameters(
-							parameterWithName("memberProviderId").description("고객 카카오 토큰")
+						// pathParameters(
+						// 	parameterWithName("memberProviderId").description("고객 카카오 토큰")
+						// ),
+						requestHeaders(
+							headerWithName("Authorization").description("Access Token")
 						),
 						requestParameters(
 							parameterWithName("id").description("리뷰 작성하고자 하는 주문 아이디")

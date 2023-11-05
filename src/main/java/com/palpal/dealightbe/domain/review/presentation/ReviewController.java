@@ -2,7 +2,6 @@ package com.palpal.dealightbe.domain.review.presentation;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.palpal.dealightbe.domain.review.application.ReviewService;
 import com.palpal.dealightbe.domain.review.application.dto.request.ReviewCreateReq;
 import com.palpal.dealightbe.domain.review.application.dto.response.ReviewCreateRes;
+import com.palpal.dealightbe.global.aop.ProviderId;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,14 +21,15 @@ import lombok.RequiredArgsConstructor;
 public class ReviewController {
 	private final ReviewService reviewService;
 
-	@PostMapping("/{memberProviderId}/orders")
+	@PostMapping("orders")
+	@ProviderId
 	public ResponseEntity<ReviewCreateRes> create(
+		Long providerId,
 		@Validated @RequestBody ReviewCreateReq request,
-		@PathVariable Long memberProviderId,
 		@RequestParam Long id
 	) {
 
-		ReviewCreateRes reviewCreateRes = reviewService.create(id, request, memberProviderId);
+		ReviewCreateRes reviewCreateRes = reviewService.create(id, request, providerId);
 
 		return ResponseEntity.ok(reviewCreateRes);
 	}
