@@ -24,3 +24,7 @@ operation::review/review-create-success[]
 === 2. 리뷰 통계 조회 - 업체별
 
 operation::review/review-find-by-store-id-success[]
+
+=== 3. 리뷰 조회 - 주문별
+
+operation::review/review-find-by-order-id-success[]
