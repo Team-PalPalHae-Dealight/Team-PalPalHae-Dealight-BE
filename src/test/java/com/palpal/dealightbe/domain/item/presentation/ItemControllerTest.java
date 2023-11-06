@@ -416,6 +416,16 @@ class ItemControllerTest {
 	@Test
 	public void itemFindAllForStoreSuccessTest() throws Exception {
 		//given
+		Item item3 = Item.builder()
+			.name("치즈김밥")
+			.stock(4)
+			.discountPrice(4000)
+			.originalPrice(4500)
+			.description("치즈김밥 입니다.")
+			.information("통신사 할인 불가능 합니다.")
+			.store(store)
+			.build();
+
 		Long memberId = 1L;
 
 		int size = 5;
@@ -423,8 +433,8 @@ class ItemControllerTest {
 		PageRequest pageRequest = PageRequest.of(page, size);
 
 		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage());
-		ItemRes itemRes2 = new ItemRes(2L, 2L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage());
-		List<ItemRes> itemResList = List.of(itemRes, itemRes2);
+		ItemRes itemRes3 = new ItemRes(2L, 1L, item3.getName(), item3.getStock(), item3.getDiscountPrice(), item3.getOriginalPrice(), item3.getDescription(), item3.getInformation(), item3.getImage());
+		List<ItemRes> itemResList = List.of(itemRes, itemRes3);
 		ItemsRes itemsRes = new ItemsRes(itemResList);
 
 		when(itemService.findAllForStore(any(), eq(pageRequest))).thenReturn(itemsRes);
