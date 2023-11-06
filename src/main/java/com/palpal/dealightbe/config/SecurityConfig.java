@@ -42,16 +42,9 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
-			// .authorizeRequests()
-			// .antMatchers("/api/address/**").permitAll()
-			// .antMatchers("/api/auth/**").permitAll()
-			// .antMatchers("/api/image/**").permitAll()
-			// .antMatchers("/api/item/**").permitAll()
-			// .antMatchers("/api/member/**").permitAll()
-			// .antMatchers("/api/order/**").permitAll()
-			// .antMatchers("/api/review/**").permitAll()
-			// .antMatchers("/api/store/**").permitAll()
-			// .and()
+			.authorizeRequests()
+			.antMatchers("/docs/").permitAll()
+			.and()
 			.headers().disable()
 			.csrf().disable()
 			.httpBasic().disable()
