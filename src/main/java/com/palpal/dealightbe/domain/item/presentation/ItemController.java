@@ -53,7 +53,9 @@ public class ItemController {
 	}
 
 	@GetMapping("/members")
-	public ResponseEntity<ItemsRes> findAllForMember(@RequestParam double xCoordinate, @RequestParam double yCoordinate, @RequestParam String sortBy, @PageableDefault(size = 5, page = 0) Pageable pageable) {
+	public ResponseEntity<ItemsRes> findAllForMember(@RequestParam("x-coordinate") double xCoordinate, @RequestParam("y-coordinate") double yCoordinate, @RequestParam("sort-by") String sortBy, @RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = "5") int size) {
+		PageRequest pageable = PageRequest.of(page, size);
+
 		ItemsRes itemsRes = itemService.findAllForMember(xCoordinate, yCoordinate, sortBy, pageable);
 
 		return ResponseEntity.ok(itemsRes);
