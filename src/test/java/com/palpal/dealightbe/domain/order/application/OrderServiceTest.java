@@ -349,7 +349,7 @@ class OrderServiceTest {
 
 	@Nested
 	@DisplayName("<업체의 주문 목록 조회>")
-	class findByStoreIdTest {
+	class FindByStoreIdTest {
 		@Nested
 		@DisplayName("성공")
 		class Success {
@@ -414,7 +414,7 @@ class OrderServiceTest {
 
 	@Nested
 	@DisplayName("<고객의 주문 목록 조회>")
-	class findAllByMemberProviderIdTest {
+	class FindAllByMemberProviderIdTest {
 		@Nested
 		@DisplayName("성공")
 		class Success {
