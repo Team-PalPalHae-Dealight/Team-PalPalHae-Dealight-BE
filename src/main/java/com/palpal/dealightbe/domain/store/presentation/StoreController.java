@@ -2,6 +2,7 @@ package com.palpal.dealightbe.domain.store.presentation;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,55 +32,71 @@ public class StoreController {
 
 	private final StoreService storeService;
 
-	@PostMapping("/{memberId}")
-	public ResponseEntity<StoreCreateRes> register(@PathVariable Long memberId, @RequestBody @Validated StoreCreateReq req) {
-		StoreCreateRes storeCreateRes = storeService.register(memberId, req);
+	@ProviderId
+	@PostMapping
+	public ResponseEntity<StoreCreateRes> register(Long providerId, @RequestBody @Validated StoreCreateReq req) {
+		StoreCreateRes storeCreateRes = storeService.register(providerId, req);
 
 		return ResponseEntity.ok(storeCreateRes);
 	}
 
-	@GetMapping("/profiles/{memberId}/{storeId}")
-	public ResponseEntity<StoreInfoRes> getInfo(@PathVariable Long memberId, @PathVariable Long storeId) {
-		StoreInfoRes infoRes = storeService.getInfo(memberId, storeId);
+	@ProviderId
+	@GetMapping("/profiles/{storeId}")
+	public ResponseEntity<StoreInfoRes> getInfo(Long providerId, @PathVariable Long storeId) {
+		StoreInfoRes infoRes = storeService.getInfo(providerId, storeId);
 
 		return ResponseEntity.ok(infoRes);
 	}
 
-	@PatchMapping("/profiles/{memberId}/{storeId}")
-	public ResponseEntity<StoreInfoRes> updateInfo(@PathVariable Long memberId, @PathVariable Long storeId, @RequestBody @Validated StoreUpdateReq updateReq) {
-		StoreInfoRes storeInfoRes = storeService.updateInfo(memberId, storeId, updateReq);
+	@ProviderId
+	@PatchMapping("/profiles/{storeId}")
+	public ResponseEntity<StoreInfoRes> updateInfo(Long providerId, @PathVariable Long storeId, @RequestBody @Validated StoreUpdateReq updateReq) {
+		StoreInfoRes storeInfoRes = storeService.updateInfo(providerId, storeId, updateReq);
 
 		return ResponseEntity.ok(storeInfoRes);
 	}
 
-	@PatchMapping("/status/{memberId}/{storeId}")
-	public ResponseEntity<StoreStatusRes> updateStatus(@PathVariable Long memberId, @PathVariable Long storeId, @RequestBody StoreStatusReq req) {
-		StoreStatusRes storeStatusRes = storeService.updateStatus(memberId, storeId, req);
+	@ProviderId
+	@PatchMapping("/status/{storeId}")
+	public ResponseEntity<StoreStatusRes> updateStatus(Long providerId, @PathVariable Long storeId, @RequestBody StoreStatusReq req) {
+		StoreStatusRes storeStatusRes = storeService.updateStatus(providerId, storeId, req);
 
 		return ResponseEntity.ok(storeStatusRes);
 	}
 
-	@GetMapping("/status/{memberId}/{storeId}")
-	public ResponseEntity<StoreStatusRes> getStatus(@PathVariable Long memberId, @PathVariable Long storeId) {
-		StoreStatusRes status = storeService.getStatus(memberId, storeId);
+	@ProviderId
+	@GetMapping("/status/{storeId}")
+	public ResponseEntity<StoreStatusRes> getStatus(Long providerId, @PathVariable Long storeId) {
+		StoreStatusRes status = storeService.getStatus(providerId, storeId);
 
 		return ResponseEntity.ok(status);
 	}
 
-	@PostMapping("/images/{memberId}/{storeId}")
-	public ResponseEntity<ImageRes> uploadImage(@PathVariable Long memberId, @PathVariable Long storeId, MultipartFile file) {
+	@ProviderId
+	@PostMapping("/images/{storeId}")
+	public ResponseEntity<ImageRes> uploadImage(Long providerId, @PathVariable Long storeId, MultipartFile file) {
 		ImageUploadReq imageUploadReq = new ImageUploadReq(file);
-		ImageRes imageRes = storeService.uploadImage(memberId, storeId, imageUploadReq);
+		ImageRes imageRes = storeService.uploadImage(providerId, storeId, imageUploadReq);
 
 		return ResponseEntity.ok(imageRes);
 	}
 
-	@PatchMapping("/images/{memberId}/{storeId}")
-	public ResponseEntity<ImageRes> updateImage(@PathVariable Long memberId, @PathVariable Long storeId, MultipartFile file) {
+	@ProviderId
+	@PatchMapping("/images/{storeId}")
+	public ResponseEntity<ImageRes> updateImage(Long providerId, @PathVariable Long storeId, MultipartFile file) {
 		ImageUploadReq imageUpdateReq = new ImageUploadReq(file);
 
-		ImageRes imageRes = storeService.updateImage(memberId, storeId, imageUpdateReq);
+		ImageRes imageRes = storeService.updateImage(providerId, storeId, imageUpdateReq);
 
 		return ResponseEntity.ok(imageRes);
+	}
+
+	@ProviderId
+	@DeleteMapping("/images/{storeId}")
+	public ResponseEntity<Void> deleteImage(Long providerId, @PathVariable Long storeId) {
+		storeService.deleteImage(providerId, storeId);
+
+		return ResponseEntity.noContent()
+			.build();
 	}
 }

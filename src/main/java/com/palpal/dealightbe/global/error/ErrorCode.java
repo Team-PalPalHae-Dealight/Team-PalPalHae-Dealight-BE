@@ -54,9 +54,7 @@ public enum ErrorCode {
 	INVALID_ROLE_TYPE("AUTH003", "유효하지 않은 권한이 입력됐습니다."),
 	NOT_FOUND_ROLE("AUTH004", "존재하지 않는 역할입니다."),
 	INVALID_ROLE_UPDATE("AUTH005", "적어도 하나의 역할이 필요합니다."),
-	INVALID_TOKEN("AUTH006", "인증토큰이 올바르지 않습니다.")
-
-	;
+	INVALID_TOKEN("AUTH006", "인증토큰이 올바르지 않습니다.");
 
 	private final String code;
 	private final String message;
