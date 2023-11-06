@@ -311,7 +311,7 @@ class MemberControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.imageUrl", is("http://sample.com/profile.png")))
 			.andDo(print())
-			.andDo(document("member-upload-image",
+			.andDo(document("member/member-upload-image",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
@@ -347,7 +347,7 @@ class MemberControllerTest {
 				}))
 			.andExpect(status().isNotFound())
 			.andDo(print())
-			.andDo(document("member-upload-image-not-found",
+			.andDo(document("member/member-upload-image-not-found",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
@@ -378,7 +378,7 @@ class MemberControllerTest {
 				.contentType(APPLICATION_JSON))
 			.andExpect(status().isNoContent())
 			.andDo(print())
-			.andDo(document("member-delete-image-success",
+			.andDo(document("member/member-delete-image-success",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
@@ -401,7 +401,7 @@ class MemberControllerTest {
 				.contentType(APPLICATION_JSON))
 			.andExpect(status().isNotFound())
 			.andDo(print())
-			.andDo(document("member-delete-image-not-found",
+			.andDo(document("member/member-delete-image-not-found",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(
