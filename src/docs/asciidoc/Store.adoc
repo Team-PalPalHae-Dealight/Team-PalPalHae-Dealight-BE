@@ -108,9 +108,9 @@ include::{snippets}/store/store-update-image/request-parts.adoc[]
 include::{snippets}/store/store-update-image/http-response.adoc[]
 include::{snippets}/store/store-update-image/response-fields.adoc[]
 
-=== 업체 이미지 수정
+=== 업체 이미지 삭제
 
-==== DELTE - /api/stores/images/{storeId}
+==== DELETE - /api/stores/images/{storeId}
 
 .Request
 include::{snippets}/store/store-delete-image/http-request.adoc[]

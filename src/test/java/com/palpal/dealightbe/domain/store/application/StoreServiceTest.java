@@ -98,13 +98,13 @@ class StoreServiceTest {
 		LocalTime closeTime = LocalTime.of(23, 0);
 		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, Set.of(DayOff.MON));
 
-		when(memberRepository.findById(member.getId()))
+		when(memberRepository.findMemberByProviderId(member.getProviderId()))
 			.thenReturn(Optional.of(member));
 		when(addressService.register(eq("서울시 강남구"), eq(67.89), eq(293.2323)))
 			.thenReturn(new AddressRes("서울시 강남구", 67.89, 293.2323));
 
 		//when
-		StoreCreateRes storeCreateRes = storeService.register(member.getId(), storeCreateReq);
+		StoreCreateRes storeCreateRes = storeService.register(member.getProviderId(), storeCreateReq);
 
 		//then
 		assertThat(storeCreateRes.name()).isEqualTo(storeCreateReq.name());
@@ -120,13 +120,13 @@ class StoreServiceTest {
 		LocalTime closeTime = LocalTime.of(02, 0);
 		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, Set.of(DayOff.MON));
 
-		when(memberRepository.findById(member.getId()))
+		when(memberRepository.findMemberByProviderId(member.getProviderId()))
 			.thenReturn(Optional.of(member));
 		when(addressService.register(eq("서울시 강남구"), eq(67.89), eq(293.2323)))
 			.thenReturn(new AddressRes("서울시 강남구", 67.89, 293.2323));
 
 		//when
-		StoreCreateRes storeCreateRes = storeService.register(member.getId(), storeCreateReq);
+		StoreCreateRes storeCreateRes = storeService.register(member.getProviderId(), storeCreateReq);
 
 		//then
 		assertThat(storeCreateRes.name()).isEqualTo(storeCreateReq.name());
@@ -141,12 +141,12 @@ class StoreServiceTest {
 		LocalTime closeTime = LocalTime.of(23, 0);
 		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, Set.of(DayOff.MON));
 
-		when(memberRepository.findById(member.getId()))
+		when(memberRepository.findMemberByProviderId(member.getProviderId()))
 			.thenReturn(Optional.empty());
 
 		// when -> then
 		assertThrows(EntityNotFoundException.class, () -> {
-			storeService.register(member.getId(), storeCreateReq);
+			storeService.register(member.getProviderId(), storeCreateReq);
 		});
 	}
 
@@ -158,14 +158,14 @@ class StoreServiceTest {
 		LocalTime closeTime = LocalTime.of(13, 0);
 		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, Set.of(DayOff.MON));
 
-		when(memberRepository.findById(member.getId()))
+		when(memberRepository.findMemberByProviderId(member.getProviderId()))
 			.thenReturn(Optional.of(member));
 		when(addressService.register(eq("서울시 강남구"), eq(67.89), eq(293.2323)))
 			.thenReturn(new AddressRes("서울시 강남구", 67.89, 293.2323));
 
 		// when -> then
 		assertThrows(BusinessException.class, () -> {
-			storeService.register(member.getId(), storeCreateReq);
+			storeService.register(member.getProviderId(), storeCreateReq);
 		});
 	}
 
@@ -174,13 +174,13 @@ class StoreServiceTest {
 	void getStoreInfoSuccessTest() throws Exception {
 
 		//given
-		when(memberRepository.findById(member.getId()))
+		when(memberRepository.findMemberByProviderId(member.getProviderId()))
 			.thenReturn(Optional.of(member));
 		when(storeRepository.findById(store.getId()))
 			.thenReturn(Optional.of(store));
 
 		//when
-		StoreInfoRes infoRes = storeService.getInfo(member.getId(), store.getId());
+		StoreInfoRes infoRes = storeService.getInfo(member.getProviderId(), store.getId());
 
 		//then
 		assertThat(infoRes.storeNumber()).isEqualTo(store.getStoreNumber());
@@ -202,14 +202,14 @@ class StoreServiceTest {
 			.providerId(999L)
 			.build();
 
-		when(memberRepository.findById(invalidMember.getId()))
+		when(memberRepository.findMemberByProviderId(invalidMember.getProviderId()))
 			.thenReturn(Optional.of(invalidMember));
 		when(storeRepository.findById(store.getId()))
 			.thenReturn(Optional.of(store));
 
 		//when -> then
 		assertThrows(BusinessException.class, () -> {
-			storeService.getInfo(invalidMember.getId(), store.getId());
+			storeService.getInfo(invalidMember.getProviderId(), store.getId());
 		});
 	}
 
@@ -222,13 +222,13 @@ class StoreServiceTest {
 		LocalTime closeTime = LocalTime.of(12, 0);
 		StoreUpdateReq updateReq = new StoreUpdateReq("77777", "부산시 수영구", 123.123, 222.333, openTime, closeTime, Set.of(DayOff.TUE));
 
-		when(memberRepository.findById(member.getId()))
+		when(memberRepository.findMemberByProviderId(member.getProviderId()))
 			.thenReturn(Optional.of(member));
 		when(storeRepository.findById(store.getId()))
 			.thenReturn(Optional.of(store));
 
 		//when
-		StoreInfoRes storeUpdatedInfoRes = storeService.updateInfo(member.getId(), store.getId(), updateReq);
+		StoreInfoRes storeUpdatedInfoRes = storeService.updateInfo(member.getProviderId(), store.getId(), updateReq);
 
 		//then
 		assertThat(storeUpdatedInfoRes.telephone()).isEqualTo(updateReq.telephone());
@@ -245,13 +245,13 @@ class StoreServiceTest {
 		//given
 		StoreStatusReq requestStoreStatus = new StoreStatusReq(StoreStatus.OPENED);
 
-		when(memberRepository.findById(member.getId()))
+		when(memberRepository.findMemberByProviderId(member.getProviderId()))
 			.thenReturn(Optional.of(member));
 		when(storeRepository.findById(store.getId()))
 			.thenReturn(Optional.of(store));
 
 		//when
-		StoreStatusRes storeStatusRes = storeService.updateStatus(member.getId(), store.getId(), requestStoreStatus);
+		StoreStatusRes storeStatusRes = storeService.updateStatus(member.getProviderId(), store.getId(), requestStoreStatus);
 
 		//then
 		assertThat(store.getStoreStatus()).isEqualTo(requestStoreStatus.storeStatus());
@@ -267,14 +267,14 @@ class StoreServiceTest {
 		ImageUploadReq request = new ImageUploadReq(file);
 		String imageUrl = "http://fakeimageurl.com/image.jpg";
 
-		when(memberRepository.findById(member.getId()))
+		when(memberRepository.findMemberByProviderId(member.getProviderId()))
 			.thenReturn(Optional.of(member));
 		when(storeRepository.findById(store.getId()))
 			.thenReturn(Optional.of(store));
 		when(imageService.store(file)).thenReturn(imageUrl);
 
 		//when
-		ImageRes imageRes = storeService.uploadImage(member.getId(), store.getId(), request);
+		ImageRes imageRes = storeService.uploadImage(member.getProviderId(), store.getId(), request);
 
 		//then
 		assertThat(imageRes.imageUrl()).isEqualTo(imageUrl);
@@ -288,15 +288,17 @@ class StoreServiceTest {
 		ImageUploadReq request = new ImageUploadReq(file);
 		String updatedImageUrl = "http://updatedfakeimageurl.com/updated_image.jpg";
 
-		when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
-		when(storeRepository.findById(store.getId())).thenReturn(Optional.of(store));
+		when(memberRepository.findMemberByProviderId(member.getProviderId()))
+			.thenReturn(Optional.of(member));
+		when(storeRepository.findById(store.getId()))
+			.thenReturn(Optional.of(store));
 
 		String initialImage = "http://initialfakeimageurl.com/initial_image.jpg";
 		store.updateImage(initialImage);
 		when(imageService.store(file)).thenReturn(updatedImageUrl);
 
 		//when
-		ImageRes imageRes = storeService.updateImage(member.getId(), store.getId(), request);
+		ImageRes imageRes = storeService.updateImage(member.getProviderId(), store.getId(), request);
 
 		//then
 		assertThat(imageRes.imageUrl()).isEqualTo(updatedImageUrl);
