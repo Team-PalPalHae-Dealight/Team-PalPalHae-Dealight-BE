@@ -116,7 +116,8 @@ class ItemControllerTest {
 		//given
 		ItemReq itemReq = new ItemReq(item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(),
 			item.getDescription(), item.getInformation(), item.getImage());
-		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage());
+		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(),
+			item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage());
 
 		Long memberId = 1L;
 
@@ -181,7 +182,8 @@ class ItemControllerTest {
 
 		ItemReq itemReq = new ItemReq(item2.getName(), item2.getStock(), item2.getDiscountPrice(),
 			item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage());
-		ItemRes itemRes = new ItemRes(1L, 1L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage());
+		ItemRes itemRes = new ItemRes(1L, 1L, item2.getName(), item2.getStock(), item2.getDiscountPrice(),
+			item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage());
 
 		Long memberId = 1L;
 
@@ -324,7 +326,8 @@ class ItemControllerTest {
 	public void itemFindByIdSuccessTest() throws Exception {
 		//given
 		Long itemId = 1L;
-		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage());
+		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(),
+			item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage());
 
 		when(itemService.findById(any())).thenReturn(itemRes);
 
@@ -398,7 +401,8 @@ class ItemControllerTest {
 		int page = 0;
 		PageRequest pageRequest = PageRequest.of(page, size);
 
-		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage());
+		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(),
+			item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage());
 		List<ItemRes> itemResList = List.of(itemRes);
 		ItemsRes itemsRes = new ItemsRes(itemResList);
 
