@@ -1,7 +1,6 @@
 package com.palpal.dealightbe.domain.review.application;
 
 import static com.palpal.dealightbe.global.error.ErrorCode.ILLEGAL_REVIEW_REQUEST;
-import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_REVIEW_CREATOR;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ORDER;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_STORE;
 import static com.palpal.dealightbe.global.error.ErrorCode.UNAUTHORIZED_REQUEST;
@@ -41,11 +40,7 @@ public class ReviewService {
 	public ReviewCreateRes create(Long orderId, ReviewCreateReq request, Long memberProviderId) {
 		Order order = getOrder(orderId);
 
-		if (!order.isMember(memberProviderId)) {
-			log.warn("POST:WRITER:CANNOT WRITE REVIEW : ORDER {}, REQUESTER {}",
-				order.getStore().getMember().getId(), memberProviderId);
-			throw new BusinessException(INVALID_REVIEW_CREATOR);
-		}
+		checkMemberAuthority(memberProviderId, order);
 
 		if (!order.isCompleted()) {
 			log.warn("POST:WRITER:CANNOT_WRITER_REVIEW : ORDER_STATUS {}", order.getOrderStatus());
@@ -76,12 +71,7 @@ public class ReviewService {
 	@Transactional(readOnly = true)
 	public ReviewRes findByOrderId(Long id, Long providerId) {
 		Order order = getOrder(id);
-
-		if (!order.isMember(providerId)) {
-			log.warn("GET:REVIEW:UNAUTHORIZED : REVIEW_WRITER {}, REQUESTER {}",
-				order.getMember().getId(), providerId);
-			throw new BusinessException(UNAUTHORIZED_REQUEST);
-		}
+		checkMemberAuthority(providerId, order);
 
 		List<Review> reviews = reviewRepository.findAllByOrderId(id);
 
@@ -103,4 +93,13 @@ public class ReviewService {
 				return new EntityNotFoundException(NOT_FOUND_STORE);
 			});
 	}
+
+	private void checkMemberAuthority(Long memberProviderId, Order order) {
+		if (!order.isMember(memberProviderId)) {
+			log.warn("REVIEW:UNAUTHORIZED:ORDERED MEMBER {}, REQUESTER {}",
+				order.getMember().getId(), memberProviderId);
+			throw new BusinessException(UNAUTHORIZED_REQUEST);
+		}
+	}
+
 }
