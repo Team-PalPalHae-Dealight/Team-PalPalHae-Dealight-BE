@@ -1,5 +1,6 @@
 package com.palpal.dealightbe.domain.order.application;
 
+import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ORDER_TOTAL_PRICE;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_MEMBER;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ORDER;
@@ -54,9 +55,20 @@ public class OrderService {
 		orderRepository.save(order);
 
 		List<OrderItem> orderItems = createOrderItems(order, orderCreateReq.orderProductsReq().orderProducts());
+		validateTotalPrice(orderCreateReq.totalPrice(), orderItems);
 		order.addOrderItems(orderItems);
 
 		return OrderRes.from(order);
+	}
+
+	private void validateTotalPrice(int inputTotalPrice, List<OrderItem> orderItems) {
+		int actualTotalPrice = orderItems.stream()
+			.mapToInt(item -> item.getItem().getDiscountPrice() * item.getQuantity())
+			.sum();
+
+		if (inputTotalPrice != actualTotalPrice) {
+			throw new BusinessException(INVALID_ORDER_TOTAL_PRICE);
+		}
 	}
 
 	private Store getStore(Long storeId) {
@@ -150,7 +162,6 @@ public class OrderService {
 			});
 
 		int quantity = request.quantity();
-
 		item.deductStock(quantity);
 
 		return OrderItem.builder()

@@ -47,6 +47,7 @@ public class OrderServiceIntegrationTest {
 
 	@Autowired
 	private OrderService orderService;
+
 	@Autowired
 	private ItemRepository itemRepository;
 
@@ -101,7 +102,7 @@ public class OrderServiceIntegrationTest {
 		@Nested
 		@DisplayName("실패")
 		class Fail {
-			@DisplayName("재고보다 많은 수량을 구매 시도 하면 예외가 발생한다.")
+			@DisplayName("재고보다 많은 수량을 구매 시도하면 예외가 발생한다.")
 			@Test
 			void deductStock() {
 				// given
@@ -130,7 +131,7 @@ public class OrderServiceIntegrationTest {
 				);
 			}
 
-			@DisplayName("한번에 5개 종류 이상의 상품을 구매 시도 하면 예외가 발생한다.")
+			@DisplayName("한번에 5개 종류 이상의 상품을 구매 시도하면 예외가 발생한다.")
 			@Test
 			void maxOrderItems() {
 				// given
@@ -157,6 +158,36 @@ public class OrderServiceIntegrationTest {
 							new OrderProductReq(item4.getId(), item4.getStock() - 1),
 							new OrderProductReq(item5.getId(), item5.getStock() - 1),
 							new OrderProductReq(item6.getId(), item6.getStock() - 1)
+						)
+					), store.getId(), "도착할 때까지 상품 냉장고에 보관 부탁드려요", LocalTime.of(12, 30), totalPrice
+				);
+
+				// when
+				// then
+				assertThrows(BusinessException.class,
+					() -> orderService.create(orderCreateReq, memberProviderId)
+				);
+			}
+
+			@DisplayName("입력된 총 금액이 실제와 일치하지 않는 경우 예외가 발생한다.")
+			@Test
+			void validateTotalPrice() {
+				// given
+				Store store = createStore();
+
+				Item item = createItem(store);
+				Item item2 = createItem(store);
+
+				int totalPrice = 0;
+
+				Member member = createMember();
+				Long memberProviderId = member.getProviderId();
+
+				OrderCreateReq orderCreateReq = new OrderCreateReq(
+					new OrderProductsReq(
+						List.of(
+							new OrderProductReq(item.getId(), item.getStock() - 1),
+							new OrderProductReq(item2.getId(), item2.getStock() - 1)
 						)
 					), store.getId(), "도착할 때까지 상품 냉장고에 보관 부탁드려요", LocalTime.of(12, 30), totalPrice
 				);
