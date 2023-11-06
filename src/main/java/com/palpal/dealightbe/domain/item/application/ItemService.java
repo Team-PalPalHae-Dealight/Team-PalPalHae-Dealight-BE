@@ -13,11 +13,13 @@ import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemsRes;
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
+import com.palpal.dealightbe.domain.item.domain.ItemSortType;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
+import static com.palpal.dealightbe.domain.item.domain.ItemSortType.findItemSortType;
 import static com.palpal.dealightbe.global.error.ErrorCode.*;
 
 @Slf4j
@@ -72,10 +74,12 @@ public class ItemService {
 	public ItemsRes findAllForMember(double xCoordinate, double yCoordinate, String sortBy, Pageable pageable) {
 		Page<Item> items = Page.empty();
 
-		switch (sortBy) {
-			case "deadline" -> items = itemRepository.findAllByDeadline(xCoordinate, yCoordinate, pageable);
-			case "discountRate" -> items = itemRepository.findAllByDiscountRate(xCoordinate, yCoordinate, pageable);
-			case "distance" -> items = itemRepository.findAllByDistance(xCoordinate, yCoordinate, pageable);
+		ItemSortType sortType = findItemSortType(sortBy);
+
+		switch (sortType) {
+			case DEADLINE -> items = itemRepository.findAllByDeadline(xCoordinate, yCoordinate, pageable);
+			case DISCOUNT_RATE -> items = itemRepository.findAllByDiscountRate(xCoordinate, yCoordinate, pageable);
+			case DISTANCE -> items = itemRepository.findAllByDistance(xCoordinate, yCoordinate, pageable);
 		}
 
 		return ItemsRes.from(items);
