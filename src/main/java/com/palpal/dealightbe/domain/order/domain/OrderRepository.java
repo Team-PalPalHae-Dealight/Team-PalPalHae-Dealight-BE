@@ -68,7 +68,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 					orders left outer join members on orders.member_id = members.id
 					left outer join stores on orders.store_id = stores.id
 				where
-					members.provider_id = :memberProviderId and
+					members.provider_id = :member_provider_id and
 					(:status is null or order_status = :status)
 				""",
 		countQuery =
@@ -78,10 +78,14 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 						orders left outer join members on orders.member_id = members.id
 						left outer join stores on orders.store_id = stores.id
 					where
-						members.provider_id = :memberProviderId and
+						members.provider_id = :member_provider_id and
 						(:status is null or order_status = :status)
 				""",
 		nativeQuery = true
 	)
-	Slice<Order> findAllByMemberProviderId(Long memberProviderId, String status, Pageable pageable);
+	Slice<Order> findAllByMemberProviderId(
+		@Param("member_provider_id") Long memberProviderId,
+		@Param("status") String status,
+		Pageable pageable
+	);
 }

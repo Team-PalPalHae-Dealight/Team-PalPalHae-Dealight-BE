@@ -46,8 +46,8 @@ public class OrderController {
 
 		URI uri = ServletUriComponentsBuilder
 			.fromCurrentRequest()
-			.path("")
-			.buildAndExpand()
+			.path("/{id}")
+			.buildAndExpand(orderRes.orderId())
 			.toUri();
 
 		return ResponseEntity.created(uri)

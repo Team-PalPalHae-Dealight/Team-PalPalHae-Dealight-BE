@@ -15,7 +15,7 @@ endif::[]
 
 === 업체 등록
 
-==== /api/stores/{memberId}
+==== POST - /api/stores/{memberId}
 
 .Request
 include::{snippets}/store/store-register/http-request.adoc[]
@@ -39,7 +39,7 @@ include::{snippets}/store/store-register-fail-invalid-business-time/response-fie
 
 === 업체 마이 페이지 조회
 
-==== /api/stores/profiles/{memberId}/{storeId}
+==== GET - /api/stores/profiles/{storeId}
 
 .Request
 include::{snippets}/store/store-get-info/http-request.adoc[]
@@ -51,7 +51,7 @@ include::{snippets}/store/store-get-info/response-fields.adoc[]
 
 === 업체 마이 페이지 정보 수정
 
-==== /api/stores/profiles/{memberId}/{storeId}
+==== PATCH - /api/stores/profiles/{storeId}
 
 .Request
 include::{snippets}/store/store-update-info/http-request.adoc[]
@@ -63,7 +63,7 @@ include::{snippets}/store/store-update-info/response-fields.adoc[]
 
 === 업체 영업 상태 조회
 
-==== /api/stores/status/{memberId}/{storeId}
+==== GET - /api/stores/status/{storeId}
 
 .Request
 include::{snippets}/store/store-get-status/http-request.adoc[]
@@ -74,7 +74,7 @@ include::{snippets}/store/store-get-status/response-fields.adoc[]
 
 === 업체 영업 상태 수정
 
-==== /api/stores/status/{memberId}/{storeId}
+==== PATCH - /api/stores/status/{storeId}
 
 .Request
 include::{snippets}/store/store-status-update/http-request.adoc[]
@@ -86,7 +86,7 @@ include::{snippets}/store/store-status-update/response-fields.adoc[]
 
 === 업체 이미지 등록
 
-==== /api/stores/images/{memberId}/{storeId}
+==== POST - /api/stores/images/{storeId}
 
 .Request
 include::{snippets}/store/store-upload-image/http-request.adoc[]
@@ -98,7 +98,7 @@ include::{snippets}/store/store-upload-image/response-fields.adoc[]
 
 === 업체 이미지 수정
 
-==== /api/stores/images/{memberId}/{storeId}
+==== PATCH - /api/stores/images/{storeId}
 
 .Request
 include::{snippets}/store/store-update-image/http-request.adoc[]
@@ -107,6 +107,16 @@ include::{snippets}/store/store-update-image/request-parts.adoc[]
 .Response
 include::{snippets}/store/store-update-image/http-response.adoc[]
 include::{snippets}/store/store-update-image/response-fields.adoc[]
+
+=== 업체 이미지 삭제
+
+==== DELETE - /api/stores/images/{storeId}
+
+.Request
+include::{snippets}/store/store-delete-image/http-request.adoc[]
+include::{snippets}/store/store-delete-image/path-parameters.adoc[]
+.Response
+include::{snippets}/store/store-delete-image/http-response.adoc[]
 
 === 업체 소유자와 요청자가 같은 고객이 아닌 경우
 

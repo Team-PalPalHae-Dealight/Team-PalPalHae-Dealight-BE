@@ -1,6 +1,8 @@
 package com.palpal.dealightbe.domain.review.domain;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -31,10 +33,11 @@ public class Review extends BaseEntity {
 	@JoinColumn(name = "order_id")
 	private Order order;
 
-	private String content;
+	@Enumerated(EnumType.STRING)
+	private ReviewContent content;
 
 	@Builder
-	public Review(Order order, String content) {
+	public Review(Order order, ReviewContent content) {
 		this.order = order;
 		this.content = content;
 	}

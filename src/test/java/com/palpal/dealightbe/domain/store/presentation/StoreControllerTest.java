@@ -1,7 +1,12 @@
 package com.palpal.dealightbe.domain.store.presentation;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -76,7 +81,6 @@ class StoreControllerTest {
 	@DisplayName("업체 등록 성공")
 	void registerStoreSuccessTest() throws Exception {
 		//given
-		Long memberId = 1L;
 		LocalTime openTime = LocalTime.of(9, 0);
 		LocalTime closeTime = LocalTime.of(23, 0);
 
@@ -86,11 +90,12 @@ class StoreControllerTest {
 		StoreCreateRes storeCreateRes = new StoreCreateRes(1L, "888222111", "맛짱조개", "01066772291", addressRes, openTime,
 			closeTime, Set.of(DayOff.MON), DEFAULT_PATH);
 
-		given(storeService.register(memberId, storeCreateReq))
+		given(storeService.register(any(), any()))
 			.willReturn(storeCreateRes);
 
 		//when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/stores/{memberId}", memberId)
+		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/stores")
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(storeCreateReq)))
 			.andExpect(status().isOk())
@@ -101,11 +106,13 @@ class StoreControllerTest {
 			.andExpect(jsonPath("$.openTime").value(storeCreateRes.openTime().toString()))
 			.andExpect(jsonPath("$.closeTime").value(storeCreateRes.closeTime().toString()))
 			.andExpect(jsonPath("$.dayOff[0]").value(DayOff.MON.getName()))
+			.andExpect(jsonPath("$.imageUrl").value(DEFAULT_PATH))
 			.andDo(print())
 			.andDo(document("store/store-register",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				pathParameters(parameterWithName("memberId").description("고객 ID")
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
 				),
 				requestFields(
 					fieldWithPath("storeNumber").description("사업자 등록 번호"),
@@ -137,18 +144,18 @@ class StoreControllerTest {
 	void registerStoreFailTest_invalidBusinessTime() throws Exception {
 
 		//given
-		Long memberId = 1L;
 		LocalTime openTime = LocalTime.of(23, 0);
 		LocalTime closeTime = LocalTime.of(9, 0);
 
 		StoreCreateReq storeCreateReq = new StoreCreateReq("888222111", "맛짱조개", "01066772291", "서울시 강남구", 67.89,
 			293.2323, openTime, closeTime, Set.of(DayOff.MON));
 
-		given(storeService.register(memberId, storeCreateReq))
+		given(storeService.register(any(), any()))
 			.willThrow(new BusinessException(ErrorCode.INVALID_BUSINESS_TIME));
 
 		//when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/stores/{memberId}", memberId)
+		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/stores")
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(storeCreateReq)))
 			.andExpect(status().isBadRequest())
@@ -160,7 +167,8 @@ class StoreControllerTest {
 			.andDo(document("store/store-register-fail-invalid-business-time",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				pathParameters(parameterWithName("memberId").description("고객 ID")
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
 				),
 				requestFields(
 					fieldWithPath("storeNumber").description("사업자 등록 번호"),
@@ -187,27 +195,29 @@ class StoreControllerTest {
 	void getInfoSuccessTest() throws Exception {
 
 		//given
-		Long memberId = 1L;
 		Long storeId = 1L;
 		LocalTime openTime = LocalTime.of(9, 0);
 		LocalTime closeTime = LocalTime.of(23, 0);
 		StoreInfoRes storeInfoRes = new StoreInfoRes("123123213", "피나치공", "02123456", "서울시 강남구", openTime, closeTime,
 			Set.of(DayOff.MON, DayOff.TUE), StoreStatus.OPENED, null);
 
-		given(storeService.getInfo(memberId, storeId))
+		given(storeService.getInfo(any(), eq(storeId)))
 			.willReturn(storeInfoRes);
 
 		//when -> then
 		mockMvc.perform(
-				RestDocumentationRequestBuilders.get("/api/stores/profiles/{memberId}/{storeId}", memberId, storeId)
+				RestDocumentationRequestBuilders.get("/api/stores/profiles/{storeId}", storeId)
+					.header("Authorization", "Bearer {ACCESS_TOKEN}")
 					.contentType(APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andDo(print())
 			.andDo(document("store/store-get-info",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
 				pathParameters(
-					parameterWithName("memberId").description("고객 ID"),
 					parameterWithName("storeId").description("업체 ID")
 				),
 				responseFields(
@@ -229,22 +239,24 @@ class StoreControllerTest {
 	void getInfoFailTest_notMatchOwnerAndRequester() throws Exception {
 
 		//given
-		Long invalidMemberId = 1L;
 		Long storeId = 1L;
-		given(storeService.getInfo(invalidMemberId, storeId))
+		given(storeService.getInfo(any(), eq(storeId)))
 			.willThrow(new BusinessException(ErrorCode.NOT_MATCH_OWNER_AND_REQUESTER));
 
 		//when -> then
 		mockMvc.perform(
-				RestDocumentationRequestBuilders.get("/api/stores/profiles/{memberId}/{storeId}", invalidMemberId, storeId)
+				RestDocumentationRequestBuilders.get("/api/stores/profiles/{storeId}", storeId)
+					.header("Authorization", "Bearer {ACCESS_TOKEN}")
 					.contentType(APPLICATION_JSON))
 			.andExpect(status().isBadRequest())
 			.andDo(print())
 			.andDo(document("store/store-get-info-fail-not-match-owner-and-requester",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
 				pathParameters(
-					parameterWithName("memberId").description("고객 ID"),
 					parameterWithName("storeId").description("업체 ID")
 				),
 				responseFields(
@@ -261,7 +273,6 @@ class StoreControllerTest {
 	void updateInfoSuccessTest() throws Exception {
 
 		//given
-		Long memberId = 1L;
 		Long storeId = 1L;
 		LocalTime openTime = LocalTime.of(19, 0);
 		LocalTime closeTime = LocalTime.of(22, 0);
@@ -271,12 +282,13 @@ class StoreControllerTest {
 		StoreInfoRes storeInfoRes = new StoreInfoRes("888222111", "맛짱조개", "01066772291", "부산시", openTime, closeTime,
 			Set.of(DayOff.TUE), StoreStatus.OPENED, null);
 
-		given(storeService.updateInfo(memberId, storeId, updateReq))
+		given(storeService.updateInfo(any(), eq(storeId), eq(updateReq)))
 			.willReturn(storeInfoRes);
 
 		//when -> then
 		mockMvc.perform(
-				RestDocumentationRequestBuilders.patch("/api/stores/profiles/{memberId}/{storeId}", memberId, storeId)
+				RestDocumentationRequestBuilders.patch("/api/stores/profiles/{storeId}", storeId)
+					.header("Authorization", "Bearer {ACCESS_TOKEN}")
 					.contentType(APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(updateReq)))
 			.andExpect(status().isOk())
@@ -284,8 +296,10 @@ class StoreControllerTest {
 			.andDo(document("store/store-update-info",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
 				pathParameters(
-					parameterWithName("memberId").description("고객 ID"),
 					parameterWithName("storeId").description("업체 ID")
 				),
 				responseFields(
@@ -307,23 +321,26 @@ class StoreControllerTest {
 	void getStatusSuccessTest() throws Exception {
 
 		//given
-		Long memberId = 1L;
 		Long storeId = 1L;
 
 		StoreStatusRes storeStatusRes = new StoreStatusRes(storeId, StoreStatus.OPENED);
 
-		given(storeService.getStatus(memberId, storeId))
+		given(storeService.getStatus(any(), eq(storeId)))
 			.willReturn(storeStatusRes);
 
 		//when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/stores/status/{memberId}/{storeId}", memberId, storeId)
+		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/stores/status/{storeId}", storeId)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.contentType(APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andDo(print())
 			.andDo(document("store/store-get-status",
+				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
 				pathParameters(
-					parameterWithName("memberId").description("고객 ID"),
 					parameterWithName("storeId").description("업체 ID")
 				),
 				responseFields(
@@ -338,18 +355,18 @@ class StoreControllerTest {
 	void updateStatusSuccessTest() throws Exception {
 
 		//given
-		Long memberId = 1L;
 		Long storeId = 1L;
 
 		StoreStatusReq storeStatusReq = new StoreStatusReq(StoreStatus.OPENED);
 		StoreStatusRes storeStatusRes = new StoreStatusRes(storeId, storeStatusReq.storeStatus());
 
-		given(storeService.updateStatus(memberId, storeId, storeStatusReq))
+		given(storeService.updateStatus(any(), eq(storeId), eq(storeStatusReq)))
 			.willReturn(storeStatusRes);
 
 		//when -> then
 		mockMvc.perform(
-				RestDocumentationRequestBuilders.patch("/api/stores/status/{memberId}/{storeId}", memberId, storeId)
+				RestDocumentationRequestBuilders.patch("/api/stores/status/{storeId}", storeId)
+					.header("Authorization", "Bearer {ACCESS_TOKEN}")
 					.contentType(APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(storeStatusReq)))
 			.andExpect(status().isOk())
@@ -357,9 +374,10 @@ class StoreControllerTest {
 			.andDo(document("store/store-status-update",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				pathParameters(
-					parameterWithName("memberId").description("고객 ID"),
-					parameterWithName("storeId").description("업체 ID")
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				pathParameters(parameterWithName("storeId").description("업체 ID")
 				), requestFields(
 					fieldWithPath("storeStatus").description("영업 상태")
 				),
@@ -375,28 +393,30 @@ class StoreControllerTest {
 	void uploadImageSuccessTest() throws Exception {
 
 		//given
-		Long memberId = 1L;
 		Long storeId = 1L;
 		MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "Spring Framework".getBytes());
 		ImageUploadReq request = new ImageUploadReq(file);
 		String imageUrl = "http://fakeimageurl.com/image.jpg";
 		ImageRes imageRes = new ImageRes(imageUrl);
 
-		given(storeService.uploadImage(memberId, storeId, request))
+		given(storeService.uploadImage(any(), eq(storeId), eq(request)))
 			.willReturn(imageRes);
 
 		//when -> then
 		mockMvc.perform(
-				RestDocumentationRequestBuilders.multipart("/api/stores/images/{memberId}/{storeId}", memberId, storeId)
+				RestDocumentationRequestBuilders.multipart("/api/stores/images/{storeId}", storeId)
 					.file(file)
+					.header("Authorization", "Bearer {ACCESS_TOKEN}")
 					.contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
 			.andExpect(status().isOk())
 			.andDo(print())
 			.andDo(document("store/store-upload-image",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
 				pathParameters(
-					parameterWithName("memberId").description("고객 ID"),
 					parameterWithName("storeId").description("업체 ID")),
 				requestParts(
 					partWithName("file").description("등록할 이미지 URL")
@@ -412,30 +432,32 @@ class StoreControllerTest {
 	void updateImageSuccessTest() throws Exception {
 
 		//given
-		Long memberId = 1L;
 		Long storeId = 1L;
 		MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "Spring Framework".getBytes());
 		ImageUploadReq request = new ImageUploadReq(file);
 		String imageUrl = "http://fakeimageurl.com/image.jpg";
 		ImageRes imageRes = new ImageRes(imageUrl);
 
-		given(storeService.updateImage(memberId, storeId, request))
+		given(storeService.updateImage(any(), eq(storeId), eq(request)))
 			.willReturn(imageRes);
 
 		//when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.fileUpload("/api/stores/images/{memberId}/{storeId}", memberId, storeId)
+		mockMvc.perform(RestDocumentationRequestBuilders.fileUpload("/api/stores/images/{storeId}", storeId)
 				.file(file)
 				.with(updateRequest -> {
 					updateRequest.setMethod("PATCH");
 					return updateRequest;
-				}))
+				})
+				.header("Authorization", "Bearer {ACCESS_TOKEN}"))
 			.andExpect(status().isOk())
 			.andDo(print())
 			.andDo(document("store/store-update-image",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
 				pathParameters(
-					parameterWithName("memberId").description("고객 ID"),
 					parameterWithName("storeId").description("업체 ID")),
 				requestParts(
 					partWithName("file").description("수정할 이미지 URL")
@@ -443,6 +465,31 @@ class StoreControllerTest {
 				responseFields(
 					fieldWithPath("imageUrl").description("수정된 이미지 URL")
 				)
+			));
+	}
+
+	@Test
+	@DisplayName("업체 이미지 수정 성공")
+	void deleteImageSuccessTest() throws Exception {
+
+		//given
+		Long storeId = 1L;
+
+		doNothing().when(storeService).deleteImage(any(), eq(storeId));
+
+		//when -> then
+		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/stores/images/{storeId}", storeId)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}"))
+			.andExpect(status().isNoContent())
+			.andDo(print())
+			.andDo(document("store/store-delete-image",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				pathParameters(
+					parameterWithName("storeId").description("이미지 삭제 요청 업체 ID"))
 			));
 	}
 }

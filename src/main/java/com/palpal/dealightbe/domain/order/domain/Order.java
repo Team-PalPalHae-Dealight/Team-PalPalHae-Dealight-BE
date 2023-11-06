@@ -150,11 +150,21 @@ public class Order extends BaseEntity {
 		return updaterId == orderedMemberId;
 	}
 
+	public boolean isMember(long requesterId) {
+		long orderedMemberId = this.member.getProviderId();
+
+		return requesterId == orderedMemberId;
+	}
+
 	public boolean isStoreOwner(Member requester) {
 		long updaterId = requester.getProviderId();
 		long storeOwnerId = store.getMember().getProviderId();
 
 		return updaterId == storeOwnerId;
+	}
+
+	public boolean isCompleted() {
+		return orderStatus == COMPLETED;
 	}
 
 	private void validateDemand(String demand) {

@@ -22,7 +22,7 @@ public record MemberSignupReq(
 	String nickName,
 
 	@NotBlank(message = "사용자 전화번호는 필수 입력값입니다.")
-	@Pattern(regexp = "\\d+")
+	@Pattern(regexp = "\\d+",message = "숫자만 입력해주세요.")
 	String phoneNumber,
 	String role
 ) {

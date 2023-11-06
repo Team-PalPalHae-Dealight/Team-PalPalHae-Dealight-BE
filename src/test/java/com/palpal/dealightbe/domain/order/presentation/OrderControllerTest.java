@@ -365,7 +365,7 @@ public class OrderControllerTest {
 				.andExpect(jsonPath("$.orderProductsRes.orderProducts[0].image").value(productRes.image()))
 				.andExpect(jsonPath("$.totalPrice").value(orderCreateReq.totalPrice()))
 				.andExpect(jsonPath("$.status").value(RECEIVED.getText()))
-				.andDo(document("order-find-by-id-success", preprocessRequest(prettyPrint()),
+				.andDo(document("order/order-find-by-id-success", preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
 					pathParameters(
 						parameterWithName("orderId").description("상세 조회 하고자 하는 주문의 아이디"),

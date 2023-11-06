@@ -14,6 +14,7 @@ public enum ErrorCode {
 	//공용
 	INVALID_INPUT_VALUE("C001", "잘못된 값을 입력하셨습니다."),
 	UNAUTHORIZED_REQUEST("C002", "해당 요청을 수행할 권한이 없습니다."),
+	DEFAULT_IMAGE_ALREADY_SET("C003", "기본 이미지로 설정된 이미지는 삭제할 수 없습니다."),
 
 	//멤버
 	NOT_FOUND_MEMBER("M001", "고객을 찾을 수 없습니다."),
@@ -32,7 +33,6 @@ public enum ErrorCode {
 	INVALID_ITEM_QUANTITY("I004", "상품 재고가 부족합니다"),
 	STORE_HAS_NO_ITEM("I005", "요청하신 상품은 해당 업체에 등록되지 않은 상품입니다."),
 	INVALID_ITEM_SORT_TYPE("I006", "유효하지 않은 상품 목록 정렬 조건입니다."),
-
 
 	//파일
 	NOT_FOUND_IMAGE("F001", "존재하지 않는 이미지 입니다."),
@@ -55,7 +55,14 @@ public enum ErrorCode {
 	INVALID_ROLE_TYPE("AUTH003", "유효하지 않은 권한이 입력됐습니다."),
 	NOT_FOUND_ROLE("AUTH004", "존재하지 않는 역할입니다."),
 	INVALID_ROLE_UPDATE("AUTH005", "적어도 하나의 역할이 필요합니다."),
-	INVALID_TOKEN("AUTH006", "인증토큰이 올바르지 않습니다.");
+	INVALID_TOKEN("AUTH006", "인증토큰이 올바르지 않습니다."),
+
+	//리뷰
+	NOT_FOUND_REVIEW("R001", "존재하지 않는 리뷰입니다."),
+	INVALID_REVIEW_CREATOR("R002", "리뷰는 상품을 주문한 고객 본인만 작성할 수 있습니다."),
+	ILLEGAL_REVIEW_REQUEST("R003", "완료된 주문에 대해서만 리뷰를 작성할 수 있습니다."),
+	INVALID_REVIEW_MESSAGE("R004", "유효하지 않은 리뷰 메시지가 존재합니다."),
+	;
 
 	private final String code;
 	private final String message;

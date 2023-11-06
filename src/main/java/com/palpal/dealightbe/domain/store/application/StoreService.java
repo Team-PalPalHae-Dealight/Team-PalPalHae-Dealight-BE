@@ -1,5 +1,7 @@
 package com.palpal.dealightbe.domain.store.application;
 
+import java.util.Objects;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +20,7 @@ import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusRe
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.ErrorCode;
+import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -36,10 +39,10 @@ public class StoreService {
 	private final AddressService addressService;
 	private final ImageService imageService;
 
-	public StoreCreateRes register(Long memberId, StoreCreateReq req) {
-		Member member = memberRepository.findById(memberId)
+	public StoreCreateRes register(Long providerId, StoreCreateReq req) {
+		Member member = memberRepository.findMemberByProviderId(providerId)
 			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_ID : {}", memberId);
+				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_PROVIDER_ID : {}", providerId);
 				throw new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
 			});
 
@@ -54,14 +57,14 @@ public class StoreService {
 	}
 
 	@Transactional(readOnly = true)
-	public StoreInfoRes getInfo(Long memberId, Long storeId) {
-		Store store = validateMemberAndStoreOwner(memberId, storeId);
+	public StoreInfoRes getInfo(Long providerId, Long storeId) {
+		Store store = validateMemberAndStoreOwner(providerId, storeId);
 
 		return StoreInfoRes.from(store);
 	}
 
-	public StoreInfoRes updateInfo(Long memberId, Long storeId, StoreUpdateReq request) {
-		Store store = validateMemberAndStoreOwner(memberId, storeId);
+	public StoreInfoRes updateInfo(Long providerId, Long storeId, StoreUpdateReq request) {
+		Store store = validateMemberAndStoreOwner(providerId, storeId);
 
 		Store updateStore = StoreUpdateReq.toStore(request);
 		store.updateInfo(updateStore);
@@ -69,8 +72,8 @@ public class StoreService {
 		return StoreInfoRes.from(store);
 	}
 
-	public StoreStatusRes updateStatus(Long memberId, Long storeId, StoreStatusReq storeStatus) {
-		Store store = validateMemberAndStoreOwner(memberId, storeId);
+	public StoreStatusRes updateStatus(Long providerId, Long storeId, StoreStatusReq storeStatus) {
+		Store store = validateMemberAndStoreOwner(providerId, storeId);
 
 		store.updateStatus(storeStatus.storeStatus());
 
@@ -78,14 +81,14 @@ public class StoreService {
 	}
 
 	@Transactional(readOnly = true)
-	public StoreStatusRes getStatus(Long memberId, Long storeId) {
-		Store store = validateMemberAndStoreOwner(memberId, storeId);
+	public StoreStatusRes getStatus(Long providerId, Long storeId) {
+		Store store = validateMemberAndStoreOwner(providerId, storeId);
 
 		return StoreStatusRes.from(store);
 	}
 
-	public ImageRes uploadImage(Long memberId, Long storeId, ImageUploadReq request) {
-		Store store = validateMemberAndStoreOwner(memberId, storeId);
+	public ImageRes uploadImage(Long providerId, Long storeId, ImageUploadReq request) {
+		Store store = validateMemberAndStoreOwner(providerId, storeId);
 
 		String imageUrl = imageService.store(request.file());
 
@@ -94,8 +97,8 @@ public class StoreService {
 		return ImageRes.from(store);
 	}
 
-	public ImageRes updateImage(Long memberId, Long storeId, ImageUploadReq req) {
-		Store store = validateMemberAndStoreOwner(memberId, storeId);
+	public ImageRes updateImage(Long providerId, Long storeId, ImageUploadReq req) {
+		Store store = validateMemberAndStoreOwner(providerId, storeId);
 
 		String image = store.getImage();
 		imageService.delete(image);
@@ -106,10 +109,23 @@ public class StoreService {
 		return ImageRes.from(store);
 	}
 
-	private Store validateMemberAndStoreOwner(Long memberId, Long storeId) {
-		Member member = memberRepository.findById(memberId)
+	public void deleteImage(Long providerId, Long storeId) {
+		Store store = validateMemberAndStoreOwner(providerId, storeId);
+
+		String image = store.getImage();
+		if (Objects.equals(image, DEFAULT_PATH)) {
+			log.warn("DELETE:DELETE:DEFAULT_IMAGE_ALREADY_SET : {}", storeId);
+			throw new BusinessException(ErrorCode.DEFAULT_IMAGE_ALREADY_SET);
+		}
+
+		imageService.delete(image);
+		store.updateImage(DEFAULT_PATH);
+	}
+
+	private Store validateMemberAndStoreOwner(Long providerId, Long storeId) {
+		Member member = memberRepository.findMemberByProviderId(providerId)
 			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_ID : {}", memberId);
+				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_PROVIDER_ID : {}", providerId);
 				throw new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
 			});
 
