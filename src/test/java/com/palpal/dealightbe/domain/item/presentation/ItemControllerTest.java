@@ -494,9 +494,9 @@ class ItemControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/items/members")
 				.contentType(MediaType.APPLICATION_JSON)
-				.param("xCoordinate", String.valueOf(xCoordinate))
-				.param("yCoordinate", String.valueOf(yCoordinate))
-				.param("sortBy", sortBy)
+				.param("x-coordinate", String.valueOf(xCoordinate))
+				.param("y-coordinate", String.valueOf(yCoordinate))
+				.param("sort-by", sortBy)
 				.param("size", String.valueOf(size))
 				.param("page", String.valueOf(page)))
 			.andExpect(status().isOk())
@@ -505,9 +505,9 @@ class ItemControllerTest {
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestParameters(
-					List.of(parameterWithName("xCoordinate").description("경도"),
-						parameterWithName("yCoordinate").description("위도"),
-						parameterWithName("sortBy").description("정렬 기준(마감순)"),
+					List.of(parameterWithName("x-coordinate").description("경도"),
+						parameterWithName("y-coordinate").description("위도"),
+						parameterWithName("sort-by").description("정렬 기준(마감순)"),
 						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
@@ -532,7 +532,7 @@ class ItemControllerTest {
 		//given
 		double xCoordinate = 127.0221068;
 		double yCoordinate = 37.5912999;
-		String sortBy = "discountRate";
+		String sortBy = "discount-rate";
 
 		int size = 5;
 		int page = 0;
@@ -549,9 +549,9 @@ class ItemControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/items/members")
 				.contentType(MediaType.APPLICATION_JSON)
-				.param("xCoordinate", String.valueOf(xCoordinate))
-				.param("yCoordinate", String.valueOf(yCoordinate))
-				.param("sortBy", sortBy)
+				.param("x-coordinate", String.valueOf(xCoordinate))
+				.param("y-coordinate", String.valueOf(yCoordinate))
+				.param("sort-by", sortBy)
 				.param("size", String.valueOf(size))
 				.param("page", String.valueOf(page)))
 			.andExpect(status().isOk())
@@ -560,9 +560,9 @@ class ItemControllerTest {
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestParameters(
-					List.of(parameterWithName("xCoordinate").description("경도"),
-						parameterWithName("yCoordinate").description("위도"),
-						parameterWithName("sortBy").description("정렬 기준(할인율순)"),
+					List.of(parameterWithName("x-coordinate").description("경도"),
+						parameterWithName("y-coordinate").description("위도"),
+						parameterWithName("sort-by").description("정렬 기준(할인율순)"),
 						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
@@ -604,9 +604,9 @@ class ItemControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/items/members")
 				.contentType(MediaType.APPLICATION_JSON)
-				.param("xCoordinate", String.valueOf(xCoordinate))
-				.param("yCoordinate", String.valueOf(yCoordinate))
-				.param("sortBy", sortBy)
+				.param("x-coordinate", String.valueOf(xCoordinate))
+				.param("y-coordinate", String.valueOf(yCoordinate))
+				.param("sort-by", sortBy)
 				.param("size", String.valueOf(size))
 				.param("page", String.valueOf(page)))
 			.andExpect(status().isOk())
@@ -615,9 +615,9 @@ class ItemControllerTest {
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestParameters(
-					List.of(parameterWithName("xCoordinate").description("경도"),
-						parameterWithName("yCoordinate").description("위도"),
-						parameterWithName("sortBy").description("정렬 기준(거리순)"),
+					List.of(parameterWithName("x-coordinate").description("경도"),
+						parameterWithName("y-coordinate").description("위도"),
+						parameterWithName("sort-by").description("정렬 기준(거리순)"),
 						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),

@@ -268,7 +268,7 @@ class ItemServiceTest {
 		when(itemRepository.findAllByDiscountRate(anyDouble(), anyDouble(), eq(PageRequest.of(page, size)))).thenReturn(itemPage);
 
 		//when
-		ItemsRes itemsRes = itemService.findAllForMember(xCoordinate, yCoordinate, "discountRate", pageRequest);
+		ItemsRes itemsRes = itemService.findAllForMember(xCoordinate, yCoordinate, "discount-rate", pageRequest);
 
 		//then
 		assertThat(itemsRes.itemResponses()).hasSize(items.size());
