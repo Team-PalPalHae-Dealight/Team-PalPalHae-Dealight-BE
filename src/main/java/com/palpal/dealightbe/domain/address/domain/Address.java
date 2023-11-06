@@ -17,7 +17,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @Table(name = "addresses")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Address extends BaseEntity {
 
 	@Id
@@ -29,6 +28,12 @@ public class Address extends BaseEntity {
 	private double xCoordinate;
 
 	private double yCoordinate;
+
+	public Address() {
+		this("프로그래머스 강남",
+			37.4974495848055,
+			127.028422526103);
+	}
 
 	@Builder
 	public Address(String name, double xCoordinate, double yCoordinate) {
