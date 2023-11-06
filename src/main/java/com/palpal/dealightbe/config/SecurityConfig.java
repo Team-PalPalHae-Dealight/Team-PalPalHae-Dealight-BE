@@ -34,6 +34,7 @@ public class SecurityConfig {
 	public WebSecurityCustomizer webSecurityCustomizer() {
 		return web -> web.ignoring()
 			// .antMatchers("/api/**")
+			.antMatchers("/actuator/**")
 			.antMatchers("/api/auth/signup")
 			.antMatchers("/h2-console/**");
 	}

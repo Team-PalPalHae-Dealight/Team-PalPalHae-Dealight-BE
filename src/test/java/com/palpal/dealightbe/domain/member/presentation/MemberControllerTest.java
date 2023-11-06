@@ -4,6 +4,8 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
@@ -353,6 +355,57 @@ class MemberControllerTest {
 				),
 				requestParts(
 					partWithName("file").description("업로드하려는 이미지 파일")
+				),
+				responseFields(
+					fieldWithPath("message").description("에러 메시지"),
+					fieldWithPath("timestamp").description("오류 발생 시각"),
+					fieldWithPath("code").description("에러 코드"),
+					fieldWithPath("errors").description("추가적인 에러 정보")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("멤버 이미지 삭제 성공")
+	void deleteMemberImageSuccessTest() throws Exception {
+		// given
+		Long memberId = 1L;
+
+		doNothing().when(memberService).deleteMemberImage(memberId);
+
+		// when -> then
+		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/members/images/{memberId}", memberId)
+				.contentType(APPLICATION_JSON))
+			.andExpect(status().isNoContent())
+			.andDo(print())
+			.andDo(document("member-delete-image-success",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("memberId").description("이미지를 삭제하려는 멤버의 ID")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("멤버 이미지 삭제 실패: 멤버 ID가 존재하지 않는 경우")
+	void deleteMemberImageFailNotFoundTest() throws Exception {
+		// given
+		Long nonexistentMemberId = 999L;
+
+		doThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER)).when(memberService)
+			.deleteMemberImage(nonexistentMemberId);
+
+		// when -> then
+		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/members/images/{memberId}", nonexistentMemberId)
+				.contentType(APPLICATION_JSON))
+			.andExpect(status().isNotFound())
+			.andDo(print())
+			.andDo(document("member-delete-image-not-found",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("memberId").description("이미지를 삭제하려는 멤버의 ID")
 				),
 				responseFields(
 					fieldWithPath("message").description("에러 메시지"),
