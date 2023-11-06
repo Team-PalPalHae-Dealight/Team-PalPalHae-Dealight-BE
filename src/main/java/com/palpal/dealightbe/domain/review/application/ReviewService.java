@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 @RequiredArgsConstructor
 public class ReviewService {
+
 	private final StoreRepository storeRepository;
 	private final OrderRepository orderRepository;
 	private final ReviewRepository reviewRepository;
@@ -47,7 +48,7 @@ public class ReviewService {
 		}
 
 		if (!order.isCompleted()) {
-			log.warn("POST:WRITER:CANNOT_WRITER_REVIEW: ORDER_STATUS {}", order.getOrderStatus());
+			log.warn("POST:WRITER:CANNOT_WRITER_REVIEW : ORDER_STATUS {}", order.getOrderStatus());
 			throw new BusinessException(ILLEGAL_REVIEW_REQUEST);
 		}
 
@@ -77,7 +78,7 @@ public class ReviewService {
 		Order order = getOrder(id);
 
 		if (!order.isMember(providerId)) {
-			log.warn("GET:REVIEW:UNAUTHORIZED: REVIEW_WRITER {}, REQUESTER {}",
+			log.warn("GET:REVIEW:UNAUTHORIZED : REVIEW_WRITER {}, REQUESTER {}",
 				order.getMember().getId(), providerId);
 			throw new BusinessException(UNAUTHORIZED_REQUEST);
 		}

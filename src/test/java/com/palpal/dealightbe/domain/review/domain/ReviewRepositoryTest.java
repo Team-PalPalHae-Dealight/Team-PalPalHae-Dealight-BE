@@ -74,11 +74,11 @@ class ReviewRepositoryTest {
 		long storeId = store.getId();
 
 		List<Review> reviews = List.of(
-			createReview("사장님이 친절해요"),
-			createReview("사장님이 친절해요"),
-			createReview("사장님이 친절해요"),
-			createReview("가격이 저렴해요"),
-			createReview("가격이 저렴해요")
+			createReview(ReviewContent.Q1.getMessage()),
+			createReview(ReviewContent.Q1.getMessage()),
+			createReview(ReviewContent.Q1.getMessage()),
+			createReview(ReviewContent.Q2.getMessage()),
+			createReview(ReviewContent.Q2.getMessage())
 		);
 
 		reviewRepository.saveAll(reviews);
@@ -92,14 +92,14 @@ class ReviewRepositoryTest {
 		assertThat(storeReviewsRes.reviews()).hasSize(2)
 			.extracting("content", "count")
 			.containsExactlyInAnyOrder(
-				tuple("사장님이 친절해요", 3),
-				tuple("가격이 저렴해요", 2)
+				tuple("Q1", 3),
+				tuple("Q2", 2)
 			);
 	}
 
 	private Review createReview(String content) {
 		return Review.builder()
-			.content(content)
+			.content(ReviewContent.messageOf(content))
 			.order(order)
 			.build();
 	}

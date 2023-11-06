@@ -28,6 +28,7 @@ import com.palpal.dealightbe.domain.review.application.dto.request.ReviewCreateR
 import com.palpal.dealightbe.domain.review.application.dto.response.ReviewCreateRes;
 import com.palpal.dealightbe.domain.review.application.dto.response.ReviewRes;
 import com.palpal.dealightbe.domain.review.domain.Review;
+import com.palpal.dealightbe.domain.review.domain.ReviewContent;
 import com.palpal.dealightbe.domain.review.domain.ReviewRepository;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
@@ -69,7 +70,9 @@ class ReviewServiceIntegrationTest {
 
 				long orderId = order.getId();
 
-				ReviewCreateReq reviewCreateReq = new ReviewCreateReq(List.of("사장님이 친절해요", "가격이 저렴해요"));
+				ReviewCreateReq reviewCreateReq = new ReviewCreateReq(
+					List.of(ReviewContent.Q1.getMessage(), ReviewContent.Q2.getMessage())
+				);
 				long memberProviderId = member.getProviderId();
 
 				order.changeStatus(store.getMember(), "CONFIRMED");
@@ -89,7 +92,7 @@ class ReviewServiceIntegrationTest {
 					.forEach(
 						id -> {
 							Review review = reviewRepository.findById(id).get();
-							messages.add(review.getContent());
+							messages.add(review.getContent().getMessage());
 
 							assertThat(review.getOrder().getId(), is(orderId));
 						}
@@ -174,8 +177,8 @@ class ReviewServiceIntegrationTest {
 				Order order = createOrder(member, store);
 
 				List<Review> reviewReq = List.of(
-					createReview(order, "사장님이 친절해요"),
-					createReview(order, "가격이 저렴해요")
+					createReview(order, ReviewContent.Q1.getMessage()),
+					createReview(order, ReviewContent.Q2.getMessage())
 				);
 
 				reviewRepository.saveAll(reviewReq);
@@ -190,7 +193,7 @@ class ReviewServiceIntegrationTest {
 
 				Assertions.assertThat(reviewRes.messages())
 					.usingRecursiveComparison()
-					.isEqualTo(reviewReq.stream().map(Review::getContent).toList());
+					.isEqualTo(reviewReq.stream().map(m -> m.getContent().getMessage()).toList());
 
 			}
 		}
@@ -271,7 +274,7 @@ class ReviewServiceIntegrationTest {
 
 	private Review createReview(Order order, String content) {
 		return Review.builder()
-			.content(content)
+			.content(ReviewContent.messageOf(content))
 			.order(order)
 			.build();
 	}

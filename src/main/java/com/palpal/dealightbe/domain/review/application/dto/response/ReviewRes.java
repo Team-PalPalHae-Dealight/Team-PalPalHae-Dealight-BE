@@ -10,7 +10,7 @@ public record ReviewRes(
 	public static ReviewRes from(List<Review> review) {
 		return new ReviewRes(
 			review.stream()
-				.map(Review::getContent)
+				.map(r -> r.getContent().getMessage())
 				.toList()
 		);
 	}

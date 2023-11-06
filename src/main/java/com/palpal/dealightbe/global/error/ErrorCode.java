@@ -58,7 +58,9 @@ public enum ErrorCode {
 	//리뷰
 	NOT_FOUND_REVIEW("R001", "존재하지 않는 리뷰입니다."),
 	INVALID_REVIEW_CREATOR("R002", "리뷰는 상품을 주문한 고객 본인만 작성할 수 있습니다."),
-	ILLEGAL_REVIEW_REQUEST("R003", "완료된 주문에 대해서만 리뷰를 작성할 수 있습니다.");
+	ILLEGAL_REVIEW_REQUEST("R003", "완료된 주문에 대해서만 리뷰를 작성할 수 있습니다."),
+	INVALID_REVIEW_MESSAGE("R004", "유효하지 않은 리뷰 메시지가 존재합니다."),
+	;
 
 	private final String code;
 	private final String message;
