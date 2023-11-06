@@ -33,7 +33,7 @@ public class SecurityConfig {
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
 		return web -> web.ignoring()
-			// .antMatchers("/api/**")
+			.antMatchers("/docs/**")
 			.antMatchers("/actuator/**")
 			.antMatchers("/api/auth/signup")
 			.antMatchers("/h2-console/**");
