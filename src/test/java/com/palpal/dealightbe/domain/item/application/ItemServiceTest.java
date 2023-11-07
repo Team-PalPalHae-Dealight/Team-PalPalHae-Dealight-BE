@@ -320,48 +320,57 @@ class ItemServiceTest {
 		assertThat(itemsRes.itemResponses()).hasSize(items.size());
 	}
 
-//	@DisplayName("상품 수정 성공 테스트")
-//	@Test
-//	void itemUpdateSuccessTest() {
-//		//given
-//		ItemReq itemReq = new ItemReq("수정이름", 1, 3000, 3500, "상세 내용 수정", "안내 사항 수정", null);
-//		Long memberId = 1L;
-//		Long itemId = 1L;
-//
-//		when(storeRepository.findByMemberId(any())).thenReturn(Optional.of(store));
-//		when(itemRepository.existsByNameAndStoreId(any(), any())).thenReturn(false);
-//		when(itemRepository.findById(any())).thenReturn(Optional.of(item));
-//
-//		//when
-//		ItemRes itemRes = itemService.update(itemId, itemReq, memberId);
-//
-//		//then
-//		assertThat(itemRes.name()).isEqualTo(itemReq.name());
-//		assertThat(itemRes.stock()).isEqualTo(itemReq.stock());
-//		assertThat(itemRes.discountPrice()).isEqualTo(itemReq.discountPrice());
-//		assertThat(itemRes.originalPrice()).isEqualTo(itemReq.originalPrice());
-//		assertThat(itemRes.description()).isEqualTo(itemReq.description());
-//		assertThat(itemRes.information()).isEqualTo(itemReq.information());
-//	}
-//
-//	@DisplayName("상품 수정 실패 테스트 - 할인가가 원가보다 큰 경우")
-//	@Test
-//	void itemUpdateFailureTest_invalidDiscountPrice() {
-//		//given
-//		ItemReq itemReq = new ItemReq("수정이름", 1, 4000, 3500, "상세 내용 수정", "안내 사항 수정", null);
-//		Long memberId = 1L;
-//		Long itemId = 1L;
-//
-//		when(storeRepository.findByMemberId(any())).thenReturn(Optional.of(store));
-//		when(itemRepository.existsByNameAndStoreId(any(), any())).thenReturn(false);
-//		when(itemRepository.findById(any())).thenReturn(Optional.of(item));
-//
-//		//when
-//		//then
-//		assertThrows(BusinessException.class, () -> {
-//			itemService.update(itemId, itemReq, memberId);
-//		});
-//	}
+	@DisplayName("상품 수정 성공 테스트")
+	@Test
+	void itemUpdateSuccessTest() {
+		//given
+		ItemReq itemReq = new ItemReq("수정이름", 1, 3000, 3500, "상세 내용 수정", "안내 사항 수정");
+		Long memberId = 1L;
+		Long itemId = 1L;
+
+		MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "Spring Framework".getBytes());
+		ImageUploadReq imageUploadReq = new ImageUploadReq(file);
+		String imageUrl = "http://image-url.com/image.jpg";
+
+		when(storeRepository.findByMemberId(any())).thenReturn(Optional.of(store));
+		when(itemRepository.findById(any())).thenReturn(Optional.of(item));
+		when(imageService.store(file)).thenReturn(imageUrl);
+
+		//when
+		ItemRes itemRes = itemService.update(itemId, itemReq, memberId, imageUploadReq);
+
+		//then
+		assertThat(itemRes.name()).isEqualTo(itemReq.name());
+		assertThat(itemRes.stock()).isEqualTo(itemReq.stock());
+		assertThat(itemRes.discountPrice()).isEqualTo(itemReq.discountPrice());
+		assertThat(itemRes.originalPrice()).isEqualTo(itemReq.originalPrice());
+		assertThat(itemRes.description()).isEqualTo(itemReq.description());
+		assertThat(itemRes.information()).isEqualTo(itemReq.information());
+		assertThat(itemRes.image()).isEqualTo(imageUrl);
+	}
+
+	@DisplayName("상품 수정 실패 테스트 - 할인가가 원가보다 큰 경우")
+	@Test
+	void itemUpdateFailureTest_invalidDiscountPrice() {
+		//given
+		ItemReq itemReq = new ItemReq("수정이름", 1, 4000, 3500, "상세 내용 수정", "안내 사항 수정");
+		Long memberId = 1L;
+		Long itemId = 1L;
+
+		MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "Spring Framework".getBytes());
+		ImageUploadReq imageUploadReq = new ImageUploadReq(file);
+		String imageUrl = "http://image-url.com/image.jpg";
+
+		when(storeRepository.findByMemberId(any())).thenReturn(Optional.of(store));
+		when(itemRepository.findById(any())).thenReturn(Optional.of(item));
+		when(imageService.store(file)).thenReturn(imageUrl);
+
+		//when
+		//then
+		assertThrows(BusinessException.class, () -> {
+			itemService.update(itemId, itemReq, memberId, imageUploadReq);
+		});
+	}
 
 	@DisplayName("상품 삭제 성공 테스트")
 	@Test

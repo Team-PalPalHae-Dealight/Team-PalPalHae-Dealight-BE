@@ -37,11 +37,7 @@ public class ItemService {
 	private final ImageService imageService;
 
 	public ItemRes create(ItemReq itemReq, Long memberId, ImageUploadReq imageUploadReq) {
-		Store store = storeRepository.findByMemberId(memberId)
-			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_STORE_BY_MEMBER_ID : {}", memberId);
-				return new EntityNotFoundException(NOT_FOUND_STORE);
-			});
+		Store store = getStore(memberId);
 
 		checkDuplicatedItemName(itemReq.name(), store.getId());
 
@@ -55,22 +51,14 @@ public class ItemService {
 
 	@Transactional(readOnly = true)
 	public ItemRes findById(Long itemId) {
-		Item item = itemRepository.findById(itemId)
-			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", itemId);
-				return new EntityNotFoundException(NOT_FOUND_ITEM);
-			});
+		Item item = getItem(itemId);
 
 		return ItemRes.from(item);
 	}
 
 	@Transactional(readOnly = true)
 	public ItemsRes findAllForStore(Long memberId, Pageable pageable) {
-		Store store = storeRepository.findByMemberId(memberId)
-			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_STORE_BY_MEMBER_ID : {}", memberId);
-				return new EntityNotFoundException(NOT_FOUND_STORE);
-			});
+		Store store = getStore(memberId);
 
 		Page<Item> items = itemRepository.findAllByStoreIdOrderByUpdatedAtDesc(store.getId(), pageable);
 
@@ -92,43 +80,36 @@ public class ItemService {
 		return ItemsRes.from(items);
 	}
 
-//	public ItemRes update(Long itemId, ItemReq itemReq, Long memberId) {
-//		Store store = storeRepository.findByMemberId(memberId)
-//			.orElseThrow(() -> {
-//				log.warn("GET:READ:NOT_FOUND_STORE_BY_MEMBER_ID : {}", memberId);
-//				return new EntityNotFoundException(NOT_FOUND_STORE);
-//			});
-//
-//		checkDuplicatedItemName(itemReq.name(), store.getId());
-//
-//		Item item = itemRepository.findById(itemId)
-//			.orElseThrow(() -> {
-//				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", itemId);
-//				return new EntityNotFoundException(NOT_FOUND_ITEM);
-//			});
-//
-//		Item updatedItem = ItemReq.toItem(itemReq, store);
-//		item.update(updatedItem);
-//
-//		return ItemRes.from(item);
-//	}
+	public ItemRes update(Long itemId, ItemReq itemReq, Long memberId, ImageUploadReq imageUploadReq) {
+		Store store = getStore(memberId);
+		Item item = getItem(itemId);
+
+		String image = item.getImage();
+		imageService.delete(image);
+
+		String imageUrl = saveImage(imageUploadReq);
+
+		Item updatedItem = ItemReq.toItem(itemReq, store, imageUrl);
+		item.update(updatedItem);
+
+		return ItemRes.from(item);
+	}
 
 	public void delete(Long itemId, Long memberId) {
-		Store store = storeRepository.findByMemberId(memberId)
-			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_STORE_BY_MEMBER_ID : {}", memberId);
-				return new EntityNotFoundException(NOT_FOUND_STORE);
-			});
-
-		Item item = itemRepository.findById(itemId)
-			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", itemId);
-				return new EntityNotFoundException(NOT_FOUND_ITEM);
-			});
+		Store store = getStore(memberId);
+		Item item = getItem(itemId);
 
 		item.checkItemInStore(store);
 
 		itemRepository.delete(item);
+	}
+
+	public String saveImage(ImageUploadReq imageUploadReq) {
+		if (!imageUploadReq.file().isEmpty()) {
+			return imageService.store(imageUploadReq.file());
+		}
+
+		return DEFAULT_ITEM_IMAGE_PATH;
 	}
 
 	private void checkDuplicatedItemName(String itemName, Long storeId) {
@@ -138,11 +119,19 @@ public class ItemService {
 		}
 	}
 
-	public String saveImage(ImageUploadReq imageUploadReq) {
-		if (!imageUploadReq.file().isEmpty()) {
-			return imageService.store(imageUploadReq.file());
-		}
+	private Store getStore(Long memberId) {
+		return storeRepository.findByMemberId(memberId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_STORE_BY_MEMBER_ID : {}", memberId);
+				return new EntityNotFoundException(NOT_FOUND_STORE);
+			});
+	}
 
-		return DEFAULT_ITEM_IMAGE_PATH;
+	private Item getItem(Long itemId) {
+		return itemRepository.findById(itemId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", itemId);
+				return new EntityNotFoundException(NOT_FOUND_ITEM);
+			});
 	}
 }

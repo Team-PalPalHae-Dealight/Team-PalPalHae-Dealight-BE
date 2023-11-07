@@ -18,10 +18,13 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palpal.dealightbe.config.SecurityConfig;
@@ -793,222 +796,241 @@ class ItemControllerTest {
 			));
 	}
 
-//	@DisplayName("상품 수정 성공 테스트")
-//	@Test
-//	public void itemUpdateSuccessTest() throws Exception {
-//		//given
-//		Long itemId = 1L;
-//		Long memberId = 1L;
-//
-//		ItemReq itemReq = new ItemReq("치즈 떡볶이", 4, 9900, 14000, "치즈 떡볶이 입니다.", "통신사 할인 가능 합니다.", null);
-//		ItemRes itemRes = new ItemRes(itemId, 1L, itemReq.name(), itemReq.stock(), itemReq.discountPrice(),
-//			itemReq.originalPrice(), itemReq.description(), itemReq.information(), itemReq.image());
-//
-//		when(itemService.update(any(), any(), any())).thenReturn(itemRes);
-//
-//		//when
-//		//then
-//		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/items/{id}", itemId)
-//				.contentType(MediaType.APPLICATION_JSON)
-//				.content(objectMapper.writeValueAsString(itemReq))
-//				.param("memberId", memberId.toString()))
-//			.andExpect(status().isOk())
-//			.andExpect(jsonPath("$.name").value(itemRes.name()))
-//			.andExpect(jsonPath("$.stock").value(itemRes.stock()))
-//			.andExpect(jsonPath("$.discountPrice").value(itemRes.discountPrice()))
-//			.andExpect(jsonPath("$.originalPrice").value(itemRes.originalPrice()))
-//			.andExpect(jsonPath("$.description").value(itemRes.description()))
-//			.andExpect(jsonPath("$.information").value(itemRes.information()))
-//			.andExpect(jsonPath("$.image").value(itemRes.image()))
-//			.andDo(print())
-//			.andDo(document("item/item-update",
-//				Preprocessors.preprocessRequest(prettyPrint()),
-//				preprocessResponse(prettyPrint()),
-//				pathParameters(parameterWithName("id").description("상품 ID")),
-//				requestParameters(parameterWithName("memberId").description("고객 ID")),
-//				requestFields(
-//					fieldWithPath("name").description("상품 이름"),
-//					fieldWithPath("stock").description("재고 수"),
-//					fieldWithPath("discountPrice").description("할인가"),
-//					fieldWithPath("originalPrice").description("원가"),
-//					fieldWithPath("description").description("상세 설명"),
-//					fieldWithPath("information").description("안내 사항"),
-//					fieldWithPath("image").description("상품 이미지")
-//				),
-//				responseFields(
-//					fieldWithPath("itemId").type(NUMBER).description("상품 ID"),
-//					fieldWithPath("storeId").type(NUMBER).description("업체 ID"),
-//					fieldWithPath("name").type(STRING).description("상품 이름"),
-//					subsectionWithPath("stock").type(NUMBER).description("재고 수"),
-//					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
-//					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
-//					fieldWithPath("description").type(STRING).description("상세 설명"),
-//					fieldWithPath("information").type(STRING).description("안내 사항"),
-//					fieldWithPath("image").type(NULL).description("상품 이미지")
-//				)
-//			));
-//	}
-//
-//	@DisplayName("상품 수정 실패 테스트 - 입력되지 않은 상품 이름")
-//	@Test
-//	public void itemUpdateFailureTest_invalidName() throws Exception {
-//		//given
-//		Long itemId = 1L;
-//		Long memberId = 1L;
-//
-//		Item item2 = Item.builder()
-//			.name("")
-//			.stock(4)
-//			.discountPrice(9900)
-//			.originalPrice(14500)
-//			.description("치즈 떡볶이 입니다.")
-//			.information("통신사 할인 가능 합니다.")
-//			.store(store)
-//			.build();
-//
-//		ItemReq itemReq = new ItemReq(item2.getName(), item2.getStock(), item2.getDiscountPrice(),
-//			item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage());
-//		ItemRes itemRes = new ItemRes(itemId, 1L, itemReq.name(), itemReq.stock(), itemReq.discountPrice(),
-//			itemReq.originalPrice(), itemReq.description(), itemReq.information(), itemReq.image());
-//
-//		when(itemService.update(any(), any(), any())).thenReturn(itemRes);
-//
-//		//when
-//		//then
-//		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/items/{id}", itemId)
-//				.contentType(MediaType.APPLICATION_JSON)
-//				.content(objectMapper.writeValueAsString(itemReq))
-//				.param("memberId", memberId.toString()))
-//			.andExpect(status().isBadRequest())
-//			.andExpect(jsonPath("$.timestamp").isNotEmpty())
-//			.andExpect(jsonPath("$.code").value("C001"))
-//			.andExpect(jsonPath("$.errors[0].field").value("name"))
-//			.andExpect(jsonPath("$.errors[0].value").value(""))
-//			.andExpect(jsonPath("$.errors[0].reason").isNotEmpty())
-//			.andExpect(jsonPath("$.errors[1].field").value("name"))
-//			.andExpect(jsonPath("$.errors[1].value").value(""))
-//			.andExpect(jsonPath("$.errors[1].reason").isNotEmpty())
-//			.andExpect(jsonPath("$.message").value("잘못된 값을 입력하셨습니다."))
-//			.andDo(print())
-//			.andDo(document("item/item-update-fail-invalid-name",
-//				Preprocessors.preprocessRequest(prettyPrint()),
-//				preprocessResponse(prettyPrint()),
-//				pathParameters(parameterWithName("id").description("상품 ID")),
-//				requestParameters(parameterWithName("memberId").description("고객 ID")),
-//				requestFields(
-//					fieldWithPath("name").description("상품 이름"),
-//					fieldWithPath("stock").description("재고 수"),
-//					fieldWithPath("discountPrice").description("할인가"),
-//					fieldWithPath("originalPrice").description("원가"),
-//					fieldWithPath("description").description("상세 설명"),
-//					fieldWithPath("information").description("안내 사항"),
-//					fieldWithPath("image").description("상품 이미지")
-//				),
-//				responseFields(
-//					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
-//					fieldWithPath("code").type(STRING).description("예외 코드"),
-//					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
-//					fieldWithPath("errors[].field").type(STRING).description("오류 필드"),
-//					fieldWithPath("errors[].value").type(STRING).description("오류 값"),
-//					fieldWithPath("errors[].reason").type(STRING).description("오류 사유"),
-//					fieldWithPath("message").type(STRING).description("오류 메시지")
-//				)
-//			));
-//	}
-//
-//	@DisplayName("상품 수정 실패 테스트 - 할인가가 원가보다 큰 경우")
-//	@Test
-//	public void itemUpdateFailureTest_invalidDiscountPrice() throws Exception {
-//		//given
-//		ItemReq itemReq = new ItemReq("치즈 떡볶이", 4, 10000, 5000, "치즈 떡볶이 입니다.", "통신사 할인 가능 합니다.", null);
-//
-//		Long memberId = 1L;
-//		Long itemId = 1L;
-//
-//		when(itemService.update(any(), any(), any())).thenThrow(
-//			new BusinessException(ErrorCode.INVALID_ITEM_DISCOUNT_PRICE));
-//
-//		//when
-//		//then
-//		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/items/{id}", itemId)
-//				.contentType(MediaType.APPLICATION_JSON)
-//				.content(objectMapper.writeValueAsString(itemReq))
-//				.param("memberId", memberId.toString()))
-//			.andExpect(status().isBadRequest())
-//			.andExpect(jsonPath("$.timestamp").isNotEmpty())
-//			.andExpect(jsonPath("$.code").value("I001"))
-//			.andExpect(jsonPath("$.errors").isEmpty())
-//			.andExpect(jsonPath("$.message").value("상품 할인가는 원가보다 클 수 없습니다."))
-//			.andDo(print())
-//			.andDo(document("item/item-update-fail-invalid-discount-price",
-//				Preprocessors.preprocessRequest(prettyPrint()),
-//				preprocessResponse(prettyPrint()),
-//				pathParameters(parameterWithName("id").description("상품 ID")),
-//				requestParameters(parameterWithName("memberId").description("고객 ID")),
-//				requestFields(
-//					fieldWithPath("name").description("상품 이름"),
-//					fieldWithPath("stock").description("재고 수"),
-//					fieldWithPath("discountPrice").description("할인가"),
-//					fieldWithPath("originalPrice").description("원가"),
-//					fieldWithPath("description").description("상세 설명"),
-//					fieldWithPath("information").description("안내 사항"),
-//					fieldWithPath("image").description("상품 이미지")
-//				),
-//				responseFields(
-//					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
-//					fieldWithPath("code").type(STRING).description("예외 코드"),
-//					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
-//					fieldWithPath("message").type(STRING).description("오류 메시지")
-//				)
-//			));
-//	}
-//
-//	@DisplayName("상품 수정 실패 테스트 - 이미 등록된 상품인 경우(이름 중복)")
-//	@Test
-//	public void itemUpdateFailureTest_duplicatedItemName() throws Exception {
-//		//given
-//		ItemReq itemReq = new ItemReq("떡볶이", 2, 4500, 4000, "기본 떡볶이 입니다.", "통신사 할인 불가능 합니다.", null);
-//
-//		Long memberId = 1L;
-//		Long itemId = 1L;
-//
-//		doThrow(new BusinessException(DUPLICATED_ITEM_NAME)).when(
-//			itemService).update(any(), any(), any());
-//
-//		//when
-//		//then
-//		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/items/{id}", itemId)
-//				.contentType(MediaType.APPLICATION_JSON)
-//				.content(objectMapper.writeValueAsString(itemReq))
-//				.param("memberId", memberId.toString()))
-//			.andExpect(status().isBadRequest())
-//			.andExpect(jsonPath("$.timestamp").isNotEmpty())
-//			.andExpect(jsonPath("$.code").value("I003"))
-//			.andExpect(jsonPath("$.errors").isEmpty())
-//			.andExpect(jsonPath("$.message").value("동일한 이름을 가진 상품이 이미 등록되어 있습니다."))
-//			.andDo(print())
-//			.andDo(document("item/item-update-fail-duplicated-item-name",
-//				Preprocessors.preprocessRequest(prettyPrint()),
-//				preprocessResponse(prettyPrint()),
-//				pathParameters(parameterWithName("id").description("상품 ID")),
-//				requestParameters(parameterWithName("memberId").description("고객 ID")),
-//				requestFields(
-//					fieldWithPath("name").description("상품 이름"),
-//					fieldWithPath("stock").description("재고 수"),
-//					fieldWithPath("discountPrice").description("할인가"),
-//					fieldWithPath("originalPrice").description("원가"),
-//					fieldWithPath("description").description("상세 설명"),
-//					fieldWithPath("information").description("안내 사항"),
-//					fieldWithPath("image").description("상품 이미지")
-//				),
-//				responseFields(
-//					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
-//					fieldWithPath("code").type(STRING).description("예외 코드"),
-//					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
-//					fieldWithPath("message").type(STRING).description("오류 메시지")
-//				)
-//			));
-//	}
+	@DisplayName("상품 수정 성공 테스트")
+	@Test
+	public void itemUpdateSuccessTest() throws Exception {
+		//given
+		Long itemId = 1L;
+		Long memberId = 1L;
+
+		StoreInfoRes storeInfoRes = new StoreInfoRes(store.getStoreNumber(), store.getName(), store.getTelephone(), store.getAddress().getName(), store.getOpenTime(), store.getCloseTime(), store.getDayOffs(), store.getStoreStatus(), store.getImage());
+		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
+		String imageUrl = "http://image-url.com/image.jpg";
+
+		ItemReq itemReq = new ItemReq("치즈 떡볶이", 4, 9900, 14000, "치즈 떡볶이 입니다.", "통신사 할인 가능 합니다.");
+		ItemRes itemRes = new ItemRes(itemId, 1L, itemReq.name(), itemReq.stock(), itemReq.discountPrice(),
+			itemReq.originalPrice(), itemReq.description(), itemReq.information(), imageUrl, storeInfoRes, addressRes);
+
+		MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "file".getBytes());
+		MockMultipartFile request = new MockMultipartFile("itemReq", "itemReq",
+			"application/json",
+			objectMapper.writeValueAsString(itemReq).getBytes());
+
+		MockMultipartHttpServletRequestBuilder builder = RestDocumentationRequestBuilders.
+			multipart("/api/items/{id}", itemId);
+
+		builder.with(request1 -> {
+			request1.setMethod("PATCH");
+			return request1;
+		});
+
+		when(itemService.update(any(), any(), any(), any())).thenReturn(itemRes);
+
+		//when
+		//then
+		mockMvc.perform(builder
+			.file(file)
+			.file(request)
+			.param("memberId", memberId.toString())
+			.contentType(MediaType.MULTIPART_FORM_DATA)
+			.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.itemId").value(itemRes.itemId()))
+			.andExpect(jsonPath("$.storeId").value(itemRes.storeId()))
+			.andExpect(jsonPath("$.name").value(itemRes.name()))
+			.andExpect(jsonPath("$.stock").value(itemRes.stock()))
+			.andExpect(jsonPath("$.discountPrice").value(itemRes.discountPrice()))
+			.andExpect(jsonPath("$.originalPrice").value(itemRes.originalPrice()))
+			.andExpect(jsonPath("$.description").value(itemRes.description()))
+			.andExpect(jsonPath("$.information").value(itemRes.information()))
+			.andExpect(jsonPath("$.image").value(itemRes.image()))
+			.andExpect(jsonPath("$.storeInfoRes.storeNumber").value(storeInfoRes.storeNumber()))
+			.andExpect(jsonPath("$.storeInfoRes.name").value(storeInfoRes.name()))
+			.andExpect(jsonPath("$.storeInfoRes.telephone").value(storeInfoRes.telephone()))
+			.andExpect(jsonPath("$.storeInfoRes.addressName").value(storeInfoRes.addressName()))
+			.andExpect(jsonPath("$.storeInfoRes.openTime").value(storeInfoRes.openTime().toString()))
+			.andExpect(jsonPath("$.storeInfoRes.closeTime").value(storeInfoRes.closeTime().toString()))
+			.andExpect(jsonPath("$.storeInfoRes.dayOff").value(storeInfoRes.dayOff().stream().map(DayOff::getName).collect(Collectors.toList())))
+			.andExpect(jsonPath("$.storeInfoRes.storeStatus").value(storeInfoRes.storeStatus().getName()))
+			.andExpect(jsonPath("$.storeInfoRes.image").value(storeInfoRes.image()))
+			.andExpect(jsonPath("$.storeAddressRes.name").value(addressRes.name()))
+			.andExpect(jsonPath("$.storeAddressRes.xCoordinate").value(addressRes.xCoordinate()))
+			.andExpect(jsonPath("$.storeAddressRes.yCoordinate").value(addressRes.yCoordinate()))
+			.andDo(print())
+			.andDo(document("item/item-update",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(parameterWithName("id").description("상품 ID")),
+				requestParameters(parameterWithName("memberId").description("고객 ID")),
+				requestParts(
+					partWithName("image").description("상품 이미지"),
+					partWithName("itemReq").description("상품 등록 내용")
+				),
+				responseFields(
+					fieldWithPath("itemId").type(NUMBER).description("상품 ID"),
+					fieldWithPath("storeId").type(NUMBER).description("업체 ID"),
+					fieldWithPath("name").type(STRING).description("상품 이름"),
+					fieldWithPath("stock").type(NUMBER).description("재고 수"),
+					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
+					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
+					fieldWithPath("description").type(STRING).description("상세 설명"),
+					fieldWithPath("information").type(STRING).description("안내 사항"),
+					fieldWithPath("image").type(STRING).description("상품 이미지 경로"),
+					fieldWithPath("storeInfoRes.storeNumber").type(STRING).description("사업자 등록 번호"),
+					fieldWithPath("storeInfoRes.name").type(STRING).description("상호명"),
+					fieldWithPath("storeInfoRes.telephone").type(STRING).description("업체 전화번호"),
+					fieldWithPath("storeInfoRes.addressName").type(STRING).description("업체 주소"),
+					fieldWithPath("storeInfoRes.openTime").type(STRING).description("오픈 시간"),
+					fieldWithPath("storeInfoRes.closeTime").type(STRING).description("마감 시간"),
+					fieldWithPath("storeInfoRes.dayOff").type(ARRAY).description("휴무일"),
+					fieldWithPath("storeInfoRes.storeStatus").type(STRING).description("영업 유무"),
+					fieldWithPath("storeInfoRes.image").type(STRING).description("업체 이미지 경로"),
+					fieldWithPath("storeAddressRes.name").type(STRING).description("업체 주소 URL"),
+					fieldWithPath("storeAddressRes.xCoordinate").type(NUMBER).description("업체 주소 경도"),
+					fieldWithPath("storeAddressRes.yCoordinate").type(NUMBER).description("업체 주소 위도")
+				)
+			));
+	}
+
+	@DisplayName("상품 수정 실패 테스트 - 입력되지 않은 상품 이름")
+	@Test
+	public void itemUpdateFailureTest_invalidName() throws Exception {
+		//given
+		Long itemId = 1L;
+		Long memberId = 1L;
+		String imageUrl = "http://image-url.com/image.jpg";
+
+		Item item3 = Item.builder()
+			.name("")
+			.stock(4)
+			.discountPrice(9900)
+			.originalPrice(14500)
+			.description("치즈 떡볶이 입니다.")
+			.information("통신사 할인 가능 합니다.")
+			.image(imageUrl)
+			.store(store)
+			.build();
+
+		StoreInfoRes storeInfoRes = new StoreInfoRes(store.getStoreNumber(), store.getName(), store.getTelephone(), store.getAddress().getName(), store.getOpenTime(), store.getCloseTime(), store.getDayOffs(), store.getStoreStatus(), store.getImage());
+		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
+
+		ItemReq itemReq = new ItemReq(item3.getName(), item3.getStock(), item3.getDiscountPrice(),
+			item3.getOriginalPrice(), item3.getDescription(), item3.getInformation());
+		ItemRes itemRes = new ItemRes(itemId, 1L, item3.getName(), item3.getStock(), item3.getDiscountPrice(),
+			item3.getOriginalPrice(), item3.getDescription(), item3.getInformation(), item3.getImage(), storeInfoRes, addressRes);
+
+		MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "file".getBytes());
+		MockMultipartFile request = new MockMultipartFile("itemReq", "itemReq",
+			"application/json",
+			objectMapper.writeValueAsString(itemReq).getBytes());
+
+		MockMultipartHttpServletRequestBuilder builder = RestDocumentationRequestBuilders.
+			multipart("/api/items/{id}", itemId);
+
+		builder.with(request1 -> {
+			request1.setMethod("PATCH");
+			return request1;
+		});
+
+		when(itemService.update(any(), any(), any(), any())).thenReturn(itemRes);
+
+		//when
+		//then
+		mockMvc.perform(builder
+				.file(file)
+				.file(request)
+				.param("memberId", memberId.toString())
+				.contentType(MediaType.MULTIPART_FORM_DATA)
+				.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("C001"))
+			.andExpect(jsonPath("$.errors[0].field").value("name"))
+			.andExpect(jsonPath("$.errors[0].value").value(""))
+			.andExpect(jsonPath("$.errors[0].reason").isNotEmpty())
+			.andExpect(jsonPath("$.errors[1].field").value("name"))
+			.andExpect(jsonPath("$.errors[1].value").value(""))
+			.andExpect(jsonPath("$.errors[1].reason").isNotEmpty())
+			.andExpect(jsonPath("$.message").value("잘못된 값을 입력하셨습니다."))
+			.andDo(print())
+			.andDo(document("item/item-update-fail-invalid-name",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(parameterWithName("id").description("상품 ID")),
+				requestParameters(parameterWithName("memberId").description("고객 ID")),
+				requestParts(
+					partWithName("image").description("상품 이미지"),
+					partWithName("itemReq").description("상품 등록 내용")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("예외 코드"),
+					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
+					fieldWithPath("errors[].field").type(STRING).description("오류 필드"),
+					fieldWithPath("errors[].value").type(STRING).description("오류 값"),
+					fieldWithPath("errors[].reason").type(STRING).description("오류 사유"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@DisplayName("상품 수정 실패 테스트 - 할인가가 원가보다 큰 경우")
+	@Test
+	public void itemUpdateFailureTest_invalidDiscountPrice() throws Exception {
+		//given
+		ItemReq itemReq = new ItemReq("치즈 떡볶이", 4, 10000, 5000, "치즈 떡볶이 입니다.", "통신사 할인 가능 합니다.");
+
+		Long memberId = 1L;
+		Long itemId = 1L;
+
+		MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "file".getBytes());
+		MockMultipartFile request = new MockMultipartFile("itemReq", "itemReq",
+			"application/json",
+			objectMapper.writeValueAsString(itemReq).getBytes());
+
+		MockMultipartHttpServletRequestBuilder builder = RestDocumentationRequestBuilders.
+			multipart("/api/items/{id}", itemId);
+
+		builder.with(request1 -> {
+			request1.setMethod("PATCH");
+			return request1;
+		});
+
+		when(itemService.update(any(), any(), any(), any())).thenThrow(
+			new BusinessException(ErrorCode.INVALID_ITEM_DISCOUNT_PRICE));
+
+		//when
+		//then
+		mockMvc.perform(builder
+				.file(file)
+				.file(request)
+				.param("memberId", memberId.toString())
+				.contentType(MediaType.MULTIPART_FORM_DATA)
+				.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("I001"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("상품 할인가는 원가보다 클 수 없습니다."))
+			.andDo(print())
+			.andDo(document("item/item-update-fail-invalid-discount-price",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(parameterWithName("id").description("상품 ID")),
+				requestParameters(parameterWithName("memberId").description("고객 ID")),
+				requestParts(
+					partWithName("image").description("상품 이미지"),
+					partWithName("itemReq").description("상품 등록 내용")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("예외 코드"),
+					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
 
 	@DisplayName("상품 삭제 성공 테스트")
 	@Test
