@@ -101,6 +101,9 @@ public class ItemService {
 
 		item.checkItemInStore(store);
 
+		String imageUrl = item.getImage();
+		imageService.delete(imageUrl);
+
 		itemRepository.delete(item);
 	}
 
