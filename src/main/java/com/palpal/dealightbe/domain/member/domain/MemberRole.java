@@ -1,6 +1,5 @@
 package com.palpal.dealightbe.domain.member.domain;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
