@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.palpal.dealightbe.domain.address.application.dto.request.AddressReq;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
-import com.palpal.dealightbe.domain.auth.application.AuthService;
 import com.palpal.dealightbe.domain.image.ImageService;
 import com.palpal.dealightbe.domain.image.application.dto.request.ImageUploadReq;
 import com.palpal.dealightbe.domain.image.application.dto.response.ImageRes;
@@ -33,15 +32,14 @@ public class MemberService {
 	private final ImageService imageService;
 
 	@Transactional(readOnly = true)
-	public MemberProfileRes getMemberProfile(Long memberId) {
+	public MemberProfileRes getMemberProfile(Long providerId) {
 
-		Member member = memberRepository.findById(memberId).orElseThrow(() -> {
-			log.warn("GET:READ:NOT_FOUND_MEMBER_BY_ID : {}", memberId);
+		Member member = memberRepository.findById(providerId).orElseThrow(() -> {
+			log.warn("GET:READ:NOT_FOUND_MEMBER_BY_ID : {}", providerId);
 			throw new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
 		});
 
 		return MemberProfileRes.from(member);
-
 	}
 
 	public MemberUpdateRes updateMemberProfile(Long memberId, MemberUpdateReq request) {
