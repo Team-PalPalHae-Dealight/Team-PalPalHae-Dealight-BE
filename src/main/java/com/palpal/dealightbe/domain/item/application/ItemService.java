@@ -99,8 +99,6 @@ public class ItemService {
 				return new EntityNotFoundException(NOT_FOUND_STORE);
 			});
 
-		checkDuplicatedItemName(itemReq.name(), store.getId());
-
 		Item item = itemRepository.findById(itemId)
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", itemId);
@@ -110,7 +108,7 @@ public class ItemService {
 		String image = item.getImage();
 		imageService.delete(image);
 
-		String imageUrl = imageService.store(imageUploadReq.file());
+		String imageUrl = saveImage(imageUploadReq);
 
 		Item updatedItem = ItemReq.toItem(itemReq, store, imageUrl);
 		item.update(updatedItem);
@@ -136,18 +134,18 @@ public class ItemService {
 		itemRepository.delete(item);
 	}
 
-	private void checkDuplicatedItemName(String itemName, Long storeId) {
-		if (itemRepository.existsByNameAndStoreId(itemName, storeId)) {
-			log.warn("DUPLICATED_ITEM_NAME : {}", itemName);
-			throw new BusinessException(DUPLICATED_ITEM_NAME);
-		}
-	}
-
 	public String saveImage(ImageUploadReq imageUploadReq) {
 		if (!imageUploadReq.file().isEmpty()) {
 			return imageService.store(imageUploadReq.file());
 		}
 
 		return DEFAULT_ITEM_IMAGE_PATH;
+	}
+
+	private void checkDuplicatedItemName(String itemName, Long storeId) {
+		if (itemRepository.existsByNameAndStoreId(itemName, storeId)) {
+			log.warn("DUPLICATED_ITEM_NAME : {}", itemName);
+			throw new BusinessException(DUPLICATED_ITEM_NAME);
+		}
 	}
 }
