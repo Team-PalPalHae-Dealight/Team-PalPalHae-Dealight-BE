@@ -13,8 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.palpal.dealightbe.domain.address.application.dto.request.AddressReq;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
-import com.palpal.dealightbe.domain.image.dto.request.ImageUploadReq;
-import com.palpal.dealightbe.domain.image.dto.response.ImageRes;
+import com.palpal.dealightbe.domain.image.application.dto.request.ImageUploadReq;
+import com.palpal.dealightbe.domain.image.application.dto.response.ImageRes;
 import com.palpal.dealightbe.domain.member.application.MemberService;
 import com.palpal.dealightbe.domain.member.application.dto.request.MemberUpdateReq;
 import com.palpal.dealightbe.domain.member.application.dto.response.MemberProfileRes;
