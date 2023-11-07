@@ -238,4 +238,23 @@ class ReviewControllerTest {
 				);
 		}
 	}
+
+	@Test
+	@DisplayName("<리뷰 선택지 항목 조회>")
+	void getReviewContentsTest() throws Exception {
+		String path = "/api/reviews/contents";
+
+		mockMvc.perform(get(path)
+				.with(csrf().asHeader())
+				.with(user("username").roles("MEMBER"))
+			)
+			.andDo(document("review/review-contents",
+					responseFields(
+						fieldWithPath("contents[]").type(JsonFieldType.ARRAY).description("사용자에게 주어지는 리뷰 항목들")
+					)
+				)
+			)
+			.andExpect(status().isOk())
+		;
+	}
 }
