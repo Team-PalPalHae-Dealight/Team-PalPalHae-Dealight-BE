@@ -1,5 +1,8 @@
 package com.palpal.dealightbe.domain.review.presentation;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,9 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.palpal.dealightbe.domain.review.application.ReviewService;
 import com.palpal.dealightbe.domain.review.application.dto.request.ReviewCreateReq;
+import com.palpal.dealightbe.domain.review.application.dto.response.ReviewContentRes;
 import com.palpal.dealightbe.domain.review.application.dto.response.ReviewCreateRes;
 import com.palpal.dealightbe.domain.review.application.dto.response.ReviewRes;
 import com.palpal.dealightbe.domain.review.application.dto.response.StoreReviewsRes;
+import com.palpal.dealightbe.domain.review.domain.ReviewContent;
 import com.palpal.dealightbe.global.aop.ProviderId;
 
 import lombok.RequiredArgsConstructor;
@@ -60,5 +65,17 @@ public class ReviewController {
 		ReviewRes reviewRes = reviewService.findByOrderId(id, providerId);
 
 		return ResponseEntity.ok(reviewRes);
+	}
+
+	@GetMapping("/contents")
+	@ProviderId
+	public ResponseEntity<ReviewContentRes> getContents() {
+		List<String> messages = Arrays.stream(ReviewContent.values())
+			.map(ReviewContent::getMessage)
+			.toList();
+
+		ReviewContentRes reviewContentRes = new ReviewContentRes(messages);
+
+		return ResponseEntity.ok(reviewContentRes);
 	}
 }
