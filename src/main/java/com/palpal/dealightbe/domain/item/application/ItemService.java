@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.palpal.dealightbe.domain.image.ImageService;
+import com.palpal.dealightbe.domain.image.application.dto.request.ImageUploadReq;
 import com.palpal.dealightbe.domain.item.application.dto.request.ItemReq;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemsRes;
@@ -28,10 +30,13 @@ import static com.palpal.dealightbe.global.error.ErrorCode.*;
 @Transactional
 public class ItemService {
 
+	public static final String DEFAULT_ITEM_IMAGE_PATH = "https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/image/default-item-image.png";
+
 	private final ItemRepository itemRepository;
 	private final StoreRepository storeRepository;
+	private final ImageService imageService;
 
-	public ItemRes create(ItemReq itemReq, Long memberId) {
+	public ItemRes create(ItemReq itemReq, Long memberId, ImageUploadReq imageUploadReq) {
 		Store store = storeRepository.findByMemberId(memberId)
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_STORE_BY_MEMBER_ID : {}", memberId);
@@ -40,7 +45,9 @@ public class ItemService {
 
 		checkDuplicatedItemName(itemReq.name(), store.getId());
 
-		Item item = ItemReq.toItem(itemReq, store);
+		String imageUrl = saveImage(imageUploadReq);
+
+		Item item = ItemReq.toItem(itemReq, store, imageUrl);
 		Item savedItem = itemRepository.save(item);
 
 		return ItemRes.from(savedItem);
@@ -85,26 +92,26 @@ public class ItemService {
 		return ItemsRes.from(items);
 	}
 
-	public ItemRes update(Long itemId, ItemReq itemReq, Long memberId) {
-		Store store = storeRepository.findByMemberId(memberId)
-			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_STORE_BY_MEMBER_ID : {}", memberId);
-				return new EntityNotFoundException(NOT_FOUND_STORE);
-			});
-
-		checkDuplicatedItemName(itemReq.name(), store.getId());
-
-		Item item = itemRepository.findById(itemId)
-			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", itemId);
-				return new EntityNotFoundException(NOT_FOUND_ITEM);
-			});
-
-		Item updatedItem = ItemReq.toItem(itemReq, store);
-		item.update(updatedItem);
-
-		return ItemRes.from(item);
-	}
+//	public ItemRes update(Long itemId, ItemReq itemReq, Long memberId) {
+//		Store store = storeRepository.findByMemberId(memberId)
+//			.orElseThrow(() -> {
+//				log.warn("GET:READ:NOT_FOUND_STORE_BY_MEMBER_ID : {}", memberId);
+//				return new EntityNotFoundException(NOT_FOUND_STORE);
+//			});
+//
+//		checkDuplicatedItemName(itemReq.name(), store.getId());
+//
+//		Item item = itemRepository.findById(itemId)
+//			.orElseThrow(() -> {
+//				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", itemId);
+//				return new EntityNotFoundException(NOT_FOUND_ITEM);
+//			});
+//
+//		Item updatedItem = ItemReq.toItem(itemReq, store);
+//		item.update(updatedItem);
+//
+//		return ItemRes.from(item);
+//	}
 
 	public void delete(Long itemId, Long memberId) {
 		Store store = storeRepository.findByMemberId(memberId)
@@ -129,5 +136,13 @@ public class ItemService {
 			log.warn("DUPLICATED_ITEM_NAME : {}", itemName);
 			throw new BusinessException(DUPLICATED_ITEM_NAME);
 		}
+	}
+
+	public String saveImage(ImageUploadReq imageUploadReq) {
+		if (!imageUploadReq.file().isEmpty()) {
+			return imageService.store(imageUploadReq.file());
+		}
+
+		return DEFAULT_ITEM_IMAGE_PATH;
 	}
 }
