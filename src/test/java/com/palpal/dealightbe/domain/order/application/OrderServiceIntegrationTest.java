@@ -70,7 +70,8 @@ public class OrderServiceIntegrationTest {
 					new OrderProductsReq(
 						List.of(new OrderProductReq(item.getId(), 2))
 					),
-					store.getId(), "도착할 때까지 상품 냉장고에 보관 부탁드려요", LocalTime.of(12, 30), item.getDiscountPrice()
+					store.getId(), "도착할 때까지 상품 냉장고에 보관 부탁드려요",
+					LocalTime.of(12, 30), item.getDiscountPrice() * 2
 				);
 
 				// when
