@@ -29,6 +29,7 @@ import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreStatusReq;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreUpdateReq;
+import com.palpal.dealightbe.domain.store.application.dto.response.StoreByMemberRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusRes;
@@ -302,5 +303,40 @@ class StoreServiceTest {
 
 		//then
 		assertThat(imageRes.imageUrl()).isEqualTo(updatedImageUrl);
+	}
+
+	@Test
+	@DisplayName("providerId로 업체 조회 성공")
+	void findByProviderIdSuccessTest() throws Exception {
+
+		//given
+		when(memberRepository.findMemberByProviderId(member.getProviderId()))
+			.thenReturn(Optional.of(member));
+
+		when((storeRepository.findByMemberProviderId(member.getProviderId())))
+			.thenReturn(Optional.of(store));
+
+		//when
+		Long storeId = store.getId();
+		StoreByMemberRes storeByMemberRes = storeService.findByProviderId(member.getProviderId());
+
+		//then
+		assertThat(storeByMemberRes.storeId()).isEqualTo(storeId);
+	}
+
+	@Test
+	@DisplayName("providerId로 업체 조회 실패 - 업체를 등록하지 않은 고객")
+	void findByProviderIdFailTest_notRegisterStore() throws Exception {
+
+		//given
+		when(memberRepository.findMemberByProviderId(member.getProviderId()))
+			.thenReturn(Optional.of(member));
+		when((storeRepository.findByMemberProviderId(member.getProviderId())))
+			.thenReturn(Optional.empty());
+
+		//when -> then
+		assertThrows(EntityNotFoundException.class, () -> {
+			storeService.findByProviderId(member.getProviderId());
+		});
 	}
 }
