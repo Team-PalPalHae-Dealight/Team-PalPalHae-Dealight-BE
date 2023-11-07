@@ -13,6 +13,8 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -125,6 +127,7 @@ class ReviewControllerTest {
 					post(createApiPath, 1)
 						.with(csrf().asHeader())
 						.with(user("username").roles("MEMBER"))
+						.header("Authorization", "Bearer {ACCESS_TOKEN}")
 						.content(objectMapper.writeValueAsString(emptyReq))
 						.contentType(APPLICATION_JSON)
 						.param("id", "2")
@@ -133,7 +136,23 @@ class ReviewControllerTest {
 				.andExpect(status().is4xxClientError())
 				.andExpect(result -> {
 					assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException);
-				});
+				})
+				.andDo(document("review/review-create-fail-empty",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestHeaders(
+						headerWithName("Authorization").description("Access Token")
+					),
+					responseFields(
+						fieldWithPath("timestamp").type(STRING).description("예외 발생 시간"),
+						fieldWithPath("code").type(STRING).description("오류 코드"),
+						fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+						fieldWithPath("errors[].field").type(STRING).description("잘못 입력된 필드"),
+						fieldWithPath("errors[].value").type(STRING).description("입력된 값"),
+						fieldWithPath("errors[].reason").type(STRING).description("원인"),
+						fieldWithPath("message").type(STRING).description("오류 메시지")
+					)
+				));
 		}
 
 	}
