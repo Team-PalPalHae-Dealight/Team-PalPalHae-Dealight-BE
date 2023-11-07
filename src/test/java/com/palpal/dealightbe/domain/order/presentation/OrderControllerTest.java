@@ -38,7 +38,6 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -94,13 +93,13 @@ public class OrderControllerTest {
 			// given
 			OrderProductRes productRes = productsRes.orderProducts().get(0);
 
-			given(orderService.create(any(OrderCreateReq.class), anyLong()))
+			given(orderService.create(any(OrderCreateReq.class), any()))
 				.willReturn(orderRes);
 
 			// when
 			// then
 			mockMvc.perform(
-					post(createApiPath + "/{memberProviderId}", 1)
+					post(createApiPath)
 						.with(csrf())
 						.with(user("username").roles("MEMBER"))
 						.content(objectMapper.writeValueAsString(orderCreateReq))
@@ -125,7 +124,6 @@ public class OrderControllerTest {
 				.andExpect(jsonPath("$.status").value(RECEIVED.getText()))
 				.andDo(document("order/order-create-success", preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
-					pathParameters(parameterWithName("memberProviderId").description("고객 카카오 토큰")),
 					requestFields(
 						fieldWithPath("orderProductsReq.orderProducts[]").type(JsonFieldType.ARRAY)
 							.description("주문한 상품 정보 목록"),
@@ -174,14 +172,18 @@ public class OrderControllerTest {
 			OrderCreateReq orderCreateReq = new OrderCreateReq(
 				new OrderProductsReq(List.of(new OrderProductReq(1L, 3))), 1L, "도착할 때까지 상품 냉장고에 보관 부탁드려요", null, 10000);
 
-			given(orderService.create(any(OrderCreateReq.class), anyLong())).willReturn(orderRes);
+			given(orderService.create(any(OrderCreateReq.class), anyLong()))
+				.willReturn(orderRes);
 
 			// when
 			// then
-			mockMvc.perform(post(createApiPath + "/{memberProviderId}", 1).with(csrf())
-					.with(user("username").roles("MEMBER"))
-					.content(objectMapper.writeValueAsString(orderCreateReq))
-					.contentType(APPLICATION_JSON))
+			mockMvc.perform(
+					post(createApiPath)
+						.with(csrf())
+						.with(user("username").roles("MEMBER"))
+						.content(objectMapper.writeValueAsString(orderCreateReq))
+						.contentType(APPLICATION_JSON)
+				)
 				.andDo(print())
 				.andExpect(status().is4xxClientError())
 				.andExpect(result -> {
@@ -201,10 +203,13 @@ public class OrderControllerTest {
 
 			// when
 			// then
-			mockMvc.perform(post(createApiPath + "/{memberProviderId}", 1).with(csrf())
-					.with(user("username").roles("MEMBER"))
-					.content(objectMapper.writeValueAsString(orderCreateReq))
-					.contentType(APPLICATION_JSON))
+			mockMvc.perform(
+					post(createApiPath)
+						.with(csrf())
+						.with(user("username").roles("MEMBER"))
+						.content(objectMapper.writeValueAsString(orderCreateReq))
+						.contentType(APPLICATION_JSON)
+				)
 				.andDo(print())
 				.andExpect(status().is4xxClientError())
 				.andExpect(result -> {
@@ -225,10 +230,13 @@ public class OrderControllerTest {
 
 			// when
 			// then
-			mockMvc.perform(post(createApiPath + "/{memberProviderId}", 1).with(csrf())
-					.with(user("username").roles("MEMBER"))
-					.content(objectMapper.writeValueAsString(orderCreateReq))
-					.contentType(APPLICATION_JSON))
+			mockMvc.perform(
+					post(createApiPath)
+						.with(csrf())
+						.with(user("username").roles("MEMBER"))
+						.content(objectMapper.writeValueAsString(orderCreateReq))
+						.contentType(APPLICATION_JSON)
+				)
 				.andDo(print())
 				.andExpect(status().is4xxClientError())
 				.andExpect(result -> {
@@ -240,7 +248,7 @@ public class OrderControllerTest {
 	@Nested
 	@DisplayName("<주문 상태 변경>")
 	class updateStatusTest {
-		String updateStatusApiPath = "/api/orders/{orderId}/status/{memberProviderId}";
+		String updateStatusApiPath = "/api/orders/{orderId}";
 
 		OrderStatusUpdateRes orderStatusUpdateRes = new OrderStatusUpdateRes(1L, "RECEIVED");
 		OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq("RECEIVED");
@@ -252,7 +260,7 @@ public class OrderControllerTest {
 			long orderId = 1L;
 			long memberProviderId = 1L;
 
-			given(orderService.updateStatus(anyLong(), any(OrderStatusUpdateReq.class), anyLong()))
+			given(orderService.updateStatus(any(), any(), any()))
 				.willReturn(orderStatusUpdateRes);
 
 			// when
@@ -273,8 +281,7 @@ public class OrderControllerTest {
 						preprocessRequest(prettyPrint()),
 						preprocessResponse(prettyPrint()),
 						pathParameters(
-							parameterWithName("orderId").description("상태 변경을 하고자 하는 주문의 아이디"),
-							parameterWithName("memberProviderId").description("고객 카카오 토큰")
+							parameterWithName("orderId").description("상태 변경을 하고자 하는 주문의 아이디")
 						),
 						requestFields(
 							fieldWithPath("status").type(JsonFieldType.STRING)
@@ -317,7 +324,7 @@ public class OrderControllerTest {
 	@Nested
 	@DisplayName("<주문 상세 정보 조회>")
 	class detailedInfoTest {
-		String findByIdApiPath = "/api/orders/{orderId}/{memberProviderId}";
+		String findByIdApiPath = "/api/orders/{orderId}";
 
 		LocalDateTime createdAt = LocalDateTime.now();
 
@@ -338,16 +345,16 @@ public class OrderControllerTest {
 		void findById_success() throws Exception {
 			// given
 			long orderId = 1L;
-			long memberProviderId = 1L;
 
-			given(orderService.findById(anyLong(), anyLong()))
+			given(orderService.findById(any(), any()))
 				.willReturn(orderRes);
 
 			// when
 			// then
-			mockMvc.perform(get(findByIdApiPath, orderId, memberProviderId)
-					.with(csrf())
-					.with(user("username").roles("MEMBER")))
+			mockMvc.perform(
+					get(findByIdApiPath, orderId)
+						.with(csrf())
+						.with(user("username").roles("MEMBER")))
 				.andDo(print())
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.orderId").value(1L))
@@ -368,8 +375,8 @@ public class OrderControllerTest {
 				.andDo(document("order/order-find-by-id-success", preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
 					pathParameters(
-						parameterWithName("orderId").description("상세 조회 하고자 하는 주문의 아이디"),
-						parameterWithName("memberProviderId").description("고객 카카오 토큰")),
+						parameterWithName("orderId").description("상세 조회 하고자 하는 주문의 아이디")
+					),
 					responseFields(
 						fieldWithPath("orderId").type(JsonFieldType.NUMBER).description("등록된 주문의 아이디"),
 						fieldWithPath("storeId").type(JsonFieldType.NUMBER).description("주문이 이루어진 업체 아이디"),
@@ -402,7 +409,7 @@ public class OrderControllerTest {
 	@Nested
 	@DisplayName("<주문 목록 조회 - 업체>")
 	class findByStoreIdTest {
-		String findByStoreIdPath = "/api/orders/{memberProviderId}/stores";
+		String findByStoreIdPath = "/api/orders/stores";
 
 		LocalDateTime createdAt = LocalDateTime.now();
 
@@ -420,7 +427,7 @@ public class OrderControllerTest {
 		@DisplayName("성공 - 업체의 주문 목록을 조회한다")
 		void findByStoreId_success() throws Exception {
 			// given
-			given(orderService.findAllByStoreId(anyLong(), anyLong(), any(), any(PageRequest.class)))
+			given(orderService.findAllByStoreId(any(), any(), any(), any()))
 				.willReturn(ordersRes);
 
 			// when
@@ -452,9 +459,6 @@ public class OrderControllerTest {
 					document("order/order-find-by-store-id-success",
 						preprocessRequest(prettyPrint()),
 						preprocessResponse(prettyPrint()),
-						pathParameters(
-							parameterWithName("memberProviderId").description("고객 카카오 토큰")
-						),
 						requestParameters(
 							parameterWithName("id").description("업체의 아이디"),
 							parameterWithName("status")
@@ -499,7 +503,7 @@ public class OrderControllerTest {
 	@Nested
 	@DisplayName("<주문 목록 조회 - 고객>")
 	class findByMemberProviderIdTest {
-		String findByMemberProviderIdPath = "/api/orders/{memberProviderId}";
+		String findByMemberProviderIdPath = "/api/orders";
 
 		LocalDateTime createdAt = LocalDateTime.now();
 
@@ -517,13 +521,13 @@ public class OrderControllerTest {
 		@DisplayName("성공 - 업체의 주문 목록을 조회한다")
 		void findByStoreId_success() throws Exception {
 			// given
-			given(orderService.findAllByMemberProviderId(anyLong(), any(), any(PageRequest.class)))
+			given(orderService.findAllByMemberProviderId(any(), any(), any()))
 				.willReturn(ordersRes);
 
 			// when
 			// then
 			mockMvc.perform(
-					get(findByMemberProviderIdPath, 1)
+					get(findByMemberProviderIdPath)
 						.with(user("username").roles("MEMBER"))
 				)
 				.andExpect(status().isOk())
@@ -548,9 +552,6 @@ public class OrderControllerTest {
 					document("order/order-find-by-member-success",
 						preprocessRequest(prettyPrint()),
 						preprocessResponse(prettyPrint()),
-						pathParameters(
-							parameterWithName("memberProviderId").description("고객 카카오 토큰")
-						),
 						requestParameters(
 							parameterWithName("status")
 								.description("주문 목록 중 보고자 하는 주문의 상태 - RECEIVED, CONFIRMED, COMPLETED, CANCELED")
