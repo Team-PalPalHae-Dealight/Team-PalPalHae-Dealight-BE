@@ -6,6 +6,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
@@ -93,7 +95,7 @@ public class OrderControllerTest {
 			// given
 			OrderProductRes productRes = productsRes.orderProducts().get(0);
 
-			given(orderService.create(any(OrderCreateReq.class), any()))
+			given(orderService.create(any(), any()))
 				.willReturn(orderRes);
 
 			// when
@@ -102,6 +104,7 @@ public class OrderControllerTest {
 					post(createApiPath)
 						.with(csrf())
 						.with(user("username").roles("MEMBER"))
+						.header("Authorization", "Bearer {ACCESS_TOKEN}")
 						.content(objectMapper.writeValueAsString(orderCreateReq))
 						.contentType(APPLICATION_JSON)
 				)
@@ -124,6 +127,9 @@ public class OrderControllerTest {
 				.andExpect(jsonPath("$.status").value(RECEIVED.getText()))
 				.andDo(document("order/order-create-success", preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
+					requestHeaders(
+						headerWithName("Authorization").description("Access Token")
+					),
 					requestFields(
 						fieldWithPath("orderProductsReq.orderProducts[]").type(JsonFieldType.ARRAY)
 							.description("주문한 상품 정보 목록"),
@@ -269,6 +275,7 @@ public class OrderControllerTest {
 					patch(updateStatusApiPath, orderId, memberProviderId)
 						.with(csrf())
 						.with(user("username").roles("MEMBER"))
+						.header("Authorization", "Bearer {ACCESS_TOKEN}")
 						.content(objectMapper.writeValueAsString(orderStatusUpdateReq))
 						.contentType(APPLICATION_JSON)
 				)
@@ -282,6 +289,9 @@ public class OrderControllerTest {
 						preprocessResponse(prettyPrint()),
 						pathParameters(
 							parameterWithName("orderId").description("상태 변경을 하고자 하는 주문의 아이디")
+						),
+						requestHeaders(
+							headerWithName("Authorization").description("Access Token")
 						),
 						requestFields(
 							fieldWithPath("status").type(JsonFieldType.STRING)
@@ -354,7 +364,9 @@ public class OrderControllerTest {
 			mockMvc.perform(
 					get(findByIdApiPath, orderId)
 						.with(csrf())
-						.with(user("username").roles("MEMBER")))
+						.with(user("username").roles("MEMBER"))
+						.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				)
 				.andDo(print())
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.orderId").value(1L))
@@ -376,6 +388,9 @@ public class OrderControllerTest {
 					preprocessResponse(prettyPrint()),
 					pathParameters(
 						parameterWithName("orderId").description("상세 조회 하고자 하는 주문의 아이디")
+					),
+					requestHeaders(
+						headerWithName("Authorization").description("Access Token")
 					),
 					responseFields(
 						fieldWithPath("orderId").type(JsonFieldType.NUMBER).description("등록된 주문의 아이디"),
@@ -436,6 +451,7 @@ public class OrderControllerTest {
 					get(findByStoreIdPath, 1)
 						.param("id", "1")
 						.with(user("username").roles("MEMBER"))
+						.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				)
 				.andExpect(status().isOk())
 
@@ -459,6 +475,9 @@ public class OrderControllerTest {
 					document("order/order-find-by-store-id-success",
 						preprocessRequest(prettyPrint()),
 						preprocessResponse(prettyPrint()),
+						requestHeaders(
+							headerWithName("Authorization").description("Access Token")
+						),
 						requestParameters(
 							parameterWithName("id").description("업체의 아이디"),
 							parameterWithName("status")
@@ -529,6 +548,7 @@ public class OrderControllerTest {
 			mockMvc.perform(
 					get(findByMemberProviderIdPath)
 						.with(user("username").roles("MEMBER"))
+						.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				)
 				.andExpect(status().isOk())
 
@@ -552,6 +572,9 @@ public class OrderControllerTest {
 					document("order/order-find-by-member-success",
 						preprocessRequest(prettyPrint()),
 						preprocessResponse(prettyPrint()),
+						requestHeaders(
+							headerWithName("Authorization").description("Access Token")
+						),
 						requestParameters(
 							parameterWithName("status")
 								.description("주문 목록 중 보고자 하는 주문의 상태 - RECEIVED, CONFIRMED, COMPLETED, CANCELED")
