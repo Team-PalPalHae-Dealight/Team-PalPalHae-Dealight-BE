@@ -1031,53 +1031,6 @@ class ItemControllerTest {
 				)
 			));
 	}
-//
-//	@DisplayName("상품 수정 실패 테스트 - 이미 등록된 상품인 경우(이름 중복)")
-//	@Test
-//	public void itemUpdateFailureTest_duplicatedItemName() throws Exception {
-//		//given
-//		ItemReq itemReq = new ItemReq("떡볶이", 2, 4500, 4000, "기본 떡볶이 입니다.", "통신사 할인 불가능 합니다.", null);
-//
-//		Long memberId = 1L;
-//		Long itemId = 1L;
-//
-//		doThrow(new BusinessException(DUPLICATED_ITEM_NAME)).when(
-//			itemService).update(any(), any(), any());
-//
-//		//when
-//		//then
-//		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/items/{id}", itemId)
-//				.contentType(MediaType.APPLICATION_JSON)
-//				.content(objectMapper.writeValueAsString(itemReq))
-//				.param("memberId", memberId.toString()))
-//			.andExpect(status().isBadRequest())
-//			.andExpect(jsonPath("$.timestamp").isNotEmpty())
-//			.andExpect(jsonPath("$.code").value("I003"))
-//			.andExpect(jsonPath("$.errors").isEmpty())
-//			.andExpect(jsonPath("$.message").value("동일한 이름을 가진 상품이 이미 등록되어 있습니다."))
-//			.andDo(print())
-//			.andDo(document("item/item-update-fail-duplicated-item-name",
-//				Preprocessors.preprocessRequest(prettyPrint()),
-//				preprocessResponse(prettyPrint()),
-//				pathParameters(parameterWithName("id").description("상품 ID")),
-//				requestParameters(parameterWithName("memberId").description("고객 ID")),
-//				requestFields(
-//					fieldWithPath("name").description("상품 이름"),
-//					fieldWithPath("stock").description("재고 수"),
-//					fieldWithPath("discountPrice").description("할인가"),
-//					fieldWithPath("originalPrice").description("원가"),
-//					fieldWithPath("description").description("상세 설명"),
-//					fieldWithPath("information").description("안내 사항"),
-//					fieldWithPath("image").description("상품 이미지")
-//				),
-//				responseFields(
-//					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
-//					fieldWithPath("code").type(STRING).description("예외 코드"),
-//					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
-//					fieldWithPath("message").type(STRING).description("오류 메시지")
-//				)
-//			));
-//	}
 
 	@DisplayName("상품 삭제 성공 테스트")
 	@Test
