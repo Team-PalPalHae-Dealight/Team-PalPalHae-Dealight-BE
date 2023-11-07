@@ -247,10 +247,16 @@ class ReviewControllerTest {
 		mockMvc.perform(get(path)
 				.with(csrf().asHeader())
 				.with(user("username").roles("MEMBER"))
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 			)
-			.andDo(document("review/review-contents",
+			.andDo(document("review/review-contents-success",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestHeaders(
+						headerWithName("Authorization").description("Access Token")
+					),
 					responseFields(
-						fieldWithPath("contents[]").type(JsonFieldType.ARRAY).description("사용자에게 주어지는 리뷰 항목들")
+						fieldWithPath("contents[]").type(JsonFieldType.ARRAY).description("사용자에게 주어지는 선택 가능 항목들")
 					)
 				)
 			)

@@ -19,12 +19,73 @@ endif::[]
 
 === 1. 리뷰 등록
 
-operation::review/review-create-success[]
+==== 요청
+
+- header
+include::{snippets}/review/review-create-success/request-headers.adoc[]
+
+- body
+include::{snippets}/review/review-create-success/request-body.adoc[]
+include::{snippets}/review/review-create-success/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/review/review-create-success/response-body.adoc[]
+include::{snippets}/review/review-create-success/response-fields.adoc[]
+
+
+---
 
 === 2. 리뷰 통계 조회 - 업체별
 
-operation::review/review-find-by-store-id-success[]
+==== 요청
+
+- header
+include::{snippets}/review/review-find-by-store-id-success/request-headers.adoc[]
+
+- body
+include::{snippets}/review/review-find-by-store-id-success/request-body.adoc[]
+
+==== 응답
+
+include::{snippets}/review/review-find-by-store-id-success/response-body.adoc[]
+include::{snippets}/review/review-find-by-store-id-success/response-fields.adoc[]
+
+
+---
 
 === 3. 리뷰 조회 - 주문별
 
-operation::review/review-find-by-order-id-success[]
+==== 요청
+
+- header
+include::{snippets}/review/review-find-by-order-id-success/request-headers.adoc[]
+
+- body
+include::{snippets}/review/review-find-by-order-id-success/request-body.adoc[]
+
+==== 응답
+
+include::{snippets}/review/review-find-by-order-id-success/response-body.adoc[]
+include::{snippets}/review/review-find-by-order-id-success/response-fields.adoc[]
+
+
+---
+
+=== 4. 리뷰 선택지 조회
+
+==== 요청
+
+- header
+include::{snippets}/review/review-contents-success/request-headers.adoc[]
+
+- body
+include::{snippets}/review/review-contents-success//request-body.adoc[]
+
+==== 응답
+
+include::{snippets}/review/review-contents-success/response-body.adoc[]
+include::{snippets}/review/review-contents-success/response-fields.adoc[]
+
+
+---
