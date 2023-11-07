@@ -79,3 +79,21 @@ include::{snippets}/review/review-find-by-order-id-success/response-fields.adoc[
 
 
 ---
+
+=== 3. 리뷰 선택지 조회
+
+==== 요청
+
+- header
+include::{snippets}/review/review-contents-success/request-headers.adoc[]
+
+- body
+include::{snippets}/review/review-contents-success//request-body.adoc[]
+
+==== 응답
+
+include::{snippets}/review/review-contents-success/response-body.adoc[]
+include::{snippets}/review/review-contents-success/response-fields.adoc[]
+
+
+---
