@@ -121,3 +121,19 @@ include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/path
 .Response
 include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/http-response.adoc[]
 include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/response-fields.adoc[]
+
+=== 회원가입 한 고객의 업체 등록 유무 -> 업체 등록 O
+==== GET - /api/stores/confirm
+.Request
+include::{snippets}/store/store-find-by-provider-id/http-request.adoc[]
+.Response
+include::{snippets}/store/store-find-by-provider-id/http-response.adoc[]
+include::{snippets}/store/store-find-by-provider-id/response-fields.adoc[]
+
+=== 회원가입 한 고객의 업체 등록 유무 -> 업체 등록 X
+==== GET - /api/stores/confirm
+.Request
+include::{snippets}/store/store-customer-not-register-store/http-request.adoc[]
+.Response
+include::{snippets}/store/store-customer-not-register-store/http-response.adoc[]
+include::{snippets}/store/store-customer-not-register-store/response-fields.adoc[]
