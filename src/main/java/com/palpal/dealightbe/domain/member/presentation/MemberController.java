@@ -4,7 +4,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,6 +18,7 @@ import com.palpal.dealightbe.domain.member.application.MemberService;
 import com.palpal.dealightbe.domain.member.application.dto.request.MemberUpdateReq;
 import com.palpal.dealightbe.domain.member.application.dto.response.MemberProfileRes;
 import com.palpal.dealightbe.domain.member.application.dto.response.MemberUpdateRes;
+import com.palpal.dealightbe.global.aop.ProviderId;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,42 +29,47 @@ public class MemberController {
 
 	private final MemberService memberService;
 
-	@GetMapping("/profiles/{memberId}")
-	public ResponseEntity<MemberProfileRes> getMemberProfile(@PathVariable Long memberId) {
+	@GetMapping("/profiles")
+	@ProviderId
+	public ResponseEntity<MemberProfileRes> getMemberProfile(Long providerId) {
 
-		MemberProfileRes memberProfileRes = memberService.getMemberProfile(memberId);
+		MemberProfileRes memberProfileRes = memberService.getMemberProfile(providerId);
 
 		return ResponseEntity.ok(memberProfileRes);
 	}
 
-	@PatchMapping("/profiles/{memberId}")
-	public ResponseEntity<MemberUpdateRes> updateMemberProfile(@PathVariable Long memberId,
+	@PatchMapping("/profiles")
+	@ProviderId
+	public ResponseEntity<MemberUpdateRes> updateMemberProfile(Long providerId,
 		@RequestBody MemberUpdateReq request) {
-		MemberUpdateRes updatedMember = memberService.updateMemberProfile(memberId, request);
+		MemberUpdateRes updatedMember = memberService.updateMemberProfile(providerId, request);
 
 		return ResponseEntity.ok(updatedMember);
 	}
 
-	@PatchMapping("/address/{memberId}")
-	public ResponseEntity<AddressRes> updateMemberAddress(@PathVariable Long memberId,
+	@PatchMapping("/addresses")
+	@ProviderId
+	public ResponseEntity<AddressRes> updateMemberAddress(Long providerId,
 		@RequestBody AddressReq request) {
-		AddressRes updatedAddress = memberService.updateMemberAddress(memberId, request);
+		AddressRes updatedAddress = memberService.updateMemberAddress(providerId, request);
 
 		return ResponseEntity.ok(updatedAddress);
 	}
 
-	@PatchMapping("/images/{memberId}")
-	public ResponseEntity<ImageRes> updateMemberImage(@PathVariable Long memberId,
+	@PatchMapping("/images")
+	@ProviderId
+	public ResponseEntity<ImageRes> updateMemberImage(Long providerId,
 		@RequestParam MultipartFile file) {
 		ImageUploadReq imageUploadReq = new ImageUploadReq(file);
-		ImageRes imageRes = memberService.updateMemberImage(memberId, imageUploadReq);
+		ImageRes imageRes = memberService.updateMemberImage(providerId, imageUploadReq);
 
 		return ResponseEntity.ok(imageRes);
 	}
 
-	@DeleteMapping("/images/{memberId}")
-	public ResponseEntity<Void> deleteMemberImage(@PathVariable Long memberId) {
-		memberService.deleteMemberImage(memberId);
+	@DeleteMapping("/images")
+	@ProviderId
+	public ResponseEntity<Void> deleteMemberImage(Long providerId) {
+		memberService.deleteMemberImage(providerId);
 
 		return ResponseEntity.noContent()
 			.build();
