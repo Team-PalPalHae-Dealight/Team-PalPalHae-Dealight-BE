@@ -23,6 +23,7 @@ import com.palpal.dealightbe.domain.order.application.dto.request.OrderStatusUpd
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderRes;
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderStatusUpdateRes;
 import com.palpal.dealightbe.domain.order.application.dto.response.OrdersRes;
+import com.palpal.dealightbe.global.aop.ProviderId;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,10 +37,11 @@ public class OrderController {
 	private static final String DEFAULT_PAGING_SIZE = "10";
 	private static final String DEFAULT_SORTING = "created_at";
 
-	@PostMapping("/{memberProviderId}")
+	@PostMapping
+	@ProviderId
 	public ResponseEntity<OrderRes> create(
 		@Validated @RequestBody OrderCreateReq request,
-		@PathVariable Long memberProviderId
+		Long memberProviderId
 	) {
 
 		OrderRes orderRes = orderService.create(request, memberProviderId);
@@ -54,11 +56,12 @@ public class OrderController {
 			.body(orderRes);
 	}
 
-	@PatchMapping("/{orderId}/status/{memberProviderId}")
+	@PatchMapping("/{orderId}")
+	@ProviderId
 	public ResponseEntity<OrderStatusUpdateRes> updateStatus(
 		@Validated @RequestBody OrderStatusUpdateReq request,
 		@PathVariable Long orderId,
-		@PathVariable Long memberProviderId
+		Long memberProviderId
 	) {
 
 		OrderStatusUpdateRes orderStatusUpdateRes = orderService.updateStatus(orderId, request, memberProviderId);
@@ -66,10 +69,11 @@ public class OrderController {
 		return ResponseEntity.ok(orderStatusUpdateRes);
 	}
 
-	@GetMapping("/{orderId}/{memberProviderId}")
+	@GetMapping("/{orderId}")
+	@ProviderId
 	public ResponseEntity<OrderRes> findById(
 		@PathVariable Long orderId,
-		@PathVariable Long memberProviderId
+		Long memberProviderId
 	) {
 
 		OrderRes orderRes = orderService.findById(orderId, memberProviderId);
@@ -77,9 +81,10 @@ public class OrderController {
 		return ResponseEntity.ok(orderRes);
 	}
 
-	@GetMapping("/{memberProviderId}/stores")
+	@GetMapping("/stores")
+	@ProviderId
 	public ResponseEntity<OrdersRes> findAllByStoreId(
-		@PathVariable Long memberProviderId,
+		Long memberProviderId,
 		@RequestParam Long id,
 		@RequestParam(required = false) String status,
 		@RequestParam(required = false, defaultValue = "0") int page,
@@ -93,9 +98,10 @@ public class OrderController {
 		return ResponseEntity.ok(ordersRes);
 	}
 
-	@GetMapping("/{memberProviderId}")
+	@GetMapping
+	@ProviderId
 	public ResponseEntity<OrdersRes> findAllByMemberProviderId(
-		@PathVariable Long memberProviderId,
+		Long memberProviderId,
 		@RequestParam(required = false) String status,
 		@RequestParam(required = false, defaultValue = "0") int page,
 		@RequestParam(required = false, defaultValue = DEFAULT_PAGING_SIZE) int size

@@ -8,4 +8,8 @@ public record ImageRes(
 	public static ImageRes from(Store store) {
 		return new ImageRes(store.getImage());
 	}
+
+	public static ImageRes from(String imageUrl) {
+		return new ImageRes(imageUrl);
+	}
 }

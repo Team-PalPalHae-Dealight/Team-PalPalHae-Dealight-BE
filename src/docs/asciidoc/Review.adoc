@@ -17,6 +17,14 @@ endif::[]
 
 == 리뷰 관련 API
 
+=== 0. 예외 발생 예시
+
+include::{snippets}/review/review-create-fail-empty/response-fields.adoc[]
+include::{snippets}/review/review-create-fail-empty/response-body.adoc[]
+include::{snippets}/review/review-create-fail-empty/response-body.adoc[]
+
+---
+
 === 1. 리뷰 등록
 
 ==== 요청
@@ -32,7 +40,6 @@ include::{snippets}/review/review-create-success/request-fields.adoc[]
 
 include::{snippets}/review/review-create-success/response-body.adoc[]
 include::{snippets}/review/review-create-success/response-fields.adoc[]
-
 
 ---
 
@@ -51,7 +58,6 @@ include::{snippets}/review/review-find-by-store-id-success/request-body.adoc[]
 include::{snippets}/review/review-find-by-store-id-success/response-body.adoc[]
 include::{snippets}/review/review-find-by-store-id-success/response-fields.adoc[]
 
-
 ---
 
 === 3. 리뷰 조회 - 주문별
@@ -69,7 +75,6 @@ include::{snippets}/review/review-find-by-order-id-success/request-body.adoc[]
 include::{snippets}/review/review-find-by-order-id-success/response-body.adoc[]
 include::{snippets}/review/review-find-by-order-id-success/response-fields.adoc[]
 
-
 ---
 
 === 4. 리뷰 선택지 조회
@@ -86,6 +91,5 @@ include::{snippets}/review/review-contents-success//request-body.adoc[]
 
 include::{snippets}/review/review-contents-success/response-body.adoc[]
 include::{snippets}/review/review-contents-success/response-fields.adoc[]
-
 
 ---

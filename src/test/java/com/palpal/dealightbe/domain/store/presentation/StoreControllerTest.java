@@ -52,6 +52,7 @@ import com.palpal.dealightbe.domain.store.application.StoreService;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreStatusReq;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreUpdateReq;
+import com.palpal.dealightbe.domain.store.application.dto.response.StoreByMemberRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusRes;
@@ -59,6 +60,7 @@ import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.StoreStatus;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
+import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
 @WebMvcTest(value = StoreController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class,
 	OAuth2ClientAutoConfiguration.class}, excludeFilters = {
@@ -469,7 +471,7 @@ class StoreControllerTest {
 	}
 
 	@Test
-	@DisplayName("업체 이미지 수정 성공")
+	@DisplayName("업체 이미지 삭제 성공")
 	void deleteImageSuccessTest() throws Exception {
 
 		//given
@@ -490,6 +492,63 @@ class StoreControllerTest {
 				),
 				pathParameters(
 					parameterWithName("storeId").description("이미지 삭제 요청 업체 ID"))
+			));
+	}
+
+	@Test
+	@DisplayName("고객이 업체를 보유하고 있다")
+	void findByMemberProviderIdSuccessTest() throws Exception {
+
+		//given
+		StoreByMemberRes storeByMemberRes = new StoreByMemberRes(1L);
+
+		given(storeService.findByProviderId(any()))
+			.willReturn(storeByMemberRes);
+
+		//when -> then
+		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/stores/confirm")
+				.header("Authorization", "Bearer {ACCESS_TOKEN}"))
+			.andExpect(status().isOk())
+			.andDo(print())
+			.andDo(document("store/store-find-by-provider-id",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				responseFields(
+					fieldWithPath("storeId").description("업체 ID")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("회원가입은 했지만 업체를 등록하지 않음")
+	void findByProviderIdFailTest_notRegisterStore() throws Exception {
+
+		//given
+		Long storeId = 1L;
+		given(storeService.findByProviderId(any()))
+			.willThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_STORE));
+
+		//when -> then
+		mockMvc.perform(
+				RestDocumentationRequestBuilders.get("/api/stores/confirm")
+					.header("Authorization", "Bearer {ACCESS_TOKEN}"))
+			.andExpect(status().isNotFound())
+			.andDo(print())
+			.andDo(document("store/store-customer-not-register-store",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("오류 코드"),
+					fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
 			));
 	}
 }

@@ -15,8 +15,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.palpal.dealightbe.domain.image.application.dto.request.ImageUploadReq;
 import com.palpal.dealightbe.domain.item.application.ItemService;
 import com.palpal.dealightbe.domain.item.application.dto.request.ItemReq;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
@@ -30,8 +33,10 @@ public class ItemController {
 	private final ItemService itemService;
 
 	@PostMapping
-	public ResponseEntity<ItemRes> create(@Validated @RequestBody ItemReq itemReq, @RequestParam Long memberId) {
-		ItemRes itemRes = itemService.create(itemReq, memberId);
+	public ResponseEntity<ItemRes> create(@Validated @RequestPart ItemReq itemReq, @RequestParam Long memberId, @RequestPart(required = false) MultipartFile image) {
+		ImageUploadReq imageUploadReq = new ImageUploadReq(image);
+
+		ItemRes itemRes = itemService.create(itemReq, memberId, imageUploadReq);
 
 		return ResponseEntity.ok(itemRes);
 	}
@@ -61,12 +66,12 @@ public class ItemController {
 		return ResponseEntity.ok(itemsRes);
 	}
 
-	@PatchMapping("/{id}")
-	public ResponseEntity<ItemRes> update(@PathVariable("id") Long itemId, @Validated @RequestBody ItemReq itemReq, @RequestParam Long memberId) {
-		ItemRes itemRes = itemService.update(itemId, itemReq, memberId);
-
-		return ResponseEntity.ok(itemRes);
-	}
+//	@PatchMapping("/{id}")
+//	public ResponseEntity<ItemRes> update(@PathVariable("id") Long itemId, @Validated @RequestBody ItemReq itemReq, @RequestParam Long memberId) {
+//		ItemRes itemRes = itemService.update(itemId, itemReq, memberId);
+//
+//		return ResponseEntity.ok(itemRes);
+//	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> delete(@PathVariable("id") Long itemId, @RequestParam Long memberId) {

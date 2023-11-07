@@ -18,6 +18,7 @@ import com.palpal.dealightbe.domain.store.application.StoreService;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreStatusReq;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreUpdateReq;
+import com.palpal.dealightbe.domain.store.application.dto.response.StoreByMemberRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusRes;
@@ -98,5 +99,13 @@ public class StoreController {
 
 		return ResponseEntity.noContent()
 			.build();
+	}
+
+	@ProviderId
+	@GetMapping("/confirm")
+	public ResponseEntity<StoreByMemberRes> findByProviderId(Long providerId) {
+		StoreByMemberRes storeByMemberRes = storeService.findByProviderId(providerId);
+
+		return ResponseEntity.ok(storeByMemberRes);
 	}
 }

@@ -17,21 +17,97 @@ endif::[]
 
 == 주문 관련 API
 
+=== 0. 예외 발생 예시
+
+include::{snippets}/order/order-create-fail-arrival-time/response-fields.adoc[]
+include::{snippets}/order/order-create-fail-arrival-time/response-body.adoc[]
+
+include::{snippets}/order/order-create-fail-store-id/response-body.adoc[]
+
+---
+
 === 1. 주문 생성
-operation::order/order-create-success[]
+
+==== 요청
+
+- header
+include::{snippets}/order/order-create-success/request-headers.adoc[]
+
+- body
+include::{snippets}/order/order-create-success/request-body.adoc[]
+include::{snippets}/order/order-create-success/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/order/order-create-success/response-body.adoc[]
+include::{snippets}/order/order-create-success/response-fields.adoc[]
+
+
+---
 
 === 2. 주문 상태 변경
 
-operation::order/order-status-update-success[]
+==== 요청
+
+- header
+include::{snippets}/order/order-status-update-success/request-headers.adoc[]
+
+- body
+include::{snippets}/order/order-status-update-success/request-body.adoc[]
+include::{snippets}/order/order-status-update-success/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/order/order-status-update-success/response-body.adoc[]
+include::{snippets}/order/order-status-update-success/response-fields.adoc[]
+
+---
 
 === 3. 주문 상세 내용 조회 (단건)
 
-operation::order/order-find-by-id-success[]
+==== 요청
+
+- header
+include::{snippets}/order/order-find-by-id-success/request-headers.adoc[]
+
+- body
+include::{snippets}/order/order-find-by-id-success/request-body.adoc[]
+
+==== 응답
+
+include::{snippets}/order/order-find-by-id-success/response-body.adoc[]
+include::{snippets}/order/order-find-by-id-success/response-fields.adoc[]
+
+---
 
 === 4. 주문 조회 (다건) - 업체
 
-operation::order/order-find-by-store-id-success[]
+==== 요청
+
+- header
+include::{snippets}/order/order-find-by-store-id-success/request-headers.adoc[]
+
+- body
+include::{snippets}/order/order-find-by-store-id-success/request-body.adoc[]
+
+==== 응답
+
+include::{snippets}/order/order-find-by-store-id-success/response-body.adoc[]
+include::{snippets}/order/order-find-by-store-id-success/response-fields.adoc[]
+
+---
 
 === 5. 주문 조회 (다건) - 고객
 
-operation::order/order-find-by-member-success[]
+==== 요청
+
+- header
+include::{snippets}/order/order-find-by-member-success/request-headers.adoc[]
+
+- body
+include::{snippets}/order/order-find-by-member-success/request-body.adoc[]
+
+==== 응답
+
+include::{snippets}/order/order-find-by-member-success/response-body.adoc[]
+include::{snippets}/order/order-find-by-member-success/response-fields.adoc[]
