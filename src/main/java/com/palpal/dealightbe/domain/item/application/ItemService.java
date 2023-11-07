@@ -30,6 +30,8 @@ import static com.palpal.dealightbe.global.error.ErrorCode.*;
 @Transactional
 public class ItemService {
 
+	public static final String DEFAULT_ITEM_IMAGE_PATH = "https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/image/default-item-image.png";
+
 	private final ItemRepository itemRepository;
 	private final StoreRepository storeRepository;
 	private final ImageService imageService;
@@ -43,7 +45,7 @@ public class ItemService {
 
 		checkDuplicatedItemName(itemReq.name(), store.getId());
 
-		String imageUrl = imageService.store(imageUploadReq.file());
+		String imageUrl = saveImage(imageUploadReq);
 
 		Item item = ItemReq.toItem(itemReq, store, imageUrl);
 		Item savedItem = itemRepository.save(item);
@@ -134,5 +136,13 @@ public class ItemService {
 			log.warn("DUPLICATED_ITEM_NAME : {}", itemName);
 			throw new BusinessException(DUPLICATED_ITEM_NAME);
 		}
+	}
+
+	public String saveImage(ImageUploadReq imageUploadReq) {
+		if (!imageUploadReq.file().isEmpty()) {
+			return imageService.store(imageUploadReq.file());
+		}
+
+		return DEFAULT_ITEM_IMAGE_PATH;
 	}
 }
