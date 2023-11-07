@@ -21,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.palpal.dealightbe.domain.address.application.dto.request.AddressReq;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
 import com.palpal.dealightbe.domain.address.domain.Address;
-import com.palpal.dealightbe.domain.auth.application.AuthService;
 import com.palpal.dealightbe.domain.image.ImageService;
 import com.palpal.dealightbe.domain.image.application.dto.request.ImageUploadReq;
 import com.palpal.dealightbe.domain.image.application.dto.response.ImageRes;
