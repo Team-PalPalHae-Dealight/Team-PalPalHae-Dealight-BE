@@ -14,6 +14,7 @@ import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreStatusReq;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreUpdateReq;
+import com.palpal.dealightbe.domain.store.application.dto.response.StoreByMemberRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusRes;
@@ -120,6 +121,23 @@ public class StoreService {
 
 		imageService.delete(image);
 		store.updateImage(DEFAULT_PATH);
+	}
+
+	@Transactional(readOnly = true)
+	public StoreByMemberRes findByProviderId(Long providerId) {
+		Member member = memberRepository.findMemberByProviderId(providerId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_PROVIDER_ID : {}", providerId);
+				throw new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
+			});
+
+		Store store = storeRepository.findByMemberProviderId(member.getProviderId())
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_STORE_BY_PROVIDER_ID : {}", member.getProviderId());
+				throw new EntityNotFoundException(ErrorCode.NOT_FOUND_STORE);
+			});
+
+		return StoreByMemberRes.from(store);
 	}
 
 	private Store validateMemberAndStoreOwner(Long providerId, Long storeId) {
