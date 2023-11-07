@@ -48,6 +48,7 @@ public enum ErrorCode {
 	EXCEEDED_ORDER_ITEMS("OR006", "한 번에 5개 종류의 상품까지만 주문할 수 있습니다."),
 	UNCHANGEABLE_ORDER_STATUS("OR007", "주문 완료 또는 주문 취소 상태에서는 상태 변경이 불가능합니다."),
 	INVALID_ORDER_FILTER("OR008", "유효하지 않은 주문 조회 필터링 조건입니다."),
+	INVALID_ORDER_TOTAL_PRICE("OR009", "입력된 총 금액이 실제와 일치하지 않습니다."),
 
 	//인증, 인가
 	ACCESS_DENIED("AUTH001", "사용자 인증에 실패했습니다."),
