@@ -22,6 +22,8 @@ include::{snippets}/item/item-create/http-request.adoc[]
 
 include::{snippets}/item/item-create/request-parameters.adoc[]
 
+include::{snippets}/item/item-create/request-parts.adoc[]
+
 include::{snippets}/item/item-create/request-fields.adoc[]
 
 .Response - 성공
@@ -33,6 +35,8 @@ include::{snippets}/item/item-create/response-fields.adoc[]
 include::{snippets}/item/item-create-fail-invalid-name/http-request.adoc[]
 
 include::{snippets}/item/item-create-fail-invalid-name/request-parameters.adoc[]
+
+include::{snippets}/item/item-create-fail-invalid-name/request-parts.adoc[]
 
 include::{snippets}/item/item-create-fail-invalid-name/request-fields.adoc[]
 
@@ -46,6 +50,8 @@ include::{snippets}/item/item-create-fail-invalid-discount-price/http-request.ad
 
 include::{snippets}/item/item-create-fail-invalid-discount-price/request-parameters.adoc[]
 
+include::{snippets}/item/item-create-fail-invalid-discount-price/request-parts.adoc[]
+
 include::{snippets}/item/item-create-fail-invalid-discount-price/request-fields.adoc[]
 
 .Response Fail - 할인가가 원가보다 큰 경우
@@ -58,6 +64,8 @@ include::{snippets}/item/item-create-fail-invalid-discount-price/response-fields
 include::{snippets}/item/item-create-fail-duplicated-item-name/http-request.adoc[]
 
 include::{snippets}/item/item-create-fail-duplicated-item-name/request-parameters.adoc[]
+
+include::{snippets}/item/item-create-fail-duplicated-item-name/request-parts.adoc[]
 
 include::{snippets}/item/item-create-fail-duplicated-item-name/request-fields.adoc[]
 
