@@ -92,26 +92,31 @@ public class ItemService {
 		return ItemsRes.from(items);
 	}
 
-//	public ItemRes update(Long itemId, ItemReq itemReq, Long memberId) {
-//		Store store = storeRepository.findByMemberId(memberId)
-//			.orElseThrow(() -> {
-//				log.warn("GET:READ:NOT_FOUND_STORE_BY_MEMBER_ID : {}", memberId);
-//				return new EntityNotFoundException(NOT_FOUND_STORE);
-//			});
-//
-//		checkDuplicatedItemName(itemReq.name(), store.getId());
-//
-//		Item item = itemRepository.findById(itemId)
-//			.orElseThrow(() -> {
-//				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", itemId);
-//				return new EntityNotFoundException(NOT_FOUND_ITEM);
-//			});
-//
-//		Item updatedItem = ItemReq.toItem(itemReq, store);
-//		item.update(updatedItem);
-//
-//		return ItemRes.from(item);
-//	}
+	public ItemRes update(Long itemId, ItemReq itemReq, Long memberId, ImageUploadReq imageUploadReq) {
+		Store store = storeRepository.findByMemberId(memberId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_STORE_BY_MEMBER_ID : {}", memberId);
+				return new EntityNotFoundException(NOT_FOUND_STORE);
+			});
+
+		checkDuplicatedItemName(itemReq.name(), store.getId());
+
+		Item item = itemRepository.findById(itemId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", itemId);
+				return new EntityNotFoundException(NOT_FOUND_ITEM);
+			});
+
+		String image = item.getImage();
+		imageService.delete(image);
+
+		String imageUrl = imageService.store(imageUploadReq.file());
+
+		Item updatedItem = ItemReq.toItem(itemReq, store, imageUrl);
+		item.update(updatedItem);
+
+		return ItemRes.from(item);
+	}
 
 	public void delete(Long itemId, Long memberId) {
 		Store store = storeRepository.findByMemberId(memberId)

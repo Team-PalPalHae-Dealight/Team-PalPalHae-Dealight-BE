@@ -66,12 +66,14 @@ public class ItemController {
 		return ResponseEntity.ok(itemsRes);
 	}
 
-//	@PatchMapping("/{id}")
-//	public ResponseEntity<ItemRes> update(@PathVariable("id") Long itemId, @Validated @RequestBody ItemReq itemReq, @RequestParam Long memberId) {
-//		ItemRes itemRes = itemService.update(itemId, itemReq, memberId);
-//
-//		return ResponseEntity.ok(itemRes);
-//	}
+	@PatchMapping("/{id}")
+	public ResponseEntity<ItemRes> update(@PathVariable("id") Long itemId, @Validated @RequestPart ItemReq itemReq, @RequestParam Long memberId, @RequestPart(required = false) MultipartFile image) {
+		ImageUploadReq imageUploadReq = new ImageUploadReq(image);
+
+		ItemRes itemRes = itemService.update(itemId, itemReq, memberId, imageUploadReq);
+
+		return ResponseEntity.ok(itemRes);
+	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> delete(@PathVariable("id") Long itemId, @RequestParam Long memberId) {
