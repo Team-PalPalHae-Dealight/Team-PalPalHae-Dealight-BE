@@ -7,6 +7,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -14,9 +16,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -69,24 +69,24 @@ class MemberControllerTest {
 	void getProfileSuccessTest() throws Exception {
 
 		//given
-		Long memberId = 1L;
-
 		AddressRes addressRes = new AddressRes("서울", 37.5665, 126.9780);
 		MemberProfileRes memberProfileInfo = new MemberProfileRes("유재석", "유산슬", "01012345678", addressRes);
 
-		given(memberService.getMemberProfile(memberId))
+		given(memberService.getMemberProfile(any()))
 			.willReturn(memberProfileInfo);
 
 		//when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/members/profiles/{memberId}", memberId)
-				.contentType(APPLICATION_JSON))
+		mockMvc.perform(
+				RestDocumentationRequestBuilders.get("/api/members/profiles")
+					.header("Authorization", "Bearer {ACCESS_TOKEN}")
+					.contentType(APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andDo(print())
 			.andDo(document("member/member-get-profile",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				pathParameters(
-					parameterWithName("memberId").description("고객 ID")
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
 				),
 				responseFields(
 					fieldWithPath("realName").description("고객의 실명"),
@@ -102,22 +102,23 @@ class MemberControllerTest {
 	@Test
 	@DisplayName("멤버 프로필 조회 실패: 멤버 ID가 존재하지 않는 경우")
 	void getProfileNotFoundTest() throws Exception {
-		// given
-		Long nonexistentMemberId = 999L;
 
-		given(memberService.getMemberProfile(nonexistentMemberId))
+		// given
+		given(memberService.getMemberProfile(any()))
 			.willThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
 		// when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/members/profiles/{memberId}", nonexistentMemberId)
-				.contentType(APPLICATION_JSON))
+		mockMvc.perform(
+				RestDocumentationRequestBuilders.get("/api/members/profiles")
+					.header("Authorization", "Bearer {ACCESS_TOKEN}")
+					.contentType(APPLICATION_JSON))
 			.andExpect(status().isNotFound())
 			.andDo(print())
 			.andDo(document("member/member-get-profile-not-found",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				pathParameters(
-					parameterWithName("memberId").description("조회하려는 멤버의 ID")
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
 				),
 				responseFields(
 					fieldWithPath("message").description("에러 메시지"),
@@ -125,7 +126,6 @@ class MemberControllerTest {
 					fieldWithPath("code").description("에러 코드"),
 					fieldWithPath("errors").description("추가적인 에러 정보")
 				)
-
 			));
 	}
 
@@ -134,18 +134,18 @@ class MemberControllerTest {
 	void updateProfileSuccessTest() throws Exception {
 
 		// given
-		Long memberId = 1L;
 		AddressReq addressReq = new AddressReq("서울", 37.5665, 126.9780);
 		MemberUpdateReq updateRequest = new MemberUpdateReq("박명수", "유산슬", addressReq);
 
 		AddressRes addressRes = new AddressRes("서울", 37.5665, 126.9780);
 		MemberUpdateRes updateResponse = new MemberUpdateRes("박명수", "유산슬", addressRes);
 
-		given(memberService.updateMemberProfile(memberId, updateRequest))
+		given(memberService.updateMemberProfile(any(), eq(updateRequest)))
 			.willReturn(updateResponse);
 
 		// when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/members/profiles/{memberId}", memberId)
+		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/members/profiles")
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(updateRequest)))
 			.andExpect(status().isOk())
@@ -153,8 +153,8 @@ class MemberControllerTest {
 			.andDo(document("member/member-update-profile",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				pathParameters(
-					parameterWithName("memberId").description("업데이트하려는 멤버의 ID")
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
 				),
 				requestFields(
 					fieldWithPath("nickname").description("업데이트하려는 닉네임"),
@@ -178,15 +178,15 @@ class MemberControllerTest {
 	void updateProfileNotFoundTest() throws Exception {
 
 		// given
-		Long nonexistentMemberId = 999L;
 		AddressReq addressReq = new AddressReq("서울", 37.5665, 126.9780);
 		MemberUpdateReq updateRequest = new MemberUpdateReq("박명수", "01087654321", addressReq);
 
-		given(memberService.updateMemberProfile(nonexistentMemberId, updateRequest))
+		given(memberService.updateMemberProfile(any(), eq(updateRequest)))
 			.willThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
 		// when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/members/profiles/{memberId}", nonexistentMemberId)
+		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/members/profiles")
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(updateRequest)))
 			.andExpect(status().isNotFound())
@@ -194,8 +194,8 @@ class MemberControllerTest {
 			.andDo(document("member/member-update-profile-not-found",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				pathParameters(
-					parameterWithName("memberId").description("업데이트하려는 멤버의 ID")
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
 				),
 				requestFields(
 					fieldWithPath("nickname").description("업데이트하려는 닉네임"),
@@ -218,15 +218,15 @@ class MemberControllerTest {
 	void updateAddressSuccessTest() throws Exception {
 
 		// given
-		Long memberId = 1L;
 		AddressReq addressReq = new AddressReq("서울", 37.5665, 126.9780);
 		AddressRes addressRes = new AddressRes("서울", 37.5665, 126.9780);
 
-		given(memberService.updateMemberAddress(memberId, addressReq))
+		given(memberService.updateMemberAddress(any(), eq(addressReq)))
 			.willReturn(addressRes);
 
 		// when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/members/address/{memberId}", memberId)
+		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/members/addresses")
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(addressReq)))
 			.andExpect(status().isOk())
@@ -234,8 +234,8 @@ class MemberControllerTest {
 			.andDo(document("member/member-update-address",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				pathParameters(
-					parameterWithName("memberId").description("업데이트하려는 멤버의 ID")
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
 				),
 				requestFields(
 					fieldWithPath("name").description("업데이트하려는 주소명"),
@@ -255,14 +255,14 @@ class MemberControllerTest {
 	void updateAddressNotFoundTest() throws Exception {
 
 		// given
-		Long nonexistentMemberId = 999L;
 		AddressReq addressReq = new AddressReq("서울", 37.5665, 126.9780);
 
-		given(memberService.updateMemberAddress(nonexistentMemberId, addressReq))
+		given(memberService.updateMemberAddress(any(), eq(addressReq)))
 			.willThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
 		// when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/members/address/{memberId}", nonexistentMemberId)
+		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/members/addresses")
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(addressReq)))
 			.andExpect(status().isNotFound())
@@ -270,8 +270,8 @@ class MemberControllerTest {
 			.andDo(document("member/member-update-address-not-found",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				pathParameters(
-					parameterWithName("memberId").description("업데이트하려는 멤버의 ID")
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
 				),
 				requestFields(
 					fieldWithPath("name").description("업데이트하려는 주소명"),
@@ -292,18 +292,18 @@ class MemberControllerTest {
 	void uploadImageSuccessTest() throws Exception {
 
 		// given
-		Long memberId = 1L;
 		MockMultipartFile file = new MockMultipartFile("file", "profile.png", "image/png",
 			"sample-image-content".getBytes());
 
 		ImageUploadReq request = new ImageUploadReq(file);
 		ImageRes imageRes = new ImageRes("http://sample.com/profile.png");
 
-		given(memberService.updateMemberImage(eq(memberId), any())).willReturn(imageRes);
+		given(memberService.updateMemberImage(any(), any())).willReturn(imageRes);
 
 		// when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.fileUpload("/api/members/images/{memberId}", memberId)
+		mockMvc.perform(RestDocumentationRequestBuilders.multipart("/api/members/images")
 				.file(file)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.with(updateRequest -> {
 					updateRequest.setMethod("PATCH");
 					return updateRequest;
@@ -314,8 +314,8 @@ class MemberControllerTest {
 			.andDo(document("member/member-upload-image",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				pathParameters(
-					parameterWithName("memberId").description("이미지를 업로드하려는 멤버의 ID")
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
 				),
 				requestParts(
 					partWithName("file").description("업로드하려는 이미지 파일")
@@ -331,16 +331,16 @@ class MemberControllerTest {
 	void uploadImageFailDueToInvalidMemberIdTest() throws Exception {
 
 		// given
-		Long invalidMemberId = 9999L;
 		MockMultipartFile file = new MockMultipartFile("file", "profile.png", "image/png",
 			"sample-image-content".getBytes());
 
-		given(memberService.updateMemberImage(eq(invalidMemberId), any()))
+		given(memberService.updateMemberImage(any(), any()))
 			.willThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
 		// when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.fileUpload("/api/members/images/{memberId}", invalidMemberId)
+		mockMvc.perform(RestDocumentationRequestBuilders.multipart("/api/members/images")
 				.file(file)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.with(updateRequest -> {
 					updateRequest.setMethod("PATCH");
 					return updateRequest;
@@ -350,8 +350,8 @@ class MemberControllerTest {
 			.andDo(document("member/member-upload-image-not-found",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				pathParameters(
-					parameterWithName("memberId").description("이미지를 업로드하려는 멤버의 ID")
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
 				),
 				requestParts(
 					partWithName("file").description("업로드하려는 이미지 파일")
@@ -368,21 +368,21 @@ class MemberControllerTest {
 	@Test
 	@DisplayName("멤버 이미지 삭제 성공")
 	void deleteMemberImageSuccessTest() throws Exception {
-		// given
-		Long memberId = 1L;
 
-		doNothing().when(memberService).deleteMemberImage(memberId);
+		// given
+		doNothing().when(memberService).deleteMemberImage(any());
 
 		// when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/members/images/{memberId}", memberId)
+		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/members/images")
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.contentType(APPLICATION_JSON))
 			.andExpect(status().isNoContent())
 			.andDo(print())
 			.andDo(document("member/member-delete-image-success",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				pathParameters(
-					parameterWithName("memberId").description("이미지를 삭제하려는 멤버의 ID")
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
 				)
 			));
 	}
@@ -390,22 +390,22 @@ class MemberControllerTest {
 	@Test
 	@DisplayName("멤버 이미지 삭제 실패: 멤버 ID가 존재하지 않는 경우")
 	void deleteMemberImageFailNotFoundTest() throws Exception {
-		// given
-		Long nonexistentMemberId = 999L;
 
+		// given
 		doThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER)).when(memberService)
-			.deleteMemberImage(nonexistentMemberId);
+			.deleteMemberImage(any());
 
 		// when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/members/images/{memberId}", nonexistentMemberId)
+		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/members/images")
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.contentType(APPLICATION_JSON))
 			.andExpect(status().isNotFound())
 			.andDo(print())
 			.andDo(document("member/member-delete-image-not-found",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				pathParameters(
-					parameterWithName("memberId").description("이미지를 삭제하려는 멤버의 ID")
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
 				),
 				responseFields(
 					fieldWithPath("message").description("에러 메시지"),
