@@ -2,6 +2,7 @@ package com.palpal.dealightbe.domain.item.presentation;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -43,8 +44,19 @@ public class ItemController {
 	}
 
 	@GetMapping("/stores")
-	public ResponseEntity<ItemsRes> findAllForStore(@RequestParam Long memberId, @PageableDefault(size = 5, page = 0) Pageable pageable) {
+	public ResponseEntity<ItemsRes> findAllForStore(@RequestParam Long memberId, @RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = "5") int size) {
+		PageRequest pageable = PageRequest.of(page, size);
+
 		ItemsRes itemsRes = itemService.findAllForStore(memberId, pageable);
+
+		return ResponseEntity.ok(itemsRes);
+	}
+
+	@GetMapping("/members")
+	public ResponseEntity<ItemsRes> findAllForMember(@RequestParam("x-coordinate") double xCoordinate, @RequestParam("y-coordinate") double yCoordinate, @RequestParam("sort-by") String sortBy, @RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = "5") int size) {
+		PageRequest pageable = PageRequest.of(page, size);
+
+		ItemsRes itemsRes = itemService.findAllForMember(xCoordinate, yCoordinate, sortBy, pageable);
 
 		return ResponseEntity.ok(itemsRes);
 	}

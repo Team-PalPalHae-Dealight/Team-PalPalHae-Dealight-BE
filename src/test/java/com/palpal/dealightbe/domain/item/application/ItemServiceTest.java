@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
+import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.item.application.dto.request.ItemReq;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemsRes;
@@ -46,18 +47,19 @@ class ItemServiceTest {
 	private StoreRepository storeRepository;
 
 	private Store store;
+	private Store store2;
 	private Item item;
+	private Item item2;
 
 	@BeforeEach
 	void setUp() {
-		LocalTime openTime = LocalTime.now();
-		LocalTime closeTime = openTime.plusHours(1);
+		LocalTime openTime = LocalTime.of(13, 0);
+		LocalTime closeTime = LocalTime.of(20, 0);
 
-		if (closeTime.isBefore(openTime)) {
-			LocalTime tempTime = openTime;
-			openTime = closeTime;
-			closeTime = tempTime;
-		}
+		Address address = Address.builder()
+			.xCoordinate(127.0324773)
+			.yCoordinate(37.5893876)
+			.build();
 
 		store = Store.builder()
 			.name("동네분식")
@@ -66,16 +68,42 @@ class ItemServiceTest {
 			.openTime(openTime)
 			.closeTime(closeTime)
 			.dayOff(Collections.singleton(DayOff.MON))
+			.address(address)
 			.build();
 
 		item = Item.builder()
 			.name("떡볶이")
 			.stock(2)
-			.discountPrice(4000)
+			.discountPrice(3000)
 			.originalPrice(4500)
 			.description("기본 떡볶이 입니다.")
 			.information("통신사 할인 불가능 합니다.")
 			.store(store)
+			.build();
+
+		Address address2 = Address.builder()
+			.xCoordinate(127.0028245)
+			.yCoordinate(37.5805009)
+			.build();
+
+		store2 = Store.builder()
+			.name("먼분식")
+			.storeNumber("0000000")
+			.telephone("00000000")
+			.openTime(LocalTime.of(17, 0))
+			.closeTime(LocalTime.of(23, 30))
+			.dayOff(Collections.singleton(DayOff.MON))
+			.address(address2)
+			.build();
+
+		item2 = Item.builder()
+			.name("김밥")
+			.stock(3)
+			.discountPrice(4000)
+			.originalPrice(4500)
+			.description("김밥 입니다.")
+			.information("통신사 할인 불가능 합니다.")
+			.store(store2)
 			.build();
 	}
 
@@ -172,16 +200,6 @@ class ItemServiceTest {
 	@Test
 	void itemFindAllForStoreSuccessTest() {
 		//given
-		Item item2 = Item.builder()
-			.name("김밥")
-			.stock(3)
-			.discountPrice(5000)
-			.originalPrice(5500)
-			.description("김밥 입니다.")
-			.information("통신사 할인 불가능 합니다.")
-			.store(store)
-			.build();
-
 		Long memberId = 1L;
 
 		int page = 0;
@@ -199,6 +217,84 @@ class ItemServiceTest {
 
 		//when
 		ItemsRes itemsRes = itemService.findAllForStore(memberId, pageRequest);
+
+		//then
+		assertThat(itemsRes.itemResponses()).hasSize(items.size());
+	}
+
+	@DisplayName("상품 목록 조회(고객 시점) - 마감순 성공 테스트")
+	@Test
+	void itemFindAllForMemberSuccessSortByDeadlineTest() {
+		//given
+		int page = 0;
+		int size = 5;
+		PageRequest pageRequest = PageRequest.of(page, size);
+
+		List<Item> items = new ArrayList<>();
+		items.add(item);
+		items.add(item2);
+
+		Page<Item> itemPage = new PageImpl<>(items, pageRequest, items.size());
+
+		double xCoordinate = 127.0221068;
+		double yCoordinate = 37.5912999;
+
+		when(itemRepository.findAllByDeadline(anyDouble(), anyDouble(), eq(PageRequest.of(page, size)))).thenReturn(itemPage);
+
+		//when
+		ItemsRes itemsRes = itemService.findAllForMember(xCoordinate, yCoordinate, "deadline", pageRequest);
+
+		//then
+		assertThat(itemsRes.itemResponses()).hasSize(items.size());
+	}
+
+	@DisplayName("상품 목록 조회(고객 시점) - 할인율순 성공 테스트")
+	@Test
+	void itemFindAllForMemberSuccessSortByDiscountRateTest() {
+		//given
+		int page = 0;
+		int size = 5;
+		PageRequest pageRequest = PageRequest.of(page, size);
+
+		List<Item> items = new ArrayList<>();
+		items.add(item);
+		items.add(item2);
+
+		Page<Item> itemPage = new PageImpl<>(items, pageRequest, items.size());
+
+		double xCoordinate = 127.0221068;
+		double yCoordinate = 37.5912999;
+
+		when(itemRepository.findAllByDiscountRate(anyDouble(), anyDouble(), eq(PageRequest.of(page, size)))).thenReturn(itemPage);
+
+		//when
+		ItemsRes itemsRes = itemService.findAllForMember(xCoordinate, yCoordinate, "discount-rate", pageRequest);
+
+		//then
+		assertThat(itemsRes.itemResponses()).hasSize(items.size());
+	}
+
+	@DisplayName("상품 목록 조회(고객 시점) - 거리순 성공 테스트")
+	@Test
+	void itemFindAllForMemberSuccessSortByDistanceTest() {
+		//given
+		int page = 0;
+		int size = 5;
+		PageRequest pageRequest = PageRequest.of(page, size);
+
+		List<Item> items = new ArrayList<>();
+		items.add(item);
+		items.add(item2);
+
+		Page<Item> itemPage = new PageImpl<>(items, pageRequest, items.size());
+
+		double xCoordinate = 127.0221068;
+		double yCoordinate = 37.5912999;
+
+		when(itemRepository.findAllByDistance(anyDouble(), anyDouble(), eq(PageRequest.of(page, size)))).thenReturn(itemPage);
+
+		//when
+		ItemsRes itemsRes = itemService.findAllForMember(xCoordinate, yCoordinate, "distance", pageRequest);
 
 		//then
 		assertThat(itemsRes.itemResponses()).hasSize(items.size());
