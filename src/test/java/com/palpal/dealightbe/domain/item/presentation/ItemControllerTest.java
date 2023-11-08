@@ -3,7 +3,6 @@ package com.palpal.dealightbe.domain.item.presentation;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -155,12 +154,11 @@ class ItemControllerTest {
 	@Test
 	public void itemCreateSuccessTest() throws Exception {
 		//given
-		StoreInfoRes storeInfoRes = new StoreInfoRes(store.getStoreNumber(), store.getName(), store.getTelephone(), store.getAddress().getName(), store.getOpenTime(), store.getCloseTime(), store.getDayOffs(), store.getStoreStatus(), store.getImage());
 		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
 
 		ItemReq itemReq = new ItemReq(item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(),
 			item.getDescription(), item.getInformation());
-		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), storeInfoRes, addressRes);
+		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), item.getStore().getName(), item.getStore().getOpenTime(), item.getStore().getCloseTime(), addressRes);
 
 		MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "file".getBytes());
 		MockMultipartFile request = new MockMultipartFile("itemReq", "itemReq",
@@ -182,25 +180,19 @@ class ItemControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.itemId").value(itemRes.itemId()))
 			.andExpect(jsonPath("$.storeId").value(itemRes.storeId()))
-			.andExpect(jsonPath("$.name").value(itemRes.name()))
+			.andExpect(jsonPath("$.itemName").value(itemRes.itemName()))
 			.andExpect(jsonPath("$.stock").value(itemRes.stock()))
 			.andExpect(jsonPath("$.discountPrice").value(itemRes.discountPrice()))
 			.andExpect(jsonPath("$.originalPrice").value(itemRes.originalPrice()))
 			.andExpect(jsonPath("$.description").value(itemRes.description()))
 			.andExpect(jsonPath("$.information").value(itemRes.information()))
 			.andExpect(jsonPath("$.image").value(itemRes.image()))
-			.andExpect(jsonPath("$.storeInfoRes.storeNumber").value(storeInfoRes.storeNumber()))
-			.andExpect(jsonPath("$.storeInfoRes.name").value(storeInfoRes.name()))
-			.andExpect(jsonPath("$.storeInfoRes.telephone").value(storeInfoRes.telephone()))
-			.andExpect(jsonPath("$.storeInfoRes.addressName").value(storeInfoRes.addressName()))
-			.andExpect(jsonPath("$.storeInfoRes.openTime").value(storeInfoRes.openTime().toString()))
-			.andExpect(jsonPath("$.storeInfoRes.closeTime").value(storeInfoRes.closeTime().toString()))
-			.andExpect(jsonPath("$.storeInfoRes.dayOff").value(storeInfoRes.dayOff().stream().map(DayOff::getName).collect(Collectors.toList())))
-			.andExpect(jsonPath("$.storeInfoRes.storeStatus").value(storeInfoRes.storeStatus().getName()))
-			.andExpect(jsonPath("$.storeInfoRes.image").value(storeInfoRes.image()))
-			.andExpect(jsonPath("$.storeAddressRes.name").value(addressRes.name()))
-			.andExpect(jsonPath("$.storeAddressRes.xCoordinate").value(addressRes.xCoordinate()))
-			.andExpect(jsonPath("$.storeAddressRes.yCoordinate").value(addressRes.yCoordinate()))
+			.andExpect(jsonPath("$.storeName").value(itemRes.storeName()))
+			.andExpect(jsonPath("$.storeOpenTime").value(itemRes.storeOpenTime().toString()))
+			.andExpect(jsonPath("$.storeCloseTime").value(itemRes.storeCloseTime().toString()))
+			.andExpect(jsonPath("$.storeAddress.name").value(addressRes.name()))
+			.andExpect(jsonPath("$.storeAddress.xCoordinate").value(addressRes.xCoordinate()))
+			.andExpect(jsonPath("$.storeAddress.yCoordinate").value(addressRes.yCoordinate()))
 			.andDo(print())
 			.andDo(document("item/item-create",
 				Preprocessors.preprocessRequest(prettyPrint()),
@@ -222,25 +214,19 @@ class ItemControllerTest {
 				responseFields(
 					fieldWithPath("itemId").type(NUMBER).description("상품 ID"),
 					fieldWithPath("storeId").type(NUMBER).description("업체 ID"),
-					fieldWithPath("name").type(STRING).description("상품 이름"),
+					fieldWithPath("itemName").type(STRING).description("상품 이름"),
 					fieldWithPath("stock").type(NUMBER).description("재고 수"),
 					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
 					fieldWithPath("description").type(STRING).description("상세 설명"),
 					fieldWithPath("information").type(STRING).description("안내 사항"),
 					fieldWithPath("image").type(STRING).description("상품 이미지 경로"),
-					fieldWithPath("storeInfoRes.storeNumber").type(STRING).description("사업자 등록 번호"),
-					fieldWithPath("storeInfoRes.name").type(STRING).description("상호명"),
-					fieldWithPath("storeInfoRes.telephone").type(STRING).description("업체 전화번호"),
-					fieldWithPath("storeInfoRes.addressName").type(STRING).description("업체 주소"),
-					fieldWithPath("storeInfoRes.openTime").type(STRING).description("오픈 시간"),
-					fieldWithPath("storeInfoRes.closeTime").type(STRING).description("마감 시간"),
-					fieldWithPath("storeInfoRes.dayOff").type(ARRAY).description("휴무일"),
-					fieldWithPath("storeInfoRes.storeStatus").type(STRING).description("영업 유무"),
-					fieldWithPath("storeInfoRes.image").type(STRING).description("업체 이미지 경로"),
-					fieldWithPath("storeAddressRes.name").type(STRING).description("업체 주소"),
-					fieldWithPath("storeAddressRes.xCoordinate").type(NUMBER).description("업체 주소 경도"),
-					fieldWithPath("storeAddressRes.yCoordinate").type(NUMBER).description("업체 주소 위도")
+					fieldWithPath("storeName").type(STRING).description("상호명"),
+					fieldWithPath("storeOpenTime").type(STRING).description("오픈 시간"),
+					fieldWithPath("storeCloseTime").type(STRING).description("마감 시간"),
+					fieldWithPath("storeAddress.name").type(STRING).description("업체 주소"),
+					fieldWithPath("storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
+					fieldWithPath("storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도")
 				)
 			));
 	}
@@ -259,12 +245,11 @@ class ItemControllerTest {
 			.store(store)
 			.build();
 
-		StoreInfoRes storeInfoRes = new StoreInfoRes(store.getStoreNumber(), store.getName(), store.getTelephone(), store.getAddress().getName(), store.getOpenTime(), store.getCloseTime(), store.getDayOffs(), store.getStoreStatus(), store.getImage());
 		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
 
 		ItemReq itemReq = new ItemReq(item2.getName(), item2.getStock(), item2.getDiscountPrice(),
 			item2.getOriginalPrice(), item2.getDescription(), item2.getInformation());
-		ItemRes itemRes = new ItemRes(1L, 1L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage(), storeInfoRes, addressRes);
+		ItemRes itemRes = new ItemRes(1L, 1L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage(), item2.getStore().getName(), item2.getStore().getOpenTime(), item2.getStore().getCloseTime(), addressRes);
 
 		MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "file".getBytes());
 		MockMultipartFile request = new MockMultipartFile("itemReq", "itemReq",
@@ -438,10 +423,9 @@ class ItemControllerTest {
 		//given
 		Long itemId = 1L;
 
-		StoreInfoRes storeInfoRes = new StoreInfoRes(store.getStoreNumber(), store.getName(), store.getTelephone(), store.getAddress().getName(), store.getOpenTime(), store.getCloseTime(), store.getDayOffs(), store.getStoreStatus(), store.getImage());
 		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
 
-		ItemRes itemRes = new ItemRes(itemId, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), storeInfoRes, addressRes);
+		ItemRes itemRes = new ItemRes(itemId, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), item.getName(), item.getStore().getOpenTime(), item.getStore().getCloseTime(), addressRes);
 
 		when(itemService.findById(any())).thenReturn(itemRes);
 
@@ -452,25 +436,19 @@ class ItemControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.itemId").value(itemRes.itemId()))
 			.andExpect(jsonPath("$.storeId").value(itemRes.storeId()))
-			.andExpect(jsonPath("$.name").value(itemRes.name()))
+			.andExpect(jsonPath("$.itemName").value(itemRes.itemName()))
 			.andExpect(jsonPath("$.stock").value(itemRes.stock()))
 			.andExpect(jsonPath("$.discountPrice").value(itemRes.discountPrice()))
 			.andExpect(jsonPath("$.originalPrice").value(itemRes.originalPrice()))
 			.andExpect(jsonPath("$.description").value(itemRes.description()))
 			.andExpect(jsonPath("$.information").value(itemRes.information()))
 			.andExpect(jsonPath("$.image").value(itemRes.image()))
-			.andExpect(jsonPath("$.storeInfoRes.storeNumber").value(storeInfoRes.storeNumber()))
-			.andExpect(jsonPath("$.storeInfoRes.name").value(storeInfoRes.name()))
-			.andExpect(jsonPath("$.storeInfoRes.telephone").value(storeInfoRes.telephone()))
-			.andExpect(jsonPath("$.storeInfoRes.addressName").value(storeInfoRes.addressName()))
-			.andExpect(jsonPath("$.storeInfoRes.openTime").value(storeInfoRes.openTime().toString()))
-			.andExpect(jsonPath("$.storeInfoRes.closeTime").value(storeInfoRes.closeTime().toString()))
-			.andExpect(jsonPath("$.storeInfoRes.dayOff").value(storeInfoRes.dayOff().stream().map(DayOff::getName).collect(Collectors.toList())))
-			.andExpect(jsonPath("$.storeInfoRes.storeStatus").value(storeInfoRes.storeStatus().getName()))
-			.andExpect(jsonPath("$.storeInfoRes.image").value(storeInfoRes.image()))
-			.andExpect(jsonPath("$.storeAddressRes.name").value(addressRes.name()))
-			.andExpect(jsonPath("$.storeAddressRes.xCoordinate").value(addressRes.xCoordinate()))
-			.andExpect(jsonPath("$.storeAddressRes.yCoordinate").value(addressRes.yCoordinate()))
+			.andExpect(jsonPath("$.storeName").value(itemRes.storeName()))
+			.andExpect(jsonPath("$.storeOpenTime").value(itemRes.storeOpenTime().toString()))
+			.andExpect(jsonPath("$.storeCloseTime").value(itemRes.storeCloseTime().toString()))
+			.andExpect(jsonPath("$.storeAddress.name").value(addressRes.name()))
+			.andExpect(jsonPath("$.storeAddress.xCoordinate").value(addressRes.xCoordinate()))
+			.andExpect(jsonPath("$.storeAddress.yCoordinate").value(addressRes.yCoordinate()))
 			.andDo(print())
 			.andDo(document("item/item-find-by-id",
 				Preprocessors.preprocessRequest(prettyPrint()),
@@ -479,25 +457,19 @@ class ItemControllerTest {
 				responseFields(
 					fieldWithPath("itemId").type(NUMBER).description("상품 ID"),
 					fieldWithPath("storeId").type(NUMBER).description("업체 ID"),
-					fieldWithPath("name").type(STRING).description("상품 이름"),
+					fieldWithPath("itemName").type(STRING).description("상품 이름"),
 					fieldWithPath("stock").type(NUMBER).description("재고 수"),
 					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
 					fieldWithPath("description").type(STRING).description("상세 설명"),
 					fieldWithPath("information").type(STRING).description("안내 사항"),
 					fieldWithPath("image").type(STRING).description("상품 이미지 경로"),
-					fieldWithPath("storeInfoRes.storeNumber").type(STRING).description("사업자 등록 번호"),
-					fieldWithPath("storeInfoRes.name").type(STRING).description("상호명"),
-					fieldWithPath("storeInfoRes.telephone").type(STRING).description("업체 전화번호"),
-					fieldWithPath("storeInfoRes.addressName").type(STRING).description("업체 주소"),
-					fieldWithPath("storeInfoRes.openTime").type(STRING).description("오픈 시간"),
-					fieldWithPath("storeInfoRes.closeTime").type(STRING).description("마감 시간"),
-					fieldWithPath("storeInfoRes.dayOff").type(ARRAY).description("휴무일"),
-					fieldWithPath("storeInfoRes.storeStatus").type(STRING).description("영업 유무"),
-					fieldWithPath("storeInfoRes.image").type(STRING).description("업체 이미지 경로"),
-					fieldWithPath("storeAddressRes.name").type(STRING).description("업체 주소"),
-					fieldWithPath("storeAddressRes.xCoordinate").type(NUMBER).description("업체 주소 경도"),
-					fieldWithPath("storeAddressRes.yCoordinate").type(NUMBER).description("업체 주소 위도")
+					fieldWithPath("storeName").type(STRING).description("상호명"),
+					fieldWithPath("storeOpenTime").type(STRING).description("오픈 시간"),
+					fieldWithPath("storeCloseTime").type(STRING).description("마감 시간"),
+					fieldWithPath("storeAddress.name").type(STRING).description("업체 주소"),
+					fieldWithPath("storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
+					fieldWithPath("storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도")
 				)
 			));
 	}
@@ -550,11 +522,10 @@ class ItemControllerTest {
 		int page = 0;
 		PageRequest pageRequest = PageRequest.of(page, size);
 
-		StoreInfoRes storeInfoRes = new StoreInfoRes(store.getStoreNumber(), store.getName(), store.getTelephone(), store.getAddress().getName(), store.getOpenTime(), store.getCloseTime(), store.getDayOffs(), store.getStoreStatus(), store.getImage());
 		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
 
-		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), storeInfoRes, addressRes);
-		ItemRes itemRes3 = new ItemRes(2L, 1L, item3.getName(), item3.getStock(), item3.getDiscountPrice(), item3.getOriginalPrice(), item3.getDescription(), item3.getInformation(), item3.getImage(), storeInfoRes, addressRes);
+		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), item.getStore().getName(), item.getStore().getOpenTime(), item.getStore().getCloseTime(), addressRes);
+		ItemRes itemRes3 = new ItemRes(2L, 1L, item3.getName(), item3.getStock(), item3.getDiscountPrice(), item3.getOriginalPrice(), item3.getDescription(), item3.getInformation(), item3.getImage(), item3.getStore().getName(), item3.getStore().getOpenTime(), item3.getStore().getCloseTime(), addressRes);
 		List<ItemRes> itemResList = List.of(itemRes, itemRes3);
 		ItemsRes itemsRes = new ItemsRes(itemResList);
 
@@ -568,6 +539,21 @@ class ItemControllerTest {
 				.param("size", String.valueOf(size))
 				.param("page", String.valueOf(page)))
 			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.items[0].itemId").value(itemRes.itemId()))
+			.andExpect(jsonPath("$.items[0].storeId").value(itemRes.storeId()))
+			.andExpect(jsonPath("$.items[0].itemName").value(itemRes.itemName()))
+			.andExpect(jsonPath("$.items[0].stock").value(itemRes.stock()))
+			.andExpect(jsonPath("$.items[0].discountPrice").value(itemRes.discountPrice()))
+			.andExpect(jsonPath("$.items[0].originalPrice").value(itemRes.originalPrice()))
+			.andExpect(jsonPath("$.items[0].description").value(itemRes.description()))
+			.andExpect(jsonPath("$.items[0].information").value(itemRes.information()))
+			.andExpect(jsonPath("$.items[0].image").value(itemRes.image()))
+			.andExpect(jsonPath("$.items[0].storeName").value(itemRes.storeName()))
+			.andExpect(jsonPath("$.items[0].storeOpenTime").value(itemRes.storeOpenTime().toString()))
+			.andExpect(jsonPath("$.items[0].storeCloseTime").value(itemRes.storeCloseTime().toString()))
+			.andExpect(jsonPath("$.items[0].storeAddress.name").value(addressRes.name()))
+			.andExpect(jsonPath("$.items[0].storeAddress.xCoordinate").value(addressRes.xCoordinate()))
+			.andExpect(jsonPath("$.items[0].storeAddress.yCoordinate").value(addressRes.yCoordinate()))
 			.andDo(print())
 			.andDo(document("item/item-find-All-for-store",
 				Preprocessors.preprocessRequest(prettyPrint()),
@@ -578,28 +564,22 @@ class ItemControllerTest {
 						parameterWithName("page").description("페이지 번호")
 					)),
 				responseFields(
-					fieldWithPath("itemResponses").type(ARRAY).description("상품 목록"),
-					fieldWithPath("itemResponses[0].itemId").type(NUMBER).description("상품 ID"),
-					fieldWithPath("itemResponses[0].storeId").type(NUMBER).description("업체 ID"),
-					fieldWithPath("itemResponses[0].name").description("상품 이름"),
-					fieldWithPath("itemResponses[0].stock").type(NUMBER).description("재고 수"),
-					fieldWithPath("itemResponses[0].discountPrice").type(NUMBER).description("할인가"),
-					fieldWithPath("itemResponses[0].originalPrice").type(NUMBER).description("원가"),
-					fieldWithPath("itemResponses[0].description").type(STRING).description("상세 설명"),
-					fieldWithPath("itemResponses[0].information").type(STRING).description("안내 사항"),
-					fieldWithPath("itemResponses[0].image").type(STRING).description("상품 이미지 경로"),
-					fieldWithPath("itemResponses[0].storeInfoRes.storeNumber").type(STRING).description("사업자 등록 번호"),
-					fieldWithPath("itemResponses[0].storeInfoRes.name").type(STRING).description("상호명"),
-					fieldWithPath("itemResponses[0].storeInfoRes.telephone").type(STRING).description("업체 전화번호"),
-					fieldWithPath("itemResponses[0].storeInfoRes.addressName").type(STRING).description("업체 주소"),
-					fieldWithPath("itemResponses[0].storeInfoRes.openTime").type(STRING).description("오픈 시간"),
-					fieldWithPath("itemResponses[0].storeInfoRes.closeTime").type(STRING).description("마감 시간"),
-					fieldWithPath("itemResponses[0].storeInfoRes.dayOff").type(ARRAY).description("휴무일"),
-					fieldWithPath("itemResponses[0].storeInfoRes.storeStatus").type(STRING).description("영업 유무"),
-					fieldWithPath("itemResponses[0].storeInfoRes.image").type(STRING).description("업체 이미지 경로"),
-					fieldWithPath("itemResponses[0].storeAddressRes.name").type(STRING).description("업체 주소"),
-					fieldWithPath("itemResponses[0].storeAddressRes.xCoordinate").type(NUMBER).description("업체 주소 경도"),
-					fieldWithPath("itemResponses[0].storeAddressRes.yCoordinate").type(NUMBER).description("업체 주소 위도")
+					fieldWithPath("items").type(ARRAY).description("상품 목록"),
+					fieldWithPath("items[0].itemId").type(NUMBER).description("상품 ID"),
+					fieldWithPath("items[0].storeId").type(NUMBER).description("업체 ID"),
+					fieldWithPath("items[0].itemName").description("상품 이름"),
+					fieldWithPath("items[0].stock").type(NUMBER).description("재고 수"),
+					fieldWithPath("items[0].discountPrice").type(NUMBER).description("할인가"),
+					fieldWithPath("items[0].originalPrice").type(NUMBER).description("원가"),
+					fieldWithPath("items[0].description").type(STRING).description("상세 설명"),
+					fieldWithPath("items[0].information").type(STRING).description("안내 사항"),
+					fieldWithPath("items[0].image").type(STRING).description("상품 이미지 경로"),
+					fieldWithPath("items[0].storeName").type(STRING).description("상호명"),
+					fieldWithPath("items[0].storeOpenTime").type(STRING).description("오픈 시간"),
+					fieldWithPath("items[0].storeCloseTime").type(STRING).description("마감 시간"),
+					fieldWithPath("items[0].storeAddress.name").type(STRING).description("업체 주소"),
+					fieldWithPath("items[0].storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
+					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도")
 				)
 			));
 	}
@@ -616,14 +596,11 @@ class ItemControllerTest {
 		int page = 0;
 		PageRequest pageRequest = PageRequest.of(page, size);
 
-		StoreInfoRes storeInfoRes = new StoreInfoRes(store.getStoreNumber(), store.getName(), store.getTelephone(), store.getAddress().getName(), store.getOpenTime(), store.getCloseTime(), store.getDayOffs(), store.getStoreStatus(), store.getImage());
 		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
-
-		StoreInfoRes storeInfoRes2 = new StoreInfoRes(store2.getStoreNumber(), store2.getName(), store2.getTelephone(), store2.getAddress().getName(), store2.getOpenTime(), store2.getCloseTime(), store2.getDayOffs(), store2.getStoreStatus(), store2.getImage());
 		AddressRes addressRes2 = new AddressRes(address2.getName(), address2.getXCoordinate(), address2.getYCoordinate());
 
-		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), storeInfoRes, addressRes);
-		ItemRes itemRes2 = new ItemRes(2L, 2L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage(), storeInfoRes2, addressRes2);
+		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), item.getStore().getName(), item.getStore().getOpenTime(), item.getStore().getCloseTime(), addressRes);
+		ItemRes itemRes2 = new ItemRes(2L, 2L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage(), item2.getStore().getName(), item2.getStore().getOpenTime(), item2.getStore().getCloseTime(), addressRes2);
 		List<ItemRes> itemResList = List.of(itemRes, itemRes2);
 		ItemsRes itemsRes = new ItemsRes(itemResList);
 
@@ -639,6 +616,21 @@ class ItemControllerTest {
 				.param("size", String.valueOf(size))
 				.param("page", String.valueOf(page)))
 			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.items[0].itemId").value(itemRes.itemId()))
+			.andExpect(jsonPath("$.items[0].storeId").value(itemRes.storeId()))
+			.andExpect(jsonPath("$.items[0].itemName").value(itemRes.itemName()))
+			.andExpect(jsonPath("$.items[0].stock").value(itemRes.stock()))
+			.andExpect(jsonPath("$.items[0].discountPrice").value(itemRes.discountPrice()))
+			.andExpect(jsonPath("$.items[0].originalPrice").value(itemRes.originalPrice()))
+			.andExpect(jsonPath("$.items[0].description").value(itemRes.description()))
+			.andExpect(jsonPath("$.items[0].information").value(itemRes.information()))
+			.andExpect(jsonPath("$.items[0].image").value(itemRes.image()))
+			.andExpect(jsonPath("$.items[0].storeName").value(itemRes.storeName()))
+			.andExpect(jsonPath("$.items[0].storeOpenTime").value(itemRes.storeOpenTime().toString()))
+			.andExpect(jsonPath("$.items[0].storeCloseTime").value(itemRes.storeCloseTime().toString()))
+			.andExpect(jsonPath("$.items[0].storeAddress.name").value(addressRes.name()))
+			.andExpect(jsonPath("$.items[0].storeAddress.xCoordinate").value(addressRes.xCoordinate()))
+			.andExpect(jsonPath("$.items[0].storeAddress.yCoordinate").value(addressRes.yCoordinate()))
 			.andDo(print())
 			.andDo(document("item/item-find-All-for-member-sort-by-deadline",
 				Preprocessors.preprocessRequest(prettyPrint()),
@@ -651,28 +643,22 @@ class ItemControllerTest {
 						parameterWithName("page").description("페이지 번호")
 					)),
 				responseFields(
-					fieldWithPath("itemResponses").type(ARRAY).description("상품 목록"),
-					fieldWithPath("itemResponses[0].itemId").type(NUMBER).description("상품 ID"),
-					fieldWithPath("itemResponses[0].storeId").type(NUMBER).description("업체 ID"),
-					fieldWithPath("itemResponses[0].name").description("상품 이름"),
-					fieldWithPath("itemResponses[0].stock").type(NUMBER).description("재고 수"),
-					fieldWithPath("itemResponses[0].discountPrice").type(NUMBER).description("할인가"),
-					fieldWithPath("itemResponses[0].originalPrice").type(NUMBER).description("원가"),
-					fieldWithPath("itemResponses[0].description").type(STRING).description("상세 설명"),
-					fieldWithPath("itemResponses[0].information").type(STRING).description("안내 사항"),
-					fieldWithPath("itemResponses[0].image").type(STRING).description("상품 이미지 경로"),
-					fieldWithPath("itemResponses[0].storeInfoRes.storeNumber").type(STRING).description("사업자 등록 번호"),
-					fieldWithPath("itemResponses[0].storeInfoRes.name").type(STRING).description("상호명"),
-					fieldWithPath("itemResponses[0].storeInfoRes.telephone").type(STRING).description("업체 전화번호"),
-					fieldWithPath("itemResponses[0].storeInfoRes.addressName").type(STRING).description("업체 주소"),
-					fieldWithPath("itemResponses[0].storeInfoRes.openTime").type(STRING).description("오픈 시간"),
-					fieldWithPath("itemResponses[0].storeInfoRes.closeTime").type(STRING).description("마감 시간"),
-					fieldWithPath("itemResponses[0].storeInfoRes.dayOff").type(ARRAY).description("휴무일"),
-					fieldWithPath("itemResponses[0].storeInfoRes.storeStatus").type(STRING).description("영업 유무"),
-					fieldWithPath("itemResponses[0].storeInfoRes.image").type(STRING).description("업체 이미지 경로"),
-					fieldWithPath("itemResponses[0].storeAddressRes.name").type(STRING).description("업체 주소"),
-					fieldWithPath("itemResponses[0].storeAddressRes.xCoordinate").type(NUMBER).description("업체 주소 경도"),
-					fieldWithPath("itemResponses[0].storeAddressRes.yCoordinate").type(NUMBER).description("업체 주소 위도")
+					fieldWithPath("items").type(ARRAY).description("상품 목록"),
+					fieldWithPath("items[0].itemId").type(NUMBER).description("상품 ID"),
+					fieldWithPath("items[0].storeId").type(NUMBER).description("업체 ID"),
+					fieldWithPath("items[0].itemName").description("상품 이름"),
+					fieldWithPath("items[0].stock").type(NUMBER).description("재고 수"),
+					fieldWithPath("items[0].discountPrice").type(NUMBER).description("할인가"),
+					fieldWithPath("items[0].originalPrice").type(NUMBER).description("원가"),
+					fieldWithPath("items[0].description").type(STRING).description("상세 설명"),
+					fieldWithPath("items[0].information").type(STRING).description("안내 사항"),
+					fieldWithPath("items[0].image").type(STRING).description("상품 이미지 경로"),
+					fieldWithPath("items[0].storeName").type(STRING).description("상호명"),
+					fieldWithPath("items[0].storeOpenTime").type(STRING).description("오픈 시간"),
+					fieldWithPath("items[0].storeCloseTime").type(STRING).description("마감 시간"),
+					fieldWithPath("items[0].storeAddress.name").type(STRING).description("업체 주소"),
+					fieldWithPath("items[0].storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
+					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도")
 				)
 			));
 	}
@@ -689,14 +675,11 @@ class ItemControllerTest {
 		int page = 0;
 		PageRequest pageRequest = PageRequest.of(page, size);
 
-		StoreInfoRes storeInfoRes = new StoreInfoRes(store.getStoreNumber(), store.getName(), store.getTelephone(), store.getAddress().getName(), store.getOpenTime(), store.getCloseTime(), store.getDayOffs(), store.getStoreStatus(), store.getImage());
 		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
-
-		StoreInfoRes storeInfoRes2 = new StoreInfoRes(store2.getStoreNumber(), store2.getName(), store2.getTelephone(), store2.getAddress().getName(), store2.getOpenTime(), store2.getCloseTime(), store2.getDayOffs(), store2.getStoreStatus(), store2.getImage());
 		AddressRes addressRes2 = new AddressRes(address2.getName(), address2.getXCoordinate(), address2.getYCoordinate());
 
-		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), storeInfoRes, addressRes);
-		ItemRes itemRes2 = new ItemRes(2L, 2L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage(), storeInfoRes2, addressRes2);
+		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), item.getStore().getName(), item.getStore().getOpenTime(), item.getStore().getCloseTime(), addressRes);
+		ItemRes itemRes2 = new ItemRes(2L, 2L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage(), item2.getStore().getName(), item2.getStore().getOpenTime(), item2.getStore().getCloseTime(), addressRes2);
 		List<ItemRes> itemResList = List.of(itemRes, itemRes2);
 		ItemsRes itemsRes = new ItemsRes(itemResList);
 
@@ -712,6 +695,21 @@ class ItemControllerTest {
 				.param("size", String.valueOf(size))
 				.param("page", String.valueOf(page)))
 			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.items[0].itemId").value(itemRes.itemId()))
+			.andExpect(jsonPath("$.items[0].storeId").value(itemRes.storeId()))
+			.andExpect(jsonPath("$.items[0].itemName").value(itemRes.itemName()))
+			.andExpect(jsonPath("$.items[0].stock").value(itemRes.stock()))
+			.andExpect(jsonPath("$.items[0].discountPrice").value(itemRes.discountPrice()))
+			.andExpect(jsonPath("$.items[0].originalPrice").value(itemRes.originalPrice()))
+			.andExpect(jsonPath("$.items[0].description").value(itemRes.description()))
+			.andExpect(jsonPath("$.items[0].information").value(itemRes.information()))
+			.andExpect(jsonPath("$.items[0].image").value(itemRes.image()))
+			.andExpect(jsonPath("$.items[0].storeName").value(itemRes.storeName()))
+			.andExpect(jsonPath("$.items[0].storeOpenTime").value(itemRes.storeOpenTime().toString()))
+			.andExpect(jsonPath("$.items[0].storeCloseTime").value(itemRes.storeCloseTime().toString()))
+			.andExpect(jsonPath("$.items[0].storeAddress.name").value(addressRes.name()))
+			.andExpect(jsonPath("$.items[0].storeAddress.xCoordinate").value(addressRes.xCoordinate()))
+			.andExpect(jsonPath("$.items[0].storeAddress.yCoordinate").value(addressRes.yCoordinate()))
 			.andDo(print())
 			.andDo(document("item/item-find-All-for-member-sort-by-discount-rate",
 				Preprocessors.preprocessRequest(prettyPrint()),
@@ -724,28 +722,22 @@ class ItemControllerTest {
 						parameterWithName("page").description("페이지 번호")
 					)),
 				responseFields(
-					fieldWithPath("itemResponses").type(ARRAY).description("상품 목록"),
-					fieldWithPath("itemResponses[0].itemId").type(NUMBER).description("상품 ID"),
-					fieldWithPath("itemResponses[0].storeId").type(NUMBER).description("업체 ID"),
-					fieldWithPath("itemResponses[0].name").description("상품 이름"),
-					fieldWithPath("itemResponses[0].stock").type(NUMBER).description("재고 수"),
-					fieldWithPath("itemResponses[0].discountPrice").type(NUMBER).description("할인가"),
-					fieldWithPath("itemResponses[0].originalPrice").type(NUMBER).description("원가"),
-					fieldWithPath("itemResponses[0].description").type(STRING).description("상세 설명"),
-					fieldWithPath("itemResponses[0].information").type(STRING).description("안내 사항"),
-					fieldWithPath("itemResponses[0].image").type(STRING).description("상품 이미지 경로"),
-					fieldWithPath("itemResponses[0].storeInfoRes.storeNumber").type(STRING).description("사업자 등록 번호"),
-					fieldWithPath("itemResponses[0].storeInfoRes.name").type(STRING).description("상호명"),
-					fieldWithPath("itemResponses[0].storeInfoRes.telephone").type(STRING).description("업체 전화번호"),
-					fieldWithPath("itemResponses[0].storeInfoRes.addressName").type(STRING).description("업체 주소"),
-					fieldWithPath("itemResponses[0].storeInfoRes.openTime").type(STRING).description("오픈 시간"),
-					fieldWithPath("itemResponses[0].storeInfoRes.closeTime").type(STRING).description("마감 시간"),
-					fieldWithPath("itemResponses[0].storeInfoRes.dayOff").type(ARRAY).description("휴무일"),
-					fieldWithPath("itemResponses[0].storeInfoRes.storeStatus").type(STRING).description("영업 유무"),
-					fieldWithPath("itemResponses[0].storeInfoRes.image").type(STRING).description("업체 이미지 경로"),
-					fieldWithPath("itemResponses[0].storeAddressRes.name").type(STRING).description("업체 주소"),
-					fieldWithPath("itemResponses[0].storeAddressRes.xCoordinate").type(NUMBER).description("업체 주소 경도"),
-					fieldWithPath("itemResponses[0].storeAddressRes.yCoordinate").type(NUMBER).description("업체 주소 위도")
+					fieldWithPath("items").type(ARRAY).description("상품 목록"),
+					fieldWithPath("items[0].itemId").type(NUMBER).description("상품 ID"),
+					fieldWithPath("items[0].storeId").type(NUMBER).description("업체 ID"),
+					fieldWithPath("items[0].itemName").description("상품 이름"),
+					fieldWithPath("items[0].stock").type(NUMBER).description("재고 수"),
+					fieldWithPath("items[0].discountPrice").type(NUMBER).description("할인가"),
+					fieldWithPath("items[0].originalPrice").type(NUMBER).description("원가"),
+					fieldWithPath("items[0].description").type(STRING).description("상세 설명"),
+					fieldWithPath("items[0].information").type(STRING).description("안내 사항"),
+					fieldWithPath("items[0].image").type(STRING).description("상품 이미지 경로"),
+					fieldWithPath("items[0].storeName").type(STRING).description("상호명"),
+					fieldWithPath("items[0].storeOpenTime").type(STRING).description("오픈 시간"),
+					fieldWithPath("items[0].storeCloseTime").type(STRING).description("마감 시간"),
+					fieldWithPath("items[0].storeAddress.name").type(STRING).description("업체 주소"),
+					fieldWithPath("items[0].storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
+					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도")
 				)
 			));
 	}
@@ -762,14 +754,11 @@ class ItemControllerTest {
 		int page = 0;
 		PageRequest pageRequest = PageRequest.of(page, size);
 
-		StoreInfoRes storeInfoRes = new StoreInfoRes(store.getStoreNumber(), store.getName(), store.getTelephone(), store.getAddress().getName(), store.getOpenTime(), store.getCloseTime(), store.getDayOffs(), store.getStoreStatus(), store.getImage());
 		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
-
-		StoreInfoRes storeInfoRes2 = new StoreInfoRes(store2.getStoreNumber(), store2.getName(), store2.getTelephone(), store2.getAddress().getName(), store2.getOpenTime(), store2.getCloseTime(), store2.getDayOffs(), store2.getStoreStatus(), store2.getImage());
 		AddressRes addressRes2 = new AddressRes(address2.getName(), address2.getXCoordinate(), address2.getYCoordinate());
 
-		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), storeInfoRes, addressRes);
-		ItemRes itemRes2 = new ItemRes(2L, 2L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage(), storeInfoRes2, addressRes2);
+		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), item.getStore().getName(), item.getStore().getOpenTime(), item.getStore().getCloseTime(), addressRes);
+		ItemRes itemRes2 = new ItemRes(2L, 2L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage(), item2.getName(), item2.getStore().getOpenTime(), item2.getStore().getCloseTime(), addressRes2);
 		List<ItemRes> itemResList = List.of(itemRes, itemRes2);
 		ItemsRes itemsRes = new ItemsRes(itemResList);
 
@@ -785,6 +774,21 @@ class ItemControllerTest {
 				.param("size", String.valueOf(size))
 				.param("page", String.valueOf(page)))
 			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.items[0].itemId").value(itemRes.itemId()))
+			.andExpect(jsonPath("$.items[0].storeId").value(itemRes.storeId()))
+			.andExpect(jsonPath("$.items[0].itemName").value(itemRes.itemName()))
+			.andExpect(jsonPath("$.items[0].stock").value(itemRes.stock()))
+			.andExpect(jsonPath("$.items[0].discountPrice").value(itemRes.discountPrice()))
+			.andExpect(jsonPath("$.items[0].originalPrice").value(itemRes.originalPrice()))
+			.andExpect(jsonPath("$.items[0].description").value(itemRes.description()))
+			.andExpect(jsonPath("$.items[0].information").value(itemRes.information()))
+			.andExpect(jsonPath("$.items[0].image").value(itemRes.image()))
+			.andExpect(jsonPath("$.items[0].storeName").value(itemRes.storeName()))
+			.andExpect(jsonPath("$.items[0].storeOpenTime").value(itemRes.storeOpenTime().toString()))
+			.andExpect(jsonPath("$.items[0].storeCloseTime").value(itemRes.storeCloseTime().toString()))
+			.andExpect(jsonPath("$.items[0].storeAddress.name").value(addressRes.name()))
+			.andExpect(jsonPath("$.items[0].storeAddress.xCoordinate").value(addressRes.xCoordinate()))
+			.andExpect(jsonPath("$.items[0].storeAddress.yCoordinate").value(addressRes.yCoordinate()))
 			.andDo(print())
 			.andDo(document("item/item-find-All-for-member-sort-by-distance",
 				Preprocessors.preprocessRequest(prettyPrint()),
@@ -797,28 +801,22 @@ class ItemControllerTest {
 						parameterWithName("page").description("페이지 번호")
 					)),
 				responseFields(
-					fieldWithPath("itemResponses").type(ARRAY).description("상품 목록"),
-					fieldWithPath("itemResponses[0].itemId").type(NUMBER).description("상품 ID"),
-					fieldWithPath("itemResponses[0].storeId").type(NUMBER).description("업체 ID"),
-					fieldWithPath("itemResponses[0].name").description("상품 이름"),
-					fieldWithPath("itemResponses[0].stock").type(NUMBER).description("재고 수"),
-					fieldWithPath("itemResponses[0].discountPrice").type(NUMBER).description("할인가"),
-					fieldWithPath("itemResponses[0].originalPrice").type(NUMBER).description("원가"),
-					fieldWithPath("itemResponses[0].description").type(STRING).description("상세 설명"),
-					fieldWithPath("itemResponses[0].information").type(STRING).description("안내 사항"),
-					fieldWithPath("itemResponses[0].image").type(STRING).description("상품 이미지 경로"),
-					fieldWithPath("itemResponses[0].storeInfoRes.storeNumber").type(STRING).description("사업자 등록 번호"),
-					fieldWithPath("itemResponses[0].storeInfoRes.name").type(STRING).description("상호명"),
-					fieldWithPath("itemResponses[0].storeInfoRes.telephone").type(STRING).description("업체 전화번호"),
-					fieldWithPath("itemResponses[0].storeInfoRes.addressName").type(STRING).description("업체 주소"),
-					fieldWithPath("itemResponses[0].storeInfoRes.openTime").type(STRING).description("오픈 시간"),
-					fieldWithPath("itemResponses[0].storeInfoRes.closeTime").type(STRING).description("마감 시간"),
-					fieldWithPath("itemResponses[0].storeInfoRes.dayOff").type(ARRAY).description("휴무일"),
-					fieldWithPath("itemResponses[0].storeInfoRes.storeStatus").type(STRING).description("영업 유무"),
-					fieldWithPath("itemResponses[0].storeInfoRes.image").type(STRING).description("업체 이미지 경로"),
-					fieldWithPath("itemResponses[0].storeAddressRes.name").type(STRING).description("업체 주소"),
-					fieldWithPath("itemResponses[0].storeAddressRes.xCoordinate").type(NUMBER).description("업체 주소 경도"),
-					fieldWithPath("itemResponses[0].storeAddressRes.yCoordinate").type(NUMBER).description("업체 주소 위도")
+					fieldWithPath("items").type(ARRAY).description("상품 목록"),
+					fieldWithPath("items[0].itemId").type(NUMBER).description("상품 ID"),
+					fieldWithPath("items[0].storeId").type(NUMBER).description("업체 ID"),
+					fieldWithPath("items[0].itemName").description("상품 이름"),
+					fieldWithPath("items[0].stock").type(NUMBER).description("재고 수"),
+					fieldWithPath("items[0].discountPrice").type(NUMBER).description("할인가"),
+					fieldWithPath("items[0].originalPrice").type(NUMBER).description("원가"),
+					fieldWithPath("items[0].description").type(STRING).description("상세 설명"),
+					fieldWithPath("items[0].information").type(STRING).description("안내 사항"),
+					fieldWithPath("items[0].image").type(STRING).description("상품 이미지 경로"),
+					fieldWithPath("items[0].storeName").type(STRING).description("상호명"),
+					fieldWithPath("items[0].storeOpenTime").type(STRING).description("오픈 시간"),
+					fieldWithPath("items[0].storeCloseTime").type(STRING).description("마감 시간"),
+					fieldWithPath("items[0].storeAddress.name").type(STRING).description("업체 주소"),
+					fieldWithPath("items[0].storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
+					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도")
 				)
 			));
 	}
@@ -830,13 +828,12 @@ class ItemControllerTest {
 		Long itemId = 1L;
 		Long memberId = 1L;
 
-		StoreInfoRes storeInfoRes = new StoreInfoRes(store.getStoreNumber(), store.getName(), store.getTelephone(), store.getAddress().getName(), store.getOpenTime(), store.getCloseTime(), store.getDayOffs(), store.getStoreStatus(), store.getImage());
 		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
 		String imageUrl = "http://image-url.com/image.jpg";
 
 		ItemReq itemReq = new ItemReq("치즈 떡볶이", 4, 9900, 14000, "치즈 떡볶이 입니다.", "통신사 할인 가능 합니다.");
 		ItemRes itemRes = new ItemRes(itemId, 1L, itemReq.name(), itemReq.stock(), itemReq.discountPrice(),
-			itemReq.originalPrice(), itemReq.description(), itemReq.information(), imageUrl, storeInfoRes, addressRes);
+			itemReq.originalPrice(), itemReq.description(), itemReq.information(), imageUrl, store.getName(), store.getOpenTime(), store.getCloseTime(), addressRes);
 
 		MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "file".getBytes());
 		MockMultipartFile request = new MockMultipartFile("itemReq", "itemReq",
@@ -862,28 +859,21 @@ class ItemControllerTest {
 				.contentType(MediaType.MULTIPART_FORM_DATA)
 				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
-			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.itemId").value(itemRes.itemId()))
 			.andExpect(jsonPath("$.storeId").value(itemRes.storeId()))
-			.andExpect(jsonPath("$.name").value(itemRes.name()))
+			.andExpect(jsonPath("$.itemName").value(itemRes.itemName()))
 			.andExpect(jsonPath("$.stock").value(itemRes.stock()))
 			.andExpect(jsonPath("$.discountPrice").value(itemRes.discountPrice()))
 			.andExpect(jsonPath("$.originalPrice").value(itemRes.originalPrice()))
 			.andExpect(jsonPath("$.description").value(itemRes.description()))
 			.andExpect(jsonPath("$.information").value(itemRes.information()))
 			.andExpect(jsonPath("$.image").value(itemRes.image()))
-			.andExpect(jsonPath("$.storeInfoRes.storeNumber").value(storeInfoRes.storeNumber()))
-			.andExpect(jsonPath("$.storeInfoRes.name").value(storeInfoRes.name()))
-			.andExpect(jsonPath("$.storeInfoRes.telephone").value(storeInfoRes.telephone()))
-			.andExpect(jsonPath("$.storeInfoRes.addressName").value(storeInfoRes.addressName()))
-			.andExpect(jsonPath("$.storeInfoRes.openTime").value(storeInfoRes.openTime().toString()))
-			.andExpect(jsonPath("$.storeInfoRes.closeTime").value(storeInfoRes.closeTime().toString()))
-			.andExpect(jsonPath("$.storeInfoRes.dayOff").value(storeInfoRes.dayOff().stream().map(DayOff::getName).collect(Collectors.toList())))
-			.andExpect(jsonPath("$.storeInfoRes.storeStatus").value(storeInfoRes.storeStatus().getName()))
-			.andExpect(jsonPath("$.storeInfoRes.image").value(storeInfoRes.image()))
-			.andExpect(jsonPath("$.storeAddressRes.name").value(addressRes.name()))
-			.andExpect(jsonPath("$.storeAddressRes.xCoordinate").value(addressRes.xCoordinate()))
-			.andExpect(jsonPath("$.storeAddressRes.yCoordinate").value(addressRes.yCoordinate()))
+			.andExpect(jsonPath("$.storeName").value(itemRes.storeName()))
+			.andExpect(jsonPath("$.storeOpenTime").value(itemRes.storeOpenTime().toString()))
+			.andExpect(jsonPath("$.storeCloseTime").value(itemRes.storeCloseTime().toString()))
+			.andExpect(jsonPath("$.storeAddress.name").value(addressRes.name()))
+			.andExpect(jsonPath("$.storeAddress.xCoordinate").value(addressRes.xCoordinate()))
+			.andExpect(jsonPath("$.storeAddress.yCoordinate").value(addressRes.yCoordinate()))
 			.andDo(print())
 			.andDo(document("item/item-update",
 				Preprocessors.preprocessRequest(prettyPrint()),
@@ -905,25 +895,19 @@ class ItemControllerTest {
 				responseFields(
 					fieldWithPath("itemId").type(NUMBER).description("상품 ID"),
 					fieldWithPath("storeId").type(NUMBER).description("업체 ID"),
-					fieldWithPath("name").type(STRING).description("상품 이름"),
+					fieldWithPath("itemName").type(STRING).description("상품 이름"),
 					fieldWithPath("stock").type(NUMBER).description("재고 수"),
 					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
 					fieldWithPath("description").type(STRING).description("상세 설명"),
 					fieldWithPath("information").type(STRING).description("안내 사항"),
 					fieldWithPath("image").type(STRING).description("상품 이미지 경로"),
-					fieldWithPath("storeInfoRes.storeNumber").type(STRING).description("사업자 등록 번호"),
-					fieldWithPath("storeInfoRes.name").type(STRING).description("상호명"),
-					fieldWithPath("storeInfoRes.telephone").type(STRING).description("업체 전화번호"),
-					fieldWithPath("storeInfoRes.addressName").type(STRING).description("업체 주소"),
-					fieldWithPath("storeInfoRes.openTime").type(STRING).description("오픈 시간"),
-					fieldWithPath("storeInfoRes.closeTime").type(STRING).description("마감 시간"),
-					fieldWithPath("storeInfoRes.dayOff").type(ARRAY).description("휴무일"),
-					fieldWithPath("storeInfoRes.storeStatus").type(STRING).description("영업 유무"),
-					fieldWithPath("storeInfoRes.image").type(STRING).description("업체 이미지 경로"),
-					fieldWithPath("storeAddressRes.name").type(STRING).description("업체 주소"),
-					fieldWithPath("storeAddressRes.xCoordinate").type(NUMBER).description("업체 주소 경도"),
-					fieldWithPath("storeAddressRes.yCoordinate").type(NUMBER).description("업체 주소 위도")
+					fieldWithPath("storeName").type(STRING).description("상호명"),
+					fieldWithPath("storeOpenTime").type(STRING).description("오픈 시간"),
+					fieldWithPath("storeCloseTime").type(STRING).description("마감 시간"),
+					fieldWithPath("storeAddress.name").type(STRING).description("업체 주소"),
+					fieldWithPath("storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
+					fieldWithPath("storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도")
 				)
 			));
 	}
@@ -947,13 +931,12 @@ class ItemControllerTest {
 			.store(store)
 			.build();
 
-		StoreInfoRes storeInfoRes = new StoreInfoRes(store.getStoreNumber(), store.getName(), store.getTelephone(), store.getAddress().getName(), store.getOpenTime(), store.getCloseTime(), store.getDayOffs(), store.getStoreStatus(), store.getImage());
 		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
 
 		ItemReq itemReq = new ItemReq(item3.getName(), item3.getStock(), item3.getDiscountPrice(),
 			item3.getOriginalPrice(), item3.getDescription(), item3.getInformation());
 		ItemRes itemRes = new ItemRes(itemId, 1L, item3.getName(), item3.getStock(), item3.getDiscountPrice(),
-			item3.getOriginalPrice(), item3.getDescription(), item3.getInformation(), item3.getImage(), storeInfoRes, addressRes);
+			item3.getOriginalPrice(), item3.getDescription(), item3.getInformation(), item3.getImage(), item3.getStore().getName(), item3.getStore().getOpenTime(), item3.getStore().getCloseTime(), addressRes);
 
 		MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "file".getBytes());
 		MockMultipartFile request = new MockMultipartFile("itemReq", "itemReq",
