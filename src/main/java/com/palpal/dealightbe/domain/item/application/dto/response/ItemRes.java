@@ -1,21 +1,30 @@
 package com.palpal.dealightbe.domain.item.application.dto.response;
 
+import java.time.LocalTime;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
 import com.palpal.dealightbe.domain.item.domain.Item;
-import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
 
 public record ItemRes(
 	Long itemId,
 	Long storeId,
-	String name,
+	String itemName,
 	int stock,
 	int discountPrice,
 	int originalPrice,
 	String description,
 	String information,
 	String image,
-	StoreInfoRes storeInfoRes,
-	AddressRes storeAddressRes
+	String storeName,
+
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
+	LocalTime storeOpenTime,
+
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
+	LocalTime storeCloseTime,
+
+	AddressRes storeAddress
 ) {
 
 	public static ItemRes from(Item item) {
@@ -30,7 +39,9 @@ public record ItemRes(
 			item.getDescription(),
 			item.getInformation(),
 			item.getImage(),
-			StoreInfoRes.from(item.getStore()),
+			item.getStore().getName(),
+			item.getStore().getOpenTime(),
+			item.getStore().getCloseTime(),
 			AddressRes.from(item.getStore().getAddress())
 		);
 	}

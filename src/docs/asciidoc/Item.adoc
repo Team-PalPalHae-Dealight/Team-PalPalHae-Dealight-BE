@@ -125,7 +125,7 @@ include::{snippets}/item/item-find-All-for-store/response-fields.adoc[]
 
 === 상품 목록 조회(고객 시점) - 마감순 정렬
 
-==== /api/items/members?xCoordinate={xCoordinate}&yCoordinate={yCoordinate}&sortBy={sortBy}&size={size}&page={page}
+==== /api/items/members?x-Coordinate={xCoordinate}&y-Coordinate={yCoordinate}&sort-by={sortBy}&size={size}&page={page}
 
 .Request - 성공
 include::{snippets}/item/item-find-All-for-member-sort-by-deadline/http-request.adoc[]
@@ -140,7 +140,7 @@ include::{snippets}/item/item-find-All-for-member-sort-by-deadline/response-fiel
 
 === 상품 목록 조회(고객 시점) - 할인율순 정렬
 
-==== /api/items/members?xCoordinate={xCoordinate}&yCoordinate={yCoordinate}&sortBy={sortBy}&size={size}&page={page}
+==== /api/items/members?x-coordinate={xCoordinate}&y-coordinate={yCoordinate}&sort-by={sortBy}&size={size}&page={page}
 
 .Request - 성공
 include::{snippets}/item/item-find-All-for-member-sort-by-discount-rate/http-request.adoc[]
@@ -155,7 +155,7 @@ include::{snippets}/item/item-find-All-for-member-sort-by-discount-rate/response
 
 === 상품 목록 조회(고객 시점) - 거리순 정렬
 
-==== /api/items/members?xCoordinate={xCoordinate}&yCoordinate={yCoordinate}&sortBy={sortBy}&size={size}&page={page}
+==== /api/items/members?x-coordinate={xCoordinate}&y-coordinate={yCoordinate}&sort-by={sortBy}&size={size}&page={page}
 
 .Request - 성공
 include::{snippets}/item/item-find-All-for-member-sort-by-distance/http-request.adoc[]
