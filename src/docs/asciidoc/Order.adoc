@@ -94,7 +94,7 @@ include::{snippets}/order/order-find-by-id-success/response-fields.adoc[]
 
 === 4. 주문 조회 (다건) - 업체
 
-/api/orders/stores?status={status}&page={page}&size={size}
+/api/orders/stores?id={storeId}&status={status}&page={page}&size={size}
 
 ==== 요청
 

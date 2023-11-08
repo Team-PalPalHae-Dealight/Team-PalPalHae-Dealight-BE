@@ -95,6 +95,8 @@ include::{snippets}/review/review-find-by-order-id-success/response-fields.adoc[
 
 === 4. 리뷰 선택지 조회
 
+/api/reviews/contents
+
 ==== 요청
 
 - header
