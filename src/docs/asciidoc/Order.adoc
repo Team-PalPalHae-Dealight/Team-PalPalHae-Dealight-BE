@@ -28,6 +28,8 @@ include::{snippets}/order/order-create-fail-store-id/response-body.adoc[]
 
 === 1. 주문 생성
 
+/api/orders
+
 ==== 요청
 
 - header
@@ -47,10 +49,15 @@ include::{snippets}/order/order-create-success/response-fields.adoc[]
 
 === 2. 주문 상태 변경
 
+/api/orders/{orderId}
+
 ==== 요청
 
 - header
 include::{snippets}/order/order-status-update-success/request-headers.adoc[]
+
+- path variables
+include::{snippets}/order/order-status-update-success/path-parameters.adoc[]
 
 - body
 include::{snippets}/order/order-status-update-success/request-body.adoc[]
@@ -65,10 +72,15 @@ include::{snippets}/order/order-status-update-success/response-fields.adoc[]
 
 === 3. 주문 상세 내용 조회 (단건)
 
+/api/orders/{orderId}
+
 ==== 요청
 
 - header
 include::{snippets}/order/order-find-by-id-success/request-headers.adoc[]
+
+- path variables
+include::{snippets}/order/order-find-by-id-success/path-parameters.adoc[]
 
 - body
 include::{snippets}/order/order-find-by-id-success/request-body.adoc[]
@@ -82,10 +94,15 @@ include::{snippets}/order/order-find-by-id-success/response-fields.adoc[]
 
 === 4. 주문 조회 (다건) - 업체
 
+/api/orders/stores?status={status}&page={page}&size={size}
+
 ==== 요청
 
 - header
 include::{snippets}/order/order-find-by-store-id-success/request-headers.adoc[]
+
+- request parameters
+include::{snippets}/order/order-find-by-store-id-success/request-parameters.adoc[]
 
 - body
 include::{snippets}/order/order-find-by-store-id-success/request-body.adoc[]
@@ -99,10 +116,15 @@ include::{snippets}/order/order-find-by-store-id-success/response-fields.adoc[]
 
 === 5. 주문 조회 (다건) - 고객
 
+/api/orders?status={status}&page={page}&size={size}
+
 ==== 요청
 
 - header
 include::{snippets}/order/order-find-by-member-success/request-headers.adoc[]
+
+- request parameters
+include::{snippets}/order/order-find-by-member-success/request-parameters.adoc[]
 
 - body
 include::{snippets}/order/order-find-by-member-success/request-body.adoc[]
