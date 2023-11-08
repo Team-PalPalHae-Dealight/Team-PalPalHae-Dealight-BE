@@ -41,10 +41,10 @@ public class OrderController {
 	@ProviderId
 	public ResponseEntity<OrderRes> create(
 		@Validated @RequestBody OrderCreateReq request,
-		Long memberProviderId
+		Long providerId
 	) {
 
-		OrderRes orderRes = orderService.create(request, memberProviderId);
+		OrderRes orderRes = orderService.create(request, providerId);
 
 		URI uri = ServletUriComponentsBuilder
 			.fromCurrentRequest()
@@ -61,10 +61,10 @@ public class OrderController {
 	public ResponseEntity<OrderStatusUpdateRes> updateStatus(
 		@Validated @RequestBody OrderStatusUpdateReq request,
 		@PathVariable Long orderId,
-		Long memberProviderId
+		Long providerId
 	) {
 
-		OrderStatusUpdateRes orderStatusUpdateRes = orderService.updateStatus(orderId, request, memberProviderId);
+		OrderStatusUpdateRes orderStatusUpdateRes = orderService.updateStatus(orderId, request, providerId);
 
 		return ResponseEntity.ok(orderStatusUpdateRes);
 	}
@@ -73,10 +73,10 @@ public class OrderController {
 	@ProviderId
 	public ResponseEntity<OrderRes> findById(
 		@PathVariable Long orderId,
-		Long memberProviderId
+		Long providerId
 	) {
 
-		OrderRes orderRes = orderService.findById(orderId, memberProviderId);
+		OrderRes orderRes = orderService.findById(orderId, providerId);
 
 		return ResponseEntity.ok(orderRes);
 	}
@@ -84,7 +84,7 @@ public class OrderController {
 	@GetMapping("/stores")
 	@ProviderId
 	public ResponseEntity<OrdersRes> findAllByStoreId(
-		Long memberProviderId,
+		Long providerId,
 		@RequestParam Long id,
 		@RequestParam(required = false) String status,
 		@RequestParam(required = false, defaultValue = "0") int page,
@@ -93,7 +93,7 @@ public class OrderController {
 
 		Pageable pageable = PageRequest.of(page, size, Sort.by(DEFAULT_SORTING).descending());
 
-		OrdersRes ordersRes = orderService.findAllByStoreId(id, memberProviderId, status, pageable);
+		OrdersRes ordersRes = orderService.findAllByStoreId(id, providerId, status, pageable);
 
 		return ResponseEntity.ok(ordersRes);
 	}
@@ -101,7 +101,7 @@ public class OrderController {
 	@GetMapping
 	@ProviderId
 	public ResponseEntity<OrdersRes> findAllByMemberProviderId(
-		Long memberProviderId,
+		Long providerId,
 		@RequestParam(required = false) String status,
 		@RequestParam(required = false, defaultValue = "0") int page,
 		@RequestParam(required = false, defaultValue = DEFAULT_PAGING_SIZE) int size
@@ -109,7 +109,7 @@ public class OrderController {
 
 		Pageable pageable = PageRequest.of(page, size, Sort.by(DEFAULT_SORTING).descending());
 
-		OrdersRes ordersRes = orderService.findAllByMemberProviderId(memberProviderId, status, pageable);
+		OrdersRes ordersRes = orderService.findAllByMemberProviderId(providerId, status, pageable);
 
 		return ResponseEntity.ok(ordersRes);
 	}
