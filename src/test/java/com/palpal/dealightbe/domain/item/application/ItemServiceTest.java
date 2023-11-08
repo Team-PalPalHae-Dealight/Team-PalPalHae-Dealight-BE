@@ -135,7 +135,7 @@ class ItemServiceTest {
 		ItemRes itemRes = itemService.create(itemReq, memberId, imageUploadReq);
 
 		//then
-		assertThat(itemRes.name()).isEqualTo(item.getName());
+		assertThat(itemRes.itemName()).isEqualTo(item.getName());
 		assertThat(itemRes.stock()).isEqualTo(item.getStock());
 		assertThat(itemRes.discountPrice()).isEqualTo(item.getDiscountPrice());
 		assertThat(itemRes.originalPrice()).isEqualTo(item.getOriginalPrice());
@@ -194,7 +194,7 @@ class ItemServiceTest {
 		ItemRes itemRes = itemService.findById(itemId);
 
 		//then
-		assertThat(itemRes.name()).isEqualTo(item.getName());
+		assertThat(itemRes.itemName()).isEqualTo(item.getName());
 		assertThat(itemRes.stock()).isEqualTo(item.getStock());
 		assertThat(itemRes.discountPrice()).isEqualTo(item.getDiscountPrice());
 		assertThat(itemRes.originalPrice()).isEqualTo(item.getOriginalPrice());
@@ -239,7 +239,7 @@ class ItemServiceTest {
 		ItemsRes itemsRes = itemService.findAllForStore(memberId, pageRequest);
 
 		//then
-		assertThat(itemsRes.itemResponses()).hasSize(items.size());
+		assertThat(itemsRes.items()).hasSize(items.size());
 	}
 
 	@DisplayName("상품 목록 조회(고객 시점) - 마감순 성공 테스트")
@@ -265,7 +265,7 @@ class ItemServiceTest {
 		ItemsRes itemsRes = itemService.findAllForMember(xCoordinate, yCoordinate, "deadline", pageRequest);
 
 		//then
-		assertThat(itemsRes.itemResponses()).hasSize(items.size());
+		assertThat(itemsRes.items()).hasSize(items.size());
 	}
 
 	@DisplayName("상품 목록 조회(고객 시점) - 할인율순 성공 테스트")
@@ -291,7 +291,7 @@ class ItemServiceTest {
 		ItemsRes itemsRes = itemService.findAllForMember(xCoordinate, yCoordinate, "discount-rate", pageRequest);
 
 		//then
-		assertThat(itemsRes.itemResponses()).hasSize(items.size());
+		assertThat(itemsRes.items()).hasSize(items.size());
 	}
 
 	@DisplayName("상품 목록 조회(고객 시점) - 거리순 성공 테스트")
@@ -317,7 +317,7 @@ class ItemServiceTest {
 		ItemsRes itemsRes = itemService.findAllForMember(xCoordinate, yCoordinate, "distance", pageRequest);
 
 		//then
-		assertThat(itemsRes.itemResponses()).hasSize(items.size());
+		assertThat(itemsRes.items()).hasSize(items.size());
 	}
 
 	@DisplayName("상품 수정 성공 테스트")
@@ -340,7 +340,7 @@ class ItemServiceTest {
 		ItemRes itemRes = itemService.update(itemId, itemReq, memberId, imageUploadReq);
 
 		//then
-		assertThat(itemRes.name()).isEqualTo(itemReq.name());
+		assertThat(itemRes.itemName()).isEqualTo(itemReq.name());
 		assertThat(itemRes.stock()).isEqualTo(itemReq.stock());
 		assertThat(itemRes.discountPrice()).isEqualTo(itemReq.discountPrice());
 		assertThat(itemRes.originalPrice()).isEqualTo(itemReq.originalPrice());
