@@ -18,19 +18,16 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palpal.dealightbe.config.SecurityConfig;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
 import com.palpal.dealightbe.domain.address.domain.Address;
-import com.palpal.dealightbe.domain.image.application.dto.request.ImageUploadReq;
 import com.palpal.dealightbe.domain.item.application.ItemService;
 import com.palpal.dealightbe.domain.item.application.dto.request.ItemReq;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
@@ -52,13 +49,11 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
-import static org.springframework.restdocs.payload.JsonFieldType.NULL;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestPartFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
@@ -216,6 +211,14 @@ class ItemControllerTest {
 					partWithName("image").description("상품 이미지"),
 					partWithName("itemReq").description("상품 등록 내용")
 				),
+				requestPartFields("itemReq",
+					fieldWithPath("name").type(STRING).description("상품 이름"),
+					fieldWithPath("stock").type(NUMBER).description("재고 수"),
+					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
+					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
+					fieldWithPath("description").type(STRING).description("상품 설명"),
+					fieldWithPath("information").type(STRING).description("상품 안내")
+				),
 				responseFields(
 					fieldWithPath("itemId").type(NUMBER).description("상품 ID"),
 					fieldWithPath("storeId").type(NUMBER).description("업체 ID"),
@@ -235,7 +238,7 @@ class ItemControllerTest {
 					fieldWithPath("storeInfoRes.dayOff").type(ARRAY).description("휴무일"),
 					fieldWithPath("storeInfoRes.storeStatus").type(STRING).description("영업 유무"),
 					fieldWithPath("storeInfoRes.image").type(STRING).description("업체 이미지 경로"),
-					fieldWithPath("storeAddressRes.name").type(STRING).description("업체 주소 URL"),
+					fieldWithPath("storeAddressRes.name").type(STRING).description("업체 주소"),
 					fieldWithPath("storeAddressRes.xCoordinate").type(NUMBER).description("업체 주소 경도"),
 					fieldWithPath("storeAddressRes.yCoordinate").type(NUMBER).description("업체 주소 위도")
 				)
@@ -299,6 +302,14 @@ class ItemControllerTest {
 					partWithName("image").description("상품 이미지"),
 					partWithName("itemReq").description("상품 등록 내용")
 				),
+				requestPartFields("itemReq",
+					fieldWithPath("name").type(STRING).description("상품 이름"),
+					fieldWithPath("stock").type(NUMBER).description("재고 수"),
+					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
+					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
+					fieldWithPath("description").type(STRING).description("상품 설명"),
+					fieldWithPath("information").type(STRING).description("상품 안내")
+				),
 				responseFields(
 					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
 					fieldWithPath("code").type(STRING).description("예외 코드"),
@@ -349,6 +360,14 @@ class ItemControllerTest {
 					partWithName("image").description("상품 이미지"),
 					partWithName("itemReq").description("상품 등록 내용")
 				),
+				requestPartFields("itemReq",
+					fieldWithPath("name").type(STRING).description("상품 이름"),
+					fieldWithPath("stock").type(NUMBER).description("재고 수"),
+					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
+					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
+					fieldWithPath("description").type(STRING).description("상품 설명"),
+					fieldWithPath("information").type(STRING).description("상품 안내")
+				),
 				responseFields(
 					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
 					fieldWithPath("code").type(STRING).description("예외 코드"),
@@ -395,6 +414,14 @@ class ItemControllerTest {
 				requestParts(
 					partWithName("image").description("상품 이미지"),
 					partWithName("itemReq").description("상품 등록 내용")
+				),
+				requestPartFields("itemReq",
+					fieldWithPath("name").type(STRING).description("상품 이름"),
+					fieldWithPath("stock").type(NUMBER).description("재고 수"),
+					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
+					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
+					fieldWithPath("description").type(STRING).description("상품 설명"),
+					fieldWithPath("information").type(STRING).description("상품 안내")
 				),
 				responseFields(
 					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
@@ -468,7 +495,7 @@ class ItemControllerTest {
 					fieldWithPath("storeInfoRes.dayOff").type(ARRAY).description("휴무일"),
 					fieldWithPath("storeInfoRes.storeStatus").type(STRING).description("영업 유무"),
 					fieldWithPath("storeInfoRes.image").type(STRING).description("업체 이미지 경로"),
-					fieldWithPath("storeAddressRes.name").type(STRING).description("업체 주소 URL"),
+					fieldWithPath("storeAddressRes.name").type(STRING).description("업체 주소"),
 					fieldWithPath("storeAddressRes.xCoordinate").type(NUMBER).description("업체 주소 경도"),
 					fieldWithPath("storeAddressRes.yCoordinate").type(NUMBER).description("업체 주소 위도")
 				)
@@ -570,7 +597,7 @@ class ItemControllerTest {
 					fieldWithPath("itemResponses[0].storeInfoRes.dayOff").type(ARRAY).description("휴무일"),
 					fieldWithPath("itemResponses[0].storeInfoRes.storeStatus").type(STRING).description("영업 유무"),
 					fieldWithPath("itemResponses[0].storeInfoRes.image").type(STRING).description("업체 이미지 경로"),
-					fieldWithPath("itemResponses[0].storeAddressRes.name").type(STRING).description("업체 주소 URL"),
+					fieldWithPath("itemResponses[0].storeAddressRes.name").type(STRING).description("업체 주소"),
 					fieldWithPath("itemResponses[0].storeAddressRes.xCoordinate").type(NUMBER).description("업체 주소 경도"),
 					fieldWithPath("itemResponses[0].storeAddressRes.yCoordinate").type(NUMBER).description("업체 주소 위도")
 				)
@@ -643,7 +670,7 @@ class ItemControllerTest {
 					fieldWithPath("itemResponses[0].storeInfoRes.dayOff").type(ARRAY).description("휴무일"),
 					fieldWithPath("itemResponses[0].storeInfoRes.storeStatus").type(STRING).description("영업 유무"),
 					fieldWithPath("itemResponses[0].storeInfoRes.image").type(STRING).description("업체 이미지 경로"),
-					fieldWithPath("itemResponses[0].storeAddressRes.name").type(STRING).description("업체 주소 URL"),
+					fieldWithPath("itemResponses[0].storeAddressRes.name").type(STRING).description("업체 주소"),
 					fieldWithPath("itemResponses[0].storeAddressRes.xCoordinate").type(NUMBER).description("업체 주소 경도"),
 					fieldWithPath("itemResponses[0].storeAddressRes.yCoordinate").type(NUMBER).description("업체 주소 위도")
 				)
@@ -716,7 +743,7 @@ class ItemControllerTest {
 					fieldWithPath("itemResponses[0].storeInfoRes.dayOff").type(ARRAY).description("휴무일"),
 					fieldWithPath("itemResponses[0].storeInfoRes.storeStatus").type(STRING).description("영업 유무"),
 					fieldWithPath("itemResponses[0].storeInfoRes.image").type(STRING).description("업체 이미지 경로"),
-					fieldWithPath("itemResponses[0].storeAddressRes.name").type(STRING).description("업체 주소 URL"),
+					fieldWithPath("itemResponses[0].storeAddressRes.name").type(STRING).description("업체 주소"),
 					fieldWithPath("itemResponses[0].storeAddressRes.xCoordinate").type(NUMBER).description("업체 주소 경도"),
 					fieldWithPath("itemResponses[0].storeAddressRes.yCoordinate").type(NUMBER).description("업체 주소 위도")
 				)
@@ -789,7 +816,7 @@ class ItemControllerTest {
 					fieldWithPath("itemResponses[0].storeInfoRes.dayOff").type(ARRAY).description("휴무일"),
 					fieldWithPath("itemResponses[0].storeInfoRes.storeStatus").type(STRING).description("영업 유무"),
 					fieldWithPath("itemResponses[0].storeInfoRes.image").type(STRING).description("업체 이미지 경로"),
-					fieldWithPath("itemResponses[0].storeAddressRes.name").type(STRING).description("업체 주소 URL"),
+					fieldWithPath("itemResponses[0].storeAddressRes.name").type(STRING).description("업체 주소"),
 					fieldWithPath("itemResponses[0].storeAddressRes.xCoordinate").type(NUMBER).description("업체 주소 경도"),
 					fieldWithPath("itemResponses[0].storeAddressRes.yCoordinate").type(NUMBER).description("업체 주소 위도")
 				)
@@ -829,11 +856,11 @@ class ItemControllerTest {
 		//when
 		//then
 		mockMvc.perform(builder
-			.file(file)
-			.file(request)
-			.param("memberId", memberId.toString())
-			.contentType(MediaType.MULTIPART_FORM_DATA)
-			.accept(MediaType.APPLICATION_JSON))
+				.file(file)
+				.file(request)
+				.param("memberId", memberId.toString())
+				.contentType(MediaType.MULTIPART_FORM_DATA)
+				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.itemId").value(itemRes.itemId()))
@@ -867,6 +894,14 @@ class ItemControllerTest {
 					partWithName("image").description("상품 이미지"),
 					partWithName("itemReq").description("상품 등록 내용")
 				),
+				requestPartFields("itemReq",
+					fieldWithPath("name").type(STRING).description("상품 이름"),
+					fieldWithPath("stock").type(NUMBER).description("재고 수"),
+					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
+					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
+					fieldWithPath("description").type(STRING).description("상품 설명"),
+					fieldWithPath("information").type(STRING).description("상품 안내")
+				),
 				responseFields(
 					fieldWithPath("itemId").type(NUMBER).description("상품 ID"),
 					fieldWithPath("storeId").type(NUMBER).description("업체 ID"),
@@ -886,7 +921,7 @@ class ItemControllerTest {
 					fieldWithPath("storeInfoRes.dayOff").type(ARRAY).description("휴무일"),
 					fieldWithPath("storeInfoRes.storeStatus").type(STRING).description("영업 유무"),
 					fieldWithPath("storeInfoRes.image").type(STRING).description("업체 이미지 경로"),
-					fieldWithPath("storeAddressRes.name").type(STRING).description("업체 주소 URL"),
+					fieldWithPath("storeAddressRes.name").type(STRING).description("업체 주소"),
 					fieldWithPath("storeAddressRes.xCoordinate").type(NUMBER).description("업체 주소 경도"),
 					fieldWithPath("storeAddressRes.yCoordinate").type(NUMBER).description("업체 주소 위도")
 				)
@@ -963,6 +998,14 @@ class ItemControllerTest {
 					partWithName("image").description("상품 이미지"),
 					partWithName("itemReq").description("상품 등록 내용")
 				),
+				requestPartFields("itemReq",
+					fieldWithPath("name").type(STRING).description("상품 이름"),
+					fieldWithPath("stock").type(NUMBER).description("재고 수"),
+					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
+					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
+					fieldWithPath("description").type(STRING).description("상품 설명"),
+					fieldWithPath("information").type(STRING).description("상품 안내")
+				),
 				responseFields(
 					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
 					fieldWithPath("code").type(STRING).description("예외 코드"),
@@ -1022,6 +1065,14 @@ class ItemControllerTest {
 				requestParts(
 					partWithName("image").description("상품 이미지"),
 					partWithName("itemReq").description("상품 등록 내용")
+				),
+				requestPartFields("itemReq",
+					fieldWithPath("name").type(STRING).description("상품 이름"),
+					fieldWithPath("stock").type(NUMBER).description("재고 수"),
+					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
+					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
+					fieldWithPath("description").type(STRING).description("상품 설명"),
+					fieldWithPath("information").type(STRING).description("상품 안내")
 				),
 				responseFields(
 					fieldWithPath("timestamp").type(STRING).description("예외 시간"),

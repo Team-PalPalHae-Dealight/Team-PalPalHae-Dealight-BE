@@ -22,9 +22,11 @@ include::{snippets}/item/item-create/http-request.adoc[]
 
 include::{snippets}/item/item-create/request-parameters.adoc[]
 
+.request multipart 구성
 include::{snippets}/item/item-create/request-parts.adoc[]
 
-include::{snippets}/item/item-create/request-fields.adoc[]
+.itemReq 구성
+include::{snippets}/item/item-create/request-part-itemReq-fields.adoc[]
 
 .Response - 성공
 include::{snippets}/item/item-create/http-response.adoc[]
@@ -36,9 +38,11 @@ include::{snippets}/item/item-create-fail-invalid-name/http-request.adoc[]
 
 include::{snippets}/item/item-create-fail-invalid-name/request-parameters.adoc[]
 
+.request multipart 구성
 include::{snippets}/item/item-create-fail-invalid-name/request-parts.adoc[]
 
-include::{snippets}/item/item-create-fail-invalid-name/request-fields.adoc[]
+.itemReq 구성
+include::{snippets}/item/item-create-fail-invalid-name/request-part-itemReq-fields.adoc[]
 
 .Response Fail - 입력되지 않은 상품 이름
 include::{snippets}/item/item-create-fail-invalid-name/http-response.adoc[]
@@ -50,9 +54,11 @@ include::{snippets}/item/item-create-fail-invalid-discount-price/http-request.ad
 
 include::{snippets}/item/item-create-fail-invalid-discount-price/request-parameters.adoc[]
 
+.request multipart 구성
 include::{snippets}/item/item-create-fail-invalid-discount-price/request-parts.adoc[]
 
-include::{snippets}/item/item-create-fail-invalid-discount-price/request-fields.adoc[]
+.itemReq 구성
+include::{snippets}/item/item-create-fail-invalid-discount-price/request-part-itemReq-fields.adoc[]
 
 .Response Fail - 할인가가 원가보다 큰 경우
 include::{snippets}/item/item-create-fail-invalid-discount-price/http-response.adoc[]
@@ -65,9 +71,11 @@ include::{snippets}/item/item-create-fail-duplicated-item-name/http-request.adoc
 
 include::{snippets}/item/item-create-fail-duplicated-item-name/request-parameters.adoc[]
 
+.request multipart 구성
 include::{snippets}/item/item-create-fail-duplicated-item-name/request-parts.adoc[]
 
-include::{snippets}/item/item-create-fail-duplicated-item-name/request-fields.adoc[]
+.itemReq 구성
+include::{snippets}/item/item-create-fail-duplicated-item-name/request-part-itemReq-fields.adoc[]
 
 .Response Fail - 이미 등록된 상품인 경우(이름 중복)
 include::{snippets}/item/item-create-fail-duplicated-item-name/http-response.adoc[]
@@ -171,9 +179,11 @@ include::{snippets}/item/item-update/path-parameters.adoc[]
 
 include::{snippets}/item/item-update/request-parameters.adoc[]
 
+.request multipart 구성
 include::{snippets}/item/item-update/request-parts.adoc[]
 
-include::{snippets}/item/item-update/request-fields.adoc[]
+.itemReq 구성
+include::{snippets}/item/item-update/request-part-itemReq-fields.adoc[]
 
 .Response - 성공
 include::{snippets}/item/item-update/http-response.adoc[]
@@ -187,9 +197,11 @@ include::{snippets}/item/item-update-fail-invalid-name/path-parameters.adoc[]
 
 include::{snippets}/item/item-update-fail-invalid-name/request-parameters.adoc[]
 
+.request multipart 구성
 include::{snippets}/item/item-update-fail-invalid-name/request-parts.adoc[]
 
-include::{snippets}/item/item-update-fail-invalid-name/request-fields.adoc[]
+.itemReq 구성
+include::{snippets}/item/item-update-fail-invalid-name/request-part-itemReq-fields.adoc[]
 
 .Response Fail - 입력되지 않은 상품 이름
 include::{snippets}/item/item-update-fail-invalid-name/http-response.adoc[]
@@ -203,9 +215,11 @@ include::{snippets}/item/item-update-fail-invalid-discount-price/path-parameters
 
 include::{snippets}/item/item-update-fail-invalid-discount-price/request-parameters.adoc[]
 
+.request multipart 구성
 include::{snippets}/item/item-update-fail-invalid-discount-price/request-parts.adoc[]
 
-include::{snippets}/item/item-update-fail-invalid-discount-price/request-fields.adoc[]
+.itemReq 구성
+include::{snippets}/item/item-update-fail-invalid-discount-price/request-part-itemReq-fields.adoc[]
 
 .Response Fail - 할인가가 원가보다 큰 경우
 include::{snippets}/item/item-update-fail-invalid-discount-price/http-response.adoc[]
