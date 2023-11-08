@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 import com.palpal.dealightbe.domain.item.domain.Item;
 
 public record ItemsRes(
-	List<ItemRes> itemResponses
+	List<ItemRes> items
 ) {
 
 	public static ItemsRes from(Page<Item> items) {
