@@ -27,10 +27,15 @@ include::{snippets}/review/review-create-fail-empty/response-body.adoc[]
 
 === 1. 리뷰 등록
 
+/api/reviews/orders?id={orderId}
+
 ==== 요청
 
 - header
 include::{snippets}/review/review-create-success/request-headers.adoc[]
+
+- request parameters
+include::{snippets}/review/review-create-success/request-parameters.adoc[]
 
 - body
 include::{snippets}/review/review-create-success/request-body.adoc[]
@@ -45,10 +50,15 @@ include::{snippets}/review/review-create-success/response-fields.adoc[]
 
 === 2. 리뷰 통계 조회 - 업체별
 
+/api/reviews/stores?id={storeId}
+
 ==== 요청
 
 - header
 include::{snippets}/review/review-find-by-store-id-success/request-headers.adoc[]
+
+- request parameters
+include::{snippets}/review/review-find-by-store-id-success/request-parameters.adoc[]
 
 - body
 include::{snippets}/review/review-find-by-store-id-success/request-body.adoc[]
@@ -62,10 +72,16 @@ include::{snippets}/review/review-find-by-store-id-success/response-fields.adoc[
 
 === 3. 리뷰 조회 - 주문별
 
+/api/reviews/orders?id={orderId}
+
 ==== 요청
 
 - header
 include::{snippets}/review/review-find-by-order-id-success/request-headers.adoc[]
+
+- request parameters
+include::{snippets}/review/review-find-by-order-id-success/request-parameters.adoc[]
+
 
 - body
 include::{snippets}/review/review-find-by-order-id-success/request-body.adoc[]
