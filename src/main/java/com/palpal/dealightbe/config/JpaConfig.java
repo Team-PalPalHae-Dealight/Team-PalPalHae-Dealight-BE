@@ -21,9 +21,4 @@ public class JpaConfig {
 	public JPAQueryFactory queryFactory() {
 		return new JPAQueryFactory(entityManager);
 	}
-
-	@Bean
-	public PageableHandlerMethodArgumentResolverCustomizer customize() {
-		return p -> p.setOneIndexedParameters(true);
-	}
 }
