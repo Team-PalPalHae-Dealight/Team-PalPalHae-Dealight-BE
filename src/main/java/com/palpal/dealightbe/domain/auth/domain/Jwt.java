@@ -139,30 +139,13 @@ public class Jwt {
 		return authorities;
 	}
 
-	public boolean validateToken(String jwt) {
+	public void validateToken(String jwt) {
 		log.info("Jwt(value: {})의 유효성 검증을 시작합니다...", jwt);
-		try {
-			Jwts.parserBuilder()
-				.setSigningKey(tokenSecret)
-				.build()
-				.parseClaimsJws(jwt);
-
-			log.info("Jwt(value: {})의 유효성이 검증되었습니다.", jwt);
-			return true;
-		} catch (SignatureException ex) {
-			log.error("JWT signature가 올바르지 않습니다.");
-		} catch (MalformedJwtException ex) {
-			log.error("JWT가 올바른 값이 아닙니다.");
-		} catch (ExpiredJwtException ex) {
-			log.error("JWT가 만료되었습니다.");
-		} catch (UnsupportedJwtException ex) {
-			log.error("지원하지 않는 형식의 JWT입니다.");
-		} catch (IllegalArgumentException ex) {
-			log.error("JWT의 claim 값들이 비어있습니다.");
-		}
-
-		log.info("Jwt(value: {})가 유효성 검증에 실패했습니다.", jwt);
-		return false;
+		Jwts.parserBuilder()
+			.setSigningKey(tokenSecret)
+			.build()
+			.parseClaimsJws(jwt);
+		log.info("Jwt(value: {})의 유효성이 검증되었습니다.", jwt);
 	}
 
 	private void validateJwtProperties(JwtConfig jwtConfig) {

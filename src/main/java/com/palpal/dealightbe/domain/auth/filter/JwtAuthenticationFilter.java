@@ -15,6 +15,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palpal.dealightbe.domain.auth.domain.Jwt;
 import com.palpal.dealightbe.domain.auth.domain.JwtAuthentication;
@@ -22,6 +23,7 @@ import com.palpal.dealightbe.domain.auth.domain.JwtAuthenticationToken;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.ErrorResponse;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,38 +36,40 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 		FilterChain filterChain) throws ServletException, IOException {
-		if (SecurityContextHolder.getContext().getAuthentication() != null) {
-			log.debug("SecurityContextHolder에 이미 인증정보가 존재합니다: {}",
-				SecurityContextHolder.getContext().getAuthentication());
-			filterChain.doFilter(request, response);
-			return;
-		}
+		if (SecurityContextHolder.getContext().getAuthentication() == null) {
+			String token = parseTokenFromHttpRequest(request);
+			log.info("JwtAuthenticationFilter에서 token({}) 검증을 시작합니다...", token);
+			if (token != null) {
+				try {
+					jwt.validateToken(token);
+				} catch (ExpiredJwtException e) {
+					log.error("JWT({})가 만료되었습니다. 만료일: {}", token, e.getClaims().getExpiration());
+					// 토큰이 만료된 경우 401 Unauthorized를 보낸다.
+					writeErrorResponse(response, ErrorCode.EXPIRED_TOKEN, HttpServletResponse.SC_UNAUTHORIZED);
+					return;
+				} catch (RuntimeException e) {
+					log.error("JWT({})의 유효성(형식, 서명 등)이 올바르지 않습니다.", token);
+					// 토큰이 올바르지 않은 경우 401 Unauthorized를 보낸다.
+					writeErrorResponse(response, ErrorCode.INVALID_TOKEN_FORMAT, HttpServletResponse.SC_UNAUTHORIZED);
+					return;
+				}
 
-		String token = parseTokenFromHttpRequest(request);
-		log.info("JwtAuthenticationFilter에서 token({}) 검증을 시작합니다...", token);
-		if (token != null && jwt.validateToken(token)) {
-			try {
-				JwtAuthentication authentication = createJwtAuthentication(token);
-				JwtAuthenticationToken authenticationToken = createJwtAuthenticationToken(request, token,
-					authentication);
-				SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-			} catch (Exception e) {
-				log.warn("Jwt 처리에 실패했습니다: {}", e.getMessage());
+				try {
+					JwtAuthentication authentication = createJwtAuthentication(token);
+					JwtAuthenticationToken authenticationToken = createJwtAuthenticationToken(request, token,
+						authentication);
+					SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+				} catch (Exception e) {
+					log.error("JWT({})로부터 인증정보를 만드는데 실패했습니다: {}", token, e.getMessage());
+					writeErrorResponse(response, ErrorCode.UNABLE_TO_CREATE_AUTHENTICATION,
+						HttpServletResponse.SC_UNAUTHORIZED);
+					return;
+				}
 			}
-			filterChain.doFilter(request, response);
-			return;
 		}
 
-		// 유효하지 않은 토큰일 경우(null, 형식이 잘못된 경우) 예외메시지를 던지는 것이 필요하다.
-		log.warn("Jwt({})가 유효하지 않습니다.", jwt);
-		ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.INVALID_TOKEN);
-		ObjectMapper objectMapper = new ObjectMapper();
-		String accessDenialResponse = objectMapper.writeValueAsString(errorResponse);
-		response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-		response.setContentType("application/json;charset=UTF-8");
-		response.getWriter().write(accessDenialResponse);
-		response.getWriter().flush();
-		response.getWriter().close();
+		// 인증 정보가 이미 있는 경우, 토큰이 null인 경우, 인증에 성공한 경우
+		filterChain.doFilter(request, response);
 	}
 
 	private String parseTokenFromHttpRequest(HttpServletRequest request) {
@@ -104,5 +108,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		String jwtSubject = jwt.getSubject(token);
 
 		return new JwtAuthentication(jwtSubject, token);
+	}
+
+	private void writeErrorResponse(HttpServletResponse response, ErrorCode errorCode, int statusCode) throws
+		IOException {
+		String errorResponseJsonFormat = getErrorResponseJsonFormat(errorCode);
+		writeToHttpServletResponse(response, statusCode, errorResponseJsonFormat);
+	}
+
+	private String getErrorResponseJsonFormat(ErrorCode errorCode) throws JsonProcessingException {
+		ErrorResponse errorResponse = ErrorResponse.of(errorCode);
+		ObjectMapper objectMapper = new ObjectMapper();
+		return objectMapper.writeValueAsString(errorResponse);
+	}
+
+	private void writeToHttpServletResponse(HttpServletResponse response, int statusCode, String errorMessage) throws
+		IOException {
+		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		response.setContentType("application/json;charset=UTF-8");
+		response.getWriter().write(errorMessage);
+		response.getWriter().flush();
+		response.getWriter().close();
 	}
 }

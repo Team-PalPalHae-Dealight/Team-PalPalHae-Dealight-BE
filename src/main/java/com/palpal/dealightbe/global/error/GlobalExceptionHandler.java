@@ -1,5 +1,7 @@
 package com.palpal.dealightbe.global.error;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -38,5 +40,13 @@ public class GlobalExceptionHandler {
 		ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.UNABLE_TO_HANDLE_ERROR);
 
 		return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+	@ExceptionHandler()
+	public ResponseEntity<ErrorResponse> handleRequiredAuthenticationException() {
+		// 인증을 필요로하지만 토큰이 헤더에 들어있지 않은 경우(토큰이 null인 경우)
+		ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.REQUIRED_AUTHENTICATION);
+
+		return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
 	}
 }

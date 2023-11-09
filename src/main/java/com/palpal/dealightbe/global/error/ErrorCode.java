@@ -56,7 +56,10 @@ public enum ErrorCode {
 	INVALID_ROLE_TYPE("AUTH003", "유효하지 않은 권한이 입력됐습니다."),
 	NOT_FOUND_ROLE("AUTH004", "존재하지 않는 역할입니다."),
 	INVALID_ROLE_UPDATE("AUTH005", "적어도 하나의 역할이 필요합니다."),
-	INVALID_TOKEN("AUTH006", "인증토큰이 올바르지 않습니다."),
+	REQUIRED_AUTHENTICATION("AUTH006", "토큰이 필요한 접근입니다."),
+	EXPIRED_TOKEN("AUTH007", "만료된 토큰입니다."),
+	INVALID_TOKEN_FORMAT("AUTH008", "토큰의 유효성 혹은 형식이 올바르지 않습니다."),
+	UNABLE_TO_CREATE_AUTHENTICATION("AUTH009", "토큰에 정보가 부족하여 인증생성에 실패했습니다."),
 
 	//리뷰
 	NOT_FOUND_REVIEW("R001", "존재하지 않는 리뷰입니다."),
