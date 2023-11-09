@@ -120,19 +120,19 @@ class ItemServiceTest {
 	void itemCreateSuccessTest() {
 		//given
 		ItemReq itemReq = new ItemReq(item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation());
-		Long memberId = 1L;
+		Long providerId = 1L;
 
 		MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "Spring Framework".getBytes());
 		ImageUploadReq imageUploadReq = new ImageUploadReq(file);
 		String imageUrl = "http://image-url.com/image.jpg";
 
-		when(storeRepository.findByMemberId(any())).thenReturn(Optional.of(store));
+		when(storeRepository.findByMemberProviderId(any())).thenReturn(Optional.of(store));
 		when(itemRepository.existsByNameAndStoreId(any(), any())).thenReturn(false);
 		when(itemRepository.save(any(Item.class))).thenReturn(item);
 		when(imageService.store(file)).thenReturn(imageUrl);
 
 		//when
-		ItemRes itemRes = itemService.create(itemReq, memberId, imageUploadReq);
+		ItemRes itemRes = itemService.create(itemReq, providerId, imageUploadReq);
 
 		//then
 		assertThat(itemRes.itemName()).isEqualTo(item.getName());
@@ -149,17 +149,17 @@ class ItemServiceTest {
 	void itemCreateFailureTest_storeNotFound() {
 		//given
 		ItemReq itemReq = new ItemReq(item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation());
-		Long memberId = 1L;
+		Long providerId = 1L;
 
 		MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "Spring Framework".getBytes());
 		ImageUploadReq imageUploadReq = new ImageUploadReq(file);
 
-		when(storeRepository.findByMemberId(any())).thenReturn(Optional.empty());
+		when(storeRepository.findByMemberProviderId(any())).thenReturn(Optional.empty());
 
 		//when
 		//then
 		assertThrows(EntityNotFoundException.class, () -> {
-			itemService.create(itemReq, memberId, imageUploadReq);
+			itemService.create(itemReq, providerId, imageUploadReq);
 		});
 	}
 
@@ -168,18 +168,18 @@ class ItemServiceTest {
 	void itemCreateFailureTest_invalidDiscountPrice() {
 		//given
 		ItemReq itemReq = new ItemReq(item.getName(), item.getStock(), 4500, 4000, item.getDescription(), item.getInformation());
-		Long memberId = 1L;
+		Long providerId = 1L;
 
 		MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "Spring Framework".getBytes());
 		ImageUploadReq imageUploadReq = new ImageUploadReq(file);
 
-		when(storeRepository.findByMemberId(any())).thenReturn(Optional.of(store));
+		when(storeRepository.findByMemberProviderId(any())).thenReturn(Optional.of(store));
 		when(itemRepository.existsByNameAndStoreId(any(), any())).thenReturn(false);
 
 		//when
 		//then
 		assertThrows(BusinessException.class, () -> {
-			itemService.create(itemReq, memberId, imageUploadReq);
+			itemService.create(itemReq, providerId, imageUploadReq);
 		});
 	}
 
@@ -220,7 +220,7 @@ class ItemServiceTest {
 	@Test
 	void itemFindAllForStoreSuccessTest() {
 		//given
-		Long memberId = 1L;
+		Long providerId = 1L;
 
 		int page = 0;
 		int size = 5;
@@ -232,11 +232,11 @@ class ItemServiceTest {
 
 		Page<Item> itemPage = new PageImpl<>(items, pageRequest, items.size());
 
-		when(storeRepository.findByMemberId(any())).thenReturn(Optional.of(store));
+		when(storeRepository.findByMemberProviderId(any())).thenReturn(Optional.of(store));
 		when(itemRepository.findAllByStoreIdOrderByUpdatedAtDesc(any(), eq(PageRequest.of(page, size)))).thenReturn(itemPage);
 
 		//when
-		ItemsRes itemsRes = itemService.findAllForStore(memberId, pageRequest);
+		ItemsRes itemsRes = itemService.findAllForStore(providerId, pageRequest);
 
 		//then
 		assertThat(itemsRes.items()).hasSize(items.size());
@@ -325,19 +325,19 @@ class ItemServiceTest {
 	void itemUpdateSuccessTest() {
 		//given
 		ItemReq itemReq = new ItemReq("수정이름", 1, 3000, 3500, "상세 내용 수정", "안내 사항 수정");
-		Long memberId = 1L;
+		Long providerId = 1L;
 		Long itemId = 1L;
 
 		MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "Spring Framework".getBytes());
 		ImageUploadReq imageUploadReq = new ImageUploadReq(file);
 		String imageUrl = "http://image-url.com/image.jpg";
 
-		when(storeRepository.findByMemberId(any())).thenReturn(Optional.of(store));
+		when(storeRepository.findByMemberProviderId(any())).thenReturn(Optional.of(store));
 		when(itemRepository.findById(any())).thenReturn(Optional.of(item));
 		when(imageService.store(file)).thenReturn(imageUrl);
 
 		//when
-		ItemRes itemRes = itemService.update(itemId, itemReq, memberId, imageUploadReq);
+		ItemRes itemRes = itemService.update(itemId, itemReq, providerId, imageUploadReq);
 
 		//then
 		assertThat(itemRes.itemName()).isEqualTo(itemReq.name());
@@ -354,21 +354,21 @@ class ItemServiceTest {
 	void itemUpdateFailureTest_invalidDiscountPrice() {
 		//given
 		ItemReq itemReq = new ItemReq("수정이름", 1, 4000, 3500, "상세 내용 수정", "안내 사항 수정");
-		Long memberId = 1L;
+		Long providerId = 1L;
 		Long itemId = 1L;
 
 		MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "Spring Framework".getBytes());
 		ImageUploadReq imageUploadReq = new ImageUploadReq(file);
 		String imageUrl = "http://image-url.com/image.jpg";
 
-		when(storeRepository.findByMemberId(any())).thenReturn(Optional.of(store));
+		when(storeRepository.findByMemberProviderId(any())).thenReturn(Optional.of(store));
 		when(itemRepository.findById(any())).thenReturn(Optional.of(item));
 		when(imageService.store(file)).thenReturn(imageUrl);
 
 		//when
 		//then
 		assertThrows(BusinessException.class, () -> {
-			itemService.update(itemId, itemReq, memberId, imageUploadReq);
+			itemService.update(itemId, itemReq, providerId, imageUploadReq);
 		});
 	}
 
