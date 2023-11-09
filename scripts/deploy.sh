@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ubuntu 프로세스 매니저 버그 해결을 위해 추가
-sudo aa-status
+sudo aa-remove-unknown
 
 cd /home/ubuntu/app
 DOCKER_APP_NAME=dealight
