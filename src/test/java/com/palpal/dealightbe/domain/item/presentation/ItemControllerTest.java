@@ -40,11 +40,15 @@ import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
 import static com.palpal.dealightbe.global.error.ErrorCode.DUPLICATED_ITEM_NAME;
+import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_DISCOUNT_PRICE;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.STORE_HAS_NO_ITEM;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Mockito.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
@@ -165,8 +169,6 @@ class ItemControllerTest {
 			"application/json",
 			objectMapper.writeValueAsString(itemReq).getBytes());
 
-		Long memberId = 1L;
-
 		when(itemService.create(any(), any(), any())).thenReturn(itemRes);
 
 		//when
@@ -174,9 +176,9 @@ class ItemControllerTest {
 		mockMvc.perform(RestDocumentationRequestBuilders.multipart("/api/items")
 				.file(file)
 				.file(request)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.contentType(MediaType.MULTIPART_FORM_DATA)
-				.accept(MediaType.APPLICATION_JSON)
-				.param("memberId", memberId.toString()))
+				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.itemId").value(itemRes.itemId()))
 			.andExpect(jsonPath("$.storeId").value(itemRes.storeId()))
@@ -195,9 +197,10 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.storeAddress.yCoordinate").value(addressRes.yCoordinate()))
 			.andDo(print())
 			.andDo(document("item/item-create",
-				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				requestParameters(parameterWithName("memberId").description("고객 ID")
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
 				),
 				requestParts(
 					partWithName("image").description("상품 이미지"),
@@ -256,8 +259,6 @@ class ItemControllerTest {
 			"application/json",
 			objectMapper.writeValueAsString(itemReq).getBytes());
 
-		Long memberId = 1L;
-
 		when(itemService.create(any(), any(), any())).thenReturn(itemRes);
 
 		//when
@@ -265,9 +266,10 @@ class ItemControllerTest {
 		mockMvc.perform(RestDocumentationRequestBuilders.multipart("/api/items")
 				.file(file)
 				.file(request)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+
 				.contentType(MediaType.MULTIPART_FORM_DATA)
-				.accept(MediaType.APPLICATION_JSON)
-				.param("memberId", memberId.toString()))
+				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
 			.andExpect(jsonPath("$.code").value("C001"))
@@ -280,9 +282,11 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.message").value("잘못된 값을 입력하셨습니다."))
 			.andDo(print())
 			.andDo(document("item/item-create-fail-invalid-name",
-				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				requestParameters(parameterWithName("memberId").description("고객 ID")),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
 				requestParts(
 					partWithName("image").description("상품 이미지"),
 					partWithName("itemReq").description("상품 등록 내용")
@@ -313,24 +317,22 @@ class ItemControllerTest {
 		//given
 		ItemReq itemReq = new ItemReq("떡볶이", 2, 4500, 4000, "기본 떡볶이 입니다.", "통신사 할인 불가능 합니다.");
 
-		Long memberId = 1L;
-
 		MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "file".getBytes());
 		MockMultipartFile request = new MockMultipartFile("itemReq", "itemReq",
 			"application/json",
 			objectMapper.writeValueAsString(itemReq).getBytes());
 
-		when(itemService.create(any(), anyLong(), any())).thenThrow(
-			new BusinessException(ErrorCode.INVALID_ITEM_DISCOUNT_PRICE));
+		doThrow(new BusinessException(INVALID_ITEM_DISCOUNT_PRICE)).when(
+			itemService).create(any(), any(), any());
 
 		//when
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.multipart("/api/items")
 				.file(file)
 				.file(request)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.contentType(MediaType.MULTIPART_FORM_DATA)
-				.accept(MediaType.APPLICATION_JSON)
-				.param("memberId", memberId.toString()))
+				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
 			.andExpect(jsonPath("$.code").value("I001"))
@@ -340,7 +342,9 @@ class ItemControllerTest {
 			.andDo(document("item/item-create-fail-invalid-discount-price",
 				Preprocessors.preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				requestParameters(parameterWithName("memberId").description("고객 ID")),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
 				requestParts(
 					partWithName("image").description("상품 이미지"),
 					partWithName("itemReq").description("상품 등록 내용")
@@ -368,8 +372,6 @@ class ItemControllerTest {
 		//given
 		ItemReq itemReq = new ItemReq("떡볶이", 2, 4500, 4000, "기본 떡볶이 입니다.", "통신사 할인 불가능 합니다.");
 
-		Long memberId = 1L;
-
 		MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "file".getBytes());
 		MockMultipartFile request = new MockMultipartFile("itemReq", "itemReq",
 			"application/json",
@@ -383,9 +385,9 @@ class ItemControllerTest {
 		mockMvc.perform(RestDocumentationRequestBuilders.multipart("/api/items")
 				.file(file)
 				.file(request)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.contentType(MediaType.MULTIPART_FORM_DATA)
-				.accept(MediaType.APPLICATION_JSON)
-				.param("memberId", memberId.toString()))
+				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
 			.andExpect(jsonPath("$.code").value("I003"))
@@ -393,9 +395,11 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.message").value("동일한 이름을 가진 상품이 이미 등록되어 있습니다."))
 			.andDo(print())
 			.andDo(document("item/item-create-fail-duplicated-item-name",
-				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
-				requestParameters(parameterWithName("memberId").description("고객 ID")),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
 				requestParts(
 					partWithName("image").description("상품 이미지"),
 					partWithName("itemReq").description("상품 등록 내용")
@@ -451,7 +455,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.storeAddress.yCoordinate").value(addressRes.yCoordinate()))
 			.andDo(print())
 			.andDo(document("item/item-find-by-id",
-				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),
 				responseFields(
@@ -489,7 +493,7 @@ class ItemControllerTest {
 			.andExpect(status().isNotFound())
 			.andDo(print())
 			.andDo(document("item/item-find-by-id-fail-not-found-item",
-				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),
 				responseFields(
@@ -516,8 +520,6 @@ class ItemControllerTest {
 			.store(store)
 			.build();
 
-		Long memberId = 1L;
-
 		int size = 5;
 		int page = 0;
 		PageRequest pageRequest = PageRequest.of(page, size);
@@ -535,7 +537,7 @@ class ItemControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/items/stores")
 				.contentType(MediaType.APPLICATION_JSON)
-				.param("memberId", memberId.toString())
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.param("size", String.valueOf(size))
 				.param("page", String.valueOf(page)))
 			.andExpect(status().isOk())
@@ -556,10 +558,13 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.items[0].storeAddress.yCoordinate").value(addressRes.yCoordinate()))
 			.andDo(print())
 			.andDo(document("item/item-find-All-for-store",
-				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
 				requestParameters(
-					List.of(parameterWithName("memberId").description("고객 ID"),
+					List.of(
 						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
@@ -633,12 +638,12 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.items[0].storeAddress.yCoordinate").value(addressRes.yCoordinate()))
 			.andDo(print())
 			.andDo(document("item/item-find-All-for-member-sort-by-deadline",
-				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestParameters(
 					List.of(parameterWithName("x-coordinate").description("경도"),
 						parameterWithName("y-coordinate").description("위도"),
-						parameterWithName("sort-by").description("정렬 기준(마감순)"),
+						parameterWithName("sort-by").description("정렬 기준(마감순) : deadline"),
 						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
@@ -712,12 +717,12 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.items[0].storeAddress.yCoordinate").value(addressRes.yCoordinate()))
 			.andDo(print())
 			.andDo(document("item/item-find-All-for-member-sort-by-discount-rate",
-				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestParameters(
 					List.of(parameterWithName("x-coordinate").description("경도"),
 						parameterWithName("y-coordinate").description("위도"),
-						parameterWithName("sort-by").description("정렬 기준(할인율순)"),
+						parameterWithName("sort-by").description("정렬 기준(할인율순) : discount-rate"),
 						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
@@ -791,12 +796,12 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.items[0].storeAddress.yCoordinate").value(addressRes.yCoordinate()))
 			.andDo(print())
 			.andDo(document("item/item-find-All-for-member-sort-by-distance",
-				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestParameters(
 					List.of(parameterWithName("x-coordinate").description("경도"),
 						parameterWithName("y-coordinate").description("위도"),
-						parameterWithName("sort-by").description("정렬 기준(거리순)"),
+						parameterWithName("sort-by").description("정렬 기준(거리순) : distance"),
 						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
@@ -826,7 +831,6 @@ class ItemControllerTest {
 	public void itemUpdateSuccessTest() throws Exception {
 		//given
 		Long itemId = 1L;
-		Long memberId = 1L;
 
 		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
 		String imageUrl = "http://image-url.com/image.jpg";
@@ -855,7 +859,7 @@ class ItemControllerTest {
 		mockMvc.perform(builder
 				.file(file)
 				.file(request)
-				.param("memberId", memberId.toString())
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.contentType(MediaType.MULTIPART_FORM_DATA)
 				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
@@ -876,10 +880,12 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.storeAddress.yCoordinate").value(addressRes.yCoordinate()))
 			.andDo(print())
 			.andDo(document("item/item-update",
-				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
 				pathParameters(parameterWithName("id").description("상품 ID")),
-				requestParameters(parameterWithName("memberId").description("고객 ID")),
 				requestParts(
 					partWithName("image").description("상품 이미지"),
 					partWithName("itemReq").description("상품 등록 내용")
@@ -917,7 +923,6 @@ class ItemControllerTest {
 	public void itemUpdateFailureTest_invalidName() throws Exception {
 		//given
 		Long itemId = 1L;
-		Long memberId = 1L;
 		String imageUrl = "http://image-url.com/image.jpg";
 
 		Item item3 = Item.builder()
@@ -958,7 +963,7 @@ class ItemControllerTest {
 		mockMvc.perform(builder
 				.file(file)
 				.file(request)
-				.param("memberId", memberId.toString())
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.contentType(MediaType.MULTIPART_FORM_DATA)
 				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isBadRequest())
@@ -973,10 +978,12 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.message").value("잘못된 값을 입력하셨습니다."))
 			.andDo(print())
 			.andDo(document("item/item-update-fail-invalid-name",
-				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
 				pathParameters(parameterWithName("id").description("상품 ID")),
-				requestParameters(parameterWithName("memberId").description("고객 ID")),
 				requestParts(
 					partWithName("image").description("상품 이미지"),
 					partWithName("itemReq").description("상품 등록 내용")
@@ -1007,7 +1014,6 @@ class ItemControllerTest {
 		//given
 		ItemReq itemReq = new ItemReq("치즈 떡볶이", 4, 10000, 5000, "치즈 떡볶이 입니다.", "통신사 할인 가능 합니다.");
 
-		Long memberId = 1L;
 		Long itemId = 1L;
 
 		MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "file".getBytes());
@@ -1024,14 +1030,14 @@ class ItemControllerTest {
 		});
 
 		when(itemService.update(any(), any(), any(), any())).thenThrow(
-			new BusinessException(ErrorCode.INVALID_ITEM_DISCOUNT_PRICE));
+			new BusinessException(INVALID_ITEM_DISCOUNT_PRICE));
 
 		//when
 		//then
 		mockMvc.perform(builder
 				.file(file)
 				.file(request)
-				.param("memberId", memberId.toString())
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.contentType(MediaType.MULTIPART_FORM_DATA)
 				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isBadRequest())
@@ -1041,10 +1047,12 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.message").value("상품 할인가는 원가보다 클 수 없습니다."))
 			.andDo(print())
 			.andDo(document("item/item-update-fail-invalid-discount-price",
-				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),
-				requestParameters(parameterWithName("memberId").description("고객 ID")),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
 				requestParts(
 					partWithName("image").description("상품 이미지"),
 					partWithName("itemReq").description("상품 등록 내용")
@@ -1071,7 +1079,6 @@ class ItemControllerTest {
 	public void itemDeleteSuccessTest() throws Exception {
 		//given
 		Long itemId = 1L;
-		Long memberId = 1L;
 
 		doNothing().when(itemService).delete(any(), any());
 
@@ -1079,14 +1086,16 @@ class ItemControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/items/{id}", itemId)
 				.contentType(MediaType.APPLICATION_JSON)
-				.param("memberId", memberId.toString()))
+				.header("Authorization", "Bearer {ACCESS_TOKEN}"))
 			.andExpect(status().isNoContent())
 			.andDo(print())
 			.andDo(document("item/item-delete",
-				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),
-				requestParameters(parameterWithName("memberId").description("고객 ID"))
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				)
 			));
 	}
 
@@ -1095,7 +1104,6 @@ class ItemControllerTest {
 	public void itemDeleteFailureTest_storeHasNoItem() throws Exception {
 		//given
 		Long itemId = 1L;
-		Long memberId = 1L;
 
 		doThrow(new BusinessException(STORE_HAS_NO_ITEM)).when(
 			itemService).delete(any(), any());
@@ -1104,7 +1112,7 @@ class ItemControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/items/{id}", itemId)
 				.contentType(MediaType.APPLICATION_JSON)
-				.param("memberId", memberId.toString()))
+				.header("Authorization", "Bearer {ACCESS_TOKEN}"))
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
 			.andExpect(jsonPath("$.code").value("I005"))
@@ -1112,10 +1120,12 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.message").value("요청하신 상품은 해당 업체에 등록되지 않은 상품입니다."))
 			.andDo(print())
 			.andDo(document("item/item-delete-store-has-no-item",
-				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),
-				requestParameters(parameterWithName("memberId").description("고객 ID")),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
 				responseFields(
 					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
 					fieldWithPath("code").type(STRING).description("예외 코드"),
