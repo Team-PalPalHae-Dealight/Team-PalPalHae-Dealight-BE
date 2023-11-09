@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 
 import com.palpal.dealightbe.domain.auth.domain.JwtAuthentication;
 import com.palpal.dealightbe.domain.auth.domain.JwtAuthenticationToken;
+import com.palpal.dealightbe.domain.auth.exception.RequiredAuthenticationException;
+import com.palpal.dealightbe.global.error.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +31,9 @@ public class ProviderIdAop {
 	public Object getProviderId(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
 		JwtAuthenticationToken authentication = (JwtAuthenticationToken)SecurityContextHolder.getContext()
 			.getAuthentication();
+		if (authentication == null) {
+			throw new RequiredAuthenticationException(ErrorCode.REQUIRED_AUTHENTICATION);
+		}
 		JwtAuthentication principal = (JwtAuthentication)authentication.getPrincipal();
 		Long providerId = Long.parseLong(principal.getUsername());
 

@@ -20,6 +20,7 @@ import com.palpal.dealightbe.domain.member.domain.MemberRole;
 import com.palpal.dealightbe.domain.member.domain.Role;
 import com.palpal.dealightbe.domain.member.domain.RoleType;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.io.DecodingException;
 import io.jsonwebtoken.security.InvalidKeyException;
 import io.jsonwebtoken.security.WeakKeyException;
@@ -71,12 +72,11 @@ class JwtTest {
 		String accessToken = jwt.createAccessToken(testMember);
 		String refreshToken = jwt.createRefreshToken(testMember);
 
-		boolean isValidAccessToken = jwt.validateToken(accessToken);
-		boolean isValidRefreshToken = jwt.validateToken(refreshToken);
-
 		// then
-		assertThat(isValidAccessToken).isTrue();
-		assertThat(isValidRefreshToken).isTrue();
+		assertThatCode(() -> jwt.validateToken(accessToken))
+			.doesNotThrowAnyException();
+		assertThatCode(() -> jwt.validateToken(refreshToken))
+			.doesNotThrowAnyException();
 	}
 
 	@DisplayName("토큰으로부터 가져온 Subject 검증 성공")
@@ -222,11 +222,10 @@ class JwtTest {
 		String expiredAccessToken = testJwt.createAccessToken(testMember);
 		String expiredRefreshToken = testJwt.createRefreshToken(testMember);
 
-		boolean isValidAccessToken = testJwt.validateToken(expiredAccessToken);
-		boolean isValidRefreshToken = testJwt.validateToken(expiredRefreshToken);
-
 		// then
-		assertThat(isValidAccessToken).isFalse();
-		assertThat(isValidRefreshToken).isFalse();
+		assertThatThrownBy(() -> testJwt.validateToken(expiredAccessToken))
+			.isInstanceOf(ExpiredJwtException.class);
+		assertThatThrownBy(() -> testJwt.validateToken(expiredRefreshToken))
+			.isInstanceOf(ExpiredJwtException.class);
 	}
 }
