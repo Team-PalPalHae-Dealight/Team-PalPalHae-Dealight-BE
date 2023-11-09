@@ -7,7 +7,7 @@ cd /home/ubuntu/app
 DOCKER_APP_NAME=dealight
 
 # 실행중인 blue가 있는지
-EXIST_BLUE=$(docker ps | grep ${DOCKER_APP_NAME}-blue)
+EXIST_BLUE=$(docker ps | grep ${DOCKER_APP_NAME}-blue-container)
 
 # green이 실행중이면 blue up
 if [ -z "$EXIST_BLUE" ]; then
