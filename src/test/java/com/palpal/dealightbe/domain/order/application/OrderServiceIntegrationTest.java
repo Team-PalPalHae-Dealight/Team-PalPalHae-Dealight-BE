@@ -86,9 +86,9 @@ public class OrderServiceIntegrationTest {
 				assertThat(createdOrder.getStore().getName(), is(store.getName()));
 				assertThat(createdOrder.getOrderStatus().getText(), is(RECEIVED.getText()));
 
-				assertThat(createdOrder.getDemand(), is(createdOrder.getDemand()));
-				assertThat(createdOrder.getArrivalTime(), is(createdOrder.getArrivalTime()));
-				assertThat(createdOrder.getTotalPrice(), is(createdOrder.getTotalPrice()));
+				assertThat(createdOrder.getDemand(), is(orderCreateReq.demand()));
+				assertThat(createdOrder.getArrivalTime(), is(orderCreateReq.arrivalTime()));
+				assertThat(createdOrder.getTotalPrice(), is(orderCreateReq.totalPrice()));
 
 				OrderItem orderedItem = createdOrder.getOrderItems().get(0);
 				assertThat(orderedItem.getItem(), is(item));
