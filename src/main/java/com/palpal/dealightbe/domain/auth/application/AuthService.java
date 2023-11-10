@@ -15,6 +15,8 @@ import com.palpal.dealightbe.domain.auth.application.dto.request.MemberAuthReq;
 import com.palpal.dealightbe.domain.auth.application.dto.response.LoginRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.MemberAuthRes;
 import com.palpal.dealightbe.domain.auth.domain.Jwt;
+import com.palpal.dealightbe.domain.image.ImageService;
+import com.palpal.dealightbe.domain.image.infrastructure.S3ImageService;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.member.domain.MemberRole;
@@ -39,6 +41,7 @@ public class AuthService {
 	private final MemberRepository memberRepository;
 	private final RoleRepository roleRepository;
 	private final MemberRoleRepository memberRoleRepository;
+	private final ImageService imageService;
 	private final Jwt jwt;
 
 	@Transactional(readOnly = true)
@@ -80,11 +83,24 @@ public class AuthService {
 	@Transactional(readOnly = true)
 	public MemberAuthRes reIssueToken(Long providerId, String refreshToken) {
 		log.info("사용자(ProviderId:{})의 AccessToken을 재발급합니다.", providerId);
-		Member member = memberRepository.findMemberByProviderId(providerId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+		Member member = findMemberByProviderId(providerId);
 		String newAccessToken = jwt.createAccessToken(member);
 
 		return createMemberAuthRes(member, newAccessToken, refreshToken);
+	}
+
+	public void unregister(Long providerId) {
+		Member member = findMemberByProviderId(providerId);
+		imageService.delete(member.getImage());
+		memberRepository.delete(member);
+	}
+
+	private Member findMemberByProviderId(Long providerId) {
+		return memberRepository.findMemberByProviderId(providerId)
+			.orElseThrow(() -> {
+				log.warn("READ:NOT_FOUND_MEMBER_BY_ID : {}", providerId);
+				return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
+			});
 	}
 
 	private Member createRequestMember(MemberAuthReq request) {

@@ -1,5 +1,6 @@
 package com.palpal.dealightbe.domain.member.domain;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -30,7 +31,7 @@ public class MemberRole {
 	@JoinColumn(name = "member_id")
 	private Member member;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "role_id")
 	private Role role;
 

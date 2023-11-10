@@ -41,6 +41,8 @@ public class SecurityConfig {
 			.antMatchers("/h2-console/**").hasRole("ADMIN")
 			.antMatchers("/actuator/**").hasRole("ADMIN")
 			// 서비스 URL
+			.antMatchers("/api/auth/signup").permitAll()
+			.antMatchers("/api/auth/tokens").hasAnyRole("MEMBER", "STORE")
 			.antMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
 			.and()
 			.headers().disable()
