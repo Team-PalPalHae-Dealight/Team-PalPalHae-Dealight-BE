@@ -36,8 +36,8 @@ public class AuthController {
 
 	@RefreshToken
 	@ProviderId
-	@GetMapping("/tokens")
-	public ResponseEntity<MemberAuthRes> refreshAccessToken(Long providerId, String refreshToken) {
+	@GetMapping("/reissue")
+	public ResponseEntity<MemberAuthRes> reIssueToken(Long providerId, String refreshToken) {
 		MemberAuthRes response = authService.reIssueToken(providerId, refreshToken);
 
 		return ResponseEntity
