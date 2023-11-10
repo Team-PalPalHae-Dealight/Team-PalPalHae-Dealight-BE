@@ -13,7 +13,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -28,8 +27,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palpal.dealightbe.domain.auth.application.AuthService;
-import com.palpal.dealightbe.domain.auth.application.dto.request.MemberSignupReq;
-import com.palpal.dealightbe.domain.auth.application.dto.response.MemberSignupRes;
+import com.palpal.dealightbe.domain.auth.application.dto.request.MemberAuthReq;
+import com.palpal.dealightbe.domain.auth.application.dto.response.MemberAuthRes;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 
@@ -51,7 +50,7 @@ class AuthControllerTest {
 	class signupTest {
 		String signupApiPath = "/api/auth/signup";
 
-		MemberSignupReq memberSignupReq = new MemberSignupReq(
+		MemberAuthReq memberSignupReq = new MemberAuthReq(
 			"kakao",
 			12345L,
 			"이홍섭",
@@ -60,7 +59,7 @@ class AuthControllerTest {
 			"store"
 		);
 
-		MemberSignupRes memberSignupRes = new MemberSignupRes(
+		MemberAuthRes memberSignupRes = new MemberAuthRes(
 			"맹수호빵",
 			"MOCK_ACCESS_TOKEN",
 			"MOCK_REFRESH_TOKEN"
@@ -163,7 +162,7 @@ class AuthControllerTest {
 		@Test
 		void signupFailIfProviderIdIsNotExist() throws Exception {
 			// given
-			MemberSignupReq invalidSignupReq = new MemberSignupReq(
+			MemberAuthReq invalidSignupReq = new MemberAuthReq(
 				"kakao",
 				null,
 				"섭홍이",
@@ -217,7 +216,7 @@ class AuthControllerTest {
 		@Test
 		void signupFailIfProviderIsNotExist() throws Exception {
 			// given
-			MemberSignupReq invalidSignupReq = new MemberSignupReq(
+			MemberAuthReq invalidSignupReq = new MemberAuthReq(
 				null,
 				123L,
 				"섭홍이",
@@ -271,7 +270,7 @@ class AuthControllerTest {
 		@Test
 		void signupFailIfInvalidRoleRequest() throws Exception {
 			// given
-			MemberSignupReq invalidSignupReq = new MemberSignupReq(
+			MemberAuthReq invalidSignupReq = new MemberAuthReq(
 				"kakao",
 				123L,
 				"석봉이",

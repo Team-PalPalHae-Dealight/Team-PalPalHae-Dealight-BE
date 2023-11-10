@@ -2,7 +2,6 @@ package com.palpal.dealightbe.domain.auth.application;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -26,9 +24,9 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import com.palpal.dealightbe.domain.address.domain.Address;
-import com.palpal.dealightbe.domain.auth.application.dto.request.MemberSignupReq;
+import com.palpal.dealightbe.domain.auth.application.dto.request.MemberAuthReq;
 import com.palpal.dealightbe.domain.auth.application.dto.response.LoginRes;
-import com.palpal.dealightbe.domain.auth.application.dto.response.MemberSignupRes;
+import com.palpal.dealightbe.domain.auth.application.dto.response.MemberAuthRes;
 import com.palpal.dealightbe.domain.auth.domain.Jwt;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
@@ -170,7 +168,7 @@ class AuthServiceTest {
 	@Test
 	void returnTokensIfSignupSuccess() {
 		// given
-		MemberSignupReq memberSignupReq = new MemberSignupReq(
+		MemberAuthReq memberSignupReq = new MemberAuthReq(
 			"test",
 			123L,
 			"테스터",
@@ -182,7 +180,7 @@ class AuthServiceTest {
 			.xCoordinate(0)
 			.yCoordinate(0)
 			.build();
-		Member mockMember = MemberSignupReq.toMember(memberSignupReq);
+		Member mockMember = MemberAuthReq.toMember(memberSignupReq);
 		mockMember.updateAddress(mockAddress);
 
 		Role mockRole = Role.builder()
@@ -208,7 +206,7 @@ class AuthServiceTest {
 			.willReturn("MOCK_REFRESH_TOKEN");
 
 		// when
-		MemberSignupRes response = authService.signup(memberSignupReq);
+		MemberAuthRes response = authService.signup(memberSignupReq);
 
 		// then
 		assertThat(response.accessToken()).isEqualTo("MOCK_ACCESS_TOKEN");
@@ -220,14 +218,14 @@ class AuthServiceTest {
 	@Test
 	void throwExceptionIfAlreadyExistMember() {
 		// given
-		MemberSignupReq request = new MemberSignupReq(
+		MemberAuthReq request = new MemberAuthReq(
 			"tester",
 			123L,
 			"고예성",
 			"요송송",
 			"01012341234",
 			"member");
-		Member duplicatedMember = MemberSignupReq.toMember(request);
+		Member duplicatedMember = MemberAuthReq.toMember(request);
 		given(memberRepository.findByProviderAndProviderId("tester", 123L))
 			.willReturn(Optional.of(duplicatedMember));
 
@@ -240,7 +238,7 @@ class AuthServiceTest {
 	@Test
 	void throwExceptionIFNotFoundRole() {
 		// given
-		MemberSignupReq request = new MemberSignupReq(
+		MemberAuthReq request = new MemberAuthReq(
 			"tester",
 			123L,
 			"고예성",
@@ -260,7 +258,7 @@ class AuthServiceTest {
 	@Test
 	void throwExceptionIfNotFoundRoleInDb() {
 		// given
-		MemberSignupReq request = new MemberSignupReq(
+		MemberAuthReq request = new MemberAuthReq(
 			"tester",
 			123L,
 			"고예성",
