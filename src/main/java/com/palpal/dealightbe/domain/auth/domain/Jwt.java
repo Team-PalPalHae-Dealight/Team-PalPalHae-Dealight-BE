@@ -155,4 +155,17 @@ public class Jwt {
 			"Refresh Token 만료시간이 올바르지 않습니다.");
 		log.debug("JwtConfig 설정 값 검증에 성공했습니다.");
 	}
+
+	public Date getExpiryDate(String jwt) {
+		log.info("Jwt(value: {})로부터 토큰의 유효기간을 가져옵니다...", jwt);
+		Claims claims = Jwts.parserBuilder()
+			.setSigningKey(tokenSecret)
+			.build()
+			.parseClaimsJws(jwt)
+			.getBody();
+		Date expiration = claims.getExpiration();
+		log.info("토큰의 유효기간({})을 가져오는데 성공했습니다.", expiration);
+
+		return expiration;
+	}
 }

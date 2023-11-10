@@ -10,9 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.palpal.dealightbe.domain.auth.application.AuthService;
-import com.palpal.dealightbe.domain.auth.application.dto.request.MemberSignupReq;
-import com.palpal.dealightbe.domain.auth.application.dto.response.MemberSignupRes;
+import com.palpal.dealightbe.domain.auth.application.dto.request.MemberAuthReq;
+import com.palpal.dealightbe.domain.auth.application.dto.response.MemberAuthRes;
 import com.palpal.dealightbe.global.aop.ProviderId;
+import com.palpal.dealightbe.global.aop.RefreshToken;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,8 +25,19 @@ public class AuthController {
 	private final AuthService authService;
 
 	@PostMapping("/signup")
-	public ResponseEntity<MemberSignupRes> signup(@RequestBody @Validated MemberSignupReq request) {
-		MemberSignupRes response = authService.signup(request);
+	public ResponseEntity<MemberAuthRes> signup(@RequestBody @Validated MemberAuthReq request) {
+		MemberAuthRes response = authService.signup(request);
+
+		return ResponseEntity
+			.status(HttpStatus.CREATED)
+			.body(response);
+	}
+
+	@RefreshToken
+	@ProviderId
+	@GetMapping("/tokens")
+	public ResponseEntity<MemberAuthRes> refreshAccessToken(Long providerId, String refreshToken) {
+		MemberAuthRes response = authService.reIssueToken(providerId, refreshToken);
 
 		return ResponseEntity
 			.status(HttpStatus.CREATED)

@@ -1,6 +1,9 @@
 package com.palpal.dealightbe.domain.auth.application;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -8,9 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.palpal.dealightbe.domain.address.domain.Address;
-import com.palpal.dealightbe.domain.auth.application.dto.request.MemberSignupReq;
+import com.palpal.dealightbe.domain.auth.application.dto.request.MemberAuthReq;
 import com.palpal.dealightbe.domain.auth.application.dto.response.LoginRes;
-import com.palpal.dealightbe.domain.auth.application.dto.response.MemberSignupRes;
+import com.palpal.dealightbe.domain.auth.application.dto.response.MemberAuthRes;
 import com.palpal.dealightbe.domain.auth.domain.Jwt;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
@@ -54,7 +57,7 @@ public class AuthService {
 			.orElse(null);
 	}
 
-	public MemberSignupRes signup(MemberSignupReq request) {
+	public MemberAuthRes signup(MemberAuthReq request) {
 		memberRepository.findByProviderAndProviderId(request.provider(), request.providerId())
 			.ifPresent(member -> {
 				log.warn("POST:READ:ALREADY_EXIST_MEMBER_: PROVIDER({}), PROVIDER_ID({})",
@@ -74,17 +77,27 @@ public class AuthService {
 		return createMemberSignupResponse(savedMember);
 	}
 
-	private Member createRequestMember(MemberSignupReq request) {
+	@Transactional(readOnly = true)
+	public MemberAuthRes reIssueToken(Long providerId, String refreshToken) {
+		log.info("사용자(ProviderId:{})의 AccessToken을 재발급합니다.", providerId);
+		Member member = memberRepository.findMemberByProviderId(providerId)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+		String newAccessToken = jwt.createAccessToken(member);
+
+		return createMemberAuthRes(member, newAccessToken, refreshToken);
+	}
+
+	private Member createRequestMember(MemberAuthReq request) {
 		log.info("요청 정보({})로 Member 객체를 만듭니다...", request);
 		Address defaultAddress = new Address();
-		Member requestMember = MemberSignupReq.toMember(request);
+		Member requestMember = MemberAuthReq.toMember(request);
 		requestMember.updateAddress(defaultAddress);
 		log.info("Member({}) 객체를 만드는데 성공했습니다.", requestMember);
 
 		return requestMember;
 	}
 
-	private List<MemberRole> createMemberRoles(MemberSignupReq request, Member savedMember) {
+	private List<MemberRole> createMemberRoles(MemberAuthReq request, Member savedMember) {
 		log.info("요청 정보(request: {}, Member: {})로 MemberRole을 만듭니다...", request, savedMember);
 		RoleType roleType = getRoleType(request);
 		Role assignableRole = roleRepository.findByRoleType(roleType)
@@ -98,7 +111,7 @@ public class AuthService {
 		return assignableMemberRoles;
 	}
 
-	private RoleType getRoleType(MemberSignupReq request) {
+	private RoleType getRoleType(MemberAuthReq request) {
 		log.info("요청한 RoleType({})을 찾습니다...", request.role());
 		String roleFromString = request.role();
 		RoleType roleType = RoleType.fromString(roleFromString);
@@ -115,11 +128,32 @@ public class AuthService {
 		return memberRoles;
 	}
 
-	private MemberSignupRes createMemberSignupResponse(Member savedMember) {
+	private MemberAuthRes createMemberSignupResponse(Member savedMember) {
 		String accessToken = jwt.createAccessToken(savedMember);
 		String refreshToken = jwt.createRefreshToken(savedMember);
 		String nickName = savedMember.getNickName();
 
-		return new MemberSignupRes(nickName, accessToken, refreshToken);
+		return new MemberAuthRes(nickName, accessToken, refreshToken);
+	}
+
+	private MemberAuthRes createMemberAuthRes(Member member, String newAccessToken, String refreshToken) {
+		String nickName = member.getNickName();
+		boolean isRefreshTokenAroundExpiryDate = checkRefreshTokenAroundExpiryDate(refreshToken);
+		if (isRefreshTokenAroundExpiryDate) {
+			String newRefreshToken = jwt.createRefreshToken(member);
+
+			return new MemberAuthRes(nickName, newAccessToken, newRefreshToken);
+		}
+
+		return new MemberAuthRes(nickName, newAccessToken, refreshToken);
+	}
+
+	private boolean checkRefreshTokenAroundExpiryDate(String refreshToken) {
+		Date expiryDate = jwt.getExpiryDate(refreshToken);
+		LocalDateTime expiryDateLocalDateTime = expiryDate.toInstant()
+			.atZone(ZoneId.systemDefault()).toLocalDateTime();
+		LocalDateTime timeFromNowAfterTenDays = LocalDateTime.now().plusDays(10L);
+
+		return timeFromNowAfterTenDays.isAfter(expiryDateLocalDateTime);
 	}
 }
