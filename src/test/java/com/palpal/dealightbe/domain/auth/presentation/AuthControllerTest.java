@@ -86,7 +86,7 @@ class AuthControllerTest {
 				.andExpect(jsonPath("$.accessToken").value("MOCK_ACCESS_TOKEN"))
 				.andExpect(jsonPath("$.refreshToken").value("MOCK_REFRESH_TOKEN"))
 				.andDo(document(
-					"auth-signup-success",
+					"auth/auth-signup-success",
 					preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
 					requestFields(
@@ -133,7 +133,7 @@ class AuthControllerTest {
 				.andExpect(result -> assertThat(result.getResolvedException())
 					.isInstanceOf(BusinessException.class))
 				.andDo(document(
-					"auth-signup-fail-already-exist",
+					"auth/auth-signup-fail-already-exist",
 					preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
 					requestFields(
@@ -185,7 +185,7 @@ class AuthControllerTest {
 					assertThat(result.getResolvedException()).isInstanceOf(MethodArgumentNotValidException.class);
 				})
 				.andDo(document(
-					"auth-signup-fail-no-providerId",
+					"auth/auth-signup-fail-no-providerId",
 					preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
 					requestFields(
@@ -239,7 +239,7 @@ class AuthControllerTest {
 					assertThat(result.getResolvedException()).isInstanceOf(MethodArgumentNotValidException.class);
 				})
 				.andDo(document(
-					"auth-signup-fail-no-provider",
+					"auth/auth-signup-fail-no-provider",
 					preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
 					requestFields(
@@ -296,7 +296,7 @@ class AuthControllerTest {
 					assertTrue(result.getResolvedException() instanceof BusinessException);
 				})
 				.andDo(document(
-					"auth-signup-fail-invalid-role-request",
+					"auth/auth-signup-fail-invalid-role-request",
 					preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
 					requestFields(

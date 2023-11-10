@@ -2,6 +2,7 @@ package com.palpal.dealightbe.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -31,19 +32,16 @@ public class SecurityConfig {
 	private final Jwt jwt;
 
 	@Bean
-	public WebSecurityCustomizer webSecurityCustomizer() {
-		return web -> web.ignoring()
-			.antMatchers("/docs/**")
-			.antMatchers("/actuator/**")
-			.antMatchers("/api/auth/signup")
-			.antMatchers("/h2-console/**");
-	}
-
-	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
 			.authorizeRequests()
+			// 전체 공개 URL
 			.antMatchers("/docs/**").permitAll()
+			// 운영자용 URL
+			.antMatchers("/h2-console/**").hasRole("ADMIN")
+			.antMatchers("/actuator/**").hasRole("ADMIN")
+			// 서비스 URL
+			.antMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
 			.and()
 			.headers().disable()
 			.csrf().disable()

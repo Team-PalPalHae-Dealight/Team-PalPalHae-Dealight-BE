@@ -59,16 +59,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 					JwtAuthenticationToken authenticationToken = createJwtAuthenticationToken(request, token,
 						authentication);
 					SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-				} catch (Exception e) {
+				} catch (RuntimeException e) {
 					log.error("JWT({})로부터 인증정보를 만드는데 실패했습니다: {}", token, e.getMessage());
+					// 토큰이 정상적으로 검증되었는데, 인증객체를 만드는데 실패했다면 서버 오류로 생각
 					writeErrorResponse(response, ErrorCode.UNABLE_TO_CREATE_AUTHENTICATION,
-						HttpServletResponse.SC_UNAUTHORIZED);
+						HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 					return;
 				}
 			}
 		}
 
 		// 인증 정보가 이미 있는 경우, 토큰이 null인 경우, 인증에 성공한 경우
+		log.info("인증 과정을 마쳤으므로 다음 필터로 진행합니다...");
 		filterChain.doFilter(request, response);
 	}
 
