@@ -436,7 +436,7 @@ class AuthControllerTest {
 		void reissueTokenSuccess() throws Exception {
 			// given
 			MemberAuthRes memberAuthRes = new MemberAuthRes(
-				"장충동 왕족발 보쌈",
+				"말왕의 장충동 왕족발 보쌈",
 				"ACCESS_TOKEN",
 				"REFRESH_TOKEN"
 			);
