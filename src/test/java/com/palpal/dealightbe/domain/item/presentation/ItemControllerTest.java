@@ -571,7 +571,7 @@ class ItemControllerTest {
 					fieldWithPath("items").type(ARRAY).description("상품 목록"),
 					fieldWithPath("items[0].itemId").type(NUMBER).description("상품 ID"),
 					fieldWithPath("items[0].storeId").type(NUMBER).description("업체 ID"),
-					fieldWithPath("items[0].itemName").description("상품 이름"),
+					fieldWithPath("items[0].itemName").type(STRING).description("상품 이름"),
 					fieldWithPath("items[0].stock").type(NUMBER).description("재고 수"),
 					fieldWithPath("items[0].discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("items[0].originalPrice").type(NUMBER).description("원가"),
