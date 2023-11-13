@@ -38,9 +38,7 @@ public class CartService {
 
 		validateOwnStoreItem(providerId, item);
 
-		List<Cart> carts = cartRepository.findAllByMemberProviderId(providerId);
-
-		validateAnotherStoreItemExistence(carts, item.getStore().getId());
+		validateAnotherStoreItemExistence(providerId, item.getStore().getId());
 
 		return addItem(providerId, itemId);
 	}
@@ -50,9 +48,7 @@ public class CartService {
 
 		validateOwnStoreItem(providerId, item);
 
-		List<Cart> carts = cartRepository.findAllByMemberProviderId(providerId);
-
-		clearAnotherStoreItem(carts, item.getStore().getId());
+		clearAnotherStoreItem(providerId, item.getStore().getId());
 
 		return addItem(providerId, itemId);
 	}
@@ -67,7 +63,8 @@ public class CartService {
 		}
 	}
 
-	private void clearAnotherStoreItem(List<Cart> carts, Long attemptedStoreId) {
+	private void clearAnotherStoreItem(Long providerId, Long attemptedStoreId) {
+		List<Cart> carts = cartRepository.findAllByMemberProviderId(providerId);
 		boolean existsAnotherStoreItem = existsAnotherStoreItem(carts, attemptedStoreId);
 
 		if (existsAnotherStoreItem) {
@@ -98,7 +95,8 @@ public class CartService {
 			});
 	}
 
-	private void validateAnotherStoreItemExistence(List<Cart> carts, Long attemptedStoreId) {
+	private void validateAnotherStoreItemExistence(Long providerId, Long attemptedStoreId) {
+		List<Cart> carts = cartRepository.findAllByMemberProviderId(providerId);
 		boolean existsAnotherStoreItem = existsAnotherStoreItem(carts, attemptedStoreId);
 
 		if (existsAnotherStoreItem) {
