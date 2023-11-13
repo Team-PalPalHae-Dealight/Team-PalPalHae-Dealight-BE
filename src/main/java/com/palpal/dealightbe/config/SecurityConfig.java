@@ -1,5 +1,7 @@
 package com.palpal.dealightbe.config;
 
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,6 +13,9 @@ import org.springframework.security.oauth2.client.web.AuthorizationRequestReposi
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.palpal.dealightbe.domain.auth.domain.Jwt;
 import com.palpal.dealightbe.domain.auth.filter.JwtAuthenticationFilter;
@@ -32,18 +37,40 @@ public class SecurityConfig {
 	private final Jwt jwt;
 
 	@Bean
+	CorsConfigurationSource corsConfigurationSource() {
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		CorsConfiguration config = new CorsConfiguration();
+		config.addAllowedHeader("*");
+		config.addAllowedMethod("*");
+		config.setAllowedOrigins(
+			Arrays.asList("http://localhost:8080", "http://localhost:8081", "http://localhost:3000",
+				"https://dev-dealight.vercel.app", "http://127.0.0.1:5500"));
+		source.registerCorsConfiguration("/**", config);
+
+		return source;
+	}
+
+	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
+			.cors().configurationSource(corsConfigurationSource())
+			.and()
 			.authorizeRequests()
 			// 전체 공개 URL
-			.antMatchers("/docs/**").permitAll()
+			.antMatchers(HttpMethod.OPTIONS,
+				"/docs/**"
+			).permitAll()
 			// 운영자용 URL
-			.antMatchers("/h2-console/**").hasRole("ADMIN")
-			.antMatchers("/actuator/**").hasRole("ADMIN")
+			.antMatchers(HttpMethod.OPTIONS,
+				"/h2-console/**", "/actuator/**"
+			).hasRole("ADMIN")
 			// 서비스 URL
-			.antMatchers("/api/auth/signup").permitAll()
-			.antMatchers("/api/auth/tokens").hasAnyRole("MEMBER", "STORE")
-			.antMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
+			.antMatchers(HttpMethod.OPTIONS,
+				"/api/auth/signup"
+			).permitAll()
+			.antMatchers(HttpMethod.OPTIONS,
+				"/api/**"
+			).hasAnyRole("MEMBER", "STORE", "ADMIN")
 			.and()
 			.headers().disable()
 			.csrf().disable()
