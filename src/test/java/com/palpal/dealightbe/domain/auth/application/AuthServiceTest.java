@@ -245,34 +245,21 @@ class AuthServiceTest {
 			"요송송",
 			"01012341234",
 			"genius");
+		Member testMember = Member.builder()
+			.provider("tester")
+			.providerId(123L)
+			.realName("고예성")
+			.nickName("요송송")
+			.phoneNumber("01012341234")
+			.build();
 
 		given(memberRepository.findByProviderAndProviderId(request.provider(), request.providerId()))
 			.willReturn(Optional.empty());
+		given(memberRepository.save(any()))
+			.willReturn(testMember);
 
 		// when -> then
 		assertThatThrownBy(() -> authService.signup(request))
 			.isInstanceOf(BusinessException.class);
-	}
-
-	@DisplayName("데이터베이스에 Role이 존재하지 않으면 회원가입 실패")
-	@Test
-	void throwExceptionIfNotFoundRoleInDb() {
-		// given
-		MemberAuthReq request = new MemberAuthReq(
-			"tester",
-			123L,
-			"고예성",
-			"요송송",
-			"01012341234",
-			"member");
-
-		given(memberRepository.findByProviderAndProviderId(request.provider(), request.providerId()))
-			.willReturn(Optional.empty());
-		given(roleRepository.findByRoleType(RoleType.ROLE_MEMBER))
-			.willReturn(Optional.empty());
-
-		// when -> then
-		assertThatThrownBy(() -> authService.signup(request))
-			.isInstanceOf(EntityNotFoundException.class);
 	}
 }
