@@ -68,6 +68,8 @@ jobs:
       - name: Make zip file
         run: |
           mkdir deploy
+          mkdir deploy/docs
+          cp ./build/docs/asciidoc/*.html ./deploy/docs/
           cp ./docker-compose.blue.yml ./deploy/
           cp ./docker-compose.green.yml ./deploy/
           cp ./appspec.yml ./deploy/
