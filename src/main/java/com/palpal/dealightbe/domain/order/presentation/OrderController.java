@@ -91,6 +91,7 @@ public class OrderController {
 		@RequestParam(required = false, defaultValue = DEFAULT_PAGING_SIZE) int size
 	) {
 
+		page = Math.max(page - 1, 0);
 		Pageable pageable = PageRequest.of(page, size, Sort.by(DEFAULT_SORTING).descending());
 
 		OrdersRes ordersRes = orderService.findAllByStoreId(id, providerId, status, pageable);
@@ -107,6 +108,7 @@ public class OrderController {
 		@RequestParam(required = false, defaultValue = DEFAULT_PAGING_SIZE) int size
 	) {
 
+		page = Math.max(page - 1, 0);
 		Pageable pageable = PageRequest.of(page, size, Sort.by(DEFAULT_SORTING).descending());
 
 		OrdersRes ordersRes = orderService.findAllByMemberProviderId(providerId, status, pageable);
