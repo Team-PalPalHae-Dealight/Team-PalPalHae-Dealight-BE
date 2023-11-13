@@ -11,7 +11,7 @@ public record OrderProductsRes(
 	public static OrderProductsRes from(Order order) {
 		List<OrderProductRes> orderProducts = order.getOrderItems()
 			.stream()
-			.map(orderItem -> OrderProductRes.from(orderItem.getItem()))
+			.map(orderItem -> OrderProductRes.of(orderItem.getItem(), orderItem.getQuantity()))
 			.toList();
 
 		return new OrderProductsRes(orderProducts);

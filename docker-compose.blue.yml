@@ -3,6 +3,7 @@
 version: "3"
 services:
   dealight-blue:
+    container_name: dealight-blue-container
     build:
       context: ./
       dockerfile: Dockerfile

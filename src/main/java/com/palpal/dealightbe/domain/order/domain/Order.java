@@ -8,6 +8,7 @@ import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ARRIVAL_TIME;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_DEMAND_LENGTH;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ORDER_STATUS;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ORDER_STATUS_UPDATER;
+import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ORDER_TOTAL_PRICE;
 import static com.palpal.dealightbe.global.error.ErrorCode.UNCHANGEABLE_ORDER_STATUS;
 
 import java.time.LocalTime;
@@ -105,8 +106,21 @@ public class Order extends BaseEntity {
 			log.warn("POST:WRITE:EXCEEDED_ORDER_ITEMS : {}", orderItems.size());
 			throw new BusinessException(EXCEEDED_ORDER_ITEMS);
 		}
+		validateTotalPrice(orderItems);
 
 		this.orderItems = orderItems;
+	}
+
+	private void validateTotalPrice(List<OrderItem> orderItems) {
+		int actualTotalPrice = orderItems.stream()
+			.mapToInt(item -> item.getItem().getDiscountPrice() * item.getQuantity())
+			.sum();
+
+		if (totalPrice != actualTotalPrice) {
+			log.warn("POST:WRITE:INVALID_TOTAL_PRICE: input {} actual {}",
+				totalPrice, actualTotalPrice);
+			throw new BusinessException(INVALID_ORDER_TOTAL_PRICE);
+		}
 	}
 
 	public void validateOrderUpdater(Member updater) {

@@ -544,7 +544,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-none hljs">{
-  "timestamp" : "2023-11-08 18:21:59",
+  "timestamp" : "2023-11-09 16:12:22",
   "code" : "C001",
   "errors" : [ {
     "field" : "arrivalTime",
@@ -558,7 +558,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-none hljs">{
-  "timestamp" : "2023-11-08 18:21:59",
+  "timestamp" : "2023-11-09 16:12:22",
   "code" : "C001",
   "errors" : [ {
     "field" : "storeId",
@@ -622,7 +622,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
   "storeId" : 1,
   "demand" : "도착할 때까지 상품 냉장고에 보관 부탁드려요",
   "arrivalTime" : "12:30:00",
-  "totalPrice" : 10000
+  "totalPrice" : 30000
 }</pre>
 </div>
 </div>
@@ -693,14 +693,14 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
     "orderProducts" : [ {
       "itemId" : 1,
       "name" : "달콤한 도넛",
-      "stock" : 5,
+      "quantity" : 3,
       "discountPrice" : 10000,
       "originalPrice" : 15000,
       "image" : "https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/donut"
     } ]
   },
-  "totalPrice" : 10000,
-  "createdAt" : "2023-11-08T18:21:59.825941",
+  "totalPrice" : 30000,
+  "createdAt" : "2023-11-09T16:12:22.817564",
   "status" : "주문 확인"
 }</code></pre>
 </div>
@@ -765,9 +765,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <td class="tableblock halign-left valign-top"><p class="tableblock">상품명</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>orderProductsRes.orderProducts[].stock</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>orderProductsRes.orderProducts[].quantity</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">상품 재고</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">상품 주문 수량</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>orderProductsRes.orderProducts[].discountPrice</code></p></td>
@@ -1023,14 +1023,14 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
     "orderProducts" : [ {
       "itemId" : 1,
       "name" : "달콤한 도넛",
-      "stock" : 5,
+      "quantity" : 5,
       "discountPrice" : 10000,
       "originalPrice" : 15000,
       "image" : "https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/donut"
     } ]
   },
   "totalPrice" : 10000,
-  "createdAt" : "2023-11-08T18:21:59.728457",
+  "createdAt" : "2023-11-09T16:12:22.742336",
   "status" : "주문 확인"
 }</code></pre>
 </div>
@@ -1095,9 +1095,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <td class="tableblock halign-left valign-top"><p class="tableblock">상품명</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>orderProductsRes.orderProducts[].stock</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>orderProductsRes.orderProducts[].quantity</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">상품 재고</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">상품 주문 수량</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>orderProductsRes.orderProducts[].discountPrice</code></p></td>
@@ -1238,14 +1238,14 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
       "orderProducts" : [ {
         "itemId" : 1,
         "name" : "달콤한 도넛",
-        "stock" : 5,
+        "quantity" : 5,
         "discountPrice" : 10000,
         "originalPrice" : 15000,
         "image" : "https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/donut"
       } ]
     },
     "totalPrice" : 10000,
-    "createdAt" : "2023-11-08T18:21:59.713037",
+    "createdAt" : "2023-11-09T16:12:22.728379",
     "status" : "주문 확인"
   } ],
   "hasNext" : false
@@ -1317,9 +1317,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <td class="tableblock halign-left valign-top"><p class="tableblock">상품명</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>orders[].orderProductsRes.orderProducts[].stock</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>orders[].orderProductsRes.orderProducts[].quantity</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">상품 재고</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">상품 주문 수량</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>orders[].orderProductsRes.orderProducts[].discountPrice</code></p></td>
@@ -1460,14 +1460,14 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
       "orderProducts" : [ {
         "itemId" : 1,
         "name" : "달콤한 도넛",
-        "stock" : 5,
+        "quantity" : 5,
         "discountPrice" : 10000,
         "originalPrice" : 15000,
         "image" : "https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/donut"
       } ]
     },
     "totalPrice" : 10000,
-    "createdAt" : "2023-11-08T18:21:59.685202",
+    "createdAt" : "2023-11-09T16:12:22.707446",
     "status" : "주문 확인"
   } ],
   "hasNext" : false
@@ -1539,9 +1539,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <td class="tableblock halign-left valign-top"><p class="tableblock">상품명</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>orders[].orderProductsRes.orderProducts[].stock</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>orders[].orderProductsRes.orderProducts[].quantity</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">상품 재고</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">상품 주문 수량</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>orders[].orderProductsRes.orderProducts[].discountPrice</code></p></td>
@@ -1588,7 +1588,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2023-11-08 18:20:41 +0900
+Last updated 2023-11-08 18:24:44 +0900
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">

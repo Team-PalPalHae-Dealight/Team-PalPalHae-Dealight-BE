@@ -540,30 +540,15 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h3 id="_request">Request</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">GET /api/members/profiles/1 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">GET /api/members/profiles HTTP/1.1
 Content-Type: application/json;charset=UTF-8
+Authorization: Bearer {ACCESS_TOKEN}
 Host: localhost:8080</code></pre>
 </div>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 1. /api/members/profiles/{memberId}</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>memberId</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">고객 ID</p></td>
-</tr>
-</tbody>
-</table>
+<div class="paragraph">
+<p>Unresolved directive in Member.adoc - include::/Users/seung-won/Desktop/데브코스/Team-PalPalHae-Dealight-BE/build/generated-snippets/member/member-get-profile/path-parameters.adoc[]</p>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_response">Response</h3>
@@ -598,8 +583,9 @@ Content-Length: 192
 <h3 id="_request_2">Request</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">GET /api/members/profiles/999 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">GET /api/members/profiles HTTP/1.1
 Content-Type: application/json;charset=UTF-8
+Authorization: Bearer {ACCESS_TOKEN}
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -616,7 +602,7 @@ Content-Type: application/json
 Content-Length: 130
 
 {
-  "timestamp" : "2023-11-08 18:21:48",
+  "timestamp" : "2023-11-09 16:12:11",
   "code" : "M001",
   "errors" : [ ],
   "message" : "고객을 찾을 수 없습니다."
@@ -635,29 +621,14 @@ Content-Length: 130
 </div>
 <div class="sect2">
 <h3 id="_request_3">Request</h3>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 2. /api/members/profiles/{memberId}</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>memberId</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">업데이트하려는 멤버의 ID</p></td>
-</tr>
-</tbody>
-</table>
+<div class="paragraph">
+<p>Unresolved directive in Member.adoc - include::/Users/seung-won/Desktop/데브코스/Team-PalPalHae-Dealight-BE/build/generated-snippets/member/member-update-profile/path-parameters.adoc[]</p>
+</div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">PATCH /api/members/profiles/1 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">PATCH /api/members/profiles HTTP/1.1
 Content-Type: application/json;charset=UTF-8
+Authorization: Bearer {ACCESS_TOKEN}
 Content-Length: 162
 Host: localhost:8080
 
@@ -787,8 +758,9 @@ Content-Length: 162
 <h3 id="_request_4">Request</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">PATCH /api/members/profiles/999 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">PATCH /api/members/profiles HTTP/1.1
 Content-Type: application/json;charset=UTF-8
+Authorization: Bearer {ACCESS_TOKEN}
 Content-Length: 164
 Host: localhost:8080
 
@@ -857,7 +829,7 @@ Content-Type: application/json
 Content-Length: 130
 
 {
-  "timestamp" : "2023-11-08 18:21:48",
+  "timestamp" : "2023-11-09 16:12:11",
   "code" : "M001",
   "errors" : [ ],
   "message" : "고객을 찾을 수 없습니다."
@@ -876,29 +848,14 @@ Content-Length: 130
 </div>
 <div class="sect2">
 <h3 id="_request_5">Request</h3>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 3. /api/members/address/{memberId}</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>memberId</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">업데이트하려는 멤버의 ID</p></td>
-</tr>
-</tbody>
-</table>
+<div class="paragraph">
+<p>Unresolved directive in Member.adoc - include::/Users/seung-won/Desktop/데브코스/Team-PalPalHae-Dealight-BE/build/generated-snippets/member/member-update-address/path-parameters.adoc[]</p>
+</div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">PATCH /api/members/address/1 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">PATCH /api/members/addresses HTTP/1.1
 Content-Type: application/json;charset=UTF-8
+Authorization: Bearer {ACCESS_TOKEN}
 Content-Length: 77
 Host: localhost:8080
 
@@ -1000,8 +957,9 @@ Content-Length: 77
 <h3 id="_request_6">Request</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">PATCH /api/members/address/999 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">PATCH /api/members/addresses HTTP/1.1
 Content-Type: application/json;charset=UTF-8
+Authorization: Bearer {ACCESS_TOKEN}
 Content-Length: 77
 Host: localhost:8080
 
@@ -1056,7 +1014,7 @@ Content-Type: application/json
 Content-Length: 130
 
 {
-  "timestamp" : "2023-11-08 18:21:48",
+  "timestamp" : "2023-11-09 16:12:11",
   "code" : "M001",
   "errors" : [ ],
   "message" : "고객을 찾을 수 없습니다."
@@ -1075,30 +1033,15 @@ Content-Length: 130
 <h4 id="_request_7">Request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">PATCH /api/members/images/1 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">PATCH /api/members/images HTTP/1.1
 Content-Type: multipart/form-data;charset=UTF-8; boundary=6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
+Authorization: Bearer {ACCESS_TOKEN}
 Host: localhost:8080</code></pre>
 </div>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 4. /api/members/images/{memberId}</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>memberId</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">이미지를 업로드하려는 멤버의 ID</p></td>
-</tr>
-</tbody>
-</table>
+<div class="paragraph">
+<p>Unresolved directive in Member.adoc - include::/Users/seung-won/Desktop/데브코스/Team-PalPalHae-Dealight-BE/build/generated-snippets/member/member-upload-image/path-parameters.adoc[]</p>
+</div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -1168,30 +1111,15 @@ Content-Length: 50
 <h4 id="_request_8">Request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">PATCH /api/members/images/9999 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">PATCH /api/members/images HTTP/1.1
 Content-Type: multipart/form-data;charset=UTF-8; boundary=6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
+Authorization: Bearer {ACCESS_TOKEN}
 Host: localhost:8080</code></pre>
 </div>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 5. /api/members/images/{memberId}</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>memberId</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">이미지를 업로드하려는 멤버의 ID</p></td>
-</tr>
-</tbody>
-</table>
+<div class="paragraph">
+<p>Unresolved directive in Member.adoc - include::/Users/seung-won/Desktop/데브코스/Team-PalPalHae-Dealight-BE/build/generated-snippets/member/member-upload-image-not-found/path-parameters.adoc[]</p>
+</div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -1223,7 +1151,7 @@ Content-Type: application/json
 Content-Length: 130
 
 {
-  "timestamp" : "2023-11-08 18:21:48",
+  "timestamp" : "2023-11-09 16:12:11",
   "code" : "M001",
   "errors" : [ ],
   "message" : "고객을 찾을 수 없습니다."
@@ -1243,30 +1171,15 @@ Content-Length: 130
 <h4 id="_request_9">Request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">DELETE /api/members/images/1 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">DELETE /api/members/images HTTP/1.1
 Content-Type: application/json;charset=UTF-8
+Authorization: Bearer {ACCESS_TOKEN}
 Host: localhost:8080</code></pre>
 </div>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 6. /api/members/images/{memberId}</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>memberId</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">이미지를 삭제하려는 멤버의 ID</p></td>
-</tr>
-</tbody>
-</table>
+<div class="paragraph">
+<p>Unresolved directive in Member.adoc - include::/Users/seung-won/Desktop/데브코스/Team-PalPalHae-Dealight-BE/build/generated-snippets/member/member-delete-image-success/path-parameters.adoc[]</p>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_response_9">Response</h4>
@@ -1291,30 +1204,15 @@ Vary: Access-Control-Request-Headers</code></pre>
 <h4 id="_request_10">Request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">DELETE /api/members/images/999 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code data-lang="http" class="language-http hljs">DELETE /api/members/images HTTP/1.1
 Content-Type: application/json;charset=UTF-8
+Authorization: Bearer {ACCESS_TOKEN}
 Host: localhost:8080</code></pre>
 </div>
 </div>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 7. /api/members/images/{memberId}</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>memberId</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">이미지를 삭제하려는 멤버의 ID</p></td>
-</tr>
-</tbody>
-</table>
+<div class="paragraph">
+<p>Unresolved directive in Member.adoc - include::/Users/seung-won/Desktop/데브코스/Team-PalPalHae-Dealight-BE/build/generated-snippets/member/member-delete-image-not-found/path-parameters.adoc[]</p>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_response_10">Response</h4>
@@ -1328,7 +1226,7 @@ Content-Type: application/json
 Content-Length: 130
 
 {
-  "timestamp" : "2023-11-08 18:21:48",
+  "timestamp" : "2023-11-09 16:12:11",
   "code" : "M001",
   "errors" : [ ],
   "message" : "고객을 찾을 수 없습니다."

@@ -83,13 +83,13 @@ public class OrderControllerTest {
 
 		OrderCreateReq orderCreateReq = new OrderCreateReq(
 			new OrderProductsReq(List.of(new OrderProductReq(1L, 3))),
-			1L, "도착할 때까지 상품 냉장고에 보관 부탁드려요", LocalTime.of(12, 30), 10000);
+			1L, "도착할 때까지 상품 냉장고에 보관 부탁드려요", LocalTime.of(12, 30), 30000);
 
-		OrderProductsRes productsRes = new OrderProductsRes(List.of(new OrderProductRes(1L, "달콤한 도넛", 5, 10000, 15000,
+		OrderProductsRes productsRes = new OrderProductsRes(List.of(new OrderProductRes(1L, "달콤한 도넛", 3, 10000, 15000,
 			"https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/donut")));
 
 		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요", LocalTime.of(12, 30),
-			productsRes, 10000, createdAt, RECEIVED.getText());
+			productsRes, 30000, createdAt, RECEIVED.getText());
 
 		@Test
 		@DisplayName("성공 - 신규 주문을 등록한다")
@@ -119,7 +119,7 @@ public class OrderControllerTest {
 				.andExpect(jsonPath("$.demand").value(orderCreateReq.demand()))
 				.andExpect(jsonPath("$.orderProductsRes.orderProducts[0].itemId").value(productRes.itemId()))
 				.andExpect(jsonPath("$.orderProductsRes.orderProducts[0].name").value(productRes.name()))
-				.andExpect(jsonPath("$.orderProductsRes.orderProducts[0].stock").value(productRes.stock()))
+				.andExpect(jsonPath("$.orderProductsRes.orderProducts[0].quantity").value(productRes.quantity()))
 				.andExpect(
 					jsonPath("$.orderProductsRes.orderProducts[0].discountPrice").value(productRes.discountPrice()))
 				.andExpect(
@@ -159,8 +159,8 @@ public class OrderControllerTest {
 							.description("상품 아이디"),
 						fieldWithPath("orderProductsRes.orderProducts[].name").type(JsonFieldType.STRING)
 							.description("상품명"),
-						fieldWithPath("orderProductsRes.orderProducts[].stock").type(JsonFieldType.NUMBER)
-							.description("상품 재고"),
+						fieldWithPath("orderProductsRes.orderProducts[].quantity").type(JsonFieldType.NUMBER)
+							.description("상품 주문 수량"),
 						fieldWithPath("orderProductsRes.orderProducts[].discountPrice").type(JsonFieldType.NUMBER)
 							.description("상품의 할인된 금액"),
 						fieldWithPath("orderProductsRes.orderProducts[].originalPrice").type(JsonFieldType.NUMBER)
@@ -452,7 +452,7 @@ public class OrderControllerTest {
 				.andExpect(jsonPath("$.demand").value(orderCreateReq.demand()))
 				.andExpect(jsonPath("$.orderProductsRes.orderProducts[0].itemId").value(productRes.itemId()))
 				.andExpect(jsonPath("$.orderProductsRes.orderProducts[0].name").value(productRes.name()))
-				.andExpect(jsonPath("$.orderProductsRes.orderProducts[0].stock").value(productRes.stock()))
+				.andExpect(jsonPath("$.orderProductsRes.orderProducts[0].quantity").value(productRes.quantity()))
 				.andExpect(
 					jsonPath("$.orderProductsRes.orderProducts[0].discountPrice").value(productRes.discountPrice()))
 				.andExpect(
@@ -482,8 +482,8 @@ public class OrderControllerTest {
 							.description("상품 아이디"),
 						fieldWithPath("orderProductsRes.orderProducts[].name").type(JsonFieldType.STRING)
 							.description("상품명"),
-						fieldWithPath("orderProductsRes.orderProducts[].stock").type(JsonFieldType.NUMBER)
-							.description("상품 재고"),
+						fieldWithPath("orderProductsRes.orderProducts[].quantity").type(JsonFieldType.NUMBER)
+							.description("상품 주문 수량"),
 						fieldWithPath("orderProductsRes.orderProducts[].discountPrice").type(JsonFieldType.NUMBER)
 							.description("상품의 할인된 금액"),
 						fieldWithPath("orderProductsRes.orderProducts[].originalPrice").type(JsonFieldType.NUMBER)
@@ -538,7 +538,8 @@ public class OrderControllerTest {
 				.andExpect(jsonPath("$.orders[0].demand").value(orderRes.demand()))
 				.andExpect(jsonPath("$.orders[0].orderProductsRes.orderProducts[0].itemId").value(productRes.itemId()))
 				.andExpect(jsonPath("$.orders[0].orderProductsRes.orderProducts[0].name").value(productRes.name()))
-				.andExpect(jsonPath("$.orders[0].orderProductsRes.orderProducts[0].stock").value(productRes.stock()))
+				.andExpect(
+					jsonPath("$.orders[0].orderProductsRes.orderProducts[0].quantity").value(productRes.quantity()))
 				.andExpect(jsonPath("$.orders[0].orderProductsRes.orderProducts[0].discountPrice")
 					.value(productRes.discountPrice()))
 				.andExpect(jsonPath("$.orders[0].orderProductsRes.orderProducts[0].originalPrice")
@@ -577,8 +578,9 @@ public class OrderControllerTest {
 								.description("상품 아이디"),
 							fieldWithPath("orders[].orderProductsRes.orderProducts[].name").type(JsonFieldType.STRING)
 								.description("상품명"),
-							fieldWithPath("orders[].orderProductsRes.orderProducts[].stock").type(JsonFieldType.NUMBER)
-								.description("상품 재고"),
+							fieldWithPath("orders[].orderProductsRes.orderProducts[].quantity").type(
+									JsonFieldType.NUMBER)
+								.description("상품 주문 수량"),
 							fieldWithPath("orders[].orderProductsRes.orderProducts[].discountPrice")
 								.type(JsonFieldType.NUMBER)
 								.description("상품의 할인된 금액"),
@@ -635,7 +637,8 @@ public class OrderControllerTest {
 				.andExpect(jsonPath("$.orders[0].demand").value(orderRes.demand()))
 				.andExpect(jsonPath("$.orders[0].orderProductsRes.orderProducts[0].itemId").value(productRes.itemId()))
 				.andExpect(jsonPath("$.orders[0].orderProductsRes.orderProducts[0].name").value(productRes.name()))
-				.andExpect(jsonPath("$.orders[0].orderProductsRes.orderProducts[0].stock").value(productRes.stock()))
+				.andExpect(
+					jsonPath("$.orders[0].orderProductsRes.orderProducts[0].quantity").value(productRes.quantity()))
 				.andExpect(jsonPath("$.orders[0].orderProductsRes.orderProducts[0].discountPrice")
 					.value(productRes.discountPrice()))
 				.andExpect(jsonPath("$.orders[0].orderProductsRes.orderProducts[0].originalPrice")
@@ -673,8 +676,9 @@ public class OrderControllerTest {
 								.description("상품 아이디"),
 							fieldWithPath("orders[].orderProductsRes.orderProducts[].name").type(JsonFieldType.STRING)
 								.description("상품명"),
-							fieldWithPath("orders[].orderProductsRes.orderProducts[].stock").type(JsonFieldType.NUMBER)
-								.description("상품 재고"),
+							fieldWithPath("orders[].orderProductsRes.orderProducts[].quantity").type(
+									JsonFieldType.NUMBER)
+								.description("상품 주문 수량"),
 							fieldWithPath("orders[].orderProductsRes.orderProducts[].discountPrice")
 								.type(JsonFieldType.NUMBER)
 								.description("상품의 할인된 금액"),

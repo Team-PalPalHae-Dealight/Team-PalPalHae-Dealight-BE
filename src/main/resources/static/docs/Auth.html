@@ -451,7 +451,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="listingblock">
 <div class="title">Request Success - 회원 가입 요청</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /api/auth/signup?_csrf=6bbca907-b9a5-4251-a9ab-08221d7aadb8 HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /api/auth/signup?_csrf=3eef154d-9e18-4915-b23d-1e07d7211ade HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 162
 Host: localhost:8080
@@ -569,7 +569,7 @@ Content-Length: 113
 <div class="listingblock">
 <div class="title">Request Fail - provider 정보가 없는 회원 가입 요청</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /api/auth/signup?_csrf=0f40774a-ae81-4223-bada-7ac71cbfc807 HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /api/auth/signup?_csrf=806ebe92-2ca4-4f2d-a13f-2e2773967f30 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 157
 Host: localhost:8080
@@ -647,7 +647,7 @@ X-Frame-Options: DENY
 Content-Length: 245
 
 {
-  "timestamp" : "2023-11-08 18:21:47",
+  "timestamp" : "2023-11-09 16:12:10",
   "code" : "C001",
   "errors" : [ {
     "field" : "provider",
@@ -707,7 +707,7 @@ Content-Length: 245
 <div class="listingblock">
 <div class="title">Request Fail - providerId 정보가 없는 회원 가입 요청</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /api/auth/signup?_csrf=51f9d9ec-1846-40b5-b480-491bfe9810e0 HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /api/auth/signup?_csrf=9746aadd-a6a6-4612-878c-65d2d5ed7f52 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 161
 Host: localhost:8080
@@ -785,7 +785,7 @@ X-Frame-Options: DENY
 Content-Length: 249
 
 {
-  "timestamp" : "2023-11-08 18:21:47",
+  "timestamp" : "2023-11-09 16:12:10",
   "code" : "C001",
   "errors" : [ {
     "field" : "providerId",
@@ -845,7 +845,7 @@ Content-Length: 249
 <div class="listingblock">
 <div class="title">Request Fail - 중복 회원 가입 요청</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /api/auth/signup?_csrf=791ceadb-5084-4e8a-8355-aafd5e4ae70a HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /api/auth/signup?_csrf=96087a04-5e6f-4294-b696-4b1200d33f5a HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 162
 Host: localhost:8080
@@ -923,7 +923,7 @@ X-Frame-Options: DENY
 Content-Length: 135
 
 {
-  "timestamp" : "2023-11-08 18:21:47",
+  "timestamp" : "2023-11-09 16:12:10",
   "code" : "AUTH002",
   "errors" : [ ],
   "message" : "이미 가입된 사용자입니다."
@@ -969,7 +969,7 @@ Content-Length: 135
 <div class="listingblock">
 <div class="title">Request Fail - 잘못된 역할로 회원 가입 요청</div>
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /api/auth/signup?_csrf=f1e57aa6-cf0d-4c28-8473-fdd2ac93ee1a HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /api/auth/signup?_csrf=ba0344e2-6d16-4e46-bcf7-7b761b390e68 HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 188
 Host: localhost:8080
@@ -1047,7 +1047,7 @@ X-Frame-Options: DENY
 Content-Length: 148
 
 {
-  "timestamp" : "2023-11-08 18:21:47",
+  "timestamp" : "2023-11-09 16:12:10",
   "code" : "AUTH003",
   "errors" : [ ],
   "message" : "유효하지 않은 권한이 입력됐습니다."

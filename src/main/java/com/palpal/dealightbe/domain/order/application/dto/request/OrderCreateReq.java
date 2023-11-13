@@ -31,6 +31,7 @@ public record OrderCreateReq(
 			.store(store)
 			.arrivalTime(orderCreateReq.arrivalTime)
 			.demand(orderCreateReq.demand)
+			.totalPrice(orderCreateReq.totalPrice())
 			.build();
 	}
 }

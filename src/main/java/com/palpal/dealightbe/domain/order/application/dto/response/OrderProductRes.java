@@ -5,17 +5,17 @@ import com.palpal.dealightbe.domain.item.domain.Item;
 public record OrderProductRes(
 	long itemId,
 	String name,
-	int stock,
+	int quantity,
 	int discountPrice,
 	int originalPrice,
 	String image
 ) {
 
-	public static OrderProductRes from(Item item) {
+	public static OrderProductRes of(Item item, int quantity) {
 		return new OrderProductRes(
 			item.getId(),
 			item.getName(),
-			item.getStock(),
+			quantity,
 			item.getDiscountPrice(),
 			item.getOriginalPrice(),
 			item.getImage()
