@@ -66,13 +66,6 @@ public class Notification extends BaseEntity {
 		this.isRead = true;
 	}
 
-	public enum NotificationType {
-		ORDER_RECEIVED,
-		ORDER_CONFIRMED,
-		ORDER_COMPLETED,
-		ORDER_CANCELED
-	}
-
 	public static String createMessage(OrderStatus orderStatus, Order order) {
 		switch (orderStatus) {
 			case RECEIVED:
