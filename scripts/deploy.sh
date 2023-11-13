@@ -5,7 +5,7 @@ cd /home/ubuntu/app
 source_dir="/home/ubuntu/app/docs"
 target_dir="/home/ubuntu/docs"
 
-find "$source_dir" -name "*.html" -exec mv {} "$target_dir" \;
+sudo find "$source_dir" -name "*.html" -exec mv {} "$target_dir" \;
 
 echo "모든 .html 파일을 $target_dir로 옮겼습니다."
 
