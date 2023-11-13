@@ -3,6 +3,7 @@ package com.palpal.dealightbe.domain.auth.presentation;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
@@ -29,8 +30,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palpal.dealightbe.domain.auth.application.AuthService;
 import com.palpal.dealightbe.domain.auth.application.dto.request.MemberAuthReq;
 import com.palpal.dealightbe.domain.auth.application.dto.response.MemberAuthRes;
+import com.palpal.dealightbe.domain.auth.exception.RequiredAuthenticationException;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
+import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
 @AutoConfigureRestDocs
 @WebMvcTest(value = AuthController.class)
@@ -317,6 +320,154 @@ class AuthControllerTest {
 						fieldWithPath("code").type(STRING).description("오류 코드"),
 						fieldWithPath("errors").type(ARRAY).description("오류 목록"),
 						fieldWithPath("message").type(STRING).description("오류 메시지")
+					)
+				));
+		}
+	}
+
+	@Nested
+	@DisplayName("<회원탈퇴>")
+	class unregisterTest {
+		String unregisterApiPath = "/api/auth/unregister";
+
+		@DisplayName("인증이 된 회원의 경우 회원탈퇴에 성공")
+		@Test
+		void unregisterSuccess() throws Exception {
+			// when -> then
+			mockMvc.perform(delete(unregisterApiPath)
+					.with(csrf())
+					.header("Authorization", "Bearer {ACCESS_TOKEN}")
+					.with(user("user").roles("MEMBER"))
+				)
+				.andDo(print())
+				.andExpect(status().isNoContent())
+				.andDo(document("auth/auth-unregister-success-request",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestHeaders(
+						headerWithName("Authorization").description("Access Token")
+					)
+				));
+		}
+
+		@DisplayName("인증정보가 유효하지 않다면 회원탈퇴에 실패")
+		@Test
+		void unregisterFailIfAuthenticationIsNoValid() throws Exception {
+			// given
+			doThrow(RequiredAuthenticationException.class)
+				.when(authService)
+				.unregister(null);
+
+			// when -> then
+			mockMvc.perform(delete(unregisterApiPath)
+					.with(csrf())
+					.header("Authorization", "Bearer {ACCESS_TOKEN}")
+					.with(user("user"))
+				)
+				.andDo(print())
+				.andExpect(status().isUnauthorized())
+				.andExpect(result -> {
+					assertThat(result.getResolvedException()).isInstanceOf(RequiredAuthenticationException.class);
+				})
+				.andDo(document("auth/auth-unregister-fail-if-no-valid-provider-id", preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestHeaders(
+						headerWithName("Authorization").description("Access Token")
+					),
+					responseFields(
+						fieldWithPath("timestamp").type(STRING)
+							.description("예외가 발생한 시간"),
+						fieldWithPath("code").type(STRING)
+							.description("오류 코드"),
+						fieldWithPath("errors").type(ARRAY)
+							.description("오류 목록"),
+						fieldWithPath("message").type(STRING)
+							.description("오류 메시지")
+					)
+				));
+		}
+
+		@DisplayName("회원정보 조회에 실패한다면, 회원탈퇴에 실패")
+		@Test
+		void unregisterFailIfMemberFindFail() throws Exception {
+			// given
+			EntityNotFoundException entityNotFoundException = new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
+			doThrow(entityNotFoundException)
+				.when(authService)
+				.unregister(any());
+
+			// when -> then
+			mockMvc.perform(delete(unregisterApiPath)
+					.with(csrf())
+					.header("Authorization", "Bearer {ACCESS_TOKEN}")
+					.with(user("user").roles("MEMBER"))
+				)
+				.andDo(print())
+				.andExpect(status().isNotFound())
+				.andExpect(result -> {
+					assertThat(result.getResolvedException()).isInstanceOf(EntityNotFoundException.class);
+				})
+				.andDo(document("auth/auth-unregister-fail-if-no-valid-provider-id", preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestHeaders(
+						headerWithName("Authorization").description("Access Token")
+					),
+					responseFields(
+						fieldWithPath("timestamp").type(STRING)
+							.description("예외가 발생한 시간"),
+						fieldWithPath("code").type(STRING)
+							.description("오류 코드"),
+						fieldWithPath("errors").type(ARRAY)
+							.description("오류 목록"),
+						fieldWithPath("message").type(STRING)
+							.description("오류 메시지")
+					)
+				));
+		}
+	}
+
+	@Nested
+	@DisplayName("<토큰 재발급>")
+	class reissueTokenTest {
+		String reissueTokenApiPath = "/api/auth/reissue";
+
+		@DisplayName("회원인증이 된 경우 토큰 재발급 성공")
+		@Test
+		void reissueTokenSuccess() throws Exception {
+			// given
+			MemberAuthRes memberAuthRes = new MemberAuthRes(
+				"장충동 왕족발 보쌈",
+				"ACCESS_TOKEN",
+				"REFRESH_TOKEN"
+			);
+
+			given(authService.reIssueToken(any(), any()))
+				.willReturn(memberAuthRes);
+
+			// when -> then
+			mockMvc.perform(get(reissueTokenApiPath)
+					.with(csrf())
+					.header("Authorization", "Bearer {ACCESS_TOKEN}")
+					.with(user("user").roles("MEMBER"))
+				)
+				.andDo(print())
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.nickName").value("장충동 왕족발 보쌈"))
+				.andExpect(jsonPath("$.accessToken").value("ACCESS_TOKEN"))
+				.andExpect(jsonPath("$.refreshToken").value("REFRESH_TOKEN"))
+				.andDo(document("auth/auth-reissue-token-success-request",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestHeaders(
+						headerWithName("Authorization").description("Access Token")
+					),
+					responseFields(
+						fieldWithPath("nickName").type(JsonFieldType.STRING)
+							.description("회원의 닉네임"),
+						fieldWithPath("accessToken").type(JsonFieldType.STRING)
+							.description("Access Token"),
+						fieldWithPath("refreshToken").type(JsonFieldType.STRING)
+							.description("Refresh Token")
 					)
 				));
 		}

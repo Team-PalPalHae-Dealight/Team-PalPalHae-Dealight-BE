@@ -36,7 +36,6 @@ import com.palpal.dealightbe.domain.member.domain.Role;
 import com.palpal.dealightbe.domain.member.domain.RoleRepository;
 import com.palpal.dealightbe.domain.member.domain.RoleType;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
-import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
