@@ -40,6 +40,24 @@ public class CartService {
 		return addItem(providerId, itemId);
 	}
 
+	public CartRes clearAndAddItem(Long providerId, Long itemId) {
+		Item item = getItem(itemId);
+
+		List<Cart> carts = cartRepository.findAllByMemberProviderId(providerId);
+
+		clearAnotherStoreItem(carts, item.getStore().getId());
+
+		return addItem(providerId, itemId);
+	}
+
+	private void clearAnotherStoreItem(List<Cart> carts, Long attemptedStoreId) {
+		boolean existsAnotherStoreItem = existsAnotherStoreItem(carts, attemptedStoreId);
+
+		if (existsAnotherStoreItem) {
+			cartRepository.deleteAll(carts);
+		}
+	}
+
 	private CartRes addItem(Long providerId, Long itemId) {
 		Cart cart = getCartToAddItem(itemId, providerId);
 
@@ -73,6 +91,7 @@ public class CartService {
 	}
 
 	private boolean existsAnotherStoreItem(List<Cart> carts, Long attemptedStoreId) {
+
 		return carts.stream()
 			.anyMatch(cart -> !Objects.equals(cart.getStoreId(), attemptedStoreId));
 	}

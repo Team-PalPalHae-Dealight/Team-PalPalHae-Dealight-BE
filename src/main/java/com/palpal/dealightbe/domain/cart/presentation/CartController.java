@@ -28,4 +28,12 @@ public class CartController {
 
 		return ResponseEntity.ok(cartRes);
 	}
+
+	@ProviderId
+	@PostMapping("/clear")
+	public ResponseEntity<CartRes> clearAndAddItem(Long providerId, @RequestParam("id") Long itemId) {
+		CartRes cartRes = cartService.clearAndAddItem(providerId, itemId);
+
+		return ResponseEntity.ok(cartRes);
+	}
 }
