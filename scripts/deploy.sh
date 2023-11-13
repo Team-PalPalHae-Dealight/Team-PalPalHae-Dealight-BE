@@ -2,7 +2,7 @@
 cd /home/ubuntu/app
 
 # REST DOCS 문서 파일 이동
-source_dir="/home/ubuntu/app/docs"
+source_dir="/home/ubuntu/app"
 target_dir="/home/ubuntu/docs"
 
 sudo find "$source_dir" -name "*.html" -exec mv {} "$target_dir" \;
