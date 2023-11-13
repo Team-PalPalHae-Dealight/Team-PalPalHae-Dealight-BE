@@ -520,7 +520,7 @@ class ItemControllerTest {
 			.build();
 
 		int size = 5;
-		int page = 1;
+		int page = 0;
 		PageRequest pageRequest = PageRequest.of(page, size);
 
 		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
@@ -538,7 +538,7 @@ class ItemControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.param("size", String.valueOf(size))
-				.param("page", String.valueOf(page)))
+				.param("page", String.valueOf(1)))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.items[0].itemId").value(itemRes.itemId()))
 			.andExpect(jsonPath("$.items[0].storeId").value(itemRes.storeId()))
@@ -597,7 +597,7 @@ class ItemControllerTest {
 		String sortBy = "deadline";
 
 		int size = 5;
-		int page = 1;
+		int page = 0;
 		PageRequest pageRequest = PageRequest.of(page, size);
 
 		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
@@ -618,7 +618,7 @@ class ItemControllerTest {
 				.param("y-coordinate", String.valueOf(yCoordinate))
 				.param("sort-by", sortBy)
 				.param("size", String.valueOf(size))
-				.param("page", String.valueOf(page)))
+				.param("page", String.valueOf(1)))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.items[0].itemId").value(itemRes.itemId()))
 			.andExpect(jsonPath("$.items[0].storeId").value(itemRes.storeId()))
@@ -676,7 +676,7 @@ class ItemControllerTest {
 		String sortBy = "discount-rate";
 
 		int size = 5;
-		int page = 1;
+		int page = 0;
 		PageRequest pageRequest = PageRequest.of(page, size);
 
 		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
@@ -697,7 +697,7 @@ class ItemControllerTest {
 				.param("y-coordinate", String.valueOf(yCoordinate))
 				.param("sort-by", sortBy)
 				.param("size", String.valueOf(size))
-				.param("page", String.valueOf(page)))
+				.param("page", String.valueOf(1)))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.items[0].itemId").value(itemRes.itemId()))
 			.andExpect(jsonPath("$.items[0].storeId").value(itemRes.storeId()))
@@ -755,7 +755,7 @@ class ItemControllerTest {
 		String sortBy = "distance";
 
 		int size = 5;
-		int page = 1;
+		int page = 0;
 		PageRequest pageRequest = PageRequest.of(page, size);
 
 		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
@@ -776,7 +776,7 @@ class ItemControllerTest {
 				.param("y-coordinate", String.valueOf(yCoordinate))
 				.param("sort-by", sortBy)
 				.param("size", String.valueOf(size))
-				.param("page", String.valueOf(page)))
+				.param("page", String.valueOf(1)))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.items[0].itemId").value(itemRes.itemId()))
 			.andExpect(jsonPath("$.items[0].storeId").value(itemRes.storeId()))
@@ -843,7 +843,7 @@ class ItemControllerTest {
 			.build();
 
 		int size = 5;
-		int page = 1;
+		int page = 0;
 		PageRequest pageRequest = PageRequest.of(page, size);
 
 		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
@@ -860,7 +860,7 @@ class ItemControllerTest {
 		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/items/stores/{storeId}", storeId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.param("size", String.valueOf(size))
-				.param("page", String.valueOf(page)))
+				.param("page", String.valueOf(1)))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.items[0].itemId").value(itemRes.itemId()))
 			.andExpect(jsonPath("$.items[0].storeId").value(itemRes.storeId()))
