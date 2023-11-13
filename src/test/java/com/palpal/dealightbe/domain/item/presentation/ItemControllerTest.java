@@ -32,10 +32,8 @@ import com.palpal.dealightbe.domain.item.application.dto.request.ItemReq;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemsRes;
 import com.palpal.dealightbe.domain.item.domain.Item;
-import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
-import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
@@ -55,6 +53,7 @@ import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestPartFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
@@ -1047,6 +1046,85 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.message").value("상품 할인가는 원가보다 클 수 없습니다."))
 			.andDo(print())
 			.andDo(document("item/item-update-fail-invalid-discount-price",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(parameterWithName("id").description("상품 ID")),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				requestParts(
+					partWithName("image").description("상품 이미지"),
+					partWithName("itemReq").description("상품 등록 내용")
+				),
+				requestPartFields("itemReq",
+					fieldWithPath("name").type(STRING).description("상품 이름"),
+					fieldWithPath("stock").type(NUMBER).description("재고 수"),
+					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
+					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
+					fieldWithPath("description").type(STRING).description("상품 설명"),
+					fieldWithPath("information").type(STRING).description("상품 안내")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("예외 코드"),
+					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@DisplayName("상품 수정 실패 테스트 - 이미 등록된 상품인 경우(이름 중복)")
+	@Test
+	public void itemUpdateFailureTest_duplicatedItemName() throws Exception {
+		//given
+		Long itemId = 1L;
+		String imageUrl = "http://image-url.com/image.jpg";
+
+		Item item3 = Item.builder()
+			.name("치즈 떡볶이")
+			.stock(4)
+			.discountPrice(9900)
+			.originalPrice(14500)
+			.description("치즈 떡볶이 입니다.")
+			.information("통신사 할인 가능 합니다.")
+			.image(imageUrl)
+			.store(store)
+			.build();
+
+		ItemReq itemReq = new ItemReq(item3.getName(), item3.getStock(), item3.getDiscountPrice(),
+			item3.getOriginalPrice(), item3.getDescription(), item3.getInformation());
+
+		MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "file".getBytes());
+		MockMultipartFile request = new MockMultipartFile("itemReq", "itemReq",
+			"application/json",
+			objectMapper.writeValueAsString(itemReq).getBytes());
+
+		MockMultipartHttpServletRequestBuilder builder = RestDocumentationRequestBuilders.
+			multipart("/api/items/{id}", itemId);
+
+		builder.with(request1 -> {
+			request1.setMethod("PATCH");
+			return request1;
+		});
+
+		doThrow(new BusinessException(DUPLICATED_ITEM_NAME)).when(
+			itemService).update(any(), any(), any(), any());
+
+		//when
+		//then
+		mockMvc.perform(builder
+				.file(file)
+				.file(request)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.contentType(MediaType.MULTIPART_FORM_DATA)
+				.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("I003"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("동일한 이름을 가진 상품이 이미 등록되어 있습니다."))
+			.andDo(print())
+			.andDo(document("item/item-update-fail-duplicated-item-name",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				pathParameters(parameterWithName("id").description("상품 ID")),

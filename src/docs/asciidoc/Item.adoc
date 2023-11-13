@@ -237,6 +237,26 @@ include::{snippets}/item/item-update-fail-invalid-discount-price/http-response.a
 
 include::{snippets}/item/item-update-fail-invalid-discount-price/response-fields.adoc[]
 
+.Request Fail - 이미 등록된 상품인 경우(이름 중복)
+include::{snippets}/item/item-update-fail-duplicated-item-name/http-request.adoc[]
+
+include::{snippets}/item/item-update-fail-duplicated-item-name/path-parameters.adoc[]
+
+.request header
+include::{snippets}/item/item-update-fail-duplicated-item-name/request-headers.adoc[]
+
+.request multipart 구성
+include::{snippets}/item/item-update-fail-duplicated-item-name/request-parts.adoc[]
+
+.itemReq 구성
+include::{snippets}/item/item-update-fail-duplicated-item-name/request-part-itemReq-fields.adoc[]
+
+.Response Fail - 이미 등록된 상품인 경우(이름 중복)
+include::{snippets}/item/item-update-fail-duplicated-item-name/http-response.adoc[]
+
+include::{snippets}/item/item-update-fail-duplicated-item-name/response-fields.adoc[]
+
+
 === 상품 삭제
 
 ==== /api/items/{id}
