@@ -75,3 +75,53 @@ include::{snippets}/cart/cart-check-and-add-item-item-not-found/http-response.ad
 
 .response fields
 include::{snippets}/cart/cart-check-and-add-item-item-not-found/response-fields.adoc[]
+
+
+===  타 업체 상품 존재 시 초기화 api : 장바구니 담기
+
+==== /api/orders/carts/clear?id={itemId}
+
+.Request - 성공
+include::{snippets}/cart/cart-clear-and-add-item/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-clear-and-add-item/request-headers.adoc[]
+
+.request parameter
+include::{snippets}/cart/cart-clear-and-add-item/request-parameters.adoc[]
+
+.Response - 성공
+include::{snippets}/cart/cart-clear-and-add-item/http-response.adoc[]
+
+.response fields
+include::{snippets}/cart/cart-clear-and-add-item/response-fields.adoc[]
+
+.Request Fail - 본인이 등록한 업체의 상품 담기 불가
+include::{snippets}/cart/cart-clear-and-add-item-invalid-attempt-own-store-item/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-clear-and-add-item-invalid-attempt-own-store-item/request-headers.adoc[]
+
+.request parameter
+include::{snippets}/cart/cart-clear-and-add-item-invalid-attempt-own-store-item/request-parameters.adoc[]
+
+.Response Fail - 본인이 등록한 업체의 상품 담기 불가
+include::{snippets}/cart/cart-clear-and-add-item-invalid-attempt-own-store-item/http-response.adoc[]
+
+.response fields
+include::{snippets}/cart/cart-clear-and-add-item-invalid-attempt-own-store-item/response-fields.adoc[]
+
+.Request Fail - 상품이 존재하지 않는 경우
+include::{snippets}/cart/cart-clear-and-add-item-item-not-found/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-clear-and-add-item-item-not-found/request-headers.adoc[]
+
+.request parameter
+include::{snippets}/cart/cart-clear-and-add-item-item-not-found/request-parameters.adoc[]
+
+.Response Fail - 상품이 존재하지 않는 경우
+include::{snippets}/cart/cart-clear-and-add-item-item-not-found/http-response.adoc[]
+
+.response fields
+include::{snippets}/cart/cart-clear-and-add-item-item-not-found/response-fields.adoc[]
