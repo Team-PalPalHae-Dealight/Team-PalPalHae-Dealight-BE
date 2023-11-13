@@ -23,7 +23,7 @@ public class CartController {
 
 	@ProviderId
 	@PostMapping
-	public ResponseEntity<CartRes> addItem(Long providerId, @RequestParam("id") Long itemId) {
+	public ResponseEntity<CartRes> checkAndAddItem(Long providerId, @RequestParam("id") Long itemId) {
 		CartRes cartRes = cartService.checkAndAddItem(providerId, itemId);
 
 		return ResponseEntity.ok(cartRes);
