@@ -1,5 +1,7 @@
 package com.palpal.dealightbe.domain.cart.domain;
 
+import static com.palpal.dealightbe.global.error.ErrorCode.*;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,8 +18,6 @@ import org.springframework.data.redis.core.TimeToLive;
 import org.springframework.data.redis.core.index.Indexed;
 
 import com.palpal.dealightbe.global.error.exception.BusinessException;
-
-import static com.palpal.dealightbe.global.error.ErrorCode.*;
 
 @Slf4j
 @Getter
