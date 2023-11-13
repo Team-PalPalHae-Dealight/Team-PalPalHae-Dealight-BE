@@ -13,7 +13,10 @@ import javax.persistence.Table;
 
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.order.domain.Order;
+import com.palpal.dealightbe.domain.order.domain.OrderStatus;
 import com.palpal.dealightbe.domain.store.domain.Store;
+import com.palpal.dealightbe.global.error.ErrorCode;
+import com.palpal.dealightbe.global.error.exception.BusinessException;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -67,5 +70,20 @@ public class Notification {
 		ORDER_CONFIRMED,
 		ORDER_COMPLETED,
 		ORDER_CANCELED
+	}
+
+	public static String createMessage(OrderStatus orderStatus, Order order) {
+		switch (orderStatus) {
+			case RECEIVED:
+				return "새 주문이 도착했습니다: " + order.getId();
+			case CONFIRMED:
+				return "주문이 수락되었습니다: " + order.getId();
+			case COMPLETED:
+				return "주문이 완료되었습니다: " + order.getId();
+			case CANCELED:
+				return "주문이 취소되었습니다: " + order.getId();
+			default:
+				throw new BusinessException(ErrorCode.INVALID_ORDER_STATUS);
+		}
 	}
 }
