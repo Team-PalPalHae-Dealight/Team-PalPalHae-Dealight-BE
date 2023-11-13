@@ -56,10 +56,6 @@ public class SecurityConfig {
 			.cors().configurationSource(corsConfigurationSource())
 			.and()
 			.authorizeRequests()
-			// 전체 공개 URL
-			.antMatchers(HttpMethod.OPTIONS,
-				"/docs/**"
-			).permitAll()
 			// 운영자용 URL
 			.antMatchers(HttpMethod.OPTIONS,
 				"/h2-console/**", "/actuator/**"
