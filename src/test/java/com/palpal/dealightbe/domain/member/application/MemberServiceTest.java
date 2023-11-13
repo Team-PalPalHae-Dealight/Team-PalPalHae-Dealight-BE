@@ -65,7 +65,7 @@ class MemberServiceTest {
 
 		mockMember.updateAddress(mockAddress);
 
-		given(memberRepository.findById(memberId)).willReturn(Optional.of(mockMember));
+		given(memberRepository.findMemberByProviderId(memberId)).willReturn(Optional.of(mockMember));
 
 		// when
 		MemberProfileRes memberProfileRes = memberService.getMemberProfile(memberId);
@@ -84,7 +84,7 @@ class MemberServiceTest {
 	void getMemberProfileNotFoundTest() {
 		// given
 		Long nonexistentMemberId = 999L;
-		given(memberRepository.findById(nonexistentMemberId)).willReturn(Optional.empty());
+		given(memberRepository.findMemberByProviderId(nonexistentMemberId)).willReturn(Optional.empty());
 
 		// when & then
 		assertThrows(EntityNotFoundException.class, () -> memberService.getMemberProfile(nonexistentMemberId));
@@ -113,7 +113,7 @@ class MemberServiceTest {
 		AddressReq newAddress = new AddressReq("부산", 35.1796, 129.0756);
 		MemberUpdateReq request = new MemberUpdateReq("유느님", "01087654321", newAddress);
 
-		given(memberRepository.findById(memberId)).willReturn(Optional.of(mockMember));
+		given(memberRepository.findMemberByProviderId(memberId)).willReturn(Optional.of(mockMember));
 
 		// when
 		MemberUpdateRes updatedMemberRes = memberService.updateMemberProfile(memberId, request);
@@ -134,7 +134,7 @@ class MemberServiceTest {
 		AddressReq newAddress = new AddressReq("부산", 35.1796, 129.0756);
 		MemberUpdateReq request = new MemberUpdateReq("유느님", "01087654321", newAddress);
 
-		given(memberRepository.findById(nonexistentMemberId)).willReturn(Optional.empty());
+		given(memberRepository.findMemberByProviderId(nonexistentMemberId)).willReturn(Optional.empty());
 
 		// when & then
 		assertThrows(EntityNotFoundException.class,
@@ -163,7 +163,7 @@ class MemberServiceTest {
 
 		AddressReq newAddress = new AddressReq("부산", 35.1796, 129.0756);
 
-		given(memberRepository.findById(memberId)).willReturn(Optional.of(mockMember));
+		given(memberRepository.findMemberByProviderId(memberId)).willReturn(Optional.of(mockMember));
 
 		//when
 		AddressRes updatedAddressRes = memberService.updateMemberAddress(memberId, newAddress);
@@ -181,7 +181,7 @@ class MemberServiceTest {
 		Long nonexistentMemberId = 999L;
 		AddressReq newAddress = new AddressReq("부산", 35.1796, 129.0756);
 
-		given(memberRepository.findById(nonexistentMemberId)).willReturn(Optional.empty());
+		given(memberRepository.findMemberByProviderId(nonexistentMemberId)).willReturn(Optional.empty());
 
 		//when & then
 		assertThrows(EntityNotFoundException.class,
@@ -204,7 +204,7 @@ class MemberServiceTest {
 			.build();
 
 		given(imageService.store(mockFile)).willReturn(mockImageUrl);
-		given(memberRepository.findById(memberId)).willReturn(Optional.of(mockMember));
+		given(memberRepository.findMemberByProviderId(memberId)).willReturn(Optional.of(mockMember));
 
 		// when
 		ImageRes imageRes = memberService.updateMemberImage(memberId, imageUploadReq);
@@ -222,7 +222,7 @@ class MemberServiceTest {
 		MultipartFile mockFile = mock(MultipartFile.class);
 		ImageUploadReq imageUploadReq = new ImageUploadReq(mockFile);
 
-		given(memberRepository.findById(nonexistentMemberId)).willReturn(Optional.empty());
+		given(memberRepository.findMemberByProviderId(nonexistentMemberId)).willReturn(Optional.empty());
 
 		// when & then
 		assertThrows(EntityNotFoundException.class,
@@ -244,7 +244,8 @@ class MemberServiceTest {
 
 		mockMember.updateImage(mockImageUrl);
 
-		given(memberRepository.findById(memberId)).willReturn(Optional.of(mockMember));
+		given(memberRepository.findMemberByProviderId(memberId))
+			.willReturn(Optional.of(mockMember));
 		doNothing().when(imageService).delete(anyString());
 
 		// when
@@ -261,7 +262,7 @@ class MemberServiceTest {
 		// given
 		Long nonexistentMemberId = 999L;
 
-		given(memberRepository.findById(nonexistentMemberId)).willReturn(Optional.empty());
+		given(memberRepository.findMemberByProviderId(nonexistentMemberId)).willReturn(Optional.empty());
 
 		// when & then
 		assertThrows(EntityNotFoundException.class,
@@ -283,7 +284,7 @@ class MemberServiceTest {
 
 		mockMember.updateImage(defaultImageUrl);
 
-		given(memberRepository.findById(memberId)).willReturn(Optional.of(mockMember));
+		given(memberRepository.findMemberByProviderId(memberId)).willReturn(Optional.of(mockMember));
 
 		// when & then
 		BusinessException thrown = assertThrows(BusinessException.class,

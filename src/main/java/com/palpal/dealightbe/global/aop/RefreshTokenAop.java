@@ -2,7 +2,6 @@ package com.palpal.dealightbe.global.aop;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.Arrays;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -23,11 +22,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Aspect
 @Component
-public class ProviderIdAop {
+public class RefreshTokenAop {
 
-	private static final String PROVIDER_ID = "providerId";
+	private static final String TOKEN = "refreshToken";
 
-	@Around("@annotation(ProviderId)")
+	@Around("@annotation(com.palpal.dealightbe.global.aop.RefreshToken)")
 	public Object getProviderId(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
 		JwtAuthenticationToken authentication = (JwtAuthenticationToken)SecurityContextHolder.getContext()
 			.getAuthentication();
@@ -35,14 +34,14 @@ public class ProviderIdAop {
 			throw new RequiredAuthenticationException(ErrorCode.REQUIRED_AUTHENTICATION);
 		}
 		JwtAuthentication principal = (JwtAuthentication)authentication.getPrincipal();
-		Long providerId = Long.parseLong(principal.getUsername());
+		String token = principal.getToken();
 
-		Object[] modifiedArgs = modifyArgsWithProviderId(providerId, proceedingJoinPoint);
+		Object[] modifiedArgs = modifyArgsWithToken(token, proceedingJoinPoint);
 
 		return proceedingJoinPoint.proceed(modifiedArgs);
 	}
 
-	private Object[] modifyArgsWithProviderId(Long providerId, ProceedingJoinPoint proceedingJoinPoint) {
+	private Object[] modifyArgsWithToken(String token, ProceedingJoinPoint proceedingJoinPoint) {
 		Object[] parameters = proceedingJoinPoint.getArgs();
 		MethodSignature signature = (MethodSignature)proceedingJoinPoint.getSignature();
 		Method method = signature.getMethod();
@@ -50,11 +49,11 @@ public class ProviderIdAop {
 
 		for (int i = 0; i < methodParameters.length; i++) {
 			String parameterName = methodParameters[i].getName();
-			if (parameterName.equals(PROVIDER_ID)) {
+			if (parameterName.equals(TOKEN)) {
 				if (parameters[i] != null) {
 					break;
 				}
-				parameters[i] = providerId;
+				parameters[i] = token;
 			}
 		}
 

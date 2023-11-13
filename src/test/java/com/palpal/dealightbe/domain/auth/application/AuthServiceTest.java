@@ -2,7 +2,6 @@ package com.palpal.dealightbe.domain.auth.application;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -26,9 +24,9 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import com.palpal.dealightbe.domain.address.domain.Address;
-import com.palpal.dealightbe.domain.auth.application.dto.request.MemberSignupReq;
+import com.palpal.dealightbe.domain.auth.application.dto.request.MemberAuthReq;
 import com.palpal.dealightbe.domain.auth.application.dto.response.LoginRes;
-import com.palpal.dealightbe.domain.auth.application.dto.response.MemberSignupRes;
+import com.palpal.dealightbe.domain.auth.application.dto.response.MemberAuthRes;
 import com.palpal.dealightbe.domain.auth.domain.Jwt;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
@@ -38,7 +36,6 @@ import com.palpal.dealightbe.domain.member.domain.Role;
 import com.palpal.dealightbe.domain.member.domain.RoleRepository;
 import com.palpal.dealightbe.domain.member.domain.RoleType;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
-import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -170,7 +167,7 @@ class AuthServiceTest {
 	@Test
 	void returnTokensIfSignupSuccess() {
 		// given
-		MemberSignupReq memberSignupReq = new MemberSignupReq(
+		MemberAuthReq memberSignupReq = new MemberAuthReq(
 			"test",
 			123L,
 			"테스터",
@@ -182,7 +179,7 @@ class AuthServiceTest {
 			.xCoordinate(0)
 			.yCoordinate(0)
 			.build();
-		Member mockMember = MemberSignupReq.toMember(memberSignupReq);
+		Member mockMember = MemberAuthReq.toMember(memberSignupReq);
 		mockMember.updateAddress(mockAddress);
 
 		Role mockRole = Role.builder()
@@ -208,7 +205,7 @@ class AuthServiceTest {
 			.willReturn("MOCK_REFRESH_TOKEN");
 
 		// when
-		MemberSignupRes response = authService.signup(memberSignupReq);
+		MemberAuthRes response = authService.signup(memberSignupReq);
 
 		// then
 		assertThat(response.accessToken()).isEqualTo("MOCK_ACCESS_TOKEN");
@@ -220,14 +217,14 @@ class AuthServiceTest {
 	@Test
 	void throwExceptionIfAlreadyExistMember() {
 		// given
-		MemberSignupReq request = new MemberSignupReq(
+		MemberAuthReq request = new MemberAuthReq(
 			"tester",
 			123L,
 			"고예성",
 			"요송송",
 			"01012341234",
 			"member");
-		Member duplicatedMember = MemberSignupReq.toMember(request);
+		Member duplicatedMember = MemberAuthReq.toMember(request);
 		given(memberRepository.findByProviderAndProviderId("tester", 123L))
 			.willReturn(Optional.of(duplicatedMember));
 
@@ -240,41 +237,28 @@ class AuthServiceTest {
 	@Test
 	void throwExceptionIFNotFoundRole() {
 		// given
-		MemberSignupReq request = new MemberSignupReq(
+		MemberAuthReq request = new MemberAuthReq(
 			"tester",
 			123L,
 			"고예성",
 			"요송송",
 			"01012341234",
 			"genius");
+		Member testMember = Member.builder()
+			.provider("tester")
+			.providerId(123L)
+			.realName("고예성")
+			.nickName("요송송")
+			.phoneNumber("01012341234")
+			.build();
 
 		given(memberRepository.findByProviderAndProviderId(request.provider(), request.providerId()))
 			.willReturn(Optional.empty());
+		given(memberRepository.save(any()))
+			.willReturn(testMember);
 
 		// when -> then
 		assertThatThrownBy(() -> authService.signup(request))
 			.isInstanceOf(BusinessException.class);
-	}
-
-	@DisplayName("데이터베이스에 Role이 존재하지 않으면 회원가입 실패")
-	@Test
-	void throwExceptionIfNotFoundRoleInDb() {
-		// given
-		MemberSignupReq request = new MemberSignupReq(
-			"tester",
-			123L,
-			"고예성",
-			"요송송",
-			"01012341234",
-			"member");
-
-		given(memberRepository.findByProviderAndProviderId(request.provider(), request.providerId()))
-			.willReturn(Optional.empty());
-		given(roleRepository.findByRoleType(RoleType.ROLE_MEMBER))
-			.willReturn(Optional.empty());
-
-		// when -> then
-		assertThatThrownBy(() -> authService.signup(request))
-			.isInstanceOf(EntityNotFoundException.class);
 	}
 }

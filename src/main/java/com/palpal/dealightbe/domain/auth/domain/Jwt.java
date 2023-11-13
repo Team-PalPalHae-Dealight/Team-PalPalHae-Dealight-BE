@@ -6,14 +6,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 import com.palpal.dealightbe.config.JwtConfig;
 import com.palpal.dealightbe.domain.member.domain.Member;
@@ -22,12 +18,9 @@ import com.palpal.dealightbe.domain.member.domain.Role;
 import com.palpal.dealightbe.domain.member.domain.RoleType;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -139,30 +132,13 @@ public class Jwt {
 		return authorities;
 	}
 
-	public boolean validateToken(String jwt) {
+	public void validateToken(String jwt) {
 		log.info("Jwt(value: {})의 유효성 검증을 시작합니다...", jwt);
-		try {
-			Jwts.parserBuilder()
-				.setSigningKey(tokenSecret)
-				.build()
-				.parseClaimsJws(jwt);
-
-			log.info("Jwt(value: {})의 유효성이 검증되었습니다.", jwt);
-			return true;
-		} catch (SignatureException ex) {
-			log.error("JWT signature가 올바르지 않습니다.");
-		} catch (MalformedJwtException ex) {
-			log.error("JWT가 올바른 값이 아닙니다.");
-		} catch (ExpiredJwtException ex) {
-			log.error("JWT가 만료되었습니다.");
-		} catch (UnsupportedJwtException ex) {
-			log.error("지원하지 않는 형식의 JWT입니다.");
-		} catch (IllegalArgumentException ex) {
-			log.error("JWT의 claim 값들이 비어있습니다.");
-		}
-
-		log.info("Jwt(value: {})가 유효성 검증에 실패했습니다.", jwt);
-		return false;
+		Jwts.parserBuilder()
+			.setSigningKey(tokenSecret)
+			.build()
+			.parseClaimsJws(jwt);
+		log.info("Jwt(value: {})의 유효성이 검증되었습니다.", jwt);
 	}
 
 	private void validateJwtProperties(JwtConfig jwtConfig) {
@@ -178,5 +154,18 @@ public class Jwt {
 		Assert.isInstanceOf(Long.class, jwtConfig.getRefreshTokenExpiry(),
 			"Refresh Token 만료시간이 올바르지 않습니다.");
 		log.debug("JwtConfig 설정 값 검증에 성공했습니다.");
+	}
+
+	public Date getExpiryDate(String jwt) {
+		log.info("Jwt(value: {})로부터 토큰의 유효기간을 가져옵니다...", jwt);
+		Claims claims = Jwts.parserBuilder()
+			.setSigningKey(tokenSecret)
+			.build()
+			.parseClaimsJws(jwt)
+			.getBody();
+		Date expiration = claims.getExpiration();
+		log.info("토큰의 유효기간({})을 가져오는데 성공했습니다.", expiration);
+
+		return expiration;
 	}
 }

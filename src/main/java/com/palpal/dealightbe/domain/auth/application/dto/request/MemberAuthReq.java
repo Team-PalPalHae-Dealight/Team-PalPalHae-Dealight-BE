@@ -9,7 +9,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 import com.palpal.dealightbe.domain.member.domain.Member;
 
-public record MemberSignupReq(
+public record MemberAuthReq(
 	@NotBlank(message = "Provider는 비어있을 수 없습니다.")
 	String provider,
 
@@ -26,7 +26,7 @@ public record MemberSignupReq(
 	String phoneNumber,
 	String role
 ) {
-	public static Member toMember(MemberSignupReq request) {
+	public static Member toMember(MemberAuthReq request) {
 		String provider = request.provider();
 		Long providerId = request.providerId();
 		String realName = request.realName();

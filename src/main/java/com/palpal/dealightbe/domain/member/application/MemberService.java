@@ -34,18 +34,20 @@ public class MemberService {
 	@Transactional(readOnly = true)
 	public MemberProfileRes getMemberProfile(Long providerId) {
 
-		Member member = memberRepository.findById(providerId).orElseThrow(() -> {
-			log.warn("GET:READ:NOT_FOUND_MEMBER_BY_ID : {}", providerId);
-			throw new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
-		});
+		Member member = memberRepository.findMemberByProviderId(providerId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_ID : {}", providerId);
+				return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
+			});
 
 		return MemberProfileRes.from(member);
 	}
 
 	public MemberUpdateRes updateMemberProfile(Long memberId, MemberUpdateReq request) {
-		Member member = memberRepository.findById(memberId).orElseThrow(() -> {
+		Member member = memberRepository.findMemberByProviderId(memberId)
+			.orElseThrow(() -> {
 			log.warn("PATCH:UPDATE:NOT_FOUND_MEMBER_BY_ID : {}", memberId);
-			throw new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
+			return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
 		});
 
 		Member memberFromRequest = MemberUpdateReq.toMember(request);
@@ -55,9 +57,10 @@ public class MemberService {
 	}
 
 	public AddressRes updateMemberAddress(Long memberId, AddressReq request) {
-		Member member = memberRepository.findById(memberId).orElseThrow(() -> {
+		Member member = memberRepository.findMemberByProviderId(memberId)
+			.orElseThrow(() -> {
 			log.warn("PATCH:UPDATE:NOT_FOUND_MEMBER_BY_ID : {}", memberId);
-			throw new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
+			return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
 		});
 
 		member.getAddress().updateInfo(
@@ -70,7 +73,7 @@ public class MemberService {
 	public ImageRes updateMemberImage(Long memberId, ImageUploadReq request) {
 		String imageUrl = imageService.store(request.file());
 
-		Member member = memberRepository.findById(memberId)
+		Member member = memberRepository.findMemberByProviderId(memberId)
 			.orElseThrow(() -> {
 				log.warn("PATCH:UPDATE:NOT_FOUND_MEMBER_BY_ID : {}", memberId);
 				return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
@@ -84,7 +87,7 @@ public class MemberService {
 	}
 
 	public void deleteMemberImage(Long memberId) {
-		Member member = memberRepository.findById(memberId)
+		Member member = memberRepository.findMemberByProviderId(memberId)
 			.orElseThrow(() -> {
 				log.warn("DELETE:DELETE:NOT_FOUND_MEMBER_BY_ID : {}", memberId);
 				return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);

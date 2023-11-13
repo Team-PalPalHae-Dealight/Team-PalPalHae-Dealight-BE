@@ -18,52 +18,81 @@ endif::[]
 ==== /api/auth/signup
 
 .Request Success - 회원 가입 요청
-include::{snippets}/auth-signup-success/http-request.adoc[]
+include::{snippets}/auth/auth-signup-success/http-request.adoc[]
 
-include::{snippets}/auth-signup-success/request-fields.adoc[]
+include::{snippets}/auth/auth-signup-success/request-fields.adoc[]
 
 .Response Success - 회원 가입 응답
-include::{snippets}/auth-signup-success/http-response.adoc[]
+include::{snippets}/auth/auth-signup-success/http-response.adoc[]
 
-include::{snippets}/auth-signup-success/response-fields.adoc[]
+include::{snippets}/auth/auth-signup-success/response-fields.adoc[]
 
 .Request Fail - provider 정보가 없는 회원 가입 요청
-include::{snippets}/auth-signup-fail-no-provider/http-request.adoc[]
+include::{snippets}/auth/auth-signup-fail-no-provider/http-request.adoc[]
 
-include::{snippets}/auth-signup-fail-no-provider/request-fields.adoc[]
+include::{snippets}/auth/auth-signup-fail-no-provider/request-fields.adoc[]
 
 .Response Fail - provider 정보가 없는 회원 가입 응답
-include::{snippets}/auth-signup-fail-no-provider/http-response.adoc[]
+include::{snippets}/auth/auth-signup-fail-no-provider/http-response.adoc[]
 
-include::{snippets}/auth-signup-fail-no-provider/response-fields.adoc[]
+include::{snippets}/auth/auth-signup-fail-no-provider/response-fields.adoc[]
 
 .Request Fail - providerId 정보가 없는 회원 가입 요청
-include::{snippets}/auth-signup-fail-no-providerId/http-request.adoc[]
+include::{snippets}/auth/auth-signup-fail-no-providerId/http-request.adoc[]
 
-include::{snippets}/auth-signup-fail-no-providerId/request-fields.adoc[]
+include::{snippets}/auth/auth-signup-fail-no-providerId/request-fields.adoc[]
 
 .Response Fail - providerId 정보가 없는 회원 가입 응답
-include::{snippets}/auth-signup-fail-no-providerId/http-response.adoc[]
+include::{snippets}/auth/auth-signup-fail-no-providerId/http-response.adoc[]
 
-include::{snippets}/auth-signup-fail-no-providerId/response-fields.adoc[]
+include::{snippets}/auth/auth-signup-fail-no-providerId/response-fields.adoc[]
 
 
 .Request Fail - 중복 회원 가입 요청
-include::{snippets}/auth-signup-fail-already-exist/http-request.adoc[]
+include::{snippets}/auth/auth-signup-fail-already-exist/http-request.adoc[]
 
-include::{snippets}/auth-signup-fail-already-exist/request-fields.adoc[]
+include::{snippets}/auth/auth-signup-fail-already-exist/request-fields.adoc[]
 
 .Response Fail - 중복 회원 가입 응답
-include::{snippets}/auth-signup-fail-already-exist/http-response.adoc[]
+include::{snippets}/auth/auth-signup-fail-already-exist/http-response.adoc[]
 
-include::{snippets}/auth-signup-fail-already-exist/response-fields.adoc[]
+include::{snippets}/auth/auth-signup-fail-already-exist/response-fields.adoc[]
 
 .Request Fail - 잘못된 역할로 회원 가입 요청
-include::{snippets}/auth-signup-fail-invalid-role-request/http-request.adoc[]
+include::{snippets}/auth/auth-signup-fail-invalid-role-request/http-request.adoc[]
 
-include::{snippets}/auth-signup-fail-invalid-role-request/request-fields.adoc[]
+include::{snippets}/auth/auth-signup-fail-invalid-role-request/request-fields.adoc[]
 
 .Response Fail - 잘못된 역할로 회원 가입 응답
-include::{snippets}/auth-signup-fail-invalid-role-request/http-response.adoc[]
+include::{snippets}/auth/auth-signup-fail-invalid-role-request/http-response.adoc[]
 
-include::{snippets}/auth-signup-fail-invalid-role-request/response-fields.adoc[]
+include::{snippets}/auth/auth-signup-fail-invalid-role-request/response-fields.adoc[]
+
+.Request Success - 회원 가입 요청
+include::{snippets}/auth/auth-signup-success/http-request.adoc[]
+
+include::{snippets}/auth/auth-signup-success/request-fields.adoc[]
+
+.Request Success - 회원 탈퇴 요청
+include::{snippets}/auth/auth-unregister-success-request/http-request.adoc[]
+
+.Response Success - 회원 탈퇴 응답
+include::{snippets}/auth/auth-unregister-success-request/http-response.adoc[]
+
+.Request Fail - 토큰(인증정보)이 올바르지 않은 경우 회원 탈퇴 요청
+include::{snippets}/auth/auth-unregister-fail-if-authentication-not-valid/http-request.adoc[]
+
+.Response Fail - 토큰(인증정보)이 올바르지 않은 경우 회원 탈퇴 응답
+include::{snippets}/auth/auth-unregister-fail-if-authentication-not-valid/http-response.adoc[]
+
+.Request Fail - 회원조회가 안되는 경우 회원 탈퇴 요청
+include::{snippets}/auth/auth-unregister-fail-if-member-not-found/http-request.adoc[]
+
+.Response Fail - 회원조회가 안되는 경우 회원 탈퇴 응답
+include::{snippets}/auth/auth-unregister-fail-if-member-not-found/http-response.adoc[]
+
+.Request Success - Access Token 재발급 요청
+include::{snippets}/auth/auth-reissue-token-success-request/http-request.adoc[]
+
+.Response Success - Access Token 재발급 응답
+include::{snippets}/auth/auth-reissue-token-success-request/http-response.adoc[]

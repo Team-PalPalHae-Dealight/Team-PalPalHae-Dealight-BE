@@ -1,6 +1,6 @@
 package com.palpal.dealightbe.domain.auth.application.dto.response;
 
-public record MemberSignupRes(
+public record MemberAuthRes(
 	String nickName,
 	String accessToken,
 	String refreshToken
