@@ -3,6 +3,9 @@ package com.palpal.dealightbe.domain.cart.application;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+import java.util.Objects;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,8 +15,10 @@ import com.palpal.dealightbe.domain.cart.domain.Cart;
 import com.palpal.dealightbe.domain.cart.domain.CartRepository;
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
+import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
+import static com.palpal.dealightbe.global.error.ErrorCode.ANOTHER_STORE_ITEM_ALREADY_EXISTS_IN_THE_CART;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
 
 @Transactional
@@ -25,7 +30,17 @@ public class CartService {
 	private final CartRepository cartRepository;
 	private final ItemRepository itemRepository;
 
-	public CartRes addItem(Long providerId, Long itemId) {
+	public CartRes checkAndAddItem(Long providerId, Long itemId) {
+		Item item = getItem(itemId);
+
+		List<Cart> carts = cartRepository.findAllByMemberProviderId(providerId);
+
+		validateAnotherStoreItemExistence(carts, item.getStore().getId());
+
+		return addItem(providerId, itemId);
+	}
+
+	private CartRes addItem(Long providerId, Long itemId) {
 		Cart cart = getCartToAddItem(itemId, providerId);
 
 		cart.updateExpiration();
@@ -46,6 +61,20 @@ public class CartService {
 				Item item = getItem(itemId);
 				return CartReq.toCart(providerId, item);
 			});
+	}
+
+	private void validateAnotherStoreItemExistence(List<Cart> carts, Long attemptedStoreId) {
+		boolean existsAnotherStoreItem = existsAnotherStoreItem(carts, attemptedStoreId);
+
+		if (existsAnotherStoreItem) {
+			log.warn("POST:CREATE:ANOTHER_STORE_ITEM_ALREADY_EXISTS_IN_THE_CART : providerId = {}, existing storeId = {}, attempted storeId = {}", carts.get(0).getMemberProviderId(), carts.get(0).getStoreId(), attemptedStoreId);
+			throw new BusinessException(ANOTHER_STORE_ITEM_ALREADY_EXISTS_IN_THE_CART);
+		}
+	}
+
+	private boolean existsAnotherStoreItem(List<Cart> carts, Long attemptedStoreId) {
+		return carts.stream()
+			.anyMatch(cart -> !Objects.equals(cart.getStoreId(), attemptedStoreId));
 	}
 
 	private Item getItem(Long itemId) {
