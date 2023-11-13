@@ -1,5 +1,7 @@
 package com.palpal.dealightbe.domain.item.domain;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,6 +11,8 @@ import org.springframework.data.repository.query.Param;
 public interface ItemRepository extends JpaRepository<Item, Long>, ItemRepositoryCustom {
 
 	boolean existsByNameAndStoreId(String name, Long storeId);
+
+	Optional<Item> findByNameAndStoreId(String name, Long storeId);
 
 	@Query(value =
 		"""

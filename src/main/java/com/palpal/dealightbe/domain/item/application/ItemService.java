@@ -36,8 +36,8 @@ public class ItemService {
 	private final StoreRepository storeRepository;
 	private final ImageService imageService;
 
-	public ItemRes create(ItemReq itemReq, Long memberId, ImageUploadReq imageUploadReq) {
-		Store store = getStore(memberId);
+	public ItemRes create(ItemReq itemReq, Long providerId, ImageUploadReq imageUploadReq) {
+		Store store = getStore(providerId);
 
 		checkDuplicatedItemName(itemReq.name(), store.getId());
 
@@ -57,8 +57,8 @@ public class ItemService {
 	}
 
 	@Transactional(readOnly = true)
-	public ItemsRes findAllForStore(Long memberId, Pageable pageable) {
-		Store store = getStore(memberId);
+	public ItemsRes findAllForStore(Long providerId, Pageable pageable) {
+		Store store = getStore(providerId);
 
 		Page<Item> items = itemRepository.findAllByStoreIdOrderByUpdatedAtDesc(store.getId(), pageable);
 
@@ -80,9 +80,11 @@ public class ItemService {
 		return ItemsRes.from(items);
 	}
 
-	public ItemRes update(Long itemId, ItemReq itemReq, Long memberId, ImageUploadReq imageUploadReq) {
-		Store store = getStore(memberId);
+	public ItemRes update(Long itemId, ItemReq itemReq, Long providerId, ImageUploadReq imageUploadReq) {
+		Store store = getStore(providerId);
 		Item item = getItem(itemId);
+
+		checkDuplicatedItemNameForUpdate(itemId, itemReq.name(), store.getId());
 
 		String image = item.getImage();
 		imageService.delete(image);
@@ -95,8 +97,8 @@ public class ItemService {
 		return ItemRes.from(item);
 	}
 
-	public void delete(Long itemId, Long memberId) {
-		Store store = getStore(memberId);
+	public void delete(Long itemId, Long providerId) {
+		Store store = getStore(providerId);
 		Item item = getItem(itemId);
 
 		item.checkItemInStore(store);
@@ -122,10 +124,19 @@ public class ItemService {
 		}
 	}
 
-	private Store getStore(Long memberId) {
-		return storeRepository.findByMemberId(memberId)
+	private void checkDuplicatedItemNameForUpdate(Long updateItemId, String itemName, Long storeId) {
+		itemRepository.findByNameAndStoreId(itemName, storeId)
+			.filter(item -> !updateItemId.equals(item.getId()))
+			.ifPresent(item -> {
+				log.warn("DUPLICATED_ITEM_NAME: {}", itemName);
+				throw new BusinessException(DUPLICATED_ITEM_NAME);
+			});
+	}
+
+	private Store getStore(Long providerId) {
+		return storeRepository.findByMemberProviderId(providerId)
 			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_STORE_BY_MEMBER_ID : {}", memberId);
+				log.warn("GET:READ:NOT_FOUND_STORE_BY_MEMBER_PROVIDER_ID : {}", providerId);
 				return new EntityNotFoundException(NOT_FOUND_STORE);
 			});
 	}
