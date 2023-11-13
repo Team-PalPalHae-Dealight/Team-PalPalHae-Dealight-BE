@@ -68,6 +68,16 @@ public class ItemController {
 		return ResponseEntity.ok(itemsRes);
 	}
 
+	@GetMapping("/stores/{storeId}")
+	public ResponseEntity<ItemsRes> findAllByStoreId(@PathVariable Long storeId, @RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = "5") int size) {
+		page = Math.max(page - 1, 0);
+		PageRequest pageable = PageRequest.of(page, size);
+
+		ItemsRes itemsRes = itemService.findAllByStoreId(storeId, pageable);
+
+		return ResponseEntity.ok(itemsRes);
+	}
+
 	@ProviderId
 	@PatchMapping("/{id}")
 	public ResponseEntity<ItemRes> update(Long providerId, @PathVariable("id") Long itemId, @Validated @RequestPart ItemReq itemReq, @RequestPart(required = false) MultipartFile image) {

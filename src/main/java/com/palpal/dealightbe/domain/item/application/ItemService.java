@@ -80,6 +80,13 @@ public class ItemService {
 		return ItemsRes.from(items);
 	}
 
+	@Transactional(readOnly = true)
+	public ItemsRes findAllByStoreId(Long storeId, Pageable pageable) {
+		Page<Item> items = itemRepository.findAllByStoreIdOrderByUpdatedAtDesc(storeId, pageable);
+
+		return ItemsRes.from(items);
+	}
+
 	public ItemRes update(Long itemId, ItemReq itemReq, Long providerId, ImageUploadReq imageUploadReq) {
 		Store store = getStore(providerId);
 		Item item = getItem(itemId);
