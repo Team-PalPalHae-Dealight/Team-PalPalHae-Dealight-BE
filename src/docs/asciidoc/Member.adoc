@@ -7,7 +7,7 @@
 
 == 멤버 프로필 조회 성공
 
-=== /api/members/profiles/{memberId} [GET]
+=== /api/members/profiles [GET]
 
 === Request
 
@@ -31,7 +31,7 @@ include::{snippets}/member/member-get-profile-not-found/http-response.adoc[]
 
 == 멤버 프로필 수정 성공
 
-=== /api/members/profiles/{memberId} [PATCH]
+=== /api/members/profiles [PATCH]
 
 === Request
 
@@ -57,7 +57,7 @@ include::{snippets}/member/member-update-profile-not-found/http-response.adoc[]
 
 == 멤버 프로필 주소 수정 성공
 
-=== /api/members/address/{memberId} [PATCH]
+=== /api/members/address [PATCH]
 
 === Request
 
@@ -83,7 +83,7 @@ include::{snippets}/member/member-update-address-not-found/http-response.adoc[]
 
 == 멤버 이미지 업로드 성공
 
-=== /api/members/images/{memberId} [PATCH]
+=== /api/members/images [PATCH]
 
 ==== Request
 
@@ -98,7 +98,7 @@ include::{snippets}/member/member-upload-image/response-fields.adoc[]
 
 == 멤버 이미지 업로드 실패 - 유효하지 않은 memberId
 
-=== /api/members/images/{memberId} [PATCH]
+=== /api/members/images [PATCH]
 
 ==== Request
 
@@ -112,7 +112,7 @@ include::{snippets}/member/member-upload-image-not-found/http-response.adoc[]
 
 == 멤버 이미지 삭제 성공
 
-=== /api/members/images/{memberId} [DELETE]
+=== /api/members/images [DELETE]
 
 ==== Request
 
@@ -125,7 +125,7 @@ include::{snippets}/member/member-delete-image-success/http-response.adoc[]
 
 == 멤버 이미지 삭제 실패: 멤버 ID가 존재하지 않는 경우
 
-=== /api/members/images/{memberId} [DELETE]
+=== /api/members/images [DELETE]
 
 ==== Request
 
