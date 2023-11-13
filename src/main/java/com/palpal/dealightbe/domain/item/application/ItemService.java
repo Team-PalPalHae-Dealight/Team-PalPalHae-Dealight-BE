@@ -84,6 +84,8 @@ public class ItemService {
 		Store store = getStore(providerId);
 		Item item = getItem(itemId);
 
+		checkDuplicatedItemNameForUpdate(itemId, itemReq.name(), store.getId());
+
 		String image = item.getImage();
 		imageService.delete(image);
 
@@ -120,6 +122,15 @@ public class ItemService {
 			log.warn("DUPLICATED_ITEM_NAME : {}", itemName);
 			throw new BusinessException(DUPLICATED_ITEM_NAME);
 		}
+	}
+
+	private void checkDuplicatedItemNameForUpdate(Long updateItemId, String itemName, Long storeId) {
+		itemRepository.findByNameAndStoreId(itemName, storeId)
+			.filter(item -> !updateItemId.equals(item.getId()))
+			.ifPresent(item -> {
+				log.warn("DUPLICATED_ITEM_NAME: {}", itemName);
+				throw new BusinessException(DUPLICATED_ITEM_NAME);
+			});
 	}
 
 	private Store getStore(Long providerId) {
