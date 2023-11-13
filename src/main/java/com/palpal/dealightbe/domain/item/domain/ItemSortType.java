@@ -1,13 +1,13 @@
 package com.palpal.dealightbe.domain.item.domain;
 
+import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_SORT_TYPE;
+
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 import java.util.Objects;
 
 import com.palpal.dealightbe.global.error.exception.BusinessException;
-
-import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_SORT_TYPE;
 
 @Slf4j
 public enum ItemSortType {

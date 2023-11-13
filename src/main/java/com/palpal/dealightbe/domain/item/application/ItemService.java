@@ -1,5 +1,8 @@
 package com.palpal.dealightbe.domain.item.application;
 
+import static com.palpal.dealightbe.domain.item.domain.ItemSortType.findItemSortType;
+import static com.palpal.dealightbe.global.error.ErrorCode.*;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,9 +23,6 @@ import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
-
-import static com.palpal.dealightbe.domain.item.domain.ItemSortType.findItemSortType;
-import static com.palpal.dealightbe.global.error.ErrorCode.*;
 
 @Slf4j
 @Service
