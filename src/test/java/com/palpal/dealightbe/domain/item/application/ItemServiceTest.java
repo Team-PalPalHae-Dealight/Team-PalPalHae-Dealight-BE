@@ -220,6 +220,17 @@ class ItemServiceTest {
 	@Test
 	void itemFindAllForStoreSuccessTest() {
 		//given
+		Item item3 = Item.builder()
+			.name("치즈 김밥")
+			.stock(3)
+			.discountPrice(4000)
+			.originalPrice(4500)
+			.description("치즈 김밥 입니다.")
+			.information("통신사 할인 불가능 합니다.")
+			.image("https://fake-image.com/item2.png")
+			.store(store)
+			.build();
+
 		Long providerId = 1L;
 
 		int page = 0;
@@ -228,7 +239,7 @@ class ItemServiceTest {
 
 		List<Item> items = new ArrayList<>();
 		items.add(item);
-		items.add(item2);
+		items.add(item3);
 
 		Page<Item> itemPage = new PageImpl<>(items, pageRequest, items.size());
 
@@ -315,6 +326,42 @@ class ItemServiceTest {
 
 		//when
 		ItemsRes itemsRes = itemService.findAllForMember(xCoordinate, yCoordinate, "distance", pageRequest);
+
+		//then
+		assertThat(itemsRes.items()).hasSize(items.size());
+	}
+
+	@DisplayName("업체의 상품 목록 조회(고객 시점) 성공 테스트")
+	@Test
+	void itemFindAllByStoreIdSuccessTest() {
+		//given
+		Item item3 = Item.builder()
+			.name("치즈 김밥")
+			.stock(3)
+			.discountPrice(4000)
+			.originalPrice(4500)
+			.description("치즈 김밥 입니다.")
+			.information("통신사 할인 불가능 합니다.")
+			.image("https://fake-image.com/item2.png")
+			.store(store)
+			.build();
+
+		Long storeId = 1L;
+
+		int page = 0;
+		int size = 5;
+		PageRequest pageRequest = PageRequest.of(page, size);
+
+		List<Item> items = new ArrayList<>();
+		items.add(item);
+		items.add(item3);
+
+		Page<Item> itemPage = new PageImpl<>(items, pageRequest, items.size());
+
+		when(itemRepository.findAllByStoreIdOrderByUpdatedAtDesc(any(), eq(PageRequest.of(page, size)))).thenReturn(itemPage);
+
+		//when
+		ItemsRes itemsRes = itemService.findAllByStoreId(storeId, pageRequest);
 
 		//then
 		assertThat(itemsRes.items()).hasSize(items.size());
