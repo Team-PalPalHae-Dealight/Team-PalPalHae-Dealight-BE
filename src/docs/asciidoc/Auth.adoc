@@ -67,3 +67,32 @@ include::{snippets}/auth/auth-signup-fail-invalid-role-request/request-fields.ad
 include::{snippets}/auth/auth-signup-fail-invalid-role-request/http-response.adoc[]
 
 include::{snippets}/auth/auth-signup-fail-invalid-role-request/response-fields.adoc[]
+
+.Request Success - 회원 가입 요청
+include::{snippets}/auth/auth-signup-success/http-request.adoc[]
+
+include::{snippets}/auth/auth-signup-success/request-fields.adoc[]
+
+.Request Success - 회원 탈퇴 요청
+include::{snippets}/auth/auth-unregister-success-request/http-request.adoc[]
+
+.Response Success - 회원 탈퇴 응답
+include::{snippets}/auth/auth-unregister-success-request/http-response.adoc[]
+
+.Request Fail - 토큰(인증정보)이 올바르지 않은 경우 회원 탈퇴 요청
+include::{snippets}/auth/auth-unregister-fail-if-authentication-not-valid/http-request.adoc[]
+
+.Response Fail - 토큰(인증정보)이 올바르지 않은 경우 회원 탈퇴 응답
+include::{snippets}/auth/auth-unregister-fail-if-authentication-not-valid/http-response.adoc[]
+
+.Request Fail - 회원조회가 안되는 경우 회원 탈퇴 요청
+include::{snippets}/auth/auth-unregister-fail-if-member-not-found/http-request.adoc[]
+
+.Response Fail - 회원조회가 안되는 경우 회원 탈퇴 응답
+include::{snippets}/auth/auth-unregister-fail-if-member-not-found/http-response.adoc[]
+
+.Request Success - Access Token 재발급 요청
+include::{snippets}/auth/auth-reissue-token-success-request/http-request.adoc[]
+
+.Response Success - Access Token 재발급 응답
+include::{snippets}/auth/auth-reissue-token-success-request/http-response.adoc[]

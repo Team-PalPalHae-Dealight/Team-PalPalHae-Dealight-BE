@@ -369,7 +369,7 @@ class AuthControllerTest {
 				.andExpect(result -> {
 					assertThat(result.getResolvedException()).isInstanceOf(RequiredAuthenticationException.class);
 				})
-				.andDo(document("auth/auth-unregister-fail-if-no-valid-provider-id", preprocessRequest(prettyPrint()),
+				.andDo(document("auth/auth-unregister-fail-if-authentication-not-valid", preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
 					requestHeaders(
 						headerWithName("Authorization").description("Access Token")
@@ -389,7 +389,7 @@ class AuthControllerTest {
 
 		@DisplayName("회원정보 조회에 실패한다면, 회원탈퇴에 실패")
 		@Test
-		void unregisterFailIfMemberFindFail() throws Exception {
+		void unregisterFailIfMemberFoundFail() throws Exception {
 			// given
 			EntityNotFoundException entityNotFoundException = new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
 			doThrow(entityNotFoundException)
@@ -407,7 +407,7 @@ class AuthControllerTest {
 				.andExpect(result -> {
 					assertThat(result.getResolvedException()).isInstanceOf(EntityNotFoundException.class);
 				})
-				.andDo(document("auth/auth-unregister-fail-if-no-valid-provider-id", preprocessRequest(prettyPrint()),
+				.andDo(document("auth/auth-unregister-fail-if-member-not-found", preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
 					requestHeaders(
 						headerWithName("Authorization").description("Access Token")
@@ -452,7 +452,7 @@ class AuthControllerTest {
 				)
 				.andDo(print())
 				.andExpect(status().isCreated())
-				.andExpect(jsonPath("$.nickName").value("장충동 왕족발 보쌈"))
+				.andExpect(jsonPath("$.nickName").value("말왕의 장충동 왕족발 보쌈"))
 				.andExpect(jsonPath("$.accessToken").value("ACCESS_TOKEN"))
 				.andExpect(jsonPath("$.refreshToken").value("REFRESH_TOKEN"))
 				.andDo(document("auth/auth-reissue-token-success-request",
