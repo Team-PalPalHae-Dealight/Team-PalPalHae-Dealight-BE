@@ -74,6 +74,19 @@ public class Cart {
 		this.expiration = calculateExpiration();
 	}
 
+	public void updateQuantity(int quantity) {
+		validateQuantity(quantity, this.stock);
+
+		this.quantity = quantity;
+	}
+
+	private void validateQuantity(int quantity, int stock) {
+		if (quantity < 1 || quantity > stock) {
+			log.warn("INVALID_CART_QUANTITY : quantity = {}, stock = {}", quantity, stock);
+			throw new BusinessException(INVALID_CART_QUANTITY);
+		}
+	}
+
 	private Long calculateExpiration() {
 		LocalDateTime currentDateTime = LocalDateTime.now();
 		LocalDateTime closeDateTime = getCloseDateTime(currentDateTime);
