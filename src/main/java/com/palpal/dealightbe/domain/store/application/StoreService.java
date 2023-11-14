@@ -1,10 +1,11 @@
 package com.palpal.dealightbe.domain.store.application;
 
+import java.util.Collections;
 import java.util.Objects;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -147,7 +148,7 @@ public class StoreService {
 
 	@Transactional(readOnly = true)
 	public StoresInfoSliceRes search(double xCoordinate, double yCoordinate, String keyword, String sortBy, Pageable pageable) {
-		Slice<Store> stores = Page.empty();
+		Slice<Store> stores = new SliceImpl<>(Collections.emptyList(), pageable, false);
 
 		SearchSortType sortType = SearchSortType.findSortType(sortBy);
 

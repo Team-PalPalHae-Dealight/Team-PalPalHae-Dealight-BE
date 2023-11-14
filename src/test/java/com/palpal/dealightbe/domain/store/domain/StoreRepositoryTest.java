@@ -83,20 +83,20 @@ public class StoreRepositoryTest {
 
 		address = Address.builder()
 			.name("강남역 2번 출구 약국")
-			.xCoordinate(37.4974)
-			.yCoordinate(127.0283)
+			.xCoordinate(127.0283)
+			.yCoordinate(37.4974)
 			.build();
 
 		address2 = Address.builder()
 			.name("아리따움")
-			.xCoordinate(37.49794)
-			.yCoordinate(127.0286)
+			.xCoordinate(127.0286)
+			.yCoordinate(37.49794)
 			.build();
 
 		address3 = Address.builder()
 			.name("강남역 순대")
-			.xCoordinate(37.49801)
-			.yCoordinate(127.0279)
+			.xCoordinate(127.0279)
+			.yCoordinate(37.49801)
 			.build();
 
 		addressRepository.save(address);
@@ -146,7 +146,7 @@ public class StoreRepositoryTest {
 		item = Item.builder()
 			.name("떡볶이")
 			.stock(2)
-			.discountPrice(3000)
+			.discountPrice(100)
 			.originalPrice(4500)
 			.description("기본 떡볶이 입니다.")
 			.information("통신사 할인 불가능 합니다.")
@@ -157,7 +157,7 @@ public class StoreRepositoryTest {
 		item2 = Item.builder()
 			.name("떡볶이")
 			.stock(2)
-			.discountPrice(4000)
+			.discountPrice(1000)
 			.originalPrice(4500)
 			.description("기본 떡볶이 입니다.")
 			.information("통신사 할인 불가능 합니다.")
@@ -186,13 +186,13 @@ public class StoreRepositoryTest {
 	void findByDistanceWithin3Km() throws Exception {
 
 		//given
-		double within3KmX = 37.4980136;
-		double within3KmY = 127.0279372;
+		double within3KmX = 127.0279372;
+		double within3KmY = 37.4980136;
 		String keyword = "떡볶이";
 		Pageable pageable = PageRequest.of(0, 2);
 
-		double longDistanceX = 35.44142;
-		double longDistanceY = 128.2417;
+		double longDistanceX = 128.2417;
+		double longDistanceY = 35.44142;
 		String keyword2 = "순대";
 
 		//when
@@ -212,8 +212,8 @@ public class StoreRepositoryTest {
 	void findByDeadline() throws Exception {
 
 		//given
-		double within3KmX = 37.4980136;
-		double within3KmY = 127.0279372;
+		double within3KmX = 127.0279372;
+		double within3KmY = 37.4980136;
 		String keyword = "떡볶이";
 		Pageable pageable = PageRequest.of(0, 2);
 
@@ -231,8 +231,8 @@ public class StoreRepositoryTest {
 	void findByDiscountRate() throws Exception {
 
 		//given
-		double within3KmX = 37.4980136;
-		double within3KmY = 127.0279372;
+		double within3KmX = 127.0279372;
+		double within3KmY = 37.4980136;
 		String keyword = "떡볶이";
 		Pageable pageable = PageRequest.of(0, 2);
 

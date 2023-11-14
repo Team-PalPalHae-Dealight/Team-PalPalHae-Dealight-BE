@@ -456,7 +456,7 @@ class StoreServiceTest {
 			.thenReturn(storeSlice);
 
 		//when
-		StoresInfoSliceRes search = storeService.search(xCoordinate, yCoordinate, keyword, null, pageable);
+		StoresInfoSliceRes search = storeService.search(xCoordinate, yCoordinate, keyword, "distance", pageable);
 
 		//then
 		assertThat(search.storeInfoSliceRes().get(0).name()).isEqualTo(store.getName());
