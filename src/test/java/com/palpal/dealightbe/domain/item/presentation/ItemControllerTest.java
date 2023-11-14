@@ -1,5 +1,32 @@
 package com.palpal.dealightbe.domain.item.presentation;
 
+import static com.palpal.dealightbe.global.error.ErrorCode.DUPLICATED_ITEM_NAME;
+import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_DISCOUNT_PRICE;
+import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
+import static com.palpal.dealightbe.global.error.ErrorCode.STORE_HAS_NO_ITEM;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.Mockito.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
+import static org.springframework.restdocs.payload.JsonFieldType.STRING;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestPartFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
@@ -36,34 +63,6 @@ import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
-
-import static com.palpal.dealightbe.global.error.ErrorCode.DUPLICATED_ITEM_NAME;
-import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_DISCOUNT_PRICE;
-import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
-import static com.palpal.dealightbe.global.error.ErrorCode.STORE_HAS_NO_ITEM;
-import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.Mockito.*;
-import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
-import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
-import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
-import static org.springframework.restdocs.payload.JsonFieldType.STRING;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestPartFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = ItemController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class,
 	OAuth2ClientAutoConfiguration.class}, excludeFilters = {
@@ -571,7 +570,7 @@ class ItemControllerTest {
 					fieldWithPath("items").type(ARRAY).description("상품 목록"),
 					fieldWithPath("items[0].itemId").type(NUMBER).description("상품 ID"),
 					fieldWithPath("items[0].storeId").type(NUMBER).description("업체 ID"),
-					fieldWithPath("items[0].itemName").description("상품 이름"),
+					fieldWithPath("items[0].itemName").type(STRING).description("상품 이름"),
 					fieldWithPath("items[0].stock").type(NUMBER).description("재고 수"),
 					fieldWithPath("items[0].discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("items[0].originalPrice").type(NUMBER).description("원가"),

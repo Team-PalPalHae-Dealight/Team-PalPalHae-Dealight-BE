@@ -50,6 +50,12 @@ public enum ErrorCode {
 	INVALID_ORDER_FILTER("OR008", "유효하지 않은 주문 조회 필터링 조건입니다."),
 	INVALID_ORDER_TOTAL_PRICE("OR009", "입력된 총 금액이 실제와 일치하지 않습니다."),
 
+	//장바구니
+	NOT_FOUND_CART_ITEM("CT001", "장바구니에 상품이 존재하지 않습니다."),
+	INVALID_CART_QUANTITY("CT002", "상품 당 최소 1개에서 최대 재고 수량까지만 장바구니에 담을 수 있습니다."),
+	ANOTHER_STORE_ITEM_ALREADY_EXISTS_IN_THE_CART("CT003", "이미 다른 업체의 상품이 장바구니에 담겨 있습니다."),
+	INVALID_ATTEMPT_TO_ADD_OWN_STORE_ITEM_TO_CART("CT004", "본인이 등록한 업체의 상품은 장바구니에 담을 수 없습니다."),
+
 	//인증, 인가
 	ACCESS_DENIED("AUTH001", "사용자 인증에 실패했습니다."),
 	ALREADY_EXIST_MEMBER("AUTH002", "이미 가입된 사용자입니다."),
