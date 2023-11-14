@@ -152,7 +152,7 @@ public class StoreService {
 		SearchSortType sortType = SearchSortType.findSortType(sortBy);
 
 		switch (sortType) {
-			case DEFAULT, DISTANCE:
+			case DISTANCE:
 				stores = storeRepository.findByDistanceWithin3Km(xCoordinate, yCoordinate, keyword, pageable);
 				break;
 			case DISCOUNT_RATE:

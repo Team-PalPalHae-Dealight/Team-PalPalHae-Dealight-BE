@@ -116,7 +116,7 @@ public class StoreController {
 	@GetMapping("/search")
 	public ResponseEntity<StoresInfoSliceRes> searchByOption(
 		@RequestParam("x-coordinate") double xCoordinate, @RequestParam("y-coordinate") double yCoordinate,
-		@RequestParam String keyword, @RequestParam(required = false) String sortBy,
+		@RequestParam String keyword, @RequestParam(required = false, defaultValue = "distance") String sortBy,
 		@RequestParam(required = false, defaultValue = "0") int page,
 		@RequestParam(required = false, defaultValue = DEFAULT_PAGING_SIZE) int size) {
 

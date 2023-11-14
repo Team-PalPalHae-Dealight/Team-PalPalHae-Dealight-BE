@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public enum SearchSortType {
-	DEFAULT(null),
 	DEADLINE("deadline"),
 	DISCOUNT_RATE("discount-rate"),
 	DISTANCE("distance"),
