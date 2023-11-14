@@ -42,17 +42,18 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
 
 	@Query(value =
 		"""
-					SELECT s.*
-					FROM stores s
-					JOIN addresses a ON s.address_id = a.id
-					LEFT JOIN items i ON s.id = i.store_id
-					WHERE s.store_status = 'OPENED'
-					AND (6371 * ACOS(COS(RADIANS(:yCoordinate))
-								* COS(RADIANS(a.y_coordinate))
-								* COS(RADIANS(a.x_coordinate) - RADIANS(:xCoordinate))
-								+ SIN(RADIANS(:yCoordinate)) * SIN(RADIANS(a.y_coordinate)))) <= 3
-					AND (s.name LIKE %:keyword% OR i.name LIKE %:keyword%)	
-					ORDER BY ABS(EXTRACT(EPOCH FROM s.close_time - CURRENT_TIME)) ASC
+			            SELECT s.*
+			            FROM stores s
+			            JOIN addresses a ON s.address_id = a.id
+			            LEFT JOIN items i ON s.id = i.store_id
+			            WHERE s.store_status = 'OPENED'
+			            AND (6371 * ACOS(COS(RADIANS(:yCoordinate))
+			                        * COS(RADIANS(a.y_coordinate))
+			                        * COS(RADIANS(a.x_coordinate) - RADIANS(:xCoordinate))
+			                        + SIN(RADIANS(:yCoordinate)) * SIN(RADIANS(a.y_coordinate)))) <= 3
+			            AND (s.name LIKE %:keyword% OR i.name LIKE %:keyword%)    
+			            ORDER BY ABS(EXTRACT(HOUR FROM s.close_time) * 60 + EXTRACT(MINUTE FROM s.close_time) - 
+			                        (EXTRACT(HOUR FROM CURRENT_TIME) * 60 + EXTRACT(MINUTE FROM CURRENT_TIME)))
 			""", nativeQuery = true)
 	Slice<Store> findByDeadLine(
 		@Param("xCoordinate") double xCoordinate,

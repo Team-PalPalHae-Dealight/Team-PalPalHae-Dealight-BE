@@ -55,10 +55,8 @@ public class StoreService {
 
 		Address address = addressService.register(req.addressName(), req.xCoordinate(), req.yCoordinate());
 
-		Store store = StoreCreateReq.toStore(req);
-		store.updateAddress(address);
-		store.updateMember(member);
-		store.updateImage(DEFAULT_PATH);
+		Store store = StoreCreateReq.toStore(req, address, member);
+
 		storeRepository.save(store);
 
 		return StoreCreateRes.from(store);
