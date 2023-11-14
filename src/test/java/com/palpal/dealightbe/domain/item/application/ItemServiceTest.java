@@ -21,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.mock.web.MockMultipartFile;
 
 import com.palpal.dealightbe.domain.address.domain.Address;
@@ -241,7 +242,7 @@ class ItemServiceTest {
 		items.add(item);
 		items.add(item3);
 
-		Page<Item> itemPage = new PageImpl<>(items, pageRequest, items.size());
+		SliceImpl<Item> itemPage = new SliceImpl<>(items);
 
 		when(storeRepository.findByMemberProviderId(any())).thenReturn(Optional.of(store));
 		when(itemRepository.findAllByStoreIdOrderByUpdatedAtDesc(any(), eq(PageRequest.of(page, size)))).thenReturn(itemPage);
@@ -265,7 +266,7 @@ class ItemServiceTest {
 		items.add(item);
 		items.add(item2);
 
-		Page<Item> itemPage = new PageImpl<>(items, pageRequest, items.size());
+		SliceImpl<Item> itemPage = new SliceImpl<>(items);
 
 		double xCoordinate = 127.0221068;
 		double yCoordinate = 37.5912999;
@@ -291,7 +292,7 @@ class ItemServiceTest {
 		items.add(item);
 		items.add(item2);
 
-		Page<Item> itemPage = new PageImpl<>(items, pageRequest, items.size());
+		SliceImpl<Item> itemPage = new SliceImpl<>(items);
 
 		double xCoordinate = 127.0221068;
 		double yCoordinate = 37.5912999;
@@ -317,7 +318,7 @@ class ItemServiceTest {
 		items.add(item);
 		items.add(item2);
 
-		Page<Item> itemPage = new PageImpl<>(items, pageRequest, items.size());
+		SliceImpl<Item> itemPage = new SliceImpl<>(items);
 
 		double xCoordinate = 127.0221068;
 		double yCoordinate = 37.5912999;
@@ -356,7 +357,7 @@ class ItemServiceTest {
 		items.add(item);
 		items.add(item3);
 
-		Page<Item> itemPage = new PageImpl<>(items, pageRequest, items.size());
+		SliceImpl<Item> itemPage = new SliceImpl<>(items);
 
 		when(itemRepository.findAllByStoreIdOrderByUpdatedAtDesc(any(), eq(PageRequest.of(page, size)))).thenReturn(itemPage);
 

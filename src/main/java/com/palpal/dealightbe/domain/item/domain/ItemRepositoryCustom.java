@@ -1,9 +1,9 @@
 package com.palpal.dealightbe.domain.item.domain;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 public interface ItemRepositoryCustom {
 
-	Page<Item> findAllByStoreIdOrderByUpdatedAtDesc(Long storeId, Pageable pageable);
+	Slice<Item> findAllByStoreIdOrderByUpdatedAtDesc(Long storeId, Pageable pageable);
 }

@@ -7,6 +7,8 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepositoryCustom;
@@ -20,20 +22,21 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 	private QItem item = QItem.item;
 
 	@Override
-	public Page<Item> findAllByStoreIdOrderByUpdatedAtDesc(Long storeId, Pageable pageable) {
+	public Slice<Item> findAllByStoreIdOrderByUpdatedAtDesc(Long storeId, Pageable pageable) {
 		List<Item> items = queryFactory.select(item)
 			.from(item)
 			.where(item.store.id.eq(storeId))
 			.orderBy(item.updatedAt.desc())
 			.offset(pageable.getOffset())
-			.limit(pageable.getPageSize())
+			.limit(pageable.getPageSize() + 1)
 			.fetch();
 
-		Long count = queryFactory.select(item.count())
-			.from(item)
-			.where(item.store.id.eq(storeId))
-			.fetchOne();
+		boolean hasNext = false;
+		if (items.size() > pageable.getPageSize()) {
+			items.remove(pageable.getPageSize());
+			hasNext = true;
+		}
 
-		return new PageImpl<>(items, pageable, count);
+		return new SliceImpl<>(items, pageable, hasNext);
 	}
 }

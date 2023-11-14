@@ -13,6 +13,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -527,7 +528,8 @@ class ItemControllerTest {
 		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), item.getStore().getName(), item.getStore().getOpenTime(), item.getStore().getCloseTime(), addressRes);
 		ItemRes itemRes3 = new ItemRes(2L, 1L, item3.getName(), item3.getStock(), item3.getDiscountPrice(), item3.getOriginalPrice(), item3.getDescription(), item3.getInformation(), item3.getImage(), item3.getStore().getName(), item3.getStore().getOpenTime(), item3.getStore().getCloseTime(), addressRes);
 		List<ItemRes> itemResList = List.of(itemRes, itemRes3);
-		ItemsRes itemsRes = new ItemsRes(itemResList);
+		boolean hasNext = false;
+		ItemsRes itemsRes = new ItemsRes(itemResList, hasNext);
 
 		when(itemService.findAllForStore(any(), eq(pageRequest))).thenReturn(itemsRes);
 
@@ -554,6 +556,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.items[0].storeAddress.name").value(addressRes.name()))
 			.andExpect(jsonPath("$.items[0].storeAddress.xCoordinate").value(addressRes.xCoordinate()))
 			.andExpect(jsonPath("$.items[0].storeAddress.yCoordinate").value(addressRes.yCoordinate()))
+			.andExpect(jsonPath("$.hasNext").value(hasNext))
 			.andDo(print())
 			.andDo(document("item/item-find-all-for-store",
 				preprocessRequest(prettyPrint()),
@@ -582,7 +585,8 @@ class ItemControllerTest {
 					fieldWithPath("items[0].storeCloseTime").type(STRING).description("마감 시간"),
 					fieldWithPath("items[0].storeAddress.name").type(STRING).description("업체 주소"),
 					fieldWithPath("items[0].storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
-					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도")
+					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도"),
+					fieldWithPath("hasNext").type(BOOLEAN).description("다음 데이터 존재 여부")
 				)
 			));
 	}
@@ -605,7 +609,8 @@ class ItemControllerTest {
 		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), item.getStore().getName(), item.getStore().getOpenTime(), item.getStore().getCloseTime(), addressRes);
 		ItemRes itemRes2 = new ItemRes(2L, 2L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage(), item2.getStore().getName(), item2.getStore().getOpenTime(), item2.getStore().getCloseTime(), addressRes2);
 		List<ItemRes> itemResList = List.of(itemRes, itemRes2);
-		ItemsRes itemsRes = new ItemsRes(itemResList);
+		boolean hasNext = false;
+		ItemsRes itemsRes = new ItemsRes(itemResList, hasNext);
 
 		when(itemService.findAllForMember(anyDouble(), anyDouble(), eq(sortBy), eq(pageRequest))).thenReturn(itemsRes);
 
@@ -634,6 +639,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.items[0].storeAddress.name").value(addressRes.name()))
 			.andExpect(jsonPath("$.items[0].storeAddress.xCoordinate").value(addressRes.xCoordinate()))
 			.andExpect(jsonPath("$.items[0].storeAddress.yCoordinate").value(addressRes.yCoordinate()))
+			.andExpect(jsonPath("$.hasNext").value(hasNext))
 			.andDo(print())
 			.andDo(document("item/item-find-all-for-member-sort-by-deadline",
 				preprocessRequest(prettyPrint()),
@@ -661,7 +667,8 @@ class ItemControllerTest {
 					fieldWithPath("items[0].storeCloseTime").type(STRING).description("마감 시간"),
 					fieldWithPath("items[0].storeAddress.name").type(STRING).description("업체 주소"),
 					fieldWithPath("items[0].storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
-					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도")
+					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도"),
+					fieldWithPath("hasNext").type(BOOLEAN).description("다음 데이터 존재 여부")
 				)
 			));
 	}
@@ -684,7 +691,8 @@ class ItemControllerTest {
 		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), item.getStore().getName(), item.getStore().getOpenTime(), item.getStore().getCloseTime(), addressRes);
 		ItemRes itemRes2 = new ItemRes(2L, 2L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage(), item2.getStore().getName(), item2.getStore().getOpenTime(), item2.getStore().getCloseTime(), addressRes2);
 		List<ItemRes> itemResList = List.of(itemRes, itemRes2);
-		ItemsRes itemsRes = new ItemsRes(itemResList);
+		boolean hasNext = false;
+		ItemsRes itemsRes = new ItemsRes(itemResList, hasNext);
 
 		when(itemService.findAllForMember(anyDouble(), anyDouble(), eq(sortBy), eq(pageRequest))).thenReturn(itemsRes);
 
@@ -713,6 +721,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.items[0].storeAddress.name").value(addressRes.name()))
 			.andExpect(jsonPath("$.items[0].storeAddress.xCoordinate").value(addressRes.xCoordinate()))
 			.andExpect(jsonPath("$.items[0].storeAddress.yCoordinate").value(addressRes.yCoordinate()))
+			.andExpect(jsonPath("$.hasNext").value(hasNext))
 			.andDo(print())
 			.andDo(document("item/item-find-all-for-member-sort-by-discount-rate",
 				preprocessRequest(prettyPrint()),
@@ -740,7 +749,8 @@ class ItemControllerTest {
 					fieldWithPath("items[0].storeCloseTime").type(STRING).description("마감 시간"),
 					fieldWithPath("items[0].storeAddress.name").type(STRING).description("업체 주소"),
 					fieldWithPath("items[0].storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
-					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도")
+					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도"),
+					fieldWithPath("hasNext").type(BOOLEAN).description("다음 데이터 존재 여부")
 				)
 			));
 	}
@@ -763,7 +773,8 @@ class ItemControllerTest {
 		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), item.getStore().getName(), item.getStore().getOpenTime(), item.getStore().getCloseTime(), addressRes);
 		ItemRes itemRes2 = new ItemRes(2L, 2L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage(), item2.getName(), item2.getStore().getOpenTime(), item2.getStore().getCloseTime(), addressRes2);
 		List<ItemRes> itemResList = List.of(itemRes, itemRes2);
-		ItemsRes itemsRes = new ItemsRes(itemResList);
+		boolean hasNext = false;
+		ItemsRes itemsRes = new ItemsRes(itemResList, hasNext);
 
 		when(itemService.findAllForMember(anyDouble(), anyDouble(), eq(sortBy), eq(pageRequest))).thenReturn(itemsRes);
 
@@ -819,7 +830,8 @@ class ItemControllerTest {
 					fieldWithPath("items[0].storeCloseTime").type(STRING).description("마감 시간"),
 					fieldWithPath("items[0].storeAddress.name").type(STRING).description("업체 주소"),
 					fieldWithPath("items[0].storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
-					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도")
+					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도"),
+					fieldWithPath("hasNext").type(BOOLEAN).description("다음 데이터 존재 여부")
 				)
 			));
 	}
@@ -850,7 +862,8 @@ class ItemControllerTest {
 		ItemRes itemRes = new ItemRes(1L, storeId, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), item.getStore().getName(), item.getStore().getOpenTime(), item.getStore().getCloseTime(), addressRes);
 		ItemRes itemRes3 = new ItemRes(2L, storeId, item3.getName(), item3.getStock(), item3.getDiscountPrice(), item3.getOriginalPrice(), item3.getDescription(), item3.getInformation(), item3.getImage(), item3.getStore().getName(), item3.getStore().getOpenTime(), item3.getStore().getCloseTime(), addressRes);
 		List<ItemRes> itemResList = List.of(itemRes, itemRes3);
-		ItemsRes itemsRes = new ItemsRes(itemResList);
+		boolean hasNext = false;
+		ItemsRes itemsRes = new ItemsRes(itemResList, hasNext);
 
 		when(itemService.findAllByStoreId(any(), eq(pageRequest))).thenReturn(itemsRes);
 
@@ -876,6 +889,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.items[0].storeAddress.name").value(addressRes.name()))
 			.andExpect(jsonPath("$.items[0].storeAddress.xCoordinate").value(addressRes.xCoordinate()))
 			.andExpect(jsonPath("$.items[0].storeAddress.yCoordinate").value(addressRes.yCoordinate()))
+			.andExpect(jsonPath("$.hasNext").value(hasNext))
 			.andDo(print())
 			.andDo(document("item/item-find-all-by-store-id",
 				preprocessRequest(prettyPrint()),
@@ -904,7 +918,8 @@ class ItemControllerTest {
 					fieldWithPath("items[0].storeCloseTime").type(STRING).description("마감 시간"),
 					fieldWithPath("items[0].storeAddress.name").type(STRING).description("업체 주소"),
 					fieldWithPath("items[0].storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
-					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도")
+					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도"),
+					fieldWithPath("hasNext").type(BOOLEAN).description("다음 데이터 존재 여부")
 				)
 			));
 	}

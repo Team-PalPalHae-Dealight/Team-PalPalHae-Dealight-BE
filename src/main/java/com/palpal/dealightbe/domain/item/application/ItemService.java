@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,14 +61,14 @@ public class ItemService {
 	public ItemsRes findAllForStore(Long providerId, Pageable pageable) {
 		Store store = getStore(providerId);
 
-		Page<Item> items = itemRepository.findAllByStoreIdOrderByUpdatedAtDesc(store.getId(), pageable);
+		Slice<Item> items = itemRepository.findAllByStoreIdOrderByUpdatedAtDesc(store.getId(), pageable);
 
 		return ItemsRes.from(items);
 	}
 
 	@Transactional(readOnly = true)
 	public ItemsRes findAllForMember(double xCoordinate, double yCoordinate, String sortBy, Pageable pageable) {
-		Page<Item> items = Page.empty();
+		Slice<Item> items = Page.empty();
 
 		SearchSortType sortType = findSortType(sortBy);
 
@@ -82,7 +83,7 @@ public class ItemService {
 
 	@Transactional(readOnly = true)
 	public ItemsRes findAllByStoreId(Long storeId, Pageable pageable) {
-		Page<Item> items = itemRepository.findAllByStoreIdOrderByUpdatedAtDesc(storeId, pageable);
+		Slice<Item> items = itemRepository.findAllByStoreIdOrderByUpdatedAtDesc(storeId, pageable);
 
 		return ItemsRes.from(items);
 	}
