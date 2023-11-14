@@ -56,7 +56,6 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.12.0'
 
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '2.7.0'
-    implementation group: 'org.springframework.session', name: 'spring-session-data-redis', version: '2.7.0'
 
     // compileOnly
     compileOnly 'org.projectlombok:lombok'

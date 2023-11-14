@@ -14,14 +14,6 @@ spring:
     console:
       enabled: true
 
-  sql:
-    init:
-      platform: h2
-      schema-locations: classpath:org/springframework/security/oauth2/client/oauth2-client-schema.sql
-      encoding: UTF-8
-      data-locations: classpath:data.sql
-      mode: always
-
   jpa:
     database: h2
     open-in-view: false
@@ -29,9 +21,19 @@ spring:
       ddl-auto: create
       naming:
         implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
-    show-sql: false
+    show-sql: true
     properties:
       hibernate:
-        format_sql: false
+        format_sql: true
         dialect: org.hibernate.dialect.H2Dialect
-    defer-datasource-initialization: true
+    defer-datasource-initialization: true # 필수
+
+  sql: # depth 주의 jpa와 같은 depth
+    init:
+      data-locations: classpath:data.sql
+      mode: always
+      platform: h2 # 본인 DB 종류
+
+  redis:
+    host: localhost
+    port: 6379

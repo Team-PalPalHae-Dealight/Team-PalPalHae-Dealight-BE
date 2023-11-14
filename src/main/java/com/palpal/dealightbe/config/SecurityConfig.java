@@ -53,9 +53,8 @@ public class SecurityConfig {
 
 	@Bean
 	WebSecurityCustomizer webSecurityCustomizer() {
-		// 전체 공개 URL
 		return web -> web.ignoring()
-			.antMatchers("/docs/**");
+			.antMatchers("/notification/**");
 	}
 
 	@Bean
