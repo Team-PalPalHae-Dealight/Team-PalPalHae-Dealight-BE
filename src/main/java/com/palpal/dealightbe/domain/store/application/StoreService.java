@@ -2,10 +2,14 @@ package com.palpal.dealightbe.domain.store.application;
 
 import java.util.Objects;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.palpal.dealightbe.domain.address.application.AddressService;
+import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.image.ImageService;
 import com.palpal.dealightbe.domain.image.application.dto.request.ImageUploadReq;
 import com.palpal.dealightbe.domain.image.application.dto.response.ImageRes;
@@ -18,8 +22,10 @@ import com.palpal.dealightbe.domain.store.application.dto.response.StoreByMember
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusRes;
+import com.palpal.dealightbe.domain.store.application.dto.response.StoresInfoSliceRes;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
+import com.palpal.dealightbe.global.SearchSortType;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
@@ -47,11 +53,10 @@ public class StoreService {
 				throw new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
 			});
 
-		addressService.register(req.addressName(), req.xCoordinate(), req.yCoordinate());
+		Address address = addressService.register(req.addressName(), req.xCoordinate(), req.yCoordinate());
 
-		Store store = StoreCreateReq.toStore(req);
-		store.updateMember(member);
-		store.updateImage(DEFAULT_PATH);
+		Store store = StoreCreateReq.toStore(req, address, member);
+
 		storeRepository.save(store);
 
 		return StoreCreateRes.from(store);
@@ -138,6 +143,27 @@ public class StoreService {
 			});
 
 		return StoreByMemberRes.from(store);
+	}
+
+	@Transactional(readOnly = true)
+	public StoresInfoSliceRes search(double xCoordinate, double yCoordinate, String keyword, String sortBy, Pageable pageable) {
+		Slice<Store> stores = Page.empty();
+
+		SearchSortType sortType = SearchSortType.findSortType(sortBy);
+
+		switch (sortType) {
+			case DISTANCE:
+				stores = storeRepository.findByDistanceWithin3Km(xCoordinate, yCoordinate, keyword, pageable);
+				break;
+			case DISCOUNT_RATE:
+				stores = storeRepository.findByDiscountRate(xCoordinate, yCoordinate, keyword, pageable);
+				break;
+			case DEADLINE:
+				stores = storeRepository.findByDeadLine(xCoordinate, yCoordinate, keyword, pageable);
+				break;
+		}
+
+		return StoresInfoSliceRes.from(stores);
 	}
 
 	private Store validateMemberAndStoreOwner(Long providerId, Long storeId) {

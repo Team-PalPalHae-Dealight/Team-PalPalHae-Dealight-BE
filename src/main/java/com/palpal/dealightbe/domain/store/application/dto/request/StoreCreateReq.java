@@ -6,7 +6,8 @@ import java.util.Set;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
-import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
+import com.palpal.dealightbe.domain.address.domain.Address;
+import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
 
@@ -32,12 +33,13 @@ public record StoreCreateReq(
 	Set<DayOff> dayOff
 ) {
 
-	public static Store toStore(StoreCreateReq request) {
+	public static Store toStore(StoreCreateReq request, Address address, Member member) {
 		return Store.builder()
+			.member(member)
 			.storeNumber(request.storeNumber)
 			.name(request.name)
+			.address(address)
 			.telephone(request.telephone)
-			.address(AddressRes.toAddress(request.addressName, request.xCoordinate, request.yCoordinate))
 			.openTime(request.openTime)
 			.closeTime(request.closeTime)
 			.dayOff(request.dayOff)

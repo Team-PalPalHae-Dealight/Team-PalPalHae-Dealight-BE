@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
@@ -51,15 +52,18 @@ public class SecurityConfig {
 	}
 
 	@Bean
+	WebSecurityCustomizer webSecurityCustomizer() {
+		// 전체 공개 URL
+		return web -> web.ignoring()
+			.antMatchers("/docs/**");
+	}
+
+	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
 			.cors().configurationSource(corsConfigurationSource())
 			.and()
 			.authorizeRequests()
-			// 전체 공개 URL
-			.antMatchers(HttpMethod.OPTIONS,
-				"/docs/**"
-			).permitAll()
 			// 운영자용 URL
 			.antMatchers(HttpMethod.OPTIONS,
 				"/h2-console/**", "/actuator/**"
