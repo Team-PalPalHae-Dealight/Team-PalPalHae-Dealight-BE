@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.palpal.dealightbe.domain.cart.application.dto.response.CartRes;
 import com.palpal.dealightbe.domain.cart.domain.Cart;
+import com.palpal.dealightbe.domain.cart.domain.CartAdditionType;
 import com.palpal.dealightbe.domain.cart.domain.CartRepository;
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
@@ -32,27 +33,16 @@ public class CartService {
 	private final CartRepository cartRepository;
 	private final ItemRepository itemRepository;
 
-	public CartRes checkAndAddItem(Long providerId, Long itemId) {
+	public CartRes addItem(Long providerId, Long itemId, CartAdditionType cartAdditionType) {
 		Item item = getItem(itemId);
 
 		validateOwnStoreItem(providerId, item);
 
-		validateAnotherStoreItemExistence(providerId, item.getStore().getId());
+		List<Cart> carts = cartRepository.findAllByMemberProviderId(providerId);
 
-		CartRes cartRes = addItem(providerId, itemId);
+		validateAnotherStoreItemExistence(carts, item.getStore().getId(), cartAdditionType);
 
-		return cartRes;
-	}
-
-	public CartRes clearAndAddItem(Long providerId, Long itemId) {
-		Item item = getItem(itemId);
-
-		validateOwnStoreItem(providerId, item);
-
-		clearAnotherStoreItem(providerId, item.getStore().getId());
-
-		CartRes cartRes = addItem(providerId, itemId);
-
+		CartRes cartRes = addItem(providerId, itemId, carts, cartAdditionType);
 		return cartRes;
 	}
 
@@ -66,17 +56,8 @@ public class CartService {
 		}
 	}
 
-	private void clearAnotherStoreItem(Long providerId, Long attemptedStoreId) {
-		List<Cart> carts = cartRepository.findAllByMemberProviderId(providerId);
-		boolean existsAnotherStoreItem = existsAnotherStoreItem(carts, attemptedStoreId);
-
-		if (existsAnotherStoreItem) {
-			cartRepository.deleteAll(carts);
-		}
-	}
-
-	private CartRes addItem(Long providerId, Long itemId) {
-		Cart cart = getCartToAddItem(itemId, providerId);
+	private CartRes addItem(Long providerId, Long itemId, List<Cart> carts, CartAdditionType cartAdditionType) {
+		Cart cart = getCartToAddItem(itemId, providerId, carts, cartAdditionType);
 
 		cart.updateExpiration();
 
@@ -85,7 +66,7 @@ public class CartService {
 		return CartRes.from(savedCart);
 	}
 
-	private Cart getCartToAddItem(Long itemId, Long providerId) {
+	private Cart getCartToAddItem(Long itemId, Long providerId, List<Cart> carts, CartAdditionType cartAdditionType) {
 
 		return cartRepository.findByItemIdAndMemberProviderId(itemId, providerId)
 			.map(cart -> {
@@ -98,13 +79,18 @@ public class CartService {
 			});
 	}
 
-	private void validateAnotherStoreItemExistence(Long providerId, Long attemptedStoreId) {
-		List<Cart> carts = cartRepository.findAllByMemberProviderId(providerId);
+	private void validateAnotherStoreItemExistence(List<Cart> carts, Long attemptedStoreId, CartAdditionType cartAdditionType) {
 		boolean existsAnotherStoreItem = existsAnotherStoreItem(carts, attemptedStoreId);
 
 		if (existsAnotherStoreItem) {
-			log.warn("POST:CREATE:ANOTHER_STORE_ITEM_ALREADY_EXISTS_IN_THE_CART : providerId = {}, existing storeId = {}, attempted storeId = {}", carts.get(0).getMemberProviderId(), carts.get(0).getStoreId(), attemptedStoreId);
-			throw new BusinessException(ANOTHER_STORE_ITEM_ALREADY_EXISTS_IN_THE_CART);
+			{
+				if (Objects.equals(cartAdditionType, CartAdditionType.BY_CHECK)) {
+					log.warn("POST:CREATE:ANOTHER_STORE_ITEM_ALREADY_EXISTS_IN_THE_CART : providerId = {}, existing storeId = {}, attempted storeId = {}", carts.get(0).getMemberProviderId(), carts.get(0).getStoreId(), attemptedStoreId);
+					throw new BusinessException(ANOTHER_STORE_ITEM_ALREADY_EXISTS_IN_THE_CART);
+				}
+
+				cartRepository.deleteAll(carts);
+			}
 		}
 	}
 

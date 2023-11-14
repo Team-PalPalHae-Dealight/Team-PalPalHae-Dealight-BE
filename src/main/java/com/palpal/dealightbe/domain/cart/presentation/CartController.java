@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.palpal.dealightbe.domain.cart.application.CartService;
 import com.palpal.dealightbe.domain.cart.application.dto.response.CartRes;
+import com.palpal.dealightbe.domain.cart.domain.CartAdditionType;
 import com.palpal.dealightbe.global.aop.ProviderId;
 
 @RestController
@@ -23,16 +24,10 @@ public class CartController {
 
 	@ProviderId
 	@PostMapping("/items")
-	public ResponseEntity<CartRes> checkAndAddItem(Long providerId, @RequestParam("id") Long itemId) {
-		CartRes cartRes = cartService.checkAndAddItem(providerId, itemId);
+	public ResponseEntity<CartRes> addItem(Long providerId, @RequestParam("id") Long itemId, @RequestParam("type") String cartAdditionType) {
+		CartAdditionType additionType = CartAdditionType.findCartAdditionType(cartAdditionType);
 
-		return ResponseEntity.ok(cartRes);
-	}
-
-	@ProviderId
-	@PostMapping("/clear/items")
-	public ResponseEntity<CartRes> clearAndAddItem(Long providerId, @RequestParam("id") Long itemId) {
-		CartRes cartRes = cartService.clearAndAddItem(providerId, itemId);
+		CartRes cartRes = cartService.addItem(providerId, itemId, additionType);
 
 		return ResponseEntity.ok(cartRes);
 	}
