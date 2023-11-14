@@ -40,7 +40,9 @@ public class CartService {
 
 		validateAnotherStoreItemExistence(providerId, item.getStore().getId());
 
-		return addItem(providerId, itemId);
+		CartRes cartRes = addItem(providerId, itemId);
+
+		return cartRes;
 	}
 
 	public CartRes clearAndAddItem(Long providerId, Long itemId) {
@@ -50,7 +52,9 @@ public class CartService {
 
 		clearAnotherStoreItem(providerId, item.getStore().getId());
 
-		return addItem(providerId, itemId);
+		CartRes cartRes = addItem(providerId, itemId);
+
+		return cartRes;
 	}
 
 	private void validateOwnStoreItem(Long providerId, Item item) {

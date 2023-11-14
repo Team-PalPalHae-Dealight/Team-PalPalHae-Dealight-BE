@@ -25,7 +25,7 @@ import com.palpal.dealightbe.global.error.exception.BusinessException;
 @RedisHash("carts")
 public class Cart {
 
-	public static int INITIAL_QUANTITY = 1;
+	private static final int INITIAL_QUANTITY = 1;
 
 	@Id
 	private Long id;
@@ -81,7 +81,7 @@ public class Cart {
 	}
 
 	private void validateQuantity(int quantity, int stock) {
-		if (quantity < 1 || quantity > stock) {
+		if (quantity < INITIAL_QUANTITY || quantity > stock) {
 			log.warn("INVALID_CART_QUANTITY : quantity = {}, stock = {}", quantity, stock);
 			throw new BusinessException(INVALID_CART_QUANTITY);
 		}
