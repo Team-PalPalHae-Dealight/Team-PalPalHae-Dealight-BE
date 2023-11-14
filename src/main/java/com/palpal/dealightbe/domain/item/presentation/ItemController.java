@@ -28,6 +28,8 @@ import com.palpal.dealightbe.global.aop.ProviderId;
 @RestController
 public class ItemController {
 
+	private static final String DEFAULT_PAGE_SIZE = "5";
+
 	private final ItemService itemService;
 
 	@ProviderId
@@ -49,7 +51,7 @@ public class ItemController {
 
 	@ProviderId
 	@GetMapping("/stores")
-	public ResponseEntity<ItemsRes> findAllForStore(Long providerId, @RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = "5") int size) {
+	public ResponseEntity<ItemsRes> findAllForStore(Long providerId, @RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = DEFAULT_PAGE_SIZE) int size) {
 		page = Math.max(page - 1, 0);
 		PageRequest pageable = PageRequest.of(page, size);
 
@@ -59,7 +61,7 @@ public class ItemController {
 	}
 
 	@GetMapping("/members")
-	public ResponseEntity<ItemsRes> findAllForMember(@RequestParam("x-coordinate") double xCoordinate, @RequestParam("y-coordinate") double yCoordinate, @RequestParam("sort-by") String sortBy, @RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = "5") int size) {
+	public ResponseEntity<ItemsRes> findAllForMember(@RequestParam("x-coordinate") double xCoordinate, @RequestParam("y-coordinate") double yCoordinate, @RequestParam("sort-by") String sortBy, @RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = DEFAULT_PAGE_SIZE) int size) {
 		page = Math.max(page - 1, 0);
 		PageRequest pageable = PageRequest.of(page, size);
 
@@ -69,7 +71,7 @@ public class ItemController {
 	}
 
 	@GetMapping("/stores/{storeId}")
-	public ResponseEntity<ItemsRes> findAllByStoreId(@PathVariable Long storeId, @RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = "5") int size) {
+	public ResponseEntity<ItemsRes> findAllByStoreId(@PathVariable Long storeId, @RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = DEFAULT_PAGE_SIZE) int size) {
 		page = Math.max(page - 1, 0);
 		PageRequest pageable = PageRequest.of(page, size);
 
