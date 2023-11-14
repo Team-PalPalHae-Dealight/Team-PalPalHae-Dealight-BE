@@ -1,6 +1,7 @@
 package com.palpal.dealightbe.domain.cart.application;
 
 import static com.palpal.dealightbe.global.error.ErrorCode.ANOTHER_STORE_ITEM_ALREADY_EXISTS_IN_THE_CART;
+import static com.palpal.dealightbe.global.error.ErrorCode.EXCEEDED_CART_ITEM_SIZE;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ATTEMPT_TO_ADD_OWN_STORE_ITEM_TO_CART;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
 
@@ -29,6 +30,8 @@ import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 @Service
 @RequiredArgsConstructor
 public class CartService {
+
+	private static final int MAXIMUM_CART_SIZE = 5;
 
 	private final CartRepository cartRepository;
 	private final ItemRepository itemRepository;
@@ -74,6 +77,8 @@ public class CartService {
 				return cart;
 			})
 			.orElseGet(() -> {
+				validateExceedCartItemSize(carts, cartAdditionType);
+
 				Item item = getItem(itemId);
 				return toCart(providerId, item);
 			});
@@ -98,6 +103,17 @@ public class CartService {
 
 		return carts.stream()
 			.anyMatch(cart -> !Objects.equals(cart.getStoreId(), attemptedStoreId));
+	}
+
+	private void validateExceedCartItemSize(List<Cart> carts, CartAdditionType cartAdditionType) {
+		if (carts.size() >= MAXIMUM_CART_SIZE) {
+			if (Objects.equals(cartAdditionType, CartAdditionType.BY_CHECK)) {
+				log.warn("POST:CREATE:EXCEED_CART_ITEM_SIZE : cart size = {}", carts.size());
+				throw new BusinessException(EXCEEDED_CART_ITEM_SIZE);
+			}
+
+			cartRepository.deleteAll(carts);
+		}
 	}
 
 	private Item getItem(Long itemId) {
