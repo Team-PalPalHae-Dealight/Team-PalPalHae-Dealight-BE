@@ -1,6 +1,7 @@
 package com.palpal.dealightbe.domain.cart.presentation;
 
 import static com.palpal.dealightbe.global.error.ErrorCode.ANOTHER_STORE_ITEM_ALREADY_EXISTS_IN_THE_CART;
+import static com.palpal.dealightbe.global.error.ErrorCode.EXCEEDED_CART_ITEM_SIZE;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ATTEMPT_TO_ADD_OWN_STORE_ITEM_TO_CART;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
 import static org.mockito.ArgumentMatchers.any;
@@ -168,22 +169,23 @@ class CartControllerTest {
 			.build();
 	}
 
-	@DisplayName("장바구니 담기 성공 테스트 (타 업체 상품 존재 시 예외 처리 api)")
+	@DisplayName("장바구니 담기 성공 테스트")
 	@Test
-	void checkAndAddItemSuccessTest() throws Exception {
+	void addItemSuccessTest() throws Exception {
 		//given
 		Long itemId = 1L;
 
 		CartRes cartRes = new CartRes(123456789L, cart.getItemId(), cart.getStoreId(), cart.getMemberProviderId(), cart.getItemName(), cart.getStock(), cart.getDiscountPrice(), cart.getItemImage(), cart.getQuantity(), cart.getStoreName(), cart.getStoreCloseTime());
 
-		when(cartService.checkAndAddItem(any(), any())).thenReturn(cartRes);
+		when(cartService.addItem(any(), any(), any())).thenReturn(cartRes);
 
 		//when
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
-				.param("id", String.valueOf(itemId)))
+				.param("id", String.valueOf(itemId))
+				.param("type", "check"))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.cartId").value(cartRes.cartId()))
 			.andExpect(jsonPath("$.itemId").value(cartRes.itemId()))
@@ -197,14 +199,15 @@ class CartControllerTest {
 			.andExpect(jsonPath("$.storeName").value(cartRes.storeName()))
 			.andExpect(jsonPath("$.storeCloseTime").value(cartRes.storeCloseTime().toString()))
 			.andDo(print())
-			.andDo(document("cart/cart-check-and-add-item",
+			.andDo(document("cart/cart-add-item",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestHeaders(
 					headerWithName("Authorization").description("Access Token")
 				),
 				requestParameters(
-					parameterWithName("id").description("상품 ID")
+					parameterWithName("id").description("상품 ID"),
+					parameterWithName("type").description("장바구니 담기 타입")
 				),
 				responseFields(
 					fieldWithPath("cartId").type(NUMBER).description("장바구니 ID"),
@@ -222,35 +225,36 @@ class CartControllerTest {
 			));
 	}
 
-	@DisplayName("장바구니 담기 실패 테스트 (타 업체 상품 존재 시 예외 처리 api) - 본인이 등록한 업체의 상품 담기 불가")
+	@DisplayName("장바구니 담기 실패 테스트 - 유효하지 않은 장바구니 담기 타입")
 	@Test
-	void checkAndAddItemFailureTest_invalidAttemptOwnStoreItem() throws Exception {
+	void addItemFailureTest_invalidCartAdditionType() throws Exception {
 		//given
 		Long itemId = 1L;
 
-		doThrow(new BusinessException(INVALID_ATTEMPT_TO_ADD_OWN_STORE_ITEM_TO_CART)).when(
-			cartService).checkAndAddItem(any(), any());
+		//when(CartAdditionType.findCartAdditionType("exception")).thenThrow(new BusinessException(INVALID_CART_ADDITION_TYPE));
 
 		//when
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
-				.param("id", String.valueOf(itemId)))
+				.param("id", String.valueOf(itemId))
+				.param("type", "failure"))
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
-			.andExpect(jsonPath("$.code").value("CT004"))
+			.andExpect(jsonPath("$.code").value("CT006"))
 			.andExpect(jsonPath("$.errors").isEmpty())
-			.andExpect(jsonPath("$.message").value("본인이 등록한 업체의 상품은 장바구니에 담을 수 없습니다."))
+			.andExpect(jsonPath("$.message").value("유효하지 않은 장바구니 담기 타입 입니다."))
 			.andDo(print())
-			.andDo(document("cart/cart-check-and-add-item-invalid-attempt-own-store-item",
+			.andDo(document("cart/cart-add-item-invalid-cart-addition-type",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestHeaders(
 					headerWithName("Authorization").description("Access Token")
 				),
 				requestParameters(
-					parameterWithName("id").description("상품 ID")
+					parameterWithName("id").description("상품 ID"),
+					parameterWithName("type").description("장바구니 담기 타입")
 				),
 				responseFields(
 					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
@@ -261,35 +265,78 @@ class CartControllerTest {
 			));
 	}
 
-	@DisplayName("장바구니 담기 실패 테스트 (타 업체 상품 존재 시 예외 처리 api) - 타 업체 상품 존재")
+	@DisplayName("장바구니 담기 실패 테스트 - 본인이 등록한 업체의 상품 담기 불가")
 	@Test
-	void checkAndAddItemFailureTest_anotherStoreItemExists() throws Exception {
+	void addItemFailureTest_invalidAttemptOwnStoreItem() throws Exception {
 		//given
 		Long itemId = 1L;
 
-		doThrow(new BusinessException(ANOTHER_STORE_ITEM_ALREADY_EXISTS_IN_THE_CART)).when(
-			cartService).checkAndAddItem(any(), any());
+		doThrow(new BusinessException(INVALID_ATTEMPT_TO_ADD_OWN_STORE_ITEM_TO_CART)).when(
+			cartService).addItem(any(), any(), any());
 
 		//when
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
-				.param("id", String.valueOf(itemId)))
+				.param("id", String.valueOf(itemId))
+				.param("type", "check"))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("CT004"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("본인이 등록한 업체의 상품은 장바구니에 담을 수 없습니다."))
+			.andDo(print())
+			.andDo(document("cart/cart-add-item-invalid-attempt-own-store-item",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				requestParameters(
+					parameterWithName("id").description("상품 ID"),
+					parameterWithName("type").description("장바구니 담기 타입")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("예외 코드"),
+					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@DisplayName("장바구니 담기 실패 테스트 - 타 업체 상품이 존재하는 경우")
+	@Test
+	void addItemFailureTest_anotherStoreItemExists() throws Exception {
+		//given
+		Long itemId = 1L;
+
+		doThrow(new BusinessException(ANOTHER_STORE_ITEM_ALREADY_EXISTS_IN_THE_CART)).when(
+			cartService).addItem(any(), any(), any());
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.param("id", String.valueOf(itemId))
+				.param("type", "check"))
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
 			.andExpect(jsonPath("$.code").value("CT003"))
 			.andExpect(jsonPath("$.errors").isEmpty())
 			.andExpect(jsonPath("$.message").value("이미 다른 업체의 상품이 장바구니에 담겨 있습니다."))
 			.andDo(print())
-			.andDo(document("cart/cart-check-and-add-item-another-store-item-exists",
+			.andDo(document("cart/cart-add-item-another-store-item-exists",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestHeaders(
 					headerWithName("Authorization").description("Access Token")
 				),
 				requestParameters(
-					parameterWithName("id").description("상품 ID")
+					parameterWithName("id").description("상품 ID"),
+					parameterWithName("type").description("장바구니 담기 타입")
 				),
 				responseFields(
 					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
@@ -300,128 +347,37 @@ class CartControllerTest {
 			));
 	}
 
-	@DisplayName("장바구니 담기 실패 테스트 (타 업체 상품 존재 시 예외 처리 api) - 상품이 존재하지 않는 경우")
+	@DisplayName("장바구니 담기 실패 테스트 - 최대 5개 종류를 초과하여 장바구니 담기 시도하는 경우")
 	@Test
-	void checkAndAddItemFailureTest_itemNotFound() throws Exception {
+	void addItemFailureTest_exceededCartItemSize() throws Exception {
 		//given
 		Long itemId = 1L;
 
-		doThrow(new EntityNotFoundException(NOT_FOUND_ITEM)).when(
-			cartService).checkAndAddItem(any(), any());
+		doThrow(new BusinessException(EXCEEDED_CART_ITEM_SIZE)).when(
+			cartService).addItem(any(), any(), any());
 
 		//when
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
-				.param("id", String.valueOf(itemId)))
-			.andExpect(status().isNotFound())
-			.andExpect(jsonPath("$.timestamp").isNotEmpty())
-			.andExpect(jsonPath("$.code").value("I002"))
-			.andExpect(jsonPath("$.errors").isEmpty())
-			.andExpect(jsonPath("$.message").value("상품이 존재하지 않습니다."))
-			.andDo(print())
-			.andDo(document("cart/cart-check-and-add-item-item-not-found",
-				preprocessRequest(prettyPrint()),
-				preprocessResponse(prettyPrint()),
-				requestHeaders(
-					headerWithName("Authorization").description("Access Token")
-				),
-				requestParameters(
-					parameterWithName("id").description("상품 ID")
-				),
-				responseFields(
-					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
-					fieldWithPath("code").type(STRING).description("예외 코드"),
-					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
-					fieldWithPath("message").type(STRING).description("오류 메시지")
-				)
-			));
-	}
-
-	@DisplayName("장바구니 담기 성공 테스트 (타 업체 상품 존재 시 초기화 api)")
-	@Test
-	void clearAndAddItemSuccessTest() throws Exception {
-		//given
-		Long itemId = 1L;
-
-		CartRes cartRes = new CartRes(123456789L, cart.getItemId(), cart.getStoreId(), cart.getMemberProviderId(), cart.getItemName(), cart.getStock(), cart.getDiscountPrice(), cart.getItemImage(), cart.getQuantity(), cart.getStoreName(), cart.getStoreCloseTime());
-
-		when(cartService.clearAndAddItem(any(), any())).thenReturn(cartRes);
-
-		//when
-		//then
-		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/clear/items")
-				.contentType(MediaType.APPLICATION_JSON)
-				.header("Authorization", "Bearer {ACCESS_TOKEN}")
-				.param("id", String.valueOf(itemId)))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.cartId").value(cartRes.cartId()))
-			.andExpect(jsonPath("$.itemId").value(cartRes.itemId()))
-			.andExpect(jsonPath("$.storeId").value(cartRes.storeId()))
-			.andExpect(jsonPath("$.memberProviderId").value(cartRes.memberProviderId()))
-			.andExpect(jsonPath("$.itemName").value(cartRes.itemName()))
-			.andExpect(jsonPath("$.stock").value(cartRes.stock()))
-			.andExpect(jsonPath("$.discountPrice").value(cartRes.discountPrice()))
-			.andExpect(jsonPath("$.itemImage").value(cartRes.itemImage()))
-			.andExpect(jsonPath("$.quantity").value(cartRes.quantity()))
-			.andExpect(jsonPath("$.storeName").value(cartRes.storeName()))
-			.andExpect(jsonPath("$.storeCloseTime").value(cartRes.storeCloseTime().toString()))
-			.andDo(print())
-			.andDo(document("cart/cart-clear-and-add-item",
-				preprocessRequest(prettyPrint()),
-				preprocessResponse(prettyPrint()),
-				requestHeaders(
-					headerWithName("Authorization").description("Access Token")
-				),
-				requestParameters(
-					parameterWithName("id").description("상품 ID")
-				),
-				responseFields(
-					fieldWithPath("cartId").type(NUMBER).description("장바구니 ID"),
-					fieldWithPath("itemId").type(NUMBER).description("상품 ID"),
-					fieldWithPath("storeId").type(NUMBER).description("업체 ID"),
-					fieldWithPath("memberProviderId").type(NUMBER).description("회원 provider ID"),
-					fieldWithPath("itemName").type(STRING).description("상품 이름"),
-					fieldWithPath("stock").type(NUMBER).description("재고 수"),
-					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
-					fieldWithPath("itemImage").type(STRING).description("상품 이미지 경로"),
-					fieldWithPath("quantity").type(NUMBER).description("장바구니에 담은 개수"),
-					fieldWithPath("storeName").type(STRING).description("상호명"),
-					fieldWithPath("storeCloseTime").type(STRING).description("마감 시간")
-				)
-			));
-	}
-
-	@DisplayName("장바구니 담기 실패 테스트 (타 업체 상품 존재 시 초기화 api) - 본인이 등록한 업체의 상품 담기 불가")
-	@Test
-	void clearAndAddItemFailureTest_invalidAttemptOwnStoreItem() throws Exception {
-		//given
-		Long itemId = 1L;
-
-		doThrow(new BusinessException(INVALID_ATTEMPT_TO_ADD_OWN_STORE_ITEM_TO_CART)).when(
-			cartService).clearAndAddItem(any(), any());
-
-		//when
-		//then
-		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/clear/items")
-				.contentType(MediaType.APPLICATION_JSON)
-				.header("Authorization", "Bearer {ACCESS_TOKEN}")
-				.param("id", String.valueOf(itemId)))
+				.param("id", String.valueOf(itemId))
+				.param("type", "check"))
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
-			.andExpect(jsonPath("$.code").value("CT004"))
+			.andExpect(jsonPath("$.code").value("CT005"))
 			.andExpect(jsonPath("$.errors").isEmpty())
-			.andExpect(jsonPath("$.message").value("본인이 등록한 업체의 상품은 장바구니에 담을 수 없습니다."))
+			.andExpect(jsonPath("$.message").value("최대 5가지 종류의 상품까지만 장바구니에 담을 수 있습니다."))
 			.andDo(print())
-			.andDo(document("cart/cart-clear-and-add-item-invalid-attempt-own-store-item",
+			.andDo(document("cart/cart-add-item-exceeded-cart-item-size",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestHeaders(
 					headerWithName("Authorization").description("Access Token")
 				),
 				requestParameters(
-					parameterWithName("id").description("상품 ID")
+					parameterWithName("id").description("상품 ID"),
+					parameterWithName("type").description("장바구니 담기 타입")
 				),
 				responseFields(
 					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
@@ -432,35 +388,37 @@ class CartControllerTest {
 			));
 	}
 
-	@DisplayName("장바구니 담기 실패 테스트 (타 업체 상품 존재 시 초기화 api) - 상품이 존재하지 않는 경우")
+	@DisplayName("장바구니 담기 실패 테스트 - 상품이 존재하지 않는 경우")
 	@Test
-	void clearAndAddItemFailureTest_itemNotFound() throws Exception {
+	void addItemFailureTest_itemNotFound() throws Exception {
 		//given
 		Long itemId = 1L;
 
 		doThrow(new EntityNotFoundException(NOT_FOUND_ITEM)).when(
-			cartService).clearAndAddItem(any(), any());
+			cartService).addItem(any(), any(), any());
 
 		//when
 		//then
-		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/clear/items")
+		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
-				.param("id", String.valueOf(itemId)))
+				.param("id", String.valueOf(itemId))
+				.param("type", "check"))
 			.andExpect(status().isNotFound())
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
 			.andExpect(jsonPath("$.code").value("I002"))
 			.andExpect(jsonPath("$.errors").isEmpty())
 			.andExpect(jsonPath("$.message").value("상품이 존재하지 않습니다."))
 			.andDo(print())
-			.andDo(document("cart/cart-clear-and-add-item-item-not-found",
+			.andDo(document("cart/cart-add-item-item-not-found",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestHeaders(
 					headerWithName("Authorization").description("Access Token")
 				),
 				requestParameters(
-					parameterWithName("id").description("상품 ID")
+					parameterWithName("id").description("상품 ID"),
+					parameterWithName("type").description("장바구니 담기 타입")
 				),
 				responseFields(
 					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
@@ -470,4 +428,5 @@ class CartControllerTest {
 				)
 			));
 	}
+
 }
