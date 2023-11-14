@@ -69,6 +69,9 @@ public enum ErrorCode {
 
 	//알림
 	NOT_FOUND_NOTIFICATION("N001", "존재하지 않는 알림입니다."),
+
+	// SSE
+	SSE_STREAM_ERROR("SSE001", "SSE 스트림 연결 중 오류가 발생했습니다."),
 	;
 
 	private final String code;
