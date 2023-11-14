@@ -2,6 +2,7 @@ package com.palpal.dealightbe.domain.store.domain;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -35,7 +36,8 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
 	Slice<Store> findByDistanceWithin3Km(
 		@Param("xCoordinate") double xCoordinate,
 		@Param("yCoordinate") double yCoordinate,
-		@Param("keyword") String keyword
+		@Param("keyword") String keyword,
+		Pageable pageable
 	);
 
 	@Query(value =
@@ -55,7 +57,8 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
 	Slice<Store> findByDeadLine(
 		@Param("xCoordinate") double xCoordinate,
 		@Param("yCoordinate") double yCoordinate,
-		@Param("keyword") String keyword
+		@Param("keyword") String keyword,
+		Pageable pageable
 	);
 
 	@Query(value =
@@ -75,6 +78,7 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
 	Slice<Store> findByDiscountRate(
 		@Param("xCoordinate") double xCoordinate,
 		@Param("yCoordinate") double yCoordinate,
-		@Param("keyword") String keyword
+		@Param("keyword") String keyword,
+		Pageable pageable
 	);
 }

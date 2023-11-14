@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -187,14 +189,15 @@ public class StoreRepositoryTest {
 		double within3KmX = 37.4980136;
 		double within3KmY = 127.0279372;
 		String keyword = "떡볶이";
+		Pageable pageable = PageRequest.of(0, 2);
 
 		double longDistanceX = 35.44142;
 		double longDistanceY = 128.2417;
 		String keyword2 = "순대";
 
 		//when
-		Slice<Store> stores = storeRepository.findByDistanceWithin3Km(within3KmX, within3KmY, keyword);
-		Slice<Store> stores2 = storeRepository.findByDistanceWithin3Km(longDistanceX, longDistanceY, keyword2);
+		Slice<Store> stores = storeRepository.findByDistanceWithin3Km(within3KmX, within3KmY, keyword, pageable);
+		Slice<Store> stores2 = storeRepository.findByDistanceWithin3Km(longDistanceX, longDistanceY, keyword2, pageable);
 
 		//then
 		assertThat(stores).isNotNull();
@@ -212,9 +215,10 @@ public class StoreRepositoryTest {
 		double within3KmX = 37.4980136;
 		double within3KmY = 127.0279372;
 		String keyword = "떡볶이";
+		Pageable pageable = PageRequest.of(0, 2);
 
 		//when
-		Slice<Store> stores = storeRepository.findByDeadLine(within3KmX, within3KmY, keyword);
+		Slice<Store> stores = storeRepository.findByDeadLine(within3KmX, within3KmY, keyword, pageable);
 
 		//then
 		assertThat(stores).isNotNull();
@@ -230,9 +234,10 @@ public class StoreRepositoryTest {
 		double within3KmX = 37.4980136;
 		double within3KmY = 127.0279372;
 		String keyword = "떡볶이";
+		Pageable pageable = PageRequest.of(0, 2);
 
 		//when
-		Slice<Store> stores = storeRepository.findByDiscountRate(within3KmX, within3KmY, keyword);
+		Slice<Store> stores = storeRepository.findByDiscountRate(within3KmX, within3KmY, keyword, pageable);
 
 		//then
 		assertThat(stores).isNotNull();
