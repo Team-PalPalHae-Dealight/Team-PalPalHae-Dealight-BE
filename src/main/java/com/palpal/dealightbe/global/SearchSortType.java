@@ -29,7 +29,7 @@ public enum SearchSortType {
 			.filter(searchSortType -> Objects.equals(searchSortType.type, sortType))
 			.findAny()
 			.orElseThrow(() -> {
-				log.error("INVALID_ITEM_SORT_TYPE : {}", sortType);
+				log.error("INVALID_SEARCH_SORT_TYPE : {}", sortType);
 				return new BusinessException(ErrorCode.INVALID_SEARCH_SORT_TYPE);
 			});
 	}
