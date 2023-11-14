@@ -1,5 +1,7 @@
 package com.palpal.dealightbe.domain.item.domain;
 
+import static com.palpal.dealightbe.global.error.ErrorCode.*;
+
 import javax.persistence.Column;
 
 import javax.persistence.Entity;
@@ -20,8 +22,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import static com.palpal.dealightbe.global.error.ErrorCode.*;
 
 @Slf4j
 @Getter
