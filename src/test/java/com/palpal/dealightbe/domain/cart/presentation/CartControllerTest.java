@@ -180,7 +180,7 @@ class CartControllerTest {
 
 		//when
 		//then
-		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/orders/carts")
+		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.param("id", String.valueOf(itemId)))
@@ -233,7 +233,7 @@ class CartControllerTest {
 
 		//when
 		//then
-		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/orders/carts")
+		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.param("id", String.valueOf(itemId)))
@@ -272,7 +272,7 @@ class CartControllerTest {
 
 		//when
 		//then
-		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/orders/carts")
+		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.param("id", String.valueOf(itemId)))
@@ -311,7 +311,7 @@ class CartControllerTest {
 
 		//when
 		//then
-		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/orders/carts")
+		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.param("id", String.valueOf(itemId)))
@@ -351,7 +351,7 @@ class CartControllerTest {
 
 		//when
 		//then
-		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/orders/carts/clear")
+		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/clear/items")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.param("id", String.valueOf(itemId)))
@@ -404,7 +404,7 @@ class CartControllerTest {
 
 		//when
 		//then
-		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/orders/carts/clear")
+		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/clear/items")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.param("id", String.valueOf(itemId)))
@@ -443,7 +443,7 @@ class CartControllerTest {
 
 		//when
 		//then
-		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/orders/carts/clear")
+		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/clear/items")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.param("id", String.valueOf(itemId)))

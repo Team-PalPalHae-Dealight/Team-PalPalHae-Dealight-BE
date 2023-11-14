@@ -14,7 +14,7 @@ endif::[]
 == Cart API
 ===  타 업체 상품 존재 시 예외 처리 api : 장바구니 담기
 
-==== /api/orders/carts?id={itemId}
+==== /api/carts/items?id={itemId}
 
 .Request - 성공
 include::{snippets}/cart/cart-check-and-add-item/http-request.adoc[]
@@ -79,7 +79,7 @@ include::{snippets}/cart/cart-check-and-add-item-item-not-found/response-fields.
 
 ===  타 업체 상품 존재 시 초기화 api : 장바구니 담기
 
-==== /api/orders/carts/clear?id={itemId}
+==== /api/carts/clear/items?id={itemId}
 
 .Request - 성공
 include::{snippets}/cart/cart-clear-and-add-item/http-request.adoc[]

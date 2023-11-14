@@ -14,7 +14,7 @@ import com.palpal.dealightbe.domain.cart.application.dto.response.CartRes;
 import com.palpal.dealightbe.global.aop.ProviderId;
 
 @RestController
-@RequestMapping("/api/orders/carts")
+@RequestMapping("/api/carts")
 @RequiredArgsConstructor
 @Slf4j
 public class CartController {
@@ -22,7 +22,7 @@ public class CartController {
 	private final CartService cartService;
 
 	@ProviderId
-	@PostMapping
+	@PostMapping("/items")
 	public ResponseEntity<CartRes> checkAndAddItem(Long providerId, @RequestParam("id") Long itemId) {
 		CartRes cartRes = cartService.checkAndAddItem(providerId, itemId);
 
@@ -30,7 +30,7 @@ public class CartController {
 	}
 
 	@ProviderId
-	@PostMapping("/clear")
+	@PostMapping("/clear/items")
 	public ResponseEntity<CartRes> clearAndAddItem(Long providerId, @RequestParam("id") Long itemId) {
 		CartRes cartRes = cartService.clearAndAddItem(providerId, itemId);
 
