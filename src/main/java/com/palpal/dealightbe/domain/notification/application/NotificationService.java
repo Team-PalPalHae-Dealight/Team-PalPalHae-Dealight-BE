@@ -1,5 +1,7 @@
 package com.palpal.dealightbe.domain.notification.application;
 
+import static com.palpal.dealightbe.global.error.ErrorCode.SSE_STREAM_ERROR;
+
 import java.io.IOException;
 import java.util.Map;
 
@@ -15,6 +17,7 @@ import com.palpal.dealightbe.domain.notification.domain.NotificationRepository;
 import com.palpal.dealightbe.domain.order.domain.Order;
 import com.palpal.dealightbe.domain.order.domain.OrderStatus;
 import com.palpal.dealightbe.domain.store.domain.Store;
+import com.palpal.dealightbe.global.error.exception.BusinessException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,7 +33,6 @@ public class NotificationService {
 
 		String emitterId = userType.getRole() + "_" + id + "_" + System.currentTimeMillis();
 
-		System.out.println("NotificationService.subscribe" + emitterId);
 		SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
 		emitterRepository.save(emitterId, emitter);
 
@@ -57,7 +59,7 @@ public class NotificationService {
 			emitter.send(SseEmitter.event().id(emitterId).name("sse").data(data));
 		} catch (IOException exception) {
 			emitterRepository.deleteById(emitterId);
-			throw new RuntimeException("Error sending SSE", exception);
+			throw new BusinessException(SSE_STREAM_ERROR);
 		}
 	}
 
