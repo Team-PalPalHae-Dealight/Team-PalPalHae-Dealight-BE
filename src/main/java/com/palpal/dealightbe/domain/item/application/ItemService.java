@@ -1,7 +1,9 @@
 package com.palpal.dealightbe.domain.item.application;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import static com.palpal.dealightbe.global.SearchSortType.findSortType;
+import static com.palpal.dealightbe.global.error.ErrorCode.DUPLICATED_ITEM_NAME;
+import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
+import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_STORE;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,14 +17,14 @@ import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemsRes;
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
-import com.palpal.dealightbe.domain.item.domain.ItemSortType;
+import com.palpal.dealightbe.global.SearchSortType;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
-import static com.palpal.dealightbe.domain.item.domain.ItemSortType.findItemSortType;
-import static com.palpal.dealightbe.global.error.ErrorCode.*;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -69,7 +71,7 @@ public class ItemService {
 	public ItemsRes findAllForMember(double xCoordinate, double yCoordinate, String sortBy, Pageable pageable) {
 		Page<Item> items = Page.empty();
 
-		ItemSortType sortType = findItemSortType(sortBy);
+		SearchSortType sortType = findSortType(sortBy);
 
 		switch (sortType) {
 			case DEADLINE -> items = itemRepository.findAllByDeadline(xCoordinate, yCoordinate, pageable);

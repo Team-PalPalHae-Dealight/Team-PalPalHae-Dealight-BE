@@ -6,6 +6,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -16,14 +18,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.mock.web.MockMultipartFile;
 
 import com.palpal.dealightbe.domain.address.application.AddressService;
-import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
 import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.image.ImageService;
 import com.palpal.dealightbe.domain.image.application.dto.request.ImageUploadReq;
 import com.palpal.dealightbe.domain.image.application.dto.response.ImageRes;
+import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
@@ -33,6 +38,7 @@ import com.palpal.dealightbe.domain.store.application.dto.response.StoreByMember
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusRes;
+import com.palpal.dealightbe.domain.store.application.dto.response.StoresInfoSliceRes;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
@@ -60,8 +66,17 @@ class StoreServiceTest {
 
 	public static final String DEFAULT_PATH = "https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/image/free-store-icon.png";
 	private Member member;
+	private Member member2;
+	private Member member3;
 	private Store store;
+	private Store store2;
+	private Store store3;
+	private Item item;
+	private Item item2;
+	private Item item3;
 	private Address address;
+	private Address address2;
+	private Address address3;
 
 	@BeforeEach
 	void setUp() {
@@ -73,10 +88,32 @@ class StoreServiceTest {
 			.providerId(123L)
 			.build();
 
+		member2 = Member.builder()
+			.nickName("홍섭2")
+			.realName("이홍섭섭")
+			.phoneNumber("0100101021")
+			.provider("kakao")
+			.providerId(1234L)
+			.build();
+
+		member3 = Member.builder()
+			.nickName("홍섭23")
+			.realName("이홍섭섭섭")
+			.phoneNumber("02100101021")
+			.provider("kakao")
+			.providerId(12345L)
+			.build();
+
 		address = Address.builder()
-			.name("서울시 강남구")
-			.xCoordinate(111)
-			.yCoordinate(222)
+			.name("서울특별시 성북구 안암로 145")
+			.xCoordinate(127.0324773)
+			.yCoordinate(37.5893876)
+			.build();
+
+		address2 = Address.builder()
+			.name("서울특별시 종로구 이화동 대학로8길 1")
+			.xCoordinate(127.0028245)
+			.yCoordinate(37.5805009)
 			.build();
 
 		store = Store.builder()
@@ -84,11 +121,70 @@ class StoreServiceTest {
 			.name("맛짱고기")
 			.telephone("123123123")
 			.address(address)
-			.openTime(LocalTime.of(9, 0))
-			.closeTime(LocalTime.of(23, 0))
+			.openTime(LocalTime.of(12, 0))
+			.closeTime(LocalTime.of(20, 0))
 			.dayOff(Set.of(DayOff.FRI))
 			.build();
+		store.updateStatus(StoreStatus.OPENED);
 		store.updateMember(member);
+
+		store2 = Store.builder()
+			.storeNumber("8888")
+			.name("떡볶이를 파는집")
+			.telephone("123123123")
+			.address(address2)
+			.openTime(LocalTime.of(12, 0))
+			.closeTime(LocalTime.of(21, 0))
+			.dayOff(Set.of(DayOff.FRI))
+			.build();
+		store2.updateStatus(StoreStatus.OPENED);
+		store2.updateMember(member2);
+
+		store3 = Store.builder()
+			.storeNumber("8888")
+			.name("순대가 맛있는집")
+			.telephone("123123123")
+			.address(address3)
+			.openTime(LocalTime.of(10, 0))
+			.closeTime(LocalTime.of(11, 0))
+			.dayOff(Set.of(DayOff.FRI))
+			.build();
+		store3.updateMember(member3);
+		store3.updateStatus(StoreStatus.OPENED);
+
+		item = Item.builder()
+			.name("떡볶이")
+			.stock(2)
+			.discountPrice(3000)
+			.originalPrice(4500)
+			.description("기본 떡볶이 입니다.")
+			.information("통신사 할인 불가능 합니다.")
+			.image("https://fake-image.com/item1.png")
+			.store(store)
+			.build();
+
+		item2 = Item.builder()
+			.name("떡볶이")
+			.stock(2)
+			.discountPrice(4000)
+			.originalPrice(4500)
+			.description("기본 떡볶이 입니다.")
+			.information("통신사 할인 불가능 합니다.")
+			.image("https://fake-image.com/item1.png")
+			.store(store2)
+			.build();
+
+		item3 = Item.builder()
+			.name("어묵")
+			.stock(2)
+			.discountPrice(100)
+			.originalPrice(4500)
+			.description("기본 순대 입니다.")
+			.information("통신사 할인 불가능 합니다.")
+			.image("https://fake-image.com/item1.png")
+			.store(store3)
+			.build();
+
 	}
 
 	@DisplayName("업체 등록 성공")
@@ -102,7 +198,7 @@ class StoreServiceTest {
 		when(memberRepository.findMemberByProviderId(member.getProviderId()))
 			.thenReturn(Optional.of(member));
 		when(addressService.register(eq("서울시 강남구"), eq(67.89), eq(293.2323)))
-			.thenReturn(new AddressRes("서울시 강남구", 67.89, 293.2323));
+			.thenReturn(new Address("서울시 강남구", 67.89, 293.2323));
 
 		//when
 		StoreCreateRes storeCreateRes = storeService.register(member.getProviderId(), storeCreateReq);
@@ -124,7 +220,7 @@ class StoreServiceTest {
 		when(memberRepository.findMemberByProviderId(member.getProviderId()))
 			.thenReturn(Optional.of(member));
 		when(addressService.register(eq("서울시 강남구"), eq(67.89), eq(293.2323)))
-			.thenReturn(new AddressRes("서울시 강남구", 67.89, 293.2323));
+			.thenReturn(new Address("서울시 강남구", 67.89, 293.2323));
 
 		//when
 		StoreCreateRes storeCreateRes = storeService.register(member.getProviderId(), storeCreateReq);
@@ -162,7 +258,7 @@ class StoreServiceTest {
 		when(memberRepository.findMemberByProviderId(member.getProviderId()))
 			.thenReturn(Optional.of(member));
 		when(addressService.register(eq("서울시 강남구"), eq(67.89), eq(293.2323)))
-			.thenReturn(new AddressRes("서울시 강남구", 67.89, 293.2323));
+			.thenReturn(new Address("서울시 강남구", 67.89, 293.2323));
 
 		// when -> then
 		assertThrows(BusinessException.class, () -> {
@@ -338,5 +434,85 @@ class StoreServiceTest {
 		assertThrows(EntityNotFoundException.class, () -> {
 			storeService.findByProviderId(member.getProviderId());
 		});
+	}
+
+	@Test
+	@DisplayName("업체 기본 검색 - 3km 근방 내 가까운순으로 나온다.")
+	void searchByKeywordAndWithin3Km() throws Exception {
+
+		//given
+		double xCoordinate = 127.0221068;
+		double yCoordinate = 37.5912999;
+		String keyword = "떡볶이";
+		Pageable pageable = PageRequest.of(0, 2);
+
+		List<Store> stores = new ArrayList<>();
+		stores.add(store);
+		stores.add(store2);
+
+		SliceImpl<Store> storeSlice = new SliceImpl<>(stores);
+
+		when(storeRepository.findByDistanceWithin3Km(xCoordinate, yCoordinate, keyword, pageable))
+			.thenReturn(storeSlice);
+
+		//when
+		StoresInfoSliceRes search = storeService.search(xCoordinate, yCoordinate, keyword, null, pageable);
+
+		//then
+		assertThat(search.storeInfoSliceRes().get(0).name()).isEqualTo(store.getName());
+	}
+
+	@Test
+	@DisplayName("업체 필터 검색 - 마감 임박순")
+	void searchByKeywordAndDeadline() throws Exception {
+
+		//given
+		double xCoordinate = 127.0221068;
+		double yCoordinate = 37.5912999;
+		String keyword = "떡볶이";
+		String sortBy = "deadline";
+		Pageable pageable = PageRequest.of(0, 2);
+
+		List<Store> stores = new ArrayList<>();
+		stores.add(store);
+		stores.add(store2);
+
+		SliceImpl<Store> storeSlice = new SliceImpl<>(stores);
+
+		when(storeRepository.findByDeadLine(xCoordinate, yCoordinate, keyword, pageable))
+			.thenReturn(storeSlice);
+
+		//when
+		StoresInfoSliceRes search = storeService.search(xCoordinate, yCoordinate, keyword, sortBy, pageable);
+
+		//then
+		assertThat(search.storeInfoSliceRes().size()).isEqualTo(2);
+	}
+
+	@Test
+	@DisplayName("업체 필터 검색 - 할인률순")
+	void searchByKeywordAndDiscountRate() throws Exception {
+
+		//given
+		double xCoordinate = 127.0221068;
+		double yCoordinate = 37.5912999;
+		String keyword = "떡볶이";
+		String sortBy = "discount-rate";
+		Pageable pageable = PageRequest.of(0, 2);
+
+		List<Store> stores = new ArrayList<>();
+		stores.add(store);
+		stores.add(store2);
+
+		SliceImpl<Store> storeSlice = new SliceImpl<>(stores);
+
+		when(storeRepository.findByDiscountRate(xCoordinate, yCoordinate, keyword, pageable))
+			.thenReturn(storeSlice);
+
+		//when
+		StoresInfoSliceRes search = storeService.search(xCoordinate, yCoordinate, keyword, sortBy, pageable);
+
+		//then
+		assertThat(search.storeInfoSliceRes().size()).isEqualTo(2);
 	}
 }
