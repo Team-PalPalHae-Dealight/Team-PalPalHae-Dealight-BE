@@ -13,7 +13,6 @@ import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.palpal.dealightbe.domain.cart.application.dto.request.CartReq;
 import com.palpal.dealightbe.domain.cart.application.dto.response.CartRes;
 import com.palpal.dealightbe.domain.cart.domain.Cart;
 import com.palpal.dealightbe.domain.cart.domain.CartRepository;
@@ -95,7 +94,7 @@ public class CartService {
 			})
 			.orElseGet(() -> {
 				Item item = getItem(itemId);
-				return CartReq.toCart(providerId, item);
+				return toCart(providerId, item);
 			});
 	}
 
@@ -122,5 +121,20 @@ public class CartService {
 				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", itemId);
 				return new EntityNotFoundException(NOT_FOUND_ITEM);
 			});
+	}
+
+	private Cart toCart(Long memberProviderId, Item item) {
+
+		return Cart.builder()
+			.itemId(item.getId())
+			.storeId(item.getStore().getId())
+			.memberProviderId(memberProviderId)
+			.itemName(item.getName())
+			.stock(item.getStock())
+			.discountPrice(item.getDiscountPrice())
+			.itemImage(item.getImage())
+			.storeName(item.getStore().getName())
+			.storeCloseTime(item.getStore().getCloseTime())
+			.build();
 	}
 }
