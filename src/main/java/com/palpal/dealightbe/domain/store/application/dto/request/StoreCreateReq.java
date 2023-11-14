@@ -37,7 +37,6 @@ public record StoreCreateReq(
 			.storeNumber(request.storeNumber)
 			.name(request.name)
 			.telephone(request.telephone)
-			.address(AddressRes.toAddress(request.addressName, request.xCoordinate, request.yCoordinate))
 			.openTime(request.openTime)
 			.closeTime(request.closeTime)
 			.dayOff(request.dayOff)

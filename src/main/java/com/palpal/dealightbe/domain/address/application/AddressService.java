@@ -18,7 +18,7 @@ public class AddressService {
 
 	private final AddressRepository addressRepository;
 
-	public AddressRes register(String name, double x, double y) {
+	public Address register(String name, double x, double y) {
 		Address address = Address.builder()
 			.name(name)
 			.xCoordinate(x)
@@ -27,6 +27,6 @@ public class AddressService {
 
 		addressRepository.save(address);
 
-		return AddressRes.from(address);
+		return address;
 	}
 }

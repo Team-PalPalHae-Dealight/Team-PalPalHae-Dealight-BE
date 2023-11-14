@@ -3,11 +3,13 @@ package com.palpal.dealightbe.domain.store.application;
 import java.util.Objects;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.palpal.dealightbe.domain.address.application.AddressService;
+import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.image.ImageService;
 import com.palpal.dealightbe.domain.image.application.dto.request.ImageUploadReq;
 import com.palpal.dealightbe.domain.image.application.dto.response.ImageRes;
@@ -51,9 +53,10 @@ public class StoreService {
 				throw new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
 			});
 
-		addressService.register(req.addressName(), req.xCoordinate(), req.yCoordinate());
+		Address address = addressService.register(req.addressName(), req.xCoordinate(), req.yCoordinate());
 
 		Store store = StoreCreateReq.toStore(req);
+		store.updateAddress(address);
 		store.updateMember(member);
 		store.updateImage(DEFAULT_PATH);
 		storeRepository.save(store);
@@ -145,20 +148,20 @@ public class StoreService {
 	}
 
 	@Transactional(readOnly = true)
-	public StoresInfoSliceRes search(double xCoordinate, double yCoordinate, String keyword, String sortBy) {
+	public StoresInfoSliceRes search(double xCoordinate, double yCoordinate, String keyword, String sortBy, Pageable pageable) {
 		Slice<Store> stores = Page.empty();
 
 		SearchSortType sortType = SearchSortType.findSortType(sortBy);
 
 		switch (sortType) {
 			case DEFAULT, DISTANCE:
-				stores = storeRepository.findByDistanceWithin3Km(xCoordinate, yCoordinate, keyword);
+				stores = storeRepository.findByDistanceWithin3Km(xCoordinate, yCoordinate, keyword, pageable);
 				break;
 			case DISCOUNT_RATE:
-				stores = storeRepository.findByDiscountRate(xCoordinate, yCoordinate, keyword);
+				stores = storeRepository.findByDiscountRate(xCoordinate, yCoordinate, keyword, pageable);
 				break;
 			case DEADLINE:
-				stores = storeRepository.findByDeadLine(xCoordinate, yCoordinate, keyword);
+				stores = storeRepository.findByDeadLine(xCoordinate, yCoordinate, keyword, pageable);
 				break;
 		}
 

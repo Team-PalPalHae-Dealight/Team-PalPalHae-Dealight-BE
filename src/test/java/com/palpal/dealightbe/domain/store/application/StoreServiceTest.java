@@ -18,11 +18,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.mock.web.MockMultipartFile;
 
 import com.palpal.dealightbe.domain.address.application.AddressService;
-import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
 import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.image.ImageService;
 import com.palpal.dealightbe.domain.image.application.dto.request.ImageUploadReq;
@@ -197,7 +198,7 @@ class StoreServiceTest {
 		when(memberRepository.findMemberByProviderId(member.getProviderId()))
 			.thenReturn(Optional.of(member));
 		when(addressService.register(eq("서울시 강남구"), eq(67.89), eq(293.2323)))
-			.thenReturn(new AddressRes("서울시 강남구", 67.89, 293.2323));
+			.thenReturn(new Address("서울시 강남구", 67.89, 293.2323));
 
 		//when
 		StoreCreateRes storeCreateRes = storeService.register(member.getProviderId(), storeCreateReq);
@@ -219,7 +220,7 @@ class StoreServiceTest {
 		when(memberRepository.findMemberByProviderId(member.getProviderId()))
 			.thenReturn(Optional.of(member));
 		when(addressService.register(eq("서울시 강남구"), eq(67.89), eq(293.2323)))
-			.thenReturn(new AddressRes("서울시 강남구", 67.89, 293.2323));
+			.thenReturn(new Address("서울시 강남구", 67.89, 293.2323));
 
 		//when
 		StoreCreateRes storeCreateRes = storeService.register(member.getProviderId(), storeCreateReq);
@@ -257,7 +258,7 @@ class StoreServiceTest {
 		when(memberRepository.findMemberByProviderId(member.getProviderId()))
 			.thenReturn(Optional.of(member));
 		when(addressService.register(eq("서울시 강남구"), eq(67.89), eq(293.2323)))
-			.thenReturn(new AddressRes("서울시 강남구", 67.89, 293.2323));
+			.thenReturn(new Address("서울시 강남구", 67.89, 293.2323));
 
 		// when -> then
 		assertThrows(BusinessException.class, () -> {
@@ -443,6 +444,7 @@ class StoreServiceTest {
 		double xCoordinate = 127.0221068;
 		double yCoordinate = 37.5912999;
 		String keyword = "떡볶이";
+		Pageable pageable = PageRequest.of(0, 2);
 
 		List<Store> stores = new ArrayList<>();
 		stores.add(store);
@@ -450,11 +452,11 @@ class StoreServiceTest {
 
 		SliceImpl<Store> storeSlice = new SliceImpl<>(stores);
 
-		when(storeRepository.findByDistanceWithin3Km(xCoordinate, yCoordinate, keyword))
+		when(storeRepository.findByDistanceWithin3Km(xCoordinate, yCoordinate, keyword, pageable))
 			.thenReturn(storeSlice);
 
 		//when
-		StoresInfoSliceRes search = storeService.search(xCoordinate, yCoordinate, keyword, null);
+		StoresInfoSliceRes search = storeService.search(xCoordinate, yCoordinate, keyword, null, pageable);
 
 		//then
 		assertThat(search.storeInfoSliceRes().get(0).name()).isEqualTo(store.getName());
@@ -469,6 +471,7 @@ class StoreServiceTest {
 		double yCoordinate = 37.5912999;
 		String keyword = "떡볶이";
 		String sortBy = "deadline";
+		Pageable pageable = PageRequest.of(0, 2);
 
 		List<Store> stores = new ArrayList<>();
 		stores.add(store);
@@ -476,11 +479,11 @@ class StoreServiceTest {
 
 		SliceImpl<Store> storeSlice = new SliceImpl<>(stores);
 
-		when(storeRepository.findByDeadLine(xCoordinate, yCoordinate, keyword))
+		when(storeRepository.findByDeadLine(xCoordinate, yCoordinate, keyword, pageable))
 			.thenReturn(storeSlice);
 
 		//when
-		StoresInfoSliceRes search = storeService.search(xCoordinate, yCoordinate, keyword, sortBy);
+		StoresInfoSliceRes search = storeService.search(xCoordinate, yCoordinate, keyword, sortBy, pageable);
 
 		//then
 		assertThat(search.storeInfoSliceRes().size()).isEqualTo(2);
@@ -495,6 +498,7 @@ class StoreServiceTest {
 		double yCoordinate = 37.5912999;
 		String keyword = "떡볶이";
 		String sortBy = "discount-rate";
+		Pageable pageable = PageRequest.of(0, 2);
 
 		List<Store> stores = new ArrayList<>();
 		stores.add(store);
@@ -502,11 +506,11 @@ class StoreServiceTest {
 
 		SliceImpl<Store> storeSlice = new SliceImpl<>(stores);
 
-		when(storeRepository.findByDiscountRate(xCoordinate, yCoordinate, keyword))
+		when(storeRepository.findByDiscountRate(xCoordinate, yCoordinate, keyword, pageable))
 			.thenReturn(storeSlice);
 
 		//when
-		StoresInfoSliceRes search = storeService.search(xCoordinate, yCoordinate, keyword, sortBy);
+		StoresInfoSliceRes search = storeService.search(xCoordinate, yCoordinate, keyword, sortBy, pageable);
 
 		//then
 		assertThat(search.storeInfoSliceRes().size()).isEqualTo(2);

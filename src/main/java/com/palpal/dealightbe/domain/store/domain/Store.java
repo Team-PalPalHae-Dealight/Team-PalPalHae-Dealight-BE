@@ -96,6 +96,10 @@ public class Store extends BaseEntity {
 		this.image = image;
 	}
 
+	public void updateAddress(Address address) {
+		this.address = address;
+	}
+
 	public void isSameOwnerAndTheRequester(Member member, Store store) {
 		Long ownerId = store.getMember().getProviderId();
 		Long requesterId = member.getProviderId();
