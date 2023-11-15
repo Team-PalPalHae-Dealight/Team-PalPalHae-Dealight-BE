@@ -52,13 +52,13 @@ public class NotificationService {
 	}
 
 	private void resendMissedEvents(Long id, String userType, String lastEventId, SseEmitter emitter) {
-		Map<String, Object> events = emitterRepository.findAllEventCacheStartWithId(userType + "_" + id);
+		Map<String, String> events = emitterRepository.findAllEventCacheStartWithId(userType + "_" + id);
 		events.entrySet().stream()
 			.filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
 			.forEach(entry -> sendEventToEmitter(emitter, entry.getKey(), entry.getValue()));
 	}
 
-	private void sendEventToEmitter(SseEmitter emitter, String emitterId, Object data) {
+	private void sendEventToEmitter(SseEmitter emitter, String emitterId, String data) {
 		try {
 			emitter.send(SseEmitter.event().id(emitterId).name("sse").data(data));
 		} catch (IOException exception) {
