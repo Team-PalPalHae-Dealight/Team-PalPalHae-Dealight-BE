@@ -1,7 +1,6 @@
 package com.palpal.dealightbe.domain.auth.presentation;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,7 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.palpal.dealightbe.domain.auth.application.AuthService;
 import com.palpal.dealightbe.domain.auth.application.OAuth2AuthorizationService;
 import com.palpal.dealightbe.domain.auth.application.dto.request.MemberAuthReq;
+import com.palpal.dealightbe.domain.auth.application.dto.response.KakaoUserInfoRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.MemberAuthRes;
+import com.palpal.dealightbe.domain.auth.application.dto.response.OAuthLoginRes;
 import com.palpal.dealightbe.global.aop.ProviderId;
 import com.palpal.dealightbe.global.aop.RefreshToken;
 
@@ -30,8 +31,13 @@ public class AuthController {
 	private final OAuth2AuthorizationService oAuth2AuthorizationService;
 
 	@GetMapping("/kakao")
-	public ResponseEntity<> processKakaoAuthorization(@RequestParam String code) {
-		oAuth2AuthorizationService.authorizeKakao(code);
+	public ResponseEntity<OAuthLoginRes> loginByKakaoOAuth(@RequestParam String code) {
+		KakaoUserInfoRes kakaoUserInfoRes = oAuth2AuthorizationService.authorizeKakao(code);
+		OAuthLoginRes oAuthLoginRes = authService.authenticate(kakaoUserInfoRes);
+
+		return ResponseEntity
+			.status(HttpStatus.OK)
+			.body(oAuthLoginRes);
 	}
 
 	@PostMapping("/signup")
