@@ -7,9 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
@@ -20,8 +18,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.palpal.dealightbe.domain.auth.domain.Jwt;
 import com.palpal.dealightbe.domain.auth.filter.JwtAuthenticationFilter;
-import com.palpal.dealightbe.domain.auth.presentation.CustomAuthAccessDeniedHandler;
-import com.palpal.dealightbe.domain.auth.presentation.CustomOAuth2AuthenticationSuccessHandler;
+import com.palpal.dealightbe.domain.auth.application.CustomAuthAccessDeniedHandler;
+import com.palpal.dealightbe.domain.auth.application.CustomOAuth2AuthenticationSuccessHandler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,12 +50,6 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	WebSecurityCustomizer webSecurityCustomizer() {
-		return web -> web.ignoring()
-			.antMatchers("/notification/**");
-	}
-
-	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
 			.cors().configurationSource(corsConfigurationSource())
@@ -82,12 +74,6 @@ public class SecurityConfig {
 			.logout().disable()
 			.rememberMe().disable()
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-			.and()
-			.oauth2Login()
-			.authorizationEndpoint()
-			.authorizationRequestRepository(authorizationRequestRepository)
-			.and()
-			.successHandler(customOAuth2AuthenticationSuccessHandler)
 			.and()
 			.exceptionHandling().accessDeniedHandler(customAuthAccessDeniedHandler)
 			.and()

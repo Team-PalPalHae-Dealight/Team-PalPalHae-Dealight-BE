@@ -1,4 +1,4 @@
-package com.palpal.dealightbe.domain.auth.presentation;
+package com.palpal.dealightbe.domain.auth.application;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
