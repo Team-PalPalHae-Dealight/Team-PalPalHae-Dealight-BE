@@ -60,7 +60,7 @@ public class NotificationService {
 
 	private void sendEventToEmitter(SseEmitter emitter, String emitterId, String data) {
 		try {
-			emitter.send(SseEmitter.event().id(emitterId).name("sse").data(data));
+			emitter.send(SseEmitter.event().id(emitterId).name("orderNotification").data(data));
 		} catch (IOException exception) {
 			emitterRepository.deleteById(emitterId);
 			throw new BusinessException(SSE_STREAM_ERROR);
