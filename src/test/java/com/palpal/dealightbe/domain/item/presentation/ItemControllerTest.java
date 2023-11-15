@@ -1,5 +1,33 @@
 package com.palpal.dealightbe.domain.item.presentation;
 
+import static com.palpal.dealightbe.global.error.ErrorCode.DUPLICATED_ITEM_NAME;
+import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_DISCOUNT_PRICE;
+import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
+import static com.palpal.dealightbe.global.error.ErrorCode.STORE_HAS_NO_ITEM;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.Mockito.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
+import static org.springframework.restdocs.payload.JsonFieldType.STRING;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestPartFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
@@ -36,34 +64,6 @@ import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
-
-import static com.palpal.dealightbe.global.error.ErrorCode.DUPLICATED_ITEM_NAME;
-import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_DISCOUNT_PRICE;
-import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
-import static com.palpal.dealightbe.global.error.ErrorCode.STORE_HAS_NO_ITEM;
-import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.Mockito.*;
-import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
-import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
-import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
-import static org.springframework.restdocs.payload.JsonFieldType.STRING;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestPartFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = ItemController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class,
 	OAuth2ClientAutoConfiguration.class}, excludeFilters = {
@@ -509,11 +509,11 @@ class ItemControllerTest {
 	public void itemFindAllForStoreSuccessTest() throws Exception {
 		//given
 		Item item3 = Item.builder()
-			.name("치즈김밥")
+			.name("치즈 김밥")
 			.stock(4)
 			.discountPrice(4000)
 			.originalPrice(4500)
-			.description("치즈김밥 입니다.")
+			.description("치즈 김밥 입니다.")
 			.information("통신사 할인 불가능 합니다.")
 			.image("https://fake-image.com/item3.png")
 			.store(store)
@@ -528,7 +528,8 @@ class ItemControllerTest {
 		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), item.getStore().getName(), item.getStore().getOpenTime(), item.getStore().getCloseTime(), addressRes);
 		ItemRes itemRes3 = new ItemRes(2L, 1L, item3.getName(), item3.getStock(), item3.getDiscountPrice(), item3.getOriginalPrice(), item3.getDescription(), item3.getInformation(), item3.getImage(), item3.getStore().getName(), item3.getStore().getOpenTime(), item3.getStore().getCloseTime(), addressRes);
 		List<ItemRes> itemResList = List.of(itemRes, itemRes3);
-		ItemsRes itemsRes = new ItemsRes(itemResList);
+		boolean hasNext = false;
+		ItemsRes itemsRes = new ItemsRes(itemResList, hasNext);
 
 		when(itemService.findAllForStore(any(), eq(pageRequest))).thenReturn(itemsRes);
 
@@ -538,7 +539,7 @@ class ItemControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.param("size", String.valueOf(size))
-				.param("page", String.valueOf(page)))
+				.param("page", String.valueOf(1)))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.items[0].itemId").value(itemRes.itemId()))
 			.andExpect(jsonPath("$.items[0].storeId").value(itemRes.storeId()))
@@ -555,8 +556,9 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.items[0].storeAddress.name").value(addressRes.name()))
 			.andExpect(jsonPath("$.items[0].storeAddress.xCoordinate").value(addressRes.xCoordinate()))
 			.andExpect(jsonPath("$.items[0].storeAddress.yCoordinate").value(addressRes.yCoordinate()))
+			.andExpect(jsonPath("$.hasNext").value(hasNext))
 			.andDo(print())
-			.andDo(document("item/item-find-All-for-store",
+			.andDo(document("item/item-find-all-for-store",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestHeaders(
@@ -571,7 +573,7 @@ class ItemControllerTest {
 					fieldWithPath("items").type(ARRAY).description("상품 목록"),
 					fieldWithPath("items[0].itemId").type(NUMBER).description("상품 ID"),
 					fieldWithPath("items[0].storeId").type(NUMBER).description("업체 ID"),
-					fieldWithPath("items[0].itemName").description("상품 이름"),
+					fieldWithPath("items[0].itemName").type(STRING).description("상품 이름"),
 					fieldWithPath("items[0].stock").type(NUMBER).description("재고 수"),
 					fieldWithPath("items[0].discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("items[0].originalPrice").type(NUMBER).description("원가"),
@@ -583,7 +585,8 @@ class ItemControllerTest {
 					fieldWithPath("items[0].storeCloseTime").type(STRING).description("마감 시간"),
 					fieldWithPath("items[0].storeAddress.name").type(STRING).description("업체 주소"),
 					fieldWithPath("items[0].storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
-					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도")
+					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도"),
+					fieldWithPath("hasNext").type(BOOLEAN).description("다음 데이터 존재 여부")
 				)
 			));
 	}
@@ -606,7 +609,8 @@ class ItemControllerTest {
 		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), item.getStore().getName(), item.getStore().getOpenTime(), item.getStore().getCloseTime(), addressRes);
 		ItemRes itemRes2 = new ItemRes(2L, 2L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage(), item2.getStore().getName(), item2.getStore().getOpenTime(), item2.getStore().getCloseTime(), addressRes2);
 		List<ItemRes> itemResList = List.of(itemRes, itemRes2);
-		ItemsRes itemsRes = new ItemsRes(itemResList);
+		boolean hasNext = false;
+		ItemsRes itemsRes = new ItemsRes(itemResList, hasNext);
 
 		when(itemService.findAllForMember(anyDouble(), anyDouble(), eq(sortBy), eq(pageRequest))).thenReturn(itemsRes);
 
@@ -618,7 +622,7 @@ class ItemControllerTest {
 				.param("y-coordinate", String.valueOf(yCoordinate))
 				.param("sort-by", sortBy)
 				.param("size", String.valueOf(size))
-				.param("page", String.valueOf(page)))
+				.param("page", String.valueOf(1)))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.items[0].itemId").value(itemRes.itemId()))
 			.andExpect(jsonPath("$.items[0].storeId").value(itemRes.storeId()))
@@ -635,8 +639,9 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.items[0].storeAddress.name").value(addressRes.name()))
 			.andExpect(jsonPath("$.items[0].storeAddress.xCoordinate").value(addressRes.xCoordinate()))
 			.andExpect(jsonPath("$.items[0].storeAddress.yCoordinate").value(addressRes.yCoordinate()))
+			.andExpect(jsonPath("$.hasNext").value(hasNext))
 			.andDo(print())
-			.andDo(document("item/item-find-All-for-member-sort-by-deadline",
+			.andDo(document("item/item-find-all-for-member-sort-by-deadline",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestParameters(
@@ -662,7 +667,8 @@ class ItemControllerTest {
 					fieldWithPath("items[0].storeCloseTime").type(STRING).description("마감 시간"),
 					fieldWithPath("items[0].storeAddress.name").type(STRING).description("업체 주소"),
 					fieldWithPath("items[0].storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
-					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도")
+					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도"),
+					fieldWithPath("hasNext").type(BOOLEAN).description("다음 데이터 존재 여부")
 				)
 			));
 	}
@@ -685,7 +691,8 @@ class ItemControllerTest {
 		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), item.getStore().getName(), item.getStore().getOpenTime(), item.getStore().getCloseTime(), addressRes);
 		ItemRes itemRes2 = new ItemRes(2L, 2L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage(), item2.getStore().getName(), item2.getStore().getOpenTime(), item2.getStore().getCloseTime(), addressRes2);
 		List<ItemRes> itemResList = List.of(itemRes, itemRes2);
-		ItemsRes itemsRes = new ItemsRes(itemResList);
+		boolean hasNext = false;
+		ItemsRes itemsRes = new ItemsRes(itemResList, hasNext);
 
 		when(itemService.findAllForMember(anyDouble(), anyDouble(), eq(sortBy), eq(pageRequest))).thenReturn(itemsRes);
 
@@ -697,7 +704,7 @@ class ItemControllerTest {
 				.param("y-coordinate", String.valueOf(yCoordinate))
 				.param("sort-by", sortBy)
 				.param("size", String.valueOf(size))
-				.param("page", String.valueOf(page)))
+				.param("page", String.valueOf(1)))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.items[0].itemId").value(itemRes.itemId()))
 			.andExpect(jsonPath("$.items[0].storeId").value(itemRes.storeId()))
@@ -714,8 +721,9 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.items[0].storeAddress.name").value(addressRes.name()))
 			.andExpect(jsonPath("$.items[0].storeAddress.xCoordinate").value(addressRes.xCoordinate()))
 			.andExpect(jsonPath("$.items[0].storeAddress.yCoordinate").value(addressRes.yCoordinate()))
+			.andExpect(jsonPath("$.hasNext").value(hasNext))
 			.andDo(print())
-			.andDo(document("item/item-find-All-for-member-sort-by-discount-rate",
+			.andDo(document("item/item-find-all-for-member-sort-by-discount-rate",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestParameters(
@@ -741,7 +749,8 @@ class ItemControllerTest {
 					fieldWithPath("items[0].storeCloseTime").type(STRING).description("마감 시간"),
 					fieldWithPath("items[0].storeAddress.name").type(STRING).description("업체 주소"),
 					fieldWithPath("items[0].storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
-					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도")
+					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도"),
+					fieldWithPath("hasNext").type(BOOLEAN).description("다음 데이터 존재 여부")
 				)
 			));
 	}
@@ -764,7 +773,8 @@ class ItemControllerTest {
 		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), item.getStore().getName(), item.getStore().getOpenTime(), item.getStore().getCloseTime(), addressRes);
 		ItemRes itemRes2 = new ItemRes(2L, 2L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage(), item2.getName(), item2.getStore().getOpenTime(), item2.getStore().getCloseTime(), addressRes2);
 		List<ItemRes> itemResList = List.of(itemRes, itemRes2);
-		ItemsRes itemsRes = new ItemsRes(itemResList);
+		boolean hasNext = false;
+		ItemsRes itemsRes = new ItemsRes(itemResList, hasNext);
 
 		when(itemService.findAllForMember(anyDouble(), anyDouble(), eq(sortBy), eq(pageRequest))).thenReturn(itemsRes);
 
@@ -776,7 +786,7 @@ class ItemControllerTest {
 				.param("y-coordinate", String.valueOf(yCoordinate))
 				.param("sort-by", sortBy)
 				.param("size", String.valueOf(size))
-				.param("page", String.valueOf(page)))
+				.param("page", String.valueOf(1)))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.items[0].itemId").value(itemRes.itemId()))
 			.andExpect(jsonPath("$.items[0].storeId").value(itemRes.storeId()))
@@ -794,7 +804,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.items[0].storeAddress.xCoordinate").value(addressRes.xCoordinate()))
 			.andExpect(jsonPath("$.items[0].storeAddress.yCoordinate").value(addressRes.yCoordinate()))
 			.andDo(print())
-			.andDo(document("item/item-find-All-for-member-sort-by-distance",
+			.andDo(document("item/item-find-all-for-member-sort-by-distance",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestParameters(
@@ -820,7 +830,96 @@ class ItemControllerTest {
 					fieldWithPath("items[0].storeCloseTime").type(STRING).description("마감 시간"),
 					fieldWithPath("items[0].storeAddress.name").type(STRING).description("업체 주소"),
 					fieldWithPath("items[0].storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
-					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도")
+					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도"),
+					fieldWithPath("hasNext").type(BOOLEAN).description("다음 데이터 존재 여부")
+				)
+			));
+	}
+
+	@DisplayName("업체의 상품 목록 조회(고객 시점) 성공 테스트")
+	@Test
+	void itemFindAllByStoreIdSuccessTest() throws Exception {
+		//given
+		Long storeId = 1L;
+
+		Item item3 = Item.builder()
+			.name("치즈 김밥")
+			.stock(4)
+			.discountPrice(4000)
+			.originalPrice(4500)
+			.description("치즈 김밥 입니다.")
+			.information("통신사 할인 불가능 합니다.")
+			.image("https://fake-image.com/item3.png")
+			.store(store)
+			.build();
+
+		int size = 5;
+		int page = 0;
+		PageRequest pageRequest = PageRequest.of(page, size);
+
+		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
+
+		ItemRes itemRes = new ItemRes(1L, storeId, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), item.getStore().getName(), item.getStore().getOpenTime(), item.getStore().getCloseTime(), addressRes);
+		ItemRes itemRes3 = new ItemRes(2L, storeId, item3.getName(), item3.getStock(), item3.getDiscountPrice(), item3.getOriginalPrice(), item3.getDescription(), item3.getInformation(), item3.getImage(), item3.getStore().getName(), item3.getStore().getOpenTime(), item3.getStore().getCloseTime(), addressRes);
+		List<ItemRes> itemResList = List.of(itemRes, itemRes3);
+		boolean hasNext = false;
+		ItemsRes itemsRes = new ItemsRes(itemResList, hasNext);
+
+		when(itemService.findAllByStoreId(any(), eq(pageRequest))).thenReturn(itemsRes);
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/items/stores/{storeId}", storeId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.param("size", String.valueOf(size))
+				.param("page", String.valueOf(1)))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.items[0].itemId").value(itemRes.itemId()))
+			.andExpect(jsonPath("$.items[0].storeId").value(itemRes.storeId()))
+			.andExpect(jsonPath("$.items[0].itemName").value(itemRes.itemName()))
+			.andExpect(jsonPath("$.items[0].stock").value(itemRes.stock()))
+			.andExpect(jsonPath("$.items[0].discountPrice").value(itemRes.discountPrice()))
+			.andExpect(jsonPath("$.items[0].originalPrice").value(itemRes.originalPrice()))
+			.andExpect(jsonPath("$.items[0].description").value(itemRes.description()))
+			.andExpect(jsonPath("$.items[0].information").value(itemRes.information()))
+			.andExpect(jsonPath("$.items[0].image").value(itemRes.image()))
+			.andExpect(jsonPath("$.items[0].storeName").value(itemRes.storeName()))
+			.andExpect(jsonPath("$.items[0].storeOpenTime").value(itemRes.storeOpenTime().toString()))
+			.andExpect(jsonPath("$.items[0].storeCloseTime").value(itemRes.storeCloseTime().toString()))
+			.andExpect(jsonPath("$.items[0].storeAddress.name").value(addressRes.name()))
+			.andExpect(jsonPath("$.items[0].storeAddress.xCoordinate").value(addressRes.xCoordinate()))
+			.andExpect(jsonPath("$.items[0].storeAddress.yCoordinate").value(addressRes.yCoordinate()))
+			.andExpect(jsonPath("$.hasNext").value(hasNext))
+			.andDo(print())
+			.andDo(document("item/item-find-all-by-store-id",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("storeId").description("업체 ID")
+				),
+				requestParameters(
+					List.of(
+						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
+						parameterWithName("page").description("페이지 번호")
+					)),
+				responseFields(
+					fieldWithPath("items").type(ARRAY).description("상품 목록"),
+					fieldWithPath("items[0].itemId").type(NUMBER).description("상품 ID"),
+					fieldWithPath("items[0].storeId").type(NUMBER).description("업체 ID"),
+					fieldWithPath("items[0].itemName").description("상품 이름"),
+					fieldWithPath("items[0].stock").type(NUMBER).description("재고 수"),
+					fieldWithPath("items[0].discountPrice").type(NUMBER).description("할인가"),
+					fieldWithPath("items[0].originalPrice").type(NUMBER).description("원가"),
+					fieldWithPath("items[0].description").type(STRING).description("상세 설명"),
+					fieldWithPath("items[0].information").type(STRING).description("안내 사항"),
+					fieldWithPath("items[0].image").type(STRING).description("상품 이미지 경로"),
+					fieldWithPath("items[0].storeName").type(STRING).description("상호명"),
+					fieldWithPath("items[0].storeOpenTime").type(STRING).description("오픈 시간"),
+					fieldWithPath("items[0].storeCloseTime").type(STRING).description("마감 시간"),
+					fieldWithPath("items[0].storeAddress.name").type(STRING).description("업체 주소"),
+					fieldWithPath("items[0].storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
+					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도"),
+					fieldWithPath("hasNext").type(BOOLEAN).description("다음 데이터 존재 여부")
 				)
 			));
 	}

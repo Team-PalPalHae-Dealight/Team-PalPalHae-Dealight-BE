@@ -55,6 +55,8 @@ dependencies {
 
     implementation 'org.apache.commons:commons-lang3:3.12.0'
 
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '2.7.0'
+
     // compileOnly
     compileOnly 'org.projectlombok:lombok'
 
@@ -124,15 +126,4 @@ bootJar {
     from("${asciidoctor.outputDir}") {
         into 'static/docs'
     }
-}
-
-task copyDocument(type: Copy) {
-    dependsOn asciidoctor
-
-    from file("build/docs/asciidoc/")
-    into file("src/main/resources/static/docs")
-}
-
-build {
-    dependsOn copyDocument
 }

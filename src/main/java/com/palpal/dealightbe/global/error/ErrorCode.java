@@ -15,6 +15,7 @@ public enum ErrorCode {
 	INVALID_INPUT_VALUE("C001", "잘못된 값을 입력하셨습니다."),
 	UNAUTHORIZED_REQUEST("C002", "해당 요청을 수행할 권한이 없습니다."),
 	DEFAULT_IMAGE_ALREADY_SET("C003", "기본 이미지로 설정된 이미지는 삭제할 수 없습니다."),
+	INVALID_SEARCH_SORT_TYPE("C004", "유효하지 않은 정렬 조건입니다."),
 
 	//멤버
 	NOT_FOUND_MEMBER("M001", "고객을 찾을 수 없습니다."),
@@ -32,7 +33,6 @@ public enum ErrorCode {
 	DUPLICATED_ITEM_NAME("I003", "동일한 이름을 가진 상품이 이미 등록되어 있습니다."),
 	INVALID_ITEM_QUANTITY("I004", "상품 재고가 부족합니다"),
 	STORE_HAS_NO_ITEM("I005", "요청하신 상품은 해당 업체에 등록되지 않은 상품입니다."),
-	INVALID_ITEM_SORT_TYPE("I006", "유효하지 않은 상품 목록 정렬 조건입니다."),
 
 	//파일
 	NOT_FOUND_IMAGE("F001", "존재하지 않는 이미지 입니다."),
@@ -49,6 +49,12 @@ public enum ErrorCode {
 	UNCHANGEABLE_ORDER_STATUS("OR007", "주문 완료 또는 주문 취소 상태에서는 상태 변경이 불가능합니다."),
 	INVALID_ORDER_FILTER("OR008", "유효하지 않은 주문 조회 필터링 조건입니다."),
 	INVALID_ORDER_TOTAL_PRICE("OR009", "입력된 총 금액이 실제와 일치하지 않습니다."),
+
+	//장바구니
+	NOT_FOUND_CART_ITEM("CT001", "장바구니에 상품이 존재하지 않습니다."),
+	INVALID_CART_QUANTITY("CT002", "상품 당 최소 1개에서 최대 재고 수량까지만 장바구니에 담을 수 있습니다."),
+	ANOTHER_STORE_ITEM_ALREADY_EXISTS_IN_THE_CART("CT003", "이미 다른 업체의 상품이 장바구니에 담겨 있습니다."),
+	INVALID_ATTEMPT_TO_ADD_OWN_STORE_ITEM_TO_CART("CT004", "본인이 등록한 업체의 상품은 장바구니에 담을 수 없습니다."),
 
 	//인증, 인가
 	ACCESS_DENIED("AUTH001", "사용자 인증에 실패했습니다."),

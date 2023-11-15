@@ -43,12 +43,12 @@ class AddressServiceTest {
 		when(addressRepository.save(any(Address.class))).thenReturn(addressToSave);
 
 		// when
-		AddressRes addressRes = addressService.register(name, x, y);
+		Address address = addressService.register(name, x, y);
 
 		// then
-		assertNotNull(addressRes);
-		assertEquals(name, addressRes.name());
-		assertEquals(x, addressRes.xCoordinate());
-		assertEquals(y, addressRes.yCoordinate());
+		assertNotNull(address);
+		assertEquals(name, address.getName());
+		assertEquals(x, address.getXCoordinate());
+		assertEquals(y, address.getYCoordinate());
 	}
 }

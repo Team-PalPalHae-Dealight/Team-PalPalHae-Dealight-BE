@@ -1,5 +1,6 @@
 package com.palpal.dealightbe.domain.store.presentation;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +24,7 @@ import com.palpal.dealightbe.domain.store.application.dto.response.StoreByMember
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreCreateRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusRes;
+import com.palpal.dealightbe.domain.store.application.dto.response.StoresInfoSliceRes;
 import com.palpal.dealightbe.global.aop.ProviderId;
 
 import lombok.RequiredArgsConstructor;
@@ -32,6 +35,7 @@ import lombok.RequiredArgsConstructor;
 public class StoreController {
 
 	private final StoreService storeService;
+	private static final String DEFAULT_PAGING_SIZE = "10";
 
 	@ProviderId
 	@PostMapping
@@ -108,4 +112,20 @@ public class StoreController {
 
 		return ResponseEntity.ok(storeByMemberRes);
 	}
+
+	@GetMapping("/search")
+	public ResponseEntity<StoresInfoSliceRes> searchByOption(
+		@RequestParam("x-coordinate") double xCoordinate, @RequestParam("y-coordinate") double yCoordinate,
+		@RequestParam String keyword, @RequestParam(required = false, defaultValue = "distance") String sortBy,
+		@RequestParam(required = false, defaultValue = "0") int page,
+		@RequestParam(required = false, defaultValue = DEFAULT_PAGING_SIZE) int size) {
+
+		page = Math.max(page - 1, 0);
+		PageRequest pageable = PageRequest.of(page, size);
+
+		StoresInfoSliceRes storeResponse = storeService.search(xCoordinate, yCoordinate, keyword, sortBy, pageable);
+
+		return ResponseEntity.ok(storeResponse);
+	}
+
 }

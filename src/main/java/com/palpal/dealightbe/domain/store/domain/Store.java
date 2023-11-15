@@ -36,6 +36,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Store extends BaseEntity {
 
+	private static final String DEFAULT_PATH = "https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/image/free-store-icon.png";
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -69,8 +71,9 @@ public class Store extends BaseEntity {
 	private Set<DayOff> dayOffs;
 
 	@Builder
-	public Store(Address address, String name, String storeNumber, String telephone, LocalTime openTime, LocalTime closeTime, Set<DayOff> dayOff) {
+	public Store(Member member, Address address, String name, String storeNumber, String telephone, LocalTime openTime, LocalTime closeTime, Set<DayOff> dayOff) {
 		validateBusinessTimes(openTime, closeTime);
+		this.member = member;
 		this.address = address;
 		this.name = name;
 		this.storeNumber = storeNumber;
@@ -78,6 +81,7 @@ public class Store extends BaseEntity {
 		this.openTime = openTime;
 		this.closeTime = closeTime;
 		this.dayOffs = dayOff;
+		this.image = DEFAULT_PATH;
 	}
 
 	public void updateMember(Member member) {
@@ -94,6 +98,10 @@ public class Store extends BaseEntity {
 
 	public void updateImage(String image) {
 		this.image = image;
+	}
+
+	public void updateAddress(Address address) {
+		this.address = address;
 	}
 
 	public void isSameOwnerAndTheRequester(Member member, Store store) {

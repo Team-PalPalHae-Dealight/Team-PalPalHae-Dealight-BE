@@ -1,5 +1,10 @@
 package com.palpal.dealightbe.domain.item.application;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.mock.web.MockMultipartFile;
 
 import com.palpal.dealightbe.domain.address.domain.Address;
@@ -31,11 +37,6 @@ import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ItemServiceTest {
@@ -220,6 +221,17 @@ class ItemServiceTest {
 	@Test
 	void itemFindAllForStoreSuccessTest() {
 		//given
+		Item item3 = Item.builder()
+			.name("치즈 김밥")
+			.stock(3)
+			.discountPrice(4000)
+			.originalPrice(4500)
+			.description("치즈 김밥 입니다.")
+			.information("통신사 할인 불가능 합니다.")
+			.image("https://fake-image.com/item2.png")
+			.store(store)
+			.build();
+
 		Long providerId = 1L;
 
 		int page = 0;
@@ -228,9 +240,9 @@ class ItemServiceTest {
 
 		List<Item> items = new ArrayList<>();
 		items.add(item);
-		items.add(item2);
+		items.add(item3);
 
-		Page<Item> itemPage = new PageImpl<>(items, pageRequest, items.size());
+		SliceImpl<Item> itemPage = new SliceImpl<>(items);
 
 		when(storeRepository.findByMemberProviderId(any())).thenReturn(Optional.of(store));
 		when(itemRepository.findAllByStoreIdOrderByUpdatedAtDesc(any(), eq(PageRequest.of(page, size)))).thenReturn(itemPage);
@@ -254,7 +266,7 @@ class ItemServiceTest {
 		items.add(item);
 		items.add(item2);
 
-		Page<Item> itemPage = new PageImpl<>(items, pageRequest, items.size());
+		SliceImpl<Item> itemPage = new SliceImpl<>(items);
 
 		double xCoordinate = 127.0221068;
 		double yCoordinate = 37.5912999;
@@ -280,7 +292,7 @@ class ItemServiceTest {
 		items.add(item);
 		items.add(item2);
 
-		Page<Item> itemPage = new PageImpl<>(items, pageRequest, items.size());
+		SliceImpl<Item> itemPage = new SliceImpl<>(items);
 
 		double xCoordinate = 127.0221068;
 		double yCoordinate = 37.5912999;
@@ -306,7 +318,7 @@ class ItemServiceTest {
 		items.add(item);
 		items.add(item2);
 
-		Page<Item> itemPage = new PageImpl<>(items, pageRequest, items.size());
+		SliceImpl<Item> itemPage = new SliceImpl<>(items);
 
 		double xCoordinate = 127.0221068;
 		double yCoordinate = 37.5912999;
@@ -315,6 +327,42 @@ class ItemServiceTest {
 
 		//when
 		ItemsRes itemsRes = itemService.findAllForMember(xCoordinate, yCoordinate, "distance", pageRequest);
+
+		//then
+		assertThat(itemsRes.items()).hasSize(items.size());
+	}
+
+	@DisplayName("업체의 상품 목록 조회(고객 시점) 성공 테스트")
+	@Test
+	void itemFindAllByStoreIdSuccessTest() {
+		//given
+		Item item3 = Item.builder()
+			.name("치즈 김밥")
+			.stock(3)
+			.discountPrice(4000)
+			.originalPrice(4500)
+			.description("치즈 김밥 입니다.")
+			.information("통신사 할인 불가능 합니다.")
+			.image("https://fake-image.com/item2.png")
+			.store(store)
+			.build();
+
+		Long storeId = 1L;
+
+		int page = 0;
+		int size = 5;
+		PageRequest pageRequest = PageRequest.of(page, size);
+
+		List<Item> items = new ArrayList<>();
+		items.add(item);
+		items.add(item3);
+
+		SliceImpl<Item> itemPage = new SliceImpl<>(items);
+
+		when(itemRepository.findAllByStoreIdOrderByUpdatedAtDesc(any(), eq(PageRequest.of(page, size)))).thenReturn(itemPage);
+
+		//when
+		ItemsRes itemsRes = itemService.findAllByStoreId(storeId, pageRequest);
 
 		//then
 		assertThat(itemsRes.items()).hasSize(items.size());
