@@ -13,10 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.auth.application.dto.request.MemberAuthReq;
 import com.palpal.dealightbe.domain.auth.application.dto.response.JoinRequireRes;
-import com.palpal.dealightbe.domain.auth.application.dto.response.KakaoUserInfoRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.LoginRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.MemberAuthRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.OAuthLoginRes;
+import com.palpal.dealightbe.domain.auth.application.dto.response.RequiredUserInfoRes;
 import com.palpal.dealightbe.domain.auth.domain.Jwt;
 import com.palpal.dealightbe.domain.image.ImageService;
 import com.palpal.dealightbe.domain.member.domain.Member;
@@ -47,33 +47,22 @@ public class AuthService {
 	private final Jwt jwt;
 
 	@Transactional(readOnly = true)
-	public OAuthLoginRes authenticate(KakaoUserInfoRes kakaoUserInfoRes) {
-		log.info("소셜 사용자데이터({})를 기반으로 로그인을 진행합니다...");
-		long providerId = kakaoUserInfoRes.id();
-		Optional<Member> optionalMember = memberRepository.findByProviderAndProviderId("kakao", providerId);
+	public OAuthLoginRes authenticate(RequiredUserInfoRes requiredUserInfoRes) {
+		log.info("사용자 데이터({})를 기반으로 로그인을 진행합니다...", requiredUserInfoRes);
+		String provider = requiredUserInfoRes.provider();
+		long providerId = requiredUserInfoRes.providerId();
+		Optional<Member> optionalMember = memberRepository.findByProviderAndProviderId(provider, providerId);
+
 		if (optionalMember.isEmpty()) {
-			// 유저가 없는 경우에는 회원가입 메시지 반환
 			log.info("회원가입이 필요하다는 메시지를 반환합니다...");
-			String nickname = kakaoUserInfoRes.properties().nickname();
-			JoinRequireRes joinRequireRes = new JoinRequireRes("kakao", providerId, nickname);
+			String nickname = requiredUserInfoRes.nickName();
+			JoinRequireRes joinRequireRes = new JoinRequireRes(provider, providerId, nickname);
 
-			return new OAuthLoginRes("딜라이트 서비스에 가입이 필요합니다.", joinRequireRes);
+			return OAuthLoginRes.from(joinRequireRes);
 		}
+		LoginRes loginRes = login(optionalMember.get());
 
-		Member member = optionalMember.get();
-		log.info("사용자(provider: {}, providerId: {})의 로그인을 진행합니다.",
-			member.getProvider(), member.getProviderId());
-		LoginRes loginRes = login(member);
-
-		return new OAuthLoginRes("로그인에 성공했습니다.", loginRes);
-	}
-
-	private LoginRes login(Member member) {
-		Long providerId = member.getProviderId();
-		String accessToken = jwt.createAccessToken(member);
-		String refreshToken = jwt.createRefreshToken(member);
-
-		return new LoginRes(providerId, accessToken, refreshToken);
+		return OAuthLoginRes.from(loginRes);
 	}
 
 	public MemberAuthRes signup(MemberAuthReq request) {
@@ -135,6 +124,15 @@ public class AuthService {
 		log.info("사용자(ProviderId:{})의 정보를 삭제합니다...", providerId);
 		memberRepository.delete(member);
 		log.info("회원탈퇴에 성공했습니다.");
+	}
+
+	private LoginRes login(Member member) {
+		log.info("사용자(provider: {}, providerId: {})의 로그인을 진행합니다.", member.getProvider(), member.getProviderId());
+		Long providerId = member.getProviderId();
+		String accessToken = jwt.createAccessToken(member);
+		String refreshToken = jwt.createRefreshToken(member);
+
+		return new LoginRes(providerId, accessToken, refreshToken);
 	}
 
 	private Member findMemberByProviderId(Long providerId) {
