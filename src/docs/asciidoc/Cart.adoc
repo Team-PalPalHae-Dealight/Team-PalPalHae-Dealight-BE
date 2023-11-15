@@ -36,6 +36,8 @@ include::{snippets}/cart/cart-add-item/http-response.adoc[]
 .response fields
 include::{snippets}/cart/cart-add-item/response-fields.adoc[]
 
+---
+
 .Request Fail - 유효하지 않은 장바구니 담기 타입
 include::{snippets}/cart/cart-add-item-invalid-cart-addition-type/http-request.adoc[]
 
@@ -50,6 +52,8 @@ include::{snippets}/cart/cart-add-item-invalid-cart-addition-type/http-response.
 
 .response fields
 include::{snippets}/cart/cart-add-item-invalid-cart-addition-type/response-fields.adoc[]
+
+---
 
 .Request Fail - 본인이 등록한 업체의 상품 담기 불가
 include::{snippets}/cart/cart-add-item-invalid-attempt-own-store-item/http-request.adoc[]
@@ -66,6 +70,8 @@ include::{snippets}/cart/cart-add-item-invalid-attempt-own-store-item/http-respo
 .response fields
 include::{snippets}/cart/cart-add-item-invalid-attempt-own-store-item/response-fields.adoc[]
 
+---
+
 .Request Fail - 타 업체 상품이 존재하는 경우
 include::{snippets}/cart/cart-add-item-another-store-item-exists/http-request.adoc[]
 
@@ -80,6 +86,8 @@ include::{snippets}/cart/cart-add-item-another-store-item-exists/http-response.a
 
 .response fields
 include::{snippets}/cart/cart-add-item-another-store-item-exists/response-fields.adoc[]
+
+---
 
 .Request Fail - 최대 5개 종류를 초과하여 장바구니 담기 시도하는 경우
 include::{snippets}/cart/cart-add-item-exceeded-cart-item-size/http-request.adoc[]
@@ -96,6 +104,8 @@ include::{snippets}/cart/cart-add-item-exceeded-cart-item-size/http-response.ado
 .response fields
 include::{snippets}/cart/cart-add-item-exceeded-cart-item-size/response-fields.adoc[]
 
+---
+
 .Request Fail - 상품이 존재하지 않는 경우
 include::{snippets}/cart/cart-add-item-item-not-found/http-request.adoc[]
 
@@ -111,6 +121,7 @@ include::{snippets}/cart/cart-add-item-item-not-found/http-response.adoc[]
 .response fields
 include::{snippets}/cart/cart-add-item-item-not-found/response-fields.adoc[]
 
+---
 
 === 장바구니 조회
 
@@ -127,3 +138,5 @@ include::{snippets}/cart/cart-find-all-by-provider-id/http-response.adoc[]
 
 .response fields
 include::{snippets}/cart/cart-find-all-by-provider-id/response-fields.adoc[]
+
+---
