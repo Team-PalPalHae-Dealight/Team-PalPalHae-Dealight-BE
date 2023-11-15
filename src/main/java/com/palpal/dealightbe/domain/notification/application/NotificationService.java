@@ -29,9 +29,13 @@ public class NotificationService {
 	private final EmitterRepository emitterRepository;
 	private final NotificationRepository notificationRepository;
 
+	private static String getEmitterId(Long id, RoleType userType) {
+		return userType.getRole() + "_" + id + "_" + System.currentTimeMillis();
+	}
+
 	public SseEmitter subscribe(Long id, RoleType userType, String lastEventId) {
 
-		String emitterId = userType.getRole() + "_" + id + "_" + System.currentTimeMillis();
+		String emitterId = getEmitterId(id, userType);
 
 		SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
 		emitterRepository.save(emitterId, emitter);
