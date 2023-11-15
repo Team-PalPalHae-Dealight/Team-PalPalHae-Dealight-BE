@@ -46,6 +46,7 @@ public class OrderService {
 	private final StoreRepository storeRepository;
 	private final ItemRepository itemRepository;
 	private final OrderItemRepository orderItemRepository;
+	// private final NotificationService notificationService;
 
 	public OrderRes create(OrderCreateReq orderCreateReq, Long memberProviderId) {
 		long storeId = orderCreateReq.storeId();
@@ -74,9 +75,12 @@ public class OrderService {
 	public OrderStatusUpdateRes updateStatus(Long orderId, OrderStatusUpdateReq request, Long memberProviderId) {
 		Member member = getMember(memberProviderId);
 		Order order = getOrder(orderId);
+		// Store store = getStore(order.getStore().getId());
 
 		String changedStatus = request.status();
 		order.changeStatus(member, changedStatus);
+
+		// notificationService.send(member, store, order, OrderStatus.valueOf(changedStatus));
 
 		return OrderStatusUpdateRes.from(order);
 	}

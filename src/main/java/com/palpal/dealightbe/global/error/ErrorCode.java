@@ -72,6 +72,12 @@ public enum ErrorCode {
 	INVALID_REVIEW_CREATOR("R002", "리뷰는 상품을 주문한 고객 본인만 작성할 수 있습니다."),
 	ILLEGAL_REVIEW_REQUEST("R003", "완료된 주문에 대해서만 리뷰를 작성할 수 있습니다."),
 	INVALID_REVIEW_MESSAGE("R004", "유효하지 않은 리뷰 메시지가 존재합니다."),
+
+	//알림
+	NOT_FOUND_NOTIFICATION("N001", "존재하지 않는 알림입니다."),
+
+	// SSE
+	SSE_STREAM_ERROR("SSE001", "SSE 스트림 연결 중 오류가 발생했습니다."),
 	;
 
 	private final String code;
