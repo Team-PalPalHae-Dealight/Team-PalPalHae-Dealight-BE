@@ -597,7 +597,7 @@ class StoreControllerTest {
 					List.of(parameterWithName("x-coordinate").description("경도"),
 						parameterWithName("y-coordinate").description("위도"),
 						parameterWithName("keyword").description("검색어"),
-						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
+						parameterWithName("size").description("한 페이지 당 업체 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
 				responseFields(
@@ -650,7 +650,7 @@ class StoreControllerTest {
 						parameterWithName("y-coordinate").description("위도"),
 						parameterWithName("keyword").description("검색어"),
 						parameterWithName("sort-by").description("정렬 기준(기본 및 거리순) : distance"),
-						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
+						parameterWithName("size").description("한 페이지 당 업체 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
 				responseFields(
@@ -703,7 +703,7 @@ class StoreControllerTest {
 						parameterWithName("y-coordinate").description("위도"),
 						parameterWithName("keyword").description("검색어"),
 						parameterWithName("sort-by").description("정렬 기준(마감 임박순) : deadline"),
-						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
+						parameterWithName("size").description("한 페이지 당 업체 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
 				responseFields(
@@ -756,7 +756,7 @@ class StoreControllerTest {
 						parameterWithName("y-coordinate").description("위도"),
 						parameterWithName("keyword").description("검색어"),
 						parameterWithName("sort-by").description("정렬 기준(할인률순) : discount-rate"),
-						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
+						parameterWithName("size").description("한 페이지 당 업체 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
 				responseFields(
@@ -806,7 +806,7 @@ class StoreControllerTest {
 						parameterWithName("y-coordinate").description("위도"),
 						parameterWithName("keyword").description("검색어"),
 						parameterWithName("sort-by").description("정렬 기준(할인률순) : discount-rate"),
-						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
+						parameterWithName("size").description("한 페이지 당 업체 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
 				responseFields(
