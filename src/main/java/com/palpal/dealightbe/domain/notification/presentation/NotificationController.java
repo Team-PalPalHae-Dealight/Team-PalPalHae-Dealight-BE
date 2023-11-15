@@ -3,6 +3,7 @@ package com.palpal.dealightbe.domain.notification.presentation;
 import static com.palpal.dealightbe.domain.member.domain.RoleType.ROLE_MEMBER;
 import static com.palpal.dealightbe.domain.member.domain.RoleType.ROLE_STORE;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -21,14 +22,14 @@ public class NotificationController {
 
 	private final NotificationService notificationService;
 
-	@GetMapping(value = "/subscribe/member/{memberId}", produces = "text/event-stream")
+	@GetMapping(value = "/subscribe/member/{memberId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public SseEmitter subscribeMember(@PathVariable Long memberId,
 		@RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId) {
 
 		return notificationService.subscribe(memberId, ROLE_MEMBER, lastEventId);
 	}
 
-	@GetMapping(value = "/subscribe/store/{storeId}", produces = "text/event-stream")
+	@GetMapping(value = "/subscribe/store/{storeId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public SseEmitter subscribeStore(@PathVariable Long storeId,
 		@RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId) {
 
