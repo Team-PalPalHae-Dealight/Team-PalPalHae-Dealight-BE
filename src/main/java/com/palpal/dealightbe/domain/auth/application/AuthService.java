@@ -48,7 +48,7 @@ public class AuthService {
 
 	@Transactional(readOnly = true)
 	public OAuthLoginRes authenticate(KakaoUserInfoRes kakaoUserInfoRes) {
-		log.info("소셜 로그인에 성공했습니다. 소셜 사용자 데이터를 기반으로 로그인을 진행합니다...");
+		log.info("소셜 사용자데이터({})를 기반으로 로그인을 진행합니다...");
 		long providerId = kakaoUserInfoRes.id();
 		Optional<Member> optionalMember = memberRepository.findByProviderAndProviderId("kakao", providerId);
 		if (optionalMember.isEmpty()) {
