@@ -209,8 +209,6 @@ class CartControllerTest {
 		//given
 		Long itemId = 1L;
 
-		//when(CartAdditionType.findCartAdditionType("exception")).thenThrow(new BusinessException(INVALID_CART_ADDITION_TYPE));
-
 		//when
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
