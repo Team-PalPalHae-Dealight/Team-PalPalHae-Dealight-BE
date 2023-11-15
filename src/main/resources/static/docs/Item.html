@@ -699,6 +699,7 @@ Content-Length: 541
 </tr>
 </tbody>
 </table>
+<hr>
 <div class="listingblock">
 <div class="title">Request Fail - 입력되지 않은 상품 이름</div>
 <div class="content">
@@ -821,16 +822,16 @@ Content-Type: application/json
 Content-Length: 381
 
 {
-  "timestamp" : "2023-11-14 24:24:02",
+  "timestamp" : "2023-11-15 11:05:10",
   "code" : "C001",
   "errors" : [ {
     "field" : "name",
     "value" : "",
-    "reason" : "상품 이름을 입력해주세요."
+    "reason" : "상품 이름은 1자 이상 50자 이하로 등록 가능합니다."
   }, {
     "field" : "name",
     "value" : "",
-    "reason" : "상품 이름은 1자 이상 50자 이하로 등록 가능합니다."
+    "reason" : "상품 이름을 입력해주세요."
   } ],
   "message" : "잘못된 값을 입력하셨습니다."
 }</code></pre>
@@ -887,6 +888,7 @@ Content-Length: 381
 </tr>
 </tbody>
 </table>
+<hr>
 <div class="listingblock">
 <div class="title">Request Fail - 할인가가 원가보다 큰 경우</div>
 <div class="content">
@@ -1009,7 +1011,7 @@ Content-Type: application/json
 Content-Length: 155
 
 {
-  "timestamp" : "2023-11-14 24:24:03",
+  "timestamp" : "2023-11-15 11:05:11",
   "code" : "I001",
   "errors" : [ ],
   "message" : "상품 할인가는 원가보다 클 수 없습니다."
@@ -1052,6 +1054,7 @@ Content-Length: 155
 </tr>
 </tbody>
 </table>
+<hr>
 <div class="listingblock">
 <div class="title">Request Fail - 이미 등록된 상품인 경우(이름 중복)</div>
 <div class="content">
@@ -1174,7 +1177,7 @@ Content-Type: application/json
 Content-Length: 171
 
 {
-  "timestamp" : "2023-11-14 24:24:03",
+  "timestamp" : "2023-11-15 11:05:11",
   "code" : "I003",
   "errors" : [ ],
   "message" : "동일한 이름을 가진 상품이 이미 등록되어 있습니다."
@@ -1217,6 +1220,7 @@ Content-Length: 171
 </tr>
 </tbody>
 </table>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -1372,6 +1376,7 @@ Content-Length: 538
 </tr>
 </tbody>
 </table>
+<hr>
 <div class="listingblock">
 <div class="title">Request Fail - 상품이 존재하지 않는 경우</div>
 <div class="content">
@@ -1410,7 +1415,7 @@ Content-Type: application/json
 Content-Length: 137
 
 {
-  "timestamp" : "2023-11-14 24:24:03",
+  "timestamp" : "2023-11-15 11:05:11",
   "code" : "I002",
   "errors" : [ ],
   "message" : "상품이 존재하지 않습니다."
@@ -1453,6 +1458,7 @@ Content-Length: 137
 </tr>
 </tbody>
 </table>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -1518,7 +1524,7 @@ Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Content-Type: application/json
-Content-Length: 1179
+Content-Length: 1201
 
 {
   "items" : [ {
@@ -1557,7 +1563,8 @@ Content-Length: 1179
       "xCoordinate" : 127.0324773,
       "yCoordinate" : 37.5893876
     }
-  } ]
+  } ],
+  "hasNext" : false
 }</code></pre>
 </div>
 </div>
@@ -1655,8 +1662,14 @@ Content-Length: 1179
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">업체 주소 위도</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hasNext</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">다음 데이터 존재 여부</p></td>
+</tr>
 </tbody>
 </table>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -1713,7 +1726,7 @@ Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Content-Type: application/json
-Content-Length: 1174
+Content-Length: 1196
 
 {
   "items" : [ {
@@ -1752,7 +1765,8 @@ Content-Length: 1174
       "xCoordinate" : 127.0028245,
       "yCoordinate" : 37.5805009
     }
-  } ]
+  } ],
+  "hasNext" : false
 }</code></pre>
 </div>
 </div>
@@ -1850,8 +1864,14 @@ Content-Length: 1174
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">업체 주소 위도</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hasNext</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">다음 데이터 존재 여부</p></td>
+</tr>
 </tbody>
 </table>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -1908,7 +1928,7 @@ Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Content-Type: application/json
-Content-Length: 1174
+Content-Length: 1196
 
 {
   "items" : [ {
@@ -1947,7 +1967,8 @@ Content-Length: 1174
       "xCoordinate" : 127.0028245,
       "yCoordinate" : 37.5805009
     }
-  } ]
+  } ],
+  "hasNext" : false
 }</code></pre>
 </div>
 </div>
@@ -2045,8 +2066,14 @@ Content-Length: 1174
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">업체 주소 위도</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hasNext</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">다음 데이터 존재 여부</p></td>
+</tr>
 </tbody>
 </table>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -2103,7 +2130,7 @@ Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Content-Type: application/json
-Content-Length: 1171
+Content-Length: 1193
 
 {
   "items" : [ {
@@ -2142,7 +2169,8 @@ Content-Length: 1171
       "xCoordinate" : 127.0028245,
       "yCoordinate" : 37.5805009
     }
-  } ]
+  } ],
+  "hasNext" : false
 }</code></pre>
 </div>
 </div>
@@ -2240,8 +2268,14 @@ Content-Length: 1171
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">업체 주소 위도</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hasNext</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">다음 데이터 존재 여부</p></td>
+</tr>
 </tbody>
 </table>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -2306,7 +2340,7 @@ Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Content-Type: application/json
-Content-Length: 1179
+Content-Length: 1201
 
 {
   "items" : [ {
@@ -2345,7 +2379,8 @@ Content-Length: 1179
       "xCoordinate" : 127.0324773,
       "yCoordinate" : 37.5893876
     }
-  } ]
+  } ],
+  "hasNext" : false
 }</code></pre>
 </div>
 </div>
@@ -2443,8 +2478,14 @@ Content-Length: 1179
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">업체 주소 위도</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>hasNext</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">다음 데이터 존재 여부</p></td>
+</tr>
 </tbody>
 </table>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -2691,6 +2732,7 @@ Content-Length: 544
 </tr>
 </tbody>
 </table>
+<hr>
 <div class="listingblock">
 <div class="title">Request Fail - 입력되지 않은 상품 이름</div>
 <div class="content">
@@ -2820,16 +2862,16 @@ Content-Type: application/json
 Content-Length: 381
 
 {
-  "timestamp" : "2023-11-14 24:24:03",
+  "timestamp" : "2023-11-15 11:05:11",
   "code" : "C001",
   "errors" : [ {
     "field" : "name",
     "value" : "",
-    "reason" : "상품 이름은 1자 이상 50자 이하로 등록 가능합니다."
+    "reason" : "상품 이름을 입력해주세요."
   }, {
     "field" : "name",
     "value" : "",
-    "reason" : "상품 이름을 입력해주세요."
+    "reason" : "상품 이름은 1자 이상 50자 이하로 등록 가능합니다."
   } ],
   "message" : "잘못된 값을 입력하셨습니다."
 }</code></pre>
@@ -2886,6 +2928,7 @@ Content-Length: 381
 </tr>
 </tbody>
 </table>
+<hr>
 <div class="listingblock">
 <div class="title">Request Fail - 할인가가 원가보다 큰 경우</div>
 <div class="content">
@@ -3015,7 +3058,7 @@ Content-Type: application/json
 Content-Length: 155
 
 {
-  "timestamp" : "2023-11-14 24:24:03",
+  "timestamp" : "2023-11-15 11:05:11",
   "code" : "I001",
   "errors" : [ ],
   "message" : "상품 할인가는 원가보다 클 수 없습니다."
@@ -3058,6 +3101,7 @@ Content-Length: 155
 </tr>
 </tbody>
 </table>
+<hr>
 <div class="listingblock">
 <div class="title">Request Fail - 이미 등록된 상품인 경우(이름 중복)</div>
 <div class="content">
@@ -3187,7 +3231,7 @@ Content-Type: application/json
 Content-Length: 171
 
 {
-  "timestamp" : "2023-11-14 24:24:03",
+  "timestamp" : "2023-11-15 11:05:11",
   "code" : "I003",
   "errors" : [ ],
   "message" : "동일한 이름을 가진 상품이 이미 등록되어 있습니다."
@@ -3230,6 +3274,7 @@ Content-Length: 171
 </tr>
 </tbody>
 </table>
+<hr>
 </div>
 </div>
 <div class="sect2">
@@ -3292,6 +3337,7 @@ Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers</code></pre>
 </div>
 </div>
+<hr>
 <div class="listingblock">
 <div class="title">Request Fail - 요청된 상품이 해당 업체에 등록되지 않은 상품인 경우</div>
 <div class="content">
@@ -3350,7 +3396,7 @@ Content-Type: application/json
 Content-Length: 177
 
 {
-  "timestamp" : "2023-11-14 24:24:03",
+  "timestamp" : "2023-11-15 11:05:11",
   "code" : "I005",
   "errors" : [ ],
   "message" : "요청하신 상품은 해당 업체에 등록되지 않은 상품입니다."
@@ -3393,6 +3439,7 @@ Content-Length: 177
 </tr>
 </tbody>
 </table>
+<hr>
 </div>
 </div>
 </div>
@@ -3400,7 +3447,7 @@ Content-Length: 177
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2023-11-14 00:16:28 +0900
+Last updated 2023-11-15 20:24:25 +0900
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
