@@ -80,6 +80,10 @@ public class Cart {
 		this.quantity = quantity;
 	}
 
+	public void updateStock(int stock) {
+		this.stock = stock;
+	}
+
 	private void validateQuantity(int quantity, int stock) {
 		if (quantity < INITIAL_QUANTITY || quantity > stock) {
 			log.warn("INVALID_CART_QUANTITY : quantity = {}, stock = {}", quantity, stock);

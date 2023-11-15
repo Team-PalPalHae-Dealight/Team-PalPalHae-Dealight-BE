@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.palpal.dealightbe.domain.cart.application.CartService;
 import com.palpal.dealightbe.domain.cart.application.dto.response.CartRes;
+import com.palpal.dealightbe.domain.cart.application.dto.response.CartsRes;
+import com.palpal.dealightbe.domain.cart.domain.CartAdditionType;
 import com.palpal.dealightbe.global.aop.ProviderId;
 
 @RestController
@@ -23,17 +26,19 @@ public class CartController {
 
 	@ProviderId
 	@PostMapping("/items")
-	public ResponseEntity<CartRes> checkAndAddItem(Long providerId, @RequestParam("id") Long itemId) {
-		CartRes cartRes = cartService.checkAndAddItem(providerId, itemId);
+	public ResponseEntity<CartRes> addItem(Long providerId, @RequestParam("id") Long itemId, @RequestParam("type") String cartAdditionType) {
+		CartAdditionType additionType = CartAdditionType.findCartAdditionType(cartAdditionType);
+
+		CartRes cartRes = cartService.addItem(providerId, itemId, additionType);
 
 		return ResponseEntity.ok(cartRes);
 	}
 
 	@ProviderId
-	@PostMapping("/clear/items")
-	public ResponseEntity<CartRes> clearAndAddItem(Long providerId, @RequestParam("id") Long itemId) {
-		CartRes cartRes = cartService.clearAndAddItem(providerId, itemId);
+	@GetMapping
+	public ResponseEntity<CartsRes> findAllByProviderId(Long providerId) {
+		CartsRes cartsRes = cartService.findAllByProviderId(providerId);
 
-		return ResponseEntity.ok(cartRes);
+		return ResponseEntity.ok(cartsRes);
 	}
 }
