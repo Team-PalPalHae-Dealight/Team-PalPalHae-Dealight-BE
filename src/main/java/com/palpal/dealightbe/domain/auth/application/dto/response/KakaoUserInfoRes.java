@@ -1,5 +1,8 @@
 package com.palpal.dealightbe.domain.auth.application.dto.response;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record KakaoUserInfoRes(
@@ -27,6 +30,15 @@ public record KakaoUserInfoRes(
 		boolean profileImageNeedsAgreement,
 		Profile profile
 	) {
+
+		@Override
+		public String toString() {
+			return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+				.append("profileNicknameNeedsAgreement", profileNicknameNeedsAgreement)
+				.append("profileImageNeedsAgreement", profileImageNeedsAgreement)
+				.append("profile", profile)
+				.toString();
+		}
 	}
 
 	public record Profile(
@@ -38,5 +50,25 @@ public record KakaoUserInfoRes(
 		@JsonProperty("is_default_image")
 		boolean isDefaultImage
 	) {
+
+		@Override
+		public String toString() {
+			return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+				.append("nickname", nickname)
+				.append("thumbnailImageUrl", thumbnailImageUrl)
+				.append("profileImageUrl", profileImageUrl)
+				.append("isDefaultImage", isDefaultImage)
+				.toString();
+		}
+	}
+
+	@Override
+	public String toString() {
+		return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+			.append("id", id)
+			.append("connectedAt", connectedAt)
+			.append("properties", properties)
+			.append("kakaoAccount", kakaoAccount)
+			.toString();
 	}
 }

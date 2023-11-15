@@ -32,7 +32,7 @@ public class AuthController {
 
 	@GetMapping("/kakao")
 	public ResponseEntity<OAuthLoginRes> loginByKakaoOAuth(@RequestParam String code) {
-		KakaoUserInfoRes kakaoUserInfoRes = oAuth2AuthorizationService.authorizeKakao(code);
+		KakaoUserInfoRes kakaoUserInfoRes = oAuth2AuthorizationService.authorizeFromKakao(code);
 		OAuthLoginRes oAuthLoginRes = authService.authenticate(kakaoUserInfoRes);
 
 		return ResponseEntity

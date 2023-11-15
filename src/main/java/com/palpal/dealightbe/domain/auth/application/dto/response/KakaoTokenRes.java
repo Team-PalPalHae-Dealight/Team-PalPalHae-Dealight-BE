@@ -1,5 +1,8 @@
 package com.palpal.dealightbe.domain.auth.application.dto.response;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record KakaoTokenRes(
@@ -17,4 +20,17 @@ public record KakaoTokenRes(
 	Integer refreshTokenExpiresIn,
 	String scope
 ) {
+
+	@Override
+	public String toString() {
+		return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+			.append("tokenType", tokenType)
+			.append("accessToken", accessToken)
+			.append("idToken", idToken)
+			.append("expiresIn", expiresIn)
+			.append("refreshToken", refreshToken)
+			.append("refreshTokenExpiresIn", refreshTokenExpiresIn)
+			.append("scope", scope)
+			.toString();
+	}
 }
