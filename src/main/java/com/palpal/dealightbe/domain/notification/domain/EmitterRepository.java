@@ -18,7 +18,7 @@ public class EmitterRepository {
 		return sseEmitter;
 	}
 
-	public void saveEventCache(String id, Object event) {
+	public void saveEventCache(String id, String event) {
 		eventCache.put(id, event);
 	}
 
@@ -35,13 +35,8 @@ public class EmitterRepository {
 	}
 
 	public void deleteAllStartWithId(String id) {
-		emitters.forEach(
-			(key, emitter) -> {
-				if (key.startsWith(id)) {
-					emitters.remove(key);
-				}
-			}
-		);
+		emitters.entrySet()
+			.removeIf(entry -> entry.getKey().startsWith(id));
 	}
 
 	public void deleteById(String id) {
@@ -49,12 +44,6 @@ public class EmitterRepository {
 	}
 
 	public void deleteAllEventCacheStartWithId(String id) {
-		eventCache.forEach(
-			(key, data) -> {
-				if (key.startsWith(id)) {
-					eventCache.remove(key);
-				}
-			}
-		);
+		eventCache.keySet().removeIf(key -> key.startsWith(id));
 	}
 }
