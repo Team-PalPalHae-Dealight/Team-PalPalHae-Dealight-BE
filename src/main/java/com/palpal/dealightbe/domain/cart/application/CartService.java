@@ -47,7 +47,8 @@ public class CartService {
 
 		validateAnotherStoreItemExistence(carts, item.getStore().getId(), cartAdditionType);
 
-		return addItem(providerId, itemId, carts, cartAdditionType);
+		CartRes cartRes = addItem(providerId, itemId, carts, cartAdditionType);
+		return cartRes;
 	}
 
 	public CartsRes findAllByProviderId(Long providerId) {
