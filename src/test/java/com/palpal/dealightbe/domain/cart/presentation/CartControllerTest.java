@@ -26,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalTime;
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -47,6 +48,7 @@ import com.palpal.dealightbe.config.SecurityConfig;
 import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.cart.application.CartService;
 import com.palpal.dealightbe.domain.cart.application.dto.response.CartRes;
+import com.palpal.dealightbe.domain.cart.application.dto.response.CartsRes;
 import com.palpal.dealightbe.domain.cart.domain.Cart;
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
@@ -70,33 +72,28 @@ class CartControllerTest {
 	CartService cartService;
 
 	private Store store;
-	private Store store2;
 	private Item item;
 	private Item item2;
 	private Address address;
-	private Address address2;
 	private Cart cart;
 	private Cart cart2;
 
 	@BeforeEach
 	void setUp() {
-		LocalTime openTime = LocalTime.of(13, 0);
-		LocalTime closeTime = LocalTime.of(20, 0);
-
 		String storeDefaultImageUrl = "https://fake-image.com/store.png";
 
 		address = Address.builder()
-			.name("서울특별시 성북구 안암로 145")
-			.xCoordinate(127.0324773)
-			.yCoordinate(37.5893876)
+			.name("서울특별시 종로구 이화동 대학로8길 1")
+			.xCoordinate(127.0028245)
+			.yCoordinate(37.5805009)
 			.build();
 
 		store = Store.builder()
-			.name("동네분식")
+			.name("먼분식")
 			.storeNumber("0000000")
 			.telephone("00000000")
-			.openTime(openTime)
-			.closeTime(closeTime)
+			.openTime(LocalTime.of(17, 0))
+			.closeTime(LocalTime.of(23, 30))
 			.dayOff(Collections.singleton(DayOff.MON))
 			.address(address)
 			.build();
@@ -114,6 +111,17 @@ class CartControllerTest {
 			.store(store)
 			.build();
 
+		item2 = Item.builder()
+			.name("김밥")
+			.stock(3)
+			.discountPrice(4000)
+			.originalPrice(4500)
+			.description("김밥 입니다.")
+			.information("통신사 할인 불가능 합니다.")
+			.image("https://fake-image.com/item2.png")
+			.store(store)
+			.build();
+
 		cart = Cart.builder()
 			.itemId(1L)
 			.storeId(1L)
@@ -126,46 +134,16 @@ class CartControllerTest {
 			.storeCloseTime(store.getCloseTime())
 			.build();
 
-
-		address2 = Address.builder()
-			.name("서울특별시 종로구 이화동 대학로8길 1")
-			.xCoordinate(127.0028245)
-			.yCoordinate(37.5805009)
-			.build();
-
-		store2 = Store.builder()
-			.name("먼분식")
-			.storeNumber("0000000")
-			.telephone("00000000")
-			.openTime(LocalTime.of(17, 0))
-			.closeTime(LocalTime.of(23, 30))
-			.dayOff(Collections.singleton(DayOff.MON))
-			.address(address2)
-			.build();
-
-		store2.updateImage(storeDefaultImageUrl);
-
-		item2 = Item.builder()
-			.name("김밥")
-			.stock(3)
-			.discountPrice(4000)
-			.originalPrice(4500)
-			.description("김밥 입니다.")
-			.information("통신사 할인 불가능 합니다.")
-			.image("https://fake-image.com/item2.png")
-			.store(store2)
-			.build();
-
 		cart2 = Cart.builder()
 			.itemId(2L)
-			.storeId(2L)
-			.memberProviderId(2L)
+			.storeId(1L)
+			.memberProviderId(1L)
 			.itemName(item2.getName())
 			.stock(item2.getStock())
 			.discountPrice(item2.getDiscountPrice())
 			.itemImage(item2.getImage())
-			.storeName(store2.getName())
-			.storeCloseTime(store2.getCloseTime())
+			.storeName(store.getName())
+			.storeCloseTime(store.getCloseTime())
 			.build();
 	}
 
@@ -347,7 +325,7 @@ class CartControllerTest {
 			));
 	}
 
-	@DisplayName("장바구니 담기 실패 테스트 - 최대 5개 종류를 초과하여 장바구니 담기 시도하는 경우")
+	@DisplayName("장바구니 담기 실패 테스트 - 최대 5개 종류를 초과하여 장바구니 담기를 시도하는 경우")
 	@Test
 	void addItemFailureTest_exceededCartItemSize() throws Exception {
 		//given
@@ -429,4 +407,56 @@ class CartControllerTest {
 			));
 	}
 
+	@DisplayName("장바구니 조회 성공 테스트")
+	@Test
+	void findAllByProviderIdSuccessTest() throws Exception {
+		//given
+		CartRes cartRes1 = new CartRes(123456789L, cart.getItemId(), cart.getStoreId(), cart.getMemberProviderId(), cart.getItemName(), cart.getStock(), cart.getDiscountPrice(), cart.getItemImage(), cart.getQuantity(), cart.getStoreName(), cart.getStoreCloseTime());
+		CartRes cartRes2 = new CartRes(123456790L, cart2.getItemId(), cart2.getStoreId(), cart2.getMemberProviderId(), cart2.getItemName(), cart2.getStock(), cart2.getDiscountPrice(), cart2.getItemImage(), cart2.getQuantity(), cart2.getStoreName(), cart2.getStoreCloseTime());
+
+		List<CartRes> cartResList = List.of(cartRes1, cartRes2);
+		CartsRes cartsRes = new CartsRes(cartResList);
+
+		when(cartService.findAllByProviderId(any())).thenReturn(cartsRes);
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/carts")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.carts[0].cartId").value(cartRes1.cartId()))
+			.andExpect(jsonPath("$.carts[0].itemId").value(cartRes1.itemId()))
+			.andExpect(jsonPath("$.carts[0].storeId").value(cartRes1.storeId()))
+			.andExpect(jsonPath("$.carts[0].memberProviderId").value(cartRes1.memberProviderId()))
+			.andExpect(jsonPath("$.carts[0].itemName").value(cartRes1.itemName()))
+			.andExpect(jsonPath("$.carts[0].stock").value(cartRes1.stock()))
+			.andExpect(jsonPath("$.carts[0].discountPrice").value(cartRes1.discountPrice()))
+			.andExpect(jsonPath("$.carts[0].itemImage").value(cartRes1.itemImage()))
+			.andExpect(jsonPath("$.carts[0].quantity").value(cartRes1.quantity()))
+			.andExpect(jsonPath("$.carts[0].storeName").value(cartRes1.storeName()))
+			.andExpect(jsonPath("$.carts[0].storeCloseTime").value(cartRes1.storeCloseTime().toString()))
+			.andDo(print())
+			.andDo(document("cart/cart-find-all-by-provider-id",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				responseFields(
+					fieldWithPath("carts").type(ARRAY).description("장바구니 배열"),
+					fieldWithPath("carts[0].cartId").type(NUMBER).description("장바구니 ID"),
+					fieldWithPath("carts[0].itemId").type(NUMBER).description("상품 ID"),
+					fieldWithPath("carts[0].storeId").type(NUMBER).description("업체 ID"),
+					fieldWithPath("carts[0].memberProviderId").type(NUMBER).description("회원 provider ID"),
+					fieldWithPath("carts[0].itemName").type(STRING).description("상품 이름"),
+					fieldWithPath("carts[0].stock").type(NUMBER).description("재고 수"),
+					fieldWithPath("carts[0].discountPrice").type(NUMBER).description("할인가"),
+					fieldWithPath("carts[0].itemImage").type(STRING).description("상품 이미지 경로"),
+					fieldWithPath("carts[0].quantity").type(NUMBER).description("장바구니에 담은 개수"),
+					fieldWithPath("carts[0].storeName").type(STRING).description("상호명"),
+					fieldWithPath("carts[0].storeCloseTime").type(STRING).description("마감 시간")
+				)
+			));
+	}
 }
