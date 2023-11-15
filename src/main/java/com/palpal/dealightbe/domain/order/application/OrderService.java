@@ -17,7 +17,6 @@ import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
-import com.palpal.dealightbe.domain.notification.application.NotificationService;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderCreateReq;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderProductReq;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderStatusUpdateReq;
@@ -28,7 +27,6 @@ import com.palpal.dealightbe.domain.order.domain.Order;
 import com.palpal.dealightbe.domain.order.domain.OrderItem;
 import com.palpal.dealightbe.domain.order.domain.OrderItemRepository;
 import com.palpal.dealightbe.domain.order.domain.OrderRepository;
-import com.palpal.dealightbe.domain.order.domain.OrderStatus;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
@@ -48,7 +46,7 @@ public class OrderService {
 	private final StoreRepository storeRepository;
 	private final ItemRepository itemRepository;
 	private final OrderItemRepository orderItemRepository;
-	private final NotificationService notificationService;
+	// private final NotificationService notificationService;
 
 	public OrderRes create(OrderCreateReq orderCreateReq, Long memberProviderId) {
 		long storeId = orderCreateReq.storeId();
@@ -77,12 +75,12 @@ public class OrderService {
 	public OrderStatusUpdateRes updateStatus(Long orderId, OrderStatusUpdateReq request, Long memberProviderId) {
 		Member member = getMember(memberProviderId);
 		Order order = getOrder(orderId);
-		Store store = getStore(order.getStore().getId());
+		// Store store = getStore(order.getStore().getId());
 
 		String changedStatus = request.status();
 		order.changeStatus(member, changedStatus);
 
-		notificationService.send(member, store, order, OrderStatus.valueOf(changedStatus));
+		// notificationService.send(member, store, order, OrderStatus.valueOf(changedStatus));
 
 		return OrderStatusUpdateRes.from(order);
 	}
