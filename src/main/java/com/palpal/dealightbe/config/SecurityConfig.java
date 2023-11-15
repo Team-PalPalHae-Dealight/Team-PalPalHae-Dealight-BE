@@ -8,18 +8,15 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.palpal.dealightbe.domain.auth.application.CustomAuthAccessDeniedHandler;
 import com.palpal.dealightbe.domain.auth.domain.Jwt;
 import com.palpal.dealightbe.domain.auth.filter.JwtAuthenticationFilter;
-import com.palpal.dealightbe.domain.auth.application.CustomAuthAccessDeniedHandler;
-import com.palpal.dealightbe.domain.auth.application.CustomOAuth2AuthenticationSuccessHandler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,8 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 public class SecurityConfig {
 
-	private final AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository;
-	private final CustomOAuth2AuthenticationSuccessHandler customOAuth2AuthenticationSuccessHandler;
 	private final CustomAuthAccessDeniedHandler customAuthAccessDeniedHandler;
 	private final Jwt jwt;
 
@@ -58,14 +53,14 @@ public class SecurityConfig {
 			// 운영자용 URL
 			.antMatchers(HttpMethod.OPTIONS,
 				"/h2-console/**", "/actuator/**"
-			).hasRole("ADMIN")
+			).permitAll()
 			// 서비스 URL
 			.antMatchers(HttpMethod.OPTIONS,
 				"/api/auth/signup"
 			).permitAll()
 			.antMatchers(HttpMethod.OPTIONS,
 				"/api/**"
-			).hasAnyRole("MEMBER", "STORE", "ADMIN")
+			).permitAll()
 			.and()
 			.headers().disable()
 			.csrf().disable()
