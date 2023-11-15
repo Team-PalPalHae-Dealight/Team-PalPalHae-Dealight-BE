@@ -110,3 +110,20 @@ include::{snippets}/cart/cart-add-item-item-not-found/http-response.adoc[]
 
 .response fields
 include::{snippets}/cart/cart-add-item-item-not-found/response-fields.adoc[]
+
+
+=== 장바구니 조회
+
+==== /api/carts/items
+
+.Request - 성공
+include::{snippets}/cart/cart-find-all-by-provider-id/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-find-all-by-provider-id/request-headers.adoc[]
+
+.Response - 성공
+include::{snippets}/cart/cart-find-all-by-provider-id/http-response.adoc[]
+
+.response fields
+include::{snippets}/cart/cart-find-all-by-provider-id/response-fields.adoc[]
