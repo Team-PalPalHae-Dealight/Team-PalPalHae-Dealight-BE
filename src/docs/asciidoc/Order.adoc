@@ -30,6 +30,8 @@ include::{snippets}/order/order-create-fail-store-id/response-body.adoc[]
 
 /api/orders
 
+include::{snippets}/order/order-create-success/http-request.adoc[]
+
 ==== 요청
 
 - header
@@ -50,6 +52,8 @@ include::{snippets}/order/order-create-success/response-fields.adoc[]
 === 2. 주문 상태 변경
 
 /api/orders/{orderId}
+
+include::{snippets}/order/order-status-update-success/http-request.adoc[]
 
 ==== 요청
 
@@ -74,6 +78,8 @@ include::{snippets}/order/order-status-update-success/response-fields.adoc[]
 
 /api/orders/{orderId}
 
+include::{snippets}/order/order-find-by-id-success/http-request.adoc[]
+
 ==== 요청
 
 - header
@@ -96,6 +102,8 @@ include::{snippets}/order/order-find-by-id-success/response-fields.adoc[]
 
 /api/orders/stores?id={storeId}&status={status}&page={page}&size={size}
 
+include::{snippets}/order/order-find-by-store-id-success/http-request.adoc[]
+
 ==== 요청
 
 - header
@@ -117,6 +125,8 @@ include::{snippets}/order/order-find-by-store-id-success/response-fields.adoc[]
 === 5. 주문 조회 (다건) - 고객
 
 /api/orders?status={status}&page={page}&size={size}
+
+include::{snippets}/order/order-find-by-member-success/http-request.adoc[]
 
 ==== 요청
 
