@@ -25,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 
@@ -153,7 +154,7 @@ class CartControllerTest {
 		//given
 		Long itemId = 1L;
 
-		CartRes cartRes = new CartRes(123456789L, cart.getItemId(), cart.getStoreId(), cart.getMemberProviderId(), cart.getItemName(), cart.getStock(), cart.getDiscountPrice(), cart.getItemImage(), cart.getQuantity(), cart.getStoreName(), cart.getStoreCloseTime());
+		CartRes cartRes = new CartRes(123456789L, cart.getItemId(), cart.getStoreId(), cart.getMemberProviderId(), cart.getItemName(), cart.getStock(), cart.getDiscountPrice(), cart.getItemImage(), cart.getQuantity(), cart.getStoreName(), cart.getStoreCloseTime(), cart.getExpirationDateTime());
 
 		when(cartService.addItem(any(), any(), any())).thenReturn(cartRes);
 
@@ -176,6 +177,7 @@ class CartControllerTest {
 			.andExpect(jsonPath("$.quantity").value(cartRes.quantity()))
 			.andExpect(jsonPath("$.storeName").value(cartRes.storeName()))
 			.andExpect(jsonPath("$.storeCloseTime").value(cartRes.storeCloseTime().toString()))
+			.andExpect(jsonPath("$.expirationDateTime").value(cartRes.expirationDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))
 			.andDo(print())
 			.andDo(document("cart/cart-add-item",
 				preprocessRequest(prettyPrint()),
@@ -198,7 +200,8 @@ class CartControllerTest {
 					fieldWithPath("itemImage").type(STRING).description("상품 이미지 경로"),
 					fieldWithPath("quantity").type(NUMBER).description("장바구니에 담은 개수"),
 					fieldWithPath("storeName").type(STRING).description("상호명"),
-					fieldWithPath("storeCloseTime").type(STRING).description("마감 시간")
+					fieldWithPath("storeCloseTime").type(STRING).description("마감 시간"),
+					fieldWithPath("expirationDateTime").type(STRING).description("장바구니 만료 시간")
 				)
 			));
 	}
@@ -409,8 +412,8 @@ class CartControllerTest {
 	@Test
 	void findAllByProviderIdSuccessTest() throws Exception {
 		//given
-		CartRes cartRes1 = new CartRes(123456789L, cart.getItemId(), cart.getStoreId(), cart.getMemberProviderId(), cart.getItemName(), cart.getStock(), cart.getDiscountPrice(), cart.getItemImage(), cart.getQuantity(), cart.getStoreName(), cart.getStoreCloseTime());
-		CartRes cartRes2 = new CartRes(123456790L, cart2.getItemId(), cart2.getStoreId(), cart2.getMemberProviderId(), cart2.getItemName(), cart2.getStock(), cart2.getDiscountPrice(), cart2.getItemImage(), cart2.getQuantity(), cart2.getStoreName(), cart2.getStoreCloseTime());
+		CartRes cartRes1 = new CartRes(123456789L, cart.getItemId(), cart.getStoreId(), cart.getMemberProviderId(), cart.getItemName(), cart.getStock(), cart.getDiscountPrice(), cart.getItemImage(), cart.getQuantity(), cart.getStoreName(), cart.getStoreCloseTime(), cart.getExpirationDateTime());
+		CartRes cartRes2 = new CartRes(123456790L, cart2.getItemId(), cart2.getStoreId(), cart2.getMemberProviderId(), cart2.getItemName(), cart2.getStock(), cart2.getDiscountPrice(), cart2.getItemImage(), cart2.getQuantity(), cart2.getStoreName(), cart2.getStoreCloseTime(), cart2.getExpirationDateTime());
 
 		List<CartRes> cartResList = List.of(cartRes1, cartRes2);
 		CartsRes cartsRes = new CartsRes(cartResList);
@@ -434,6 +437,7 @@ class CartControllerTest {
 			.andExpect(jsonPath("$.carts[0].quantity").value(cartRes1.quantity()))
 			.andExpect(jsonPath("$.carts[0].storeName").value(cartRes1.storeName()))
 			.andExpect(jsonPath("$.carts[0].storeCloseTime").value(cartRes1.storeCloseTime().toString()))
+			.andExpect(jsonPath("$.carts[0].expirationDateTime").value(cartRes1.expirationDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))
 			.andDo(print())
 			.andDo(document("cart/cart-find-all-by-provider-id",
 				preprocessRequest(prettyPrint()),
@@ -453,7 +457,8 @@ class CartControllerTest {
 					fieldWithPath("carts[0].itemImage").type(STRING).description("상품 이미지 경로"),
 					fieldWithPath("carts[0].quantity").type(NUMBER).description("장바구니에 담은 개수"),
 					fieldWithPath("carts[0].storeName").type(STRING).description("상호명"),
-					fieldWithPath("carts[0].storeCloseTime").type(STRING).description("마감 시간")
+					fieldWithPath("carts[0].storeCloseTime").type(STRING).description("마감 시간"),
+					fieldWithPath("carts[0].expirationDateTime").type(STRING).description("장바구니 만료 시간")
 				)
 			));
 	}
