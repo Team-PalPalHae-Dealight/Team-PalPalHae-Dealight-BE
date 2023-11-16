@@ -180,8 +180,7 @@ include::{snippets}/order/order-find-by-store-fail-unauthorized/response-fields.
 /api/orders?status={status}&page={page}&size={size}
 
 include::{snippets}/order/order-find-by-member-success/http-request.adoc[]
-
-==== 요청
+정 ==== 요청
 
 - header
 include::{snippets}/order/order-find-by-member-success/request-headers.adoc[]
