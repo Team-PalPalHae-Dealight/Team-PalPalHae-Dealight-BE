@@ -3,6 +3,7 @@ package com.palpal.dealightbe.domain.cart.application;
 import static com.palpal.dealightbe.global.error.ErrorCode.ANOTHER_STORE_ITEM_ALREADY_EXISTS_IN_THE_CART;
 import static com.palpal.dealightbe.global.error.ErrorCode.EXCEEDED_CART_ITEM_SIZE;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ATTEMPT_TO_ADD_OWN_STORE_ITEM_TO_CART;
+import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_CART_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
 
 import lombok.RequiredArgsConstructor;
@@ -11,10 +12,12 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.palpal.dealightbe.domain.cart.application.dto.request.CartsReq;
 import com.palpal.dealightbe.domain.cart.application.dto.response.CartRes;
 import com.palpal.dealightbe.domain.cart.application.dto.response.CartsRes;
 import com.palpal.dealightbe.domain.cart.domain.Cart;
@@ -53,21 +56,64 @@ public class CartService {
 	public CartsRes findAllByProviderId(Long providerId) {
 		List<Cart> carts = cartRepository.findAllByMemberProviderId(providerId);
 
-		List<Cart> updatedCarts = carts.stream()
-			.map(this::updateStock)
-			.sorted(Comparator.comparing(Cart::getItemId))
+		List<Cart> updatedCarts = updateCarts(carts);
+
+		List<Cart> unexpiredCarts = getUnexpiredCarts(updatedCarts);
+
+		return CartsRes.from(unexpiredCarts);
+	}
+
+	public CartsRes update(Long providerId, CartsReq cartsReq) {
+		List<Cart> carts = getCarts(cartsReq, providerId);
+
+		List<Cart> updatedCarts = IntStream.range(0, carts.size())
+			.mapToObj(index -> updateCartQuantity(cartsReq, carts, index))
 			.toList();
 
 		return CartsRes.from(updatedCarts);
 	}
 
-	private Cart updateStock(Cart cart) {
+	private Cart updateCartQuantity(CartsReq cartsReq, List<Cart> carts, int index) {
+		int quantity = cartsReq.carts().get(index).quantity();
+		Cart cart = carts.get(index);
+
+		cart.updateQuantity(quantity);
+		return cartRepository.save(cart);
+	}
+
+	private List<Cart> updateCarts(List<Cart> carts) {
+
+		return carts.stream()
+			.map(this::renewCart)
+			.sorted(Comparator.comparing(Cart::getItemId))
+			.toList();
+	}
+
+	private Cart renewCart(Cart cart) {
 		Long itemId = cart.getItemId();
 		Item item = getItem(itemId);
 
-		cart.updateStock(item.getStock());
+		cart.update(item.getName(), item.getStock(), item.getDiscountPrice(), item.getImage(), item.getStore().getCloseTime());
+
+		if (!cart.getExpirationDateTime().toLocalTime().equals(item.getStore().getCloseTime())) {
+			cart.updateExpirationDateTime();
+		}
 
 		return cartRepository.save(cart);
+	}
+
+	private List<Cart> getUnexpiredCarts(List<Cart> carts) {
+
+		return carts.stream()
+			.peek(this::deleteExpiredCart)
+			.filter(cart -> !cart.isExpired())
+			.toList();
+	}
+
+	private void deleteExpiredCart(Cart cart) {
+		if (cart.isExpired()) {
+			cartRepository.delete(cart);
+		}
 	}
 
 	private void validateOwnStoreItem(Long providerId, Item item) {
@@ -82,8 +128,6 @@ public class CartService {
 
 	private CartRes addItem(Long providerId, Long itemId, List<Cart> carts, CartAdditionType cartAdditionType) {
 		Cart cart = getCartToAddItem(itemId, providerId, carts, cartAdditionType);
-
-		cart.updateExpiration();
 
 		Cart savedCart = cartRepository.save(cart);
 
@@ -141,6 +185,22 @@ public class CartService {
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", itemId);
 				return new EntityNotFoundException(NOT_FOUND_ITEM);
+			});
+	}
+
+	private List<Cart> getCarts(CartsReq cartsReq, Long providerId) {
+
+		return cartsReq.carts().stream()
+			.map(cartReq -> getCart(cartReq.itemId(), providerId))
+			.toList();
+	}
+
+	private Cart getCart(Long itemId, Long providerId) {
+
+		return cartRepository.findByItemIdAndMemberProviderId(itemId, providerId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_CART_BY_ITEM_ID_AND_PROVIDER_ID : itemId = {}, providerId = {}", itemId, providerId);
+				return new EntityNotFoundException(NOT_FOUND_CART_ITEM);
 			});
 	}
 

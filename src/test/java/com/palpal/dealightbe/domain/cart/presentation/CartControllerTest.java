@@ -3,6 +3,8 @@ package com.palpal.dealightbe.domain.cart.presentation;
 import static com.palpal.dealightbe.global.error.ErrorCode.ANOTHER_STORE_ITEM_ALREADY_EXISTS_IN_THE_CART;
 import static com.palpal.dealightbe.global.error.ErrorCode.EXCEEDED_CART_ITEM_SIZE;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ATTEMPT_TO_ADD_OWN_STORE_ITEM_TO_CART;
+import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_CART_QUANTITY;
+import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_CART_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -17,6 +19,7 @@ import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
@@ -25,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 
@@ -47,6 +51,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palpal.dealightbe.config.SecurityConfig;
 import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.cart.application.CartService;
+import com.palpal.dealightbe.domain.cart.application.dto.request.CartReq;
+import com.palpal.dealightbe.domain.cart.application.dto.request.CartsReq;
 import com.palpal.dealightbe.domain.cart.application.dto.response.CartRes;
 import com.palpal.dealightbe.domain.cart.application.dto.response.CartsRes;
 import com.palpal.dealightbe.domain.cart.domain.Cart;
@@ -153,7 +159,7 @@ class CartControllerTest {
 		//given
 		Long itemId = 1L;
 
-		CartRes cartRes = new CartRes(123456789L, cart.getItemId(), cart.getStoreId(), cart.getMemberProviderId(), cart.getItemName(), cart.getStock(), cart.getDiscountPrice(), cart.getItemImage(), cart.getQuantity(), cart.getStoreName(), cart.getStoreCloseTime());
+		CartRes cartRes = new CartRes(123456789L, cart.getItemId(), cart.getStoreId(), cart.getMemberProviderId(), cart.getItemName(), cart.getStock(), cart.getDiscountPrice(), cart.getItemImage(), cart.getQuantity(), cart.getStoreName(), cart.getStoreCloseTime(), cart.getExpirationDateTime());
 
 		when(cartService.addItem(any(), any(), any())).thenReturn(cartRes);
 
@@ -176,6 +182,7 @@ class CartControllerTest {
 			.andExpect(jsonPath("$.quantity").value(cartRes.quantity()))
 			.andExpect(jsonPath("$.storeName").value(cartRes.storeName()))
 			.andExpect(jsonPath("$.storeCloseTime").value(cartRes.storeCloseTime().toString()))
+			.andExpect(jsonPath("$.expirationDateTime").value(cartRes.expirationDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))
 			.andDo(print())
 			.andDo(document("cart/cart-add-item",
 				preprocessRequest(prettyPrint()),
@@ -198,7 +205,8 @@ class CartControllerTest {
 					fieldWithPath("itemImage").type(STRING).description("상품 이미지 경로"),
 					fieldWithPath("quantity").type(NUMBER).description("장바구니에 담은 개수"),
 					fieldWithPath("storeName").type(STRING).description("상호명"),
-					fieldWithPath("storeCloseTime").type(STRING).description("마감 시간")
+					fieldWithPath("storeCloseTime").type(STRING).description("마감 시간"),
+					fieldWithPath("expirationDateTime").type(STRING).description("장바구니 만료 시간")
 				)
 			));
 	}
@@ -409,8 +417,8 @@ class CartControllerTest {
 	@Test
 	void findAllByProviderIdSuccessTest() throws Exception {
 		//given
-		CartRes cartRes1 = new CartRes(123456789L, cart.getItemId(), cart.getStoreId(), cart.getMemberProviderId(), cart.getItemName(), cart.getStock(), cart.getDiscountPrice(), cart.getItemImage(), cart.getQuantity(), cart.getStoreName(), cart.getStoreCloseTime());
-		CartRes cartRes2 = new CartRes(123456790L, cart2.getItemId(), cart2.getStoreId(), cart2.getMemberProviderId(), cart2.getItemName(), cart2.getStock(), cart2.getDiscountPrice(), cart2.getItemImage(), cart2.getQuantity(), cart2.getStoreName(), cart2.getStoreCloseTime());
+		CartRes cartRes1 = new CartRes(123456789L, cart.getItemId(), cart.getStoreId(), cart.getMemberProviderId(), cart.getItemName(), cart.getStock(), cart.getDiscountPrice(), cart.getItemImage(), cart.getQuantity(), cart.getStoreName(), cart.getStoreCloseTime(), cart.getExpirationDateTime());
+		CartRes cartRes2 = new CartRes(123456790L, cart2.getItemId(), cart2.getStoreId(), cart2.getMemberProviderId(), cart2.getItemName(), cart2.getStock(), cart2.getDiscountPrice(), cart2.getItemImage(), cart2.getQuantity(), cart2.getStoreName(), cart2.getStoreCloseTime(), cart2.getExpirationDateTime());
 
 		List<CartRes> cartResList = List.of(cartRes1, cartRes2);
 		CartsRes cartsRes = new CartsRes(cartResList);
@@ -434,6 +442,7 @@ class CartControllerTest {
 			.andExpect(jsonPath("$.carts[0].quantity").value(cartRes1.quantity()))
 			.andExpect(jsonPath("$.carts[0].storeName").value(cartRes1.storeName()))
 			.andExpect(jsonPath("$.carts[0].storeCloseTime").value(cartRes1.storeCloseTime().toString()))
+			.andExpect(jsonPath("$.carts[0].expirationDateTime").value(cartRes1.expirationDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))
 			.andDo(print())
 			.andDo(document("cart/cart-find-all-by-provider-id",
 				preprocessRequest(prettyPrint()),
@@ -453,7 +462,155 @@ class CartControllerTest {
 					fieldWithPath("carts[0].itemImage").type(STRING).description("상품 이미지 경로"),
 					fieldWithPath("carts[0].quantity").type(NUMBER).description("장바구니에 담은 개수"),
 					fieldWithPath("carts[0].storeName").type(STRING).description("상호명"),
-					fieldWithPath("carts[0].storeCloseTime").type(STRING).description("마감 시간")
+					fieldWithPath("carts[0].storeCloseTime").type(STRING).description("마감 시간"),
+					fieldWithPath("carts[0].expirationDateTime").type(STRING).description("장바구니 만료 시간")
+				)
+			));
+	}
+
+	@DisplayName("장바구니 수정 성공 테스트")
+	@Test
+	void updateSuccessTest() throws Exception {
+		//given
+		CartReq cartReq = new CartReq(1L, 2);
+		CartReq cartReq2 = new CartReq(2L, 3);
+
+		CartsReq cartsReq = new CartsReq(List.of(cartReq, cartReq2));
+
+		CartRes cartRes = new CartRes(123456789L, cart.getItemId(), cart.getStoreId(), cart.getMemberProviderId(), cart.getItemName(), cart.getStock(), cart.getDiscountPrice(), cart.getItemImage(), cartReq.quantity(), cart.getStoreName(), cart.getStoreCloseTime(), cart.getExpirationDateTime());
+		CartRes cartRes2 = new CartRes(123456789L, cart2.getItemId(), cart2.getStoreId(), cart2.getMemberProviderId(), cart2.getItemName(), cart2.getStock(), cart2.getDiscountPrice(), cart2.getItemImage(), cartReq2.quantity(), cart2.getStoreName(), cart2.getStoreCloseTime(), cart2.getExpirationDateTime());
+
+		CartsRes cartsRes = new CartsRes(List.of(cartRes, cartRes2));
+		when(cartService.update(any(), any())).thenReturn(cartsRes);
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/carts")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.content(objectMapper.writeValueAsString(cartsReq)))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.carts[0].cartId").value(cartRes.cartId()))
+			.andExpect(jsonPath("$.carts[0].itemId").value(cartRes.itemId()))
+			.andExpect(jsonPath("$.carts[0].storeId").value(cartRes.storeId()))
+			.andExpect(jsonPath("$.carts[0].memberProviderId").value(cartRes.memberProviderId()))
+			.andExpect(jsonPath("$.carts[0].itemName").value(cartRes.itemName()))
+			.andExpect(jsonPath("$.carts[0].stock").value(cartRes.stock()))
+			.andExpect(jsonPath("$.carts[0].discountPrice").value(cartRes.discountPrice()))
+			.andExpect(jsonPath("$.carts[0].itemImage").value(cartRes.itemImage()))
+			.andExpect(jsonPath("$.carts[0].quantity").value(cartRes.quantity()))
+			.andExpect(jsonPath("$.carts[0].storeName").value(cartRes.storeName()))
+			.andExpect(jsonPath("$.carts[0].storeCloseTime").value(cartRes.storeCloseTime().toString()))
+			.andExpect(jsonPath("$.carts[0].expirationDateTime").value(cartRes.expirationDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))
+			.andDo(print())
+			.andDo(document("cart/cart-update",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				requestFields(
+					fieldWithPath("carts[0].itemId").description("상품 ID"),
+					fieldWithPath("carts[0].quantity").description("장바구니에 담은 개수")
+				),
+				responseFields(
+					fieldWithPath("carts").type(ARRAY).description("장바구니 배열"),
+					fieldWithPath("carts[0].cartId").type(NUMBER).description("장바구니 ID"),
+					fieldWithPath("carts[0].itemId").type(NUMBER).description("상품 ID"),
+					fieldWithPath("carts[0].storeId").type(NUMBER).description("업체 ID"),
+					fieldWithPath("carts[0].memberProviderId").type(NUMBER).description("회원 provider ID"),
+					fieldWithPath("carts[0].itemName").type(STRING).description("상품 이름"),
+					fieldWithPath("carts[0].stock").type(NUMBER).description("재고 수"),
+					fieldWithPath("carts[0].discountPrice").type(NUMBER).description("할인가"),
+					fieldWithPath("carts[0].itemImage").type(STRING).description("상품 이미지 경로"),
+					fieldWithPath("carts[0].quantity").type(NUMBER).description("장바구니에 담은 개수"),
+					fieldWithPath("carts[0].storeName").type(STRING).description("상호명"),
+					fieldWithPath("carts[0].storeCloseTime").type(STRING).description("마감 시간"),
+					fieldWithPath("carts[0].expirationDateTime").type(STRING).description("장바구니 만료 시간")
+				)
+			));
+	}
+
+	@DisplayName("장바구니 수정 실패 테스트 - 장바구니의 최소, 최대 수량 조건에 맞지 않는 경우")
+	@Test
+	void updateFailureTest_invalidCartQuantity() throws Exception {
+		//given
+		CartReq cartReq = new CartReq(1L, 0);
+		CartReq cartReq2 = new CartReq(2L, 100);
+
+		CartsReq cartsReq = new CartsReq(List.of(cartReq, cartReq2));
+
+		doThrow(new BusinessException(INVALID_CART_QUANTITY)).when(
+			cartService).update(any(), any());
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/carts")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.content(objectMapper.writeValueAsString(cartsReq)))
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("CT002"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("상품 당 최소 1개에서 최대 재고 수량까지만 장바구니에 담을 수 있습니다."))
+			.andDo(print())
+			.andDo(document("cart/cart-update-invalid-cart-quantity",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				requestFields(
+					fieldWithPath("carts[0].itemId").description("상품 ID"),
+					fieldWithPath("carts[0].quantity").description("장바구니에 담은 개수")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("예외 코드"),
+					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@DisplayName("장바구니 수정 실패 테스트 - 장바구니의 상품이 존재하지 않는 경우")
+	@Test
+	void updateFailureTest_notFoundCartItem() throws Exception {
+		//given
+		CartReq cartReq = new CartReq(1L, 0);
+		CartReq cartReq2 = new CartReq(2L, 100);
+
+		CartsReq cartsReq = new CartsReq(List.of(cartReq, cartReq2));
+
+		doThrow(new BusinessException(NOT_FOUND_CART_ITEM)).when(
+			cartService).update(any(), any());
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/carts")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.content(objectMapper.writeValueAsString(cartsReq)))
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("CT001"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("장바구니에 상품이 존재하지 않습니다."))
+			.andDo(print())
+			.andDo(document("cart/cart-update-not-found-cart-item",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				requestFields(
+					fieldWithPath("carts[0].itemId").description("상품 ID"),
+					fieldWithPath("carts[0].quantity").description("장바구니에 담은 개수")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("예외 코드"),
+					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
 				)
 			));
 	}
