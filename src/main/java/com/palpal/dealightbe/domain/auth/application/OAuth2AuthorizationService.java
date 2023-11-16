@@ -52,6 +52,7 @@ public class OAuth2AuthorizationService {
 			return kakaoTokenRes;
 		} catch (RuntimeException e) {
 			log.warn("Authorization Code({})를 사용해 카카오 Authorization Server로부터 토큰을 발급받는데 실패했습니다.", code);
+			log.warn("Error Message: {}", e.getMessage());
 			throw new OAuth2AuthorizationException(ErrorCode.UNABLE_TO_GET_TOKEN_FROM_AUTH_SERVER);
 		}
 	}
