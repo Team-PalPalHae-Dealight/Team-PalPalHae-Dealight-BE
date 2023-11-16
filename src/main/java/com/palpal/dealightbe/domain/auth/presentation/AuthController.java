@@ -38,7 +38,7 @@ public class AuthController {
 
 		if (oAuthLoginRes.data() instanceof JoinRequireRes) {
 			return ResponseEntity
-				.status(HttpStatus.OK)
+				.status(HttpStatus.UNAUTHORIZED)
 				.body(oAuthLoginRes);
 		}
 
