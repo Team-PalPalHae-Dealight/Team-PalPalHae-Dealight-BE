@@ -140,3 +140,56 @@ include::{snippets}/cart/cart-find-all-by-provider-id/http-response.adoc[]
 include::{snippets}/cart/cart-find-all-by-provider-id/response-fields.adoc[]
 
 ---
+
+=== 장바구니 수정
+
+==== /api/carts
+
+.Request - 성공
+include::{snippets}/cart/cart-update/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-update/request-headers.adoc[]
+
+.request fields
+include::{snippets}/cart/cart-update/request-fields.adoc[]
+
+.Response - 성공
+include::{snippets}/cart/cart-update/http-response.adoc[]
+
+.response fields
+include::{snippets}/cart/cart-update/response-fields.adoc[]
+
+---
+
+.Request Fail - 장바구니의 최소, 최대 수량 조건에 맞지 않는 경우
+include::{snippets}/cart/cart-update-invalid-cart-quantity/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-update-invalid-cart-quantity/request-headers.adoc[]
+
+.request fields
+include::{snippets}/cart/cart-update-invalid-cart-quantity/request-fields.adoc[]
+
+.Response Fail - 장바구니의 최소, 최대 수량 조건에 맞지 않는 경우
+include::{snippets}/cart/cart-update-invalid-cart-quantity/http-response.adoc[]
+
+.response fields
+include::{snippets}/cart/cart-update-invalid-cart-quantity/response-fields.adoc[]
+
+---
+
+.Request Fail - 장바구니의 상품이 존재하지 않는 경우
+include::{snippets}/cart/cart-update-not-found-cart-item/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-update-not-found-cart-item/request-headers.adoc[]
+
+.request fields
+include::{snippets}/cart/cart-update-not-found-cart-item/request-fields.adoc[]
+
+.Response Fail - 장바구니의 상품이 존재하지 않는 경우
+include::{snippets}/cart/cart-update-not-found-cart-item/http-response.adoc[]
+
+.response fields
+include::{snippets}/cart/cart-update-not-found-cart-item/response-fields.adoc[]
