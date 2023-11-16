@@ -127,7 +127,7 @@ class AuthControllerTest {
 					.with(user("user").roles("MEMBER"))
 					.param("code", "MOCK_AUTHORIZATION_CODE")
 				)
-				.andExpect(status().isUnauthorized())
+				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.message").value("딜라이트 서비스에 가입이 필요합니다."))
 				.andExpect(jsonPath("$.data.provider").value("MOCK_SERVER"))
 				.andExpect(jsonPath("$.data.providerId").value(12345L))
