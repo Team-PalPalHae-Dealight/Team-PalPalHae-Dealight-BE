@@ -73,6 +73,18 @@ public class CartService {
 		return CartsRes.from(updatedCarts);
 	}
 
+	public void deleteOne(Long providerId, Long itemId) {
+		Cart cart = getCart(itemId, providerId);
+
+		cartRepository.delete(cart);
+	}
+
+	public void deleteAll(Long providerId) {
+		List<Cart> carts = cartRepository.findAllByMemberProviderId(providerId);
+
+		cartRepository.deleteAll(carts);
+	}
+
 	private Cart updateCartQuantity(CartsReq cartsReq, List<Cart> carts, int index) {
 		int quantity = cartsReq.carts().get(index).quantity();
 		Cart cart = carts.get(index);
