@@ -26,13 +26,13 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.H2Dialect
-    defer-datasource-initialization: true # 필수
+#    defer-datasource-initialization: true # 필수
 
-  sql: # depth 주의 jpa와 같은 depth
-    init:
-      data-locations: classpath:data.sql
-      mode: always
-      platform: h2 # 본인 DB 종류
+#  sql: # depth 주의 jpa와 같은 depth
+#    init:
+#      data-locations: classpath:data.sql
+#      mode: always
+#      platform: h2 # 본인 DB 종류
 
   redis:
     host: localhost
