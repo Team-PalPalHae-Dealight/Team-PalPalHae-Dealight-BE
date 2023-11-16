@@ -125,7 +125,7 @@ include::{snippets}/cart/cart-add-item-item-not-found/response-fields.adoc[]
 
 === 장바구니 조회
 
-==== /api/carts/items
+==== /api/carts
 
 .Request - 성공
 include::{snippets}/cart/cart-find-all-by-provider-id/http-request.adoc[]
@@ -193,3 +193,46 @@ include::{snippets}/cart/cart-update-not-found-cart-item/http-response.adoc[]
 
 .response fields
 include::{snippets}/cart/cart-update-not-found-cart-item/response-fields.adoc[]
+
+---
+
+=== 장바구니 요소 삭제
+
+==== /api/carts/items?id={itemId}
+
+.Request - 성공
+include::{snippets}/cart/cart-delete-one/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-delete-one/request-headers.adoc[]
+
+.Response - 성공
+include::{snippets}/cart/cart-delete-one/http-response.adoc[]
+
+---
+
+.Request Fail - 장바구니의 상품이 존재하지 않는 경우
+include::{snippets}/cart/cart-delete-one-not-found-cart-item/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-delete-one-not-found-cart-item/request-headers.adoc[]
+
+.Response Fail - 요청된 상품이 해당 업체에 등록되지 않은 상품인 경우
+include::{snippets}/cart/cart-delete-one-not-found-cart-item/http-response.adoc[]
+
+include::{snippets}/cart/cart-delete-one-not-found-cart-item/response-fields.adoc[]
+
+=== 장바구니 초기화
+
+==== /api/carts
+
+.Request - 성공
+include::{snippets}/cart/cart-delete-all/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-delete-all/request-headers.adoc[]
+
+.Response - 성공
+include::{snippets}/cart/cart-delete-all/http-response.adoc[]
+
+---
