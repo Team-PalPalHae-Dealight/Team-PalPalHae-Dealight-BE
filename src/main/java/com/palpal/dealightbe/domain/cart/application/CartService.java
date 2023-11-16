@@ -67,15 +67,18 @@ public class CartService {
 		List<Cart> carts = getCarts(cartsReq, providerId);
 
 		List<Cart> updatedCarts = IntStream.range(0, carts.size())
-			.mapToObj(index -> {
-				int quantity = cartsReq.carts().get(index).quantity();
-				Cart cart = carts.get(index);
-
-				cart.updateQuantity(quantity);
-				return cartRepository.save(cart);
-			}).toList();
+			.mapToObj(index -> updateCartQuantity(cartsReq, carts, index))
+			.toList();
 
 		return CartsRes.from(updatedCarts);
+	}
+
+	private Cart updateCartQuantity(CartsReq cartsReq, List<Cart> carts, int index) {
+		int quantity = cartsReq.carts().get(index).quantity();
+		Cart cart = carts.get(index);
+
+		cart.updateQuantity(quantity);
+		return cartRepository.save(cart);
 	}
 
 	private List<Cart> updateCarts(List<Cart> carts) {
