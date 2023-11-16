@@ -15,7 +15,6 @@ import com.palpal.dealightbe.domain.auth.application.AuthService;
 import com.palpal.dealightbe.domain.auth.application.OAuth2AuthorizationService;
 import com.palpal.dealightbe.domain.auth.application.dto.request.MemberAuthReq;
 import com.palpal.dealightbe.domain.auth.application.dto.response.JoinRequireRes;
-import com.palpal.dealightbe.domain.auth.application.dto.response.KakaoUserInfoRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.MemberAuthRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.OAuthLoginRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.RequiredUserInfoRes;
@@ -29,8 +28,8 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-	private final AuthService authService;
 	private final OAuth2AuthorizationService oAuth2AuthorizationService;
+	private final AuthService authService;
 
 	@GetMapping("/kakao")
 	public ResponseEntity<OAuthLoginRes> loginByKakaoOAuth(@RequestParam String code) {

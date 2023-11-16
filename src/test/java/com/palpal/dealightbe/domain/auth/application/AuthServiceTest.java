@@ -25,8 +25,11 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.auth.application.dto.request.MemberAuthReq;
+import com.palpal.dealightbe.domain.auth.application.dto.response.JoinRequireRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.LoginRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.MemberAuthRes;
+import com.palpal.dealightbe.domain.auth.application.dto.response.OAuthLoginRes;
+import com.palpal.dealightbe.domain.auth.application.dto.response.RequiredUserInfoRes;
 import com.palpal.dealightbe.domain.auth.domain.Jwt;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
@@ -52,22 +55,10 @@ class AuthServiceTest {
 	@InjectMocks
 	private AuthService authService;
 
-	private OAuth2AuthenticationToken mockOAuth2AuthenticationToken;
-
 	private Member member;
 
 	@BeforeEach
 	void setUp() {
-		SimpleGrantedAuthority roleMember = new SimpleGrantedAuthority("ROLE_MEMBER");
-		Collection<SimpleGrantedAuthority> mockAuthorities = new ArrayList<>();
-		mockAuthorities.add(roleMember);
-
-		Map<String, Object> mockAttributes = new HashMap<>();
-		mockAttributes.put("id", 12345);
-
-		OAuth2User mockOAuth2User = new DefaultOAuth2User(mockAuthorities, mockAttributes, "id");
-		mockOAuth2AuthenticationToken = new OAuth2AuthenticationToken(mockOAuth2User, mockAuthorities,
-			"mockAuthServer");
 
 		member = Member.builder()
 			.provider("mockAuthServer")
@@ -75,59 +66,60 @@ class AuthServiceTest {
 			.build();
 	}
 
-	@DisplayName("Dealight에 등록된 사용자일 경우 올바른 loginResponse를 반환")
+	@DisplayName("Dealight에 등록된 사용자일 경우 loginResponse를 반환")
 	@Test
 	void loginSuccessIfMemberAlreadyRegisteredMember() {
 		// given
 		Long mockProviderId = 12345L;
-		String mockAccessToken = "MOCK_ACCESS_TOKEN";
-		String mockRefreshToken = "MOCK_REFRESH_TOKEN";
+		RequiredUserInfoRes requiredUserInfoRes
+			= new RequiredUserInfoRes("mockAuthServer", mockProviderId, "요송송");
 
 		when(memberRepository.findByProviderAndProviderId(member.getProvider(), member.getProviderId()))
 			.thenReturn(Optional.of(member));
-		when(jwt.createAccessToken(member))
-			.thenReturn(mockAccessToken);
-		when(jwt.createRefreshToken(member))
-			.thenReturn(mockRefreshToken);
+		when(jwt.createAccessToken(any()))
+			.thenReturn("MOCK_ACCESS_TOKEN");
+		when(jwt.createRefreshToken(any()))
+			.thenReturn("MOCK_ACCESS_TOKEN");
 
 		// when
-		LoginRes loginResponse = authService.login(mockOAuth2AuthenticationToken);
+		OAuthLoginRes oAuthLoginRes = authService.authenticate(requiredUserInfoRes);
+		LoginRes loginRes = (LoginRes)oAuthLoginRes.data();
 
 		// then
-		assertThat(loginResponse.providerId()).isEqualTo(mockProviderId);
-		assertThat(loginResponse.accessToken()).isEqualTo(mockAccessToken);
-		assertThat(loginResponse.refreshToken()).isEqualTo(mockRefreshToken);
+		assertThat(oAuthLoginRes.data())
+			.isInstanceOf(LoginRes.class);
+		assertThat(loginRes.accessToken())
+			.isInstanceOf(String.class)
+			.isNotEmpty();
+		assertThat(loginRes.refreshToken())
+			.isInstanceOf(String.class)
+			.isNotEmpty();
 	}
 
-	@DisplayName("Dealight에 등록된 사용자가 아닐 경우 loginResponse를 null로 반환")
+	@DisplayName("Dealight에 등록된 사용자가 아닐 경우 JoinRequireRes를 반환")
 	@Test
-	void loginFailIfNotRegisteredMember() {
+	void loginFailIfNotRegisteredMemberReturnJoinRequireRes() {
 		// given
+		Long mockProviderId = 12345L;
+		RequiredUserInfoRes requiredUserInfoRes
+			= new RequiredUserInfoRes("mockAuthServer", mockProviderId, "요송송");
+
 		when(memberRepository.findByProviderAndProviderId(member.getProvider(), member.getProviderId()))
 			.thenReturn(Optional.empty());
 
 		// when
-		LoginRes loginResponse = authService.login(mockOAuth2AuthenticationToken);
+		OAuthLoginRes oAuthLoginRes = authService.authenticate(requiredUserInfoRes);
+		JoinRequireRes loginRes = (JoinRequireRes)oAuthLoginRes.data();
 
 		// then
-		assertThatThrownBy(() -> loginResponse.providerId())
-			.isInstanceOf(NullPointerException.class);
-		assertThatThrownBy(() -> loginResponse.accessToken())
-			.isInstanceOf(NullPointerException.class);
-		assertThatThrownBy(() -> loginResponse.refreshToken())
-			.isInstanceOf(NullPointerException.class);
-		assertThat(loginResponse).isNull();
-	}
-
-	@DisplayName("OAuth2AuthenticationToken이 null일 경우 로그인 실패")
-	@Test
-	void loginFailIfOAuth2AuthenticationTokenIsNull() {
-		// given
-		OAuth2AuthenticationToken nullOAuth2AuthenticationToken = null;
-
-		// when -> then
-		assertThatThrownBy(() -> authService.login(nullOAuth2AuthenticationToken))
-			.isInstanceOf(NullPointerException.class);
+		assertThat(oAuthLoginRes.data())
+			.isInstanceOf(JoinRequireRes.class);
+		assertThat(loginRes.provider())
+			.isEqualTo("mockAuthServer");
+		assertThat(loginRes.providerId())
+			.isEqualTo(mockProviderId);
+		assertThat(loginRes.nickName())
+			.isEqualTo("요송송");
 	}
 
 	@DisplayName("provider가 null일 경우 로그인 실패")
