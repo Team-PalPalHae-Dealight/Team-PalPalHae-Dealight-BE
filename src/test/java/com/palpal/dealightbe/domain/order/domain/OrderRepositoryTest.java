@@ -29,13 +29,15 @@ class OrderRepositoryTest {
 	@Autowired
 	OrderRepository orderRepository;
 
+	@Autowired
+	private MemberRepository memberRepository;
+
+	@Autowired
+	private StoreRepository storeRepository;
+
 	Member member;
 	Member storeOwner;
 	Store store;
-	@Autowired
-	private MemberRepository memberRepository;
-	@Autowired
-	private StoreRepository storeRepository;
 
 	@BeforeEach
 	void setUp() {

@@ -1,5 +1,7 @@
 package com.palpal.dealightbe.domain.order.application;
 
+import static com.palpal.dealightbe.domain.store.domain.StoreStatus.CLOSED;
+import static com.palpal.dealightbe.global.error.ErrorCode.CLOSED_STORE;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_MEMBER;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ORDER;
@@ -65,11 +67,17 @@ public class OrderService {
 	}
 
 	private Store getStore(Long storeId) {
-		return storeRepository.findById(storeId)
+		Store store = storeRepository.findById(storeId)
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_STORE_BY_ID : {}", storeId);
 				return new EntityNotFoundException(NOT_FOUND_STORE);
 			});
+
+		if (store.getStoreStatus().equals(CLOSED)) {
+			throw new BusinessException(CLOSED_STORE);
+		}
+
+		return store;
 	}
 
 	public OrderStatusUpdateRes updateStatus(Long orderId, OrderStatusUpdateReq request, Long memberProviderId) {
