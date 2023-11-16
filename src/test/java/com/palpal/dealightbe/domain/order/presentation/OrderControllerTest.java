@@ -1,9 +1,14 @@
 package com.palpal.dealightbe.domain.order.presentation;
 
 import static com.palpal.dealightbe.domain.order.domain.OrderStatus.RECEIVED;
+import static com.palpal.dealightbe.global.error.ErrorCode.CLOSED_STORE;
+import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ORDER_STATUS;
+import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_STORE;
+import static com.palpal.dealightbe.global.error.ErrorCode.UNAUTHORIZED_REQUEST;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
@@ -43,6 +48,7 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -58,6 +64,9 @@ import com.palpal.dealightbe.domain.order.application.dto.response.OrderProducts
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderRes;
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderStatusUpdateRes;
 import com.palpal.dealightbe.domain.order.application.dto.response.OrdersRes;
+import com.palpal.dealightbe.domain.store.application.StoreService;
+import com.palpal.dealightbe.global.error.exception.BusinessException;
+import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
 @AutoConfigureRestDocs
 @WebMvcTest(
@@ -74,6 +83,9 @@ public class OrderControllerTest {
 
 	@MockBean
 	private OrderService orderService;
+
+	@MockBean
+	private StoreService storeService;
 
 	@Nested
 	@DisplayName("<주문 생성>")
@@ -268,7 +280,7 @@ public class OrderControllerTest {
 		}
 
 		@Test
-		@DisplayName("실패 - 주문시 상품이 0개인 경우 않은 경우 예외가 발생한다.")
+		@DisplayName("실패 - 주문시 상품이 0개인 경우 예외가 발생한다.")
 		void create_fail_totalPrice_zero() throws Exception {
 			// given
 			OrderCreateReq orderCreateReq = new OrderCreateReq(
@@ -293,7 +305,7 @@ public class OrderControllerTest {
 				.andExpect(result -> {
 					assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException);
 				})
-				.andDo(document("order/order-create-item",
+				.andDo(document("order/order-create-fail-empty-item",
 					preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
 					requestHeaders(
@@ -306,6 +318,94 @@ public class OrderControllerTest {
 						fieldWithPath("errors[].field").type(STRING).description("잘못 입력된 필드"),
 						fieldWithPath("errors[].value").type(STRING).description("입력된 값"),
 						fieldWithPath("errors[].reason").type(STRING).description("원인"),
+						fieldWithPath("message").type(STRING).description("오류 메시지")
+					)
+				));
+		}
+
+		@Test
+		@DisplayName("실패 - 업체 아이디가 잘못 입력된 경우")
+		void create_fail_invalid_storeId() throws Exception {
+			// given
+			OrderCreateReq orderCreateReq = new OrderCreateReq(
+				new OrderProductsReq(List.of(new OrderProductReq(1L, 3))), 111L, "도착할 때까지 상품 냉장고에 보관 부탁드려요",
+				LocalTime.of(12, 30), 10000);
+
+			given(orderService.create(eq(orderCreateReq), any()))
+				.willThrow(new EntityNotFoundException(NOT_FOUND_STORE));
+
+			// when
+			// then
+			mockMvc.perform(
+					post(createApiPath)
+						.with(csrf())
+						.with(user("username").roles("MEMBER"))
+						.header("Authorization", "Bearer {ACCESS_TOKEN}")
+						.content(objectMapper.writeValueAsString(orderCreateReq))
+						.contentType(APPLICATION_JSON)
+				)
+				.andDo(print())
+				.andExpect(status().is4xxClientError())
+				.andExpect(result -> {
+					assertTrue(result.getResolvedException() instanceof EntityNotFoundException);
+				})
+				.andDo(document("order/order-create-fail-invalid-store-id",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestHeaders(
+						headerWithName("Authorization").description("Access Token")
+					),
+					requestHeaders(
+						headerWithName("Authorization").description("Access Token")
+					),
+					responseFields(
+						fieldWithPath("timestamp").type(STRING).description("예외 발생 시간"),
+						fieldWithPath("code").type(STRING).description("오류 코드"),
+						fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+						fieldWithPath("message").type(STRING).description("오류 메시지")
+					)
+				));
+		}
+
+		@Test
+		@DisplayName("실패 - 영업 종료된 업체에 주문할 수 없다")
+		void craete_fail_closed_store() throws Exception {
+			// given
+			OrderCreateReq orderCreateReq = new OrderCreateReq(
+				new OrderProductsReq(List.of(new OrderProductReq(1L, 3))), 111L, "도착할 때까지 상품 냉장고에 보관 부탁드려요",
+				LocalTime.of(12, 30), 10000);
+
+			given(orderService.create(eq(orderCreateReq), any()))
+				.willThrow(new BusinessException(CLOSED_STORE));
+
+			// when
+			// then
+			mockMvc.perform(
+					post(createApiPath)
+						.with(csrf())
+						.with(user("username").roles("MEMBER"))
+						.header("Authorization", "Bearer {ACCESS_TOKEN}")
+						.content(objectMapper.writeValueAsString(orderCreateReq))
+						.contentType(APPLICATION_JSON)
+				)
+				.andDo(print())
+				.andExpect(status().is4xxClientError())
+				.andExpect(result -> {
+					assertTrue(result.getResolvedException() instanceof BusinessException);
+				})
+				.andDo(document("order/order-create-fail-closed-store",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestHeaders(
+						headerWithName("Authorization").description("Access Token")
+					),
+					requestHeaders(
+						headerWithName("Authorization").description("Access Token")
+					),
+					responseFields(
+						fieldWithPath("timestamp").type(STRING).description("예외 발생 시간"),
+						fieldWithPath("code").type(STRING).description("오류 코드"),
+						fieldWithPath("errors").type(ARRAY).description("오류 목록"),
 						fieldWithPath("message").type(STRING).description("오류 메시지")
 					)
 				));
@@ -409,6 +509,48 @@ public class OrderControllerTest {
 					)
 				));
 		}
+
+		@Test
+		@DisplayName("실패 - 유효하지 않은 순서로 상태 변경을 요청하는 경우 예외가 발생한다.")
+		void updateStatus_fail_invalid_sequence() throws Exception {
+			// given
+			long orderId = 1L;
+			long memberProviderId = 1L;
+
+			OrderStatusUpdateReq invalidOrderStatusUpdateReq = new OrderStatusUpdateReq("COMPLETED");
+
+			given(orderService.updateStatus(anyLong(), eq(invalidOrderStatusUpdateReq), any()))
+				.willThrow(new BusinessException(INVALID_ORDER_STATUS));
+
+			// when
+			// then
+			mockMvc.perform(
+					patch(updateStatusApiPath, orderId, memberProviderId)
+						.with(csrf())
+						.with(user("username").roles("MEMBER"))
+						.header("Authorization", "Bearer {ACCESS_TOKEN}")
+						.content(objectMapper.writeValueAsString(invalidOrderStatusUpdateReq))
+						.contentType(APPLICATION_JSON)
+				)
+				.andDo(print())
+				.andExpect(status().is4xxClientError())
+				.andExpect(result -> {
+					assertTrue(result.getResolvedException() instanceof BusinessException);
+				})
+				.andDo(document("order/order-create-fail-invalid-status",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestHeaders(
+						headerWithName("Authorization").description("Access Token")
+					),
+					responseFields(
+						fieldWithPath("timestamp").type(STRING).description("예외 발생 시간"),
+						fieldWithPath("code").type(STRING).description("오류 코드"),
+						fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+						fieldWithPath("message").type(STRING).description("오류 메시지")
+					)
+				));
+		}
 	}
 
 	@Nested
@@ -501,6 +643,43 @@ public class OrderControllerTest {
 						fieldWithPath("totalPrice").type(NUMBER).description("총 금액"),
 						fieldWithPath("createdAt").type(STRING).description("주문 완료 일자 및 시간"),
 						fieldWithPath("status").type(STRING).description("현재 주문 상태"))));
+		}
+
+		@Test
+		@DisplayName("실패 - 주문한 고객 본인이나 업체 주인이 아니면 상세정보를 조회할 수 없다")
+		void findById_fail_unauthorized() throws Exception {
+			// given
+			long orderId = 1L;
+
+			given(orderService.findById(eq(orderId), any()))
+				.willThrow(new BusinessException(UNAUTHORIZED_REQUEST));
+
+			// when
+			// then
+			mockMvc.perform(
+					get(findByIdApiPath, orderId)
+						.with(csrf())
+						.with(user("username").roles("MEMBER"))
+						.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				)
+				.andDo(print())
+				.andExpect(status().is4xxClientError())
+				.andExpect(result -> {
+					assertTrue(result.getResolvedException() instanceof BusinessException);
+				})
+				.andDo(document("order/order-create-fail-unauthorized",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestHeaders(
+						headerWithName("Authorization").description("Access Token")
+					),
+					responseFields(
+						fieldWithPath("timestamp").type(STRING).description("예외 발생 시간"),
+						fieldWithPath("code").type(STRING).description("오류 코드"),
+						fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+						fieldWithPath("message").type(STRING).description("오류 메시지")
+					)
+				));
 		}
 	}
 
@@ -604,6 +783,44 @@ public class OrderControllerTest {
 							fieldWithPath("hasNext").type(JsonFieldType.BOOLEAN).description("다음 데이터 존재 여부")))
 				);
 		}
+
+		@Test
+		@DisplayName("실패 - 업체의 주인외의 다른 사람이 업체의 주문 목록을 조회할 수 없다")
+		void findByStoreId_fail_unauthorized() throws Exception {
+			// given
+			long orderId = 1L;
+
+			given(orderService.findAllByStoreId(anyLong(), any(), any(), any(PageRequest.class)))
+				.willThrow(new BusinessException(UNAUTHORIZED_REQUEST));
+
+			// when
+			// then
+			mockMvc.perform(
+					get(findByStoreIdPath, orderId)
+						.with(csrf())
+						.with(user("username").roles("MEMBER"))
+						.header("Authorization", "Bearer {ACCESS_TOKEN}")
+						.param("id", "1")
+				)
+				.andDo(print())
+				.andExpect(status().is4xxClientError())
+				.andExpect(result -> {
+					assertTrue(result.getResolvedException() instanceof BusinessException);
+				})
+				.andDo(document("order/order-find-by-store-fail-unauthorized",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestHeaders(
+						headerWithName("Authorization").description("Access Token")
+					),
+					responseFields(
+						fieldWithPath("timestamp").type(STRING).description("예외 발생 시간"),
+						fieldWithPath("code").type(STRING).description("오류 코드"),
+						fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+						fieldWithPath("message").type(STRING).description("오류 메시지")
+					)
+				));
+		}
 	}
 
 	@Nested
@@ -625,8 +842,8 @@ public class OrderControllerTest {
 		OrdersRes ordersRes = new OrdersRes(List.of(orderRes), false);
 
 		@Test
-		@DisplayName("성공 - 업체의 주문 목록을 조회한다")
-		void findByStoreId_success() throws Exception {
+		@DisplayName("성공 - 고객의 주문 목록을 조회한다")
+		void findByMemberProviderId_success() throws Exception {
 			// given
 			given(orderService.findAllByMemberProviderId(any(), any(), any()))
 				.willReturn(ordersRes);

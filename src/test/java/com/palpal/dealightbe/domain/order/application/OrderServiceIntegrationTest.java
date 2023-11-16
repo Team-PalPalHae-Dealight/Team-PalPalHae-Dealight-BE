@@ -1,6 +1,7 @@
 package com.palpal.dealightbe.domain.order.application;
 
 import static com.palpal.dealightbe.domain.order.domain.OrderStatus.RECEIVED;
+import static com.palpal.dealightbe.domain.store.domain.StoreStatus.OPENED;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -63,6 +64,7 @@ public class OrderServiceIntegrationTest {
 			void member_create() {
 				// given
 				Store store = createStore();
+				store.updateStatus(OPENED);
 				Item item = createItem(store);
 				Member member = createMember();
 
