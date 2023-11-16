@@ -842,8 +842,8 @@ public class OrderControllerTest {
 		OrdersRes ordersRes = new OrdersRes(List.of(orderRes), false);
 
 		@Test
-		@DisplayName("성공 - 업체의 주문 목록을 조회한다")
-		void findByStoreId_success() throws Exception {
+		@DisplayName("성공 - 고객의 주문 목록을 조회한다")
+		void findByMemberProviderId_success() throws Exception {
 			// given
 			given(orderService.findAllByMemberProviderId(any(), any(), any()))
 				.willReturn(ordersRes);
