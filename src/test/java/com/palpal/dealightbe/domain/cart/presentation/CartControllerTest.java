@@ -7,6 +7,7 @@ import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_CART_QUANTITY
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_CART_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
@@ -582,7 +583,7 @@ class CartControllerTest {
 
 		CartsReq cartsReq = new CartsReq(List.of(cartReq, cartReq2));
 
-		doThrow(new BusinessException(NOT_FOUND_CART_ITEM)).when(
+		doThrow(new EntityNotFoundException(NOT_FOUND_CART_ITEM)).when(
 			cartService).update(any(), any());
 
 		//when
@@ -591,6 +592,7 @@ class CartControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.content(objectMapper.writeValueAsString(cartsReq)))
+			.andExpect(status().isNotFound())
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
 			.andExpect(jsonPath("$.code").value("CT001"))
 			.andExpect(jsonPath("$.errors").isEmpty())
@@ -611,6 +613,95 @@ class CartControllerTest {
 					fieldWithPath("code").type(STRING).description("예외 코드"),
 					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
 					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@DisplayName("장바구니 요소 삭제 성공 테스트")
+	@Test
+	void deleteOneSuccessTest() throws Exception {
+		//given
+		Long itemId = 1L;
+
+		doNothing().when(cartService).deleteOne(any(), any());
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/carts/items")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.param("id", String.valueOf(itemId)))
+			.andExpect(status().isNoContent())
+			.andDo(print())
+			.andDo(document("cart/cart-delete-one",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				requestParameters(
+					parameterWithName("id").description("상품 ID")
+				)
+			));
+	}
+
+	@DisplayName("장바구니 요소 삭제 실패 테스트 - 장바구니의 상품이 존재하지 않는 경우")
+	@Test
+	void deleteOneFailureTest_notFoundCartItem() throws Exception {
+		//given
+		Long itemId = 1L;
+
+		doThrow(new EntityNotFoundException(NOT_FOUND_CART_ITEM)).when(
+			cartService).deleteOne(any(), any());
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/carts/items")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.param("id", String.valueOf(itemId)))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("CT001"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("장바구니에 상품이 존재하지 않습니다."))
+			.andDo(print())
+			.andDo(document("cart/cart-delete-one-not-found-cart-item",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				requestParameters(
+					parameterWithName("id").description("상품 ID")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("예외 코드"),
+					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@DisplayName("장바구니 초기화 성공 테스트")
+	@Test
+	void deleteAllSuccessTest() throws Exception {
+		//given
+		doNothing().when(cartService).deleteAll(any());
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/carts")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}"))
+			.andExpect(status().isNoContent())
+			.andDo(print())
+			.andDo(document("cart/cart-delete-all",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
 				)
 			));
 	}
