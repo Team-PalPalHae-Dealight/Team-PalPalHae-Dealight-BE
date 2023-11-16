@@ -36,12 +36,6 @@ public class AuthController {
 		RequiredUserInfoRes requiredUserInfoRes = oAuth2AuthorizationService.authorizeFromKakao(code);
 		OAuthLoginRes oAuthLoginRes = authService.authenticate(requiredUserInfoRes);
 
-		if (oAuthLoginRes.data() instanceof JoinRequireRes) {
-			return ResponseEntity
-				.status(HttpStatus.UNAUTHORIZED)
-				.body(oAuthLoginRes);
-		}
-
 		return ResponseEntity
 			.status(HttpStatus.OK)
 			.body(oAuthLoginRes);
