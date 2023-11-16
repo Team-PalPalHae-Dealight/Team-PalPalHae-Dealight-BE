@@ -18,11 +18,11 @@ import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
-import com.palpal.dealightbe.global.SearchSortType;
+import com.palpal.dealightbe.global.ListSortType;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
-import static com.palpal.dealightbe.global.SearchSortType.findSortType;
+import static com.palpal.dealightbe.global.ListSortType.findSortType;
 import static com.palpal.dealightbe.global.error.ErrorCode.*;
 
 @Slf4j
@@ -70,7 +70,7 @@ public class ItemService {
 	public ItemsRes findAllForMember(double xCoordinate, double yCoordinate, String sortBy, Pageable pageable) {
 		Slice<Item> items = Page.empty();
 
-		SearchSortType sortType = findSortType(sortBy);
+		ListSortType sortType = findSortType(sortBy);
 
 		switch (sortType) {
 			case DEADLINE -> items = itemRepository.findAllByDeadline(xCoordinate, yCoordinate, pageable);

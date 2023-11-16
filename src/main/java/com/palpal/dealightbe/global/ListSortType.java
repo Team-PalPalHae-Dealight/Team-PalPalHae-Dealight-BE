@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-public enum SearchSortType {
+public enum ListSortType {
 	DEADLINE("deadline"),
 	DISCOUNT_RATE("discount-rate"),
 	DISTANCE("distance"),
@@ -18,18 +18,18 @@ public enum SearchSortType {
 
 	private final String type;
 
-	SearchSortType(String type) {
+	ListSortType(String type) {
 		this.type = type;
 	}
 
-	public static SearchSortType findSortType(String sortType) {
+	public static ListSortType findSortType(String sortType) {
 
-		return Arrays.stream(SearchSortType.values())
-			.filter(searchSortType -> Objects.equals(searchSortType.type, sortType))
+		return Arrays.stream(ListSortType.values())
+			.filter(listSortType -> Objects.equals(listSortType.type, sortType))
 			.findAny()
 			.orElseThrow(() -> {
-				log.error("INVALID_SEARCH_SORT_TYPE : {}", sortType);
-				return new BusinessException(ErrorCode.INVALID_SEARCH_SORT_TYPE);
+				log.error("INVALID_LIST_SORT_TYPE : {}", sortType);
+				return new BusinessException(ErrorCode.INVALID_LIST_SORT_TYPE);
 			});
 	}
 }
