@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,5 +52,23 @@ public class CartController {
 		CartsRes cartsRes = cartService.update(providerId, cartsReq);
 
 		return ResponseEntity.ok(cartsRes);
+	}
+
+	@ProviderId
+	@DeleteMapping("/items")
+	public ResponseEntity<Void> deleteOne(Long providerId, @RequestParam(value = "id") Long itemId) {
+		cartService.deleteOne(providerId, itemId);
+
+		return ResponseEntity.noContent()
+			.build();
+	}
+
+	@ProviderId
+	@DeleteMapping
+	public ResponseEntity<Void> deleteAll(Long providerId) {
+		cartService.deleteAll(providerId);
+
+		return ResponseEntity.noContent()
+			.build();
 	}
 }
