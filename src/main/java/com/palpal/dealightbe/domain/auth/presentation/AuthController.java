@@ -14,10 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.palpal.dealightbe.domain.auth.application.AuthService;
 import com.palpal.dealightbe.domain.auth.application.OAuth2AuthorizationService;
 import com.palpal.dealightbe.domain.auth.application.dto.request.MemberAuthReq;
-import com.palpal.dealightbe.domain.auth.application.dto.response.JoinRequireRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.MemberAuthRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.OAuthLoginRes;
-import com.palpal.dealightbe.domain.auth.application.dto.response.RequiredUserInfoRes;
+import com.palpal.dealightbe.domain.auth.application.dto.response.OAuthUserInfoRes;
 import com.palpal.dealightbe.global.aop.ProviderId;
 import com.palpal.dealightbe.global.aop.RefreshToken;
 
@@ -33,8 +32,8 @@ public class AuthController {
 
 	@GetMapping("/kakao")
 	public ResponseEntity<OAuthLoginRes> loginByKakaoOAuth(@RequestParam String code) {
-		RequiredUserInfoRes requiredUserInfoRes = oAuth2AuthorizationService.authorizeFromKakao(code);
-		OAuthLoginRes oAuthLoginRes = authService.authenticate(requiredUserInfoRes);
+		OAuthUserInfoRes oAuthUserInfoRes = oAuth2AuthorizationService.authorizeFromKakao(code);
+		OAuthLoginRes oAuthLoginRes = authService.authenticate(oAuthUserInfoRes);
 
 		return ResponseEntity
 			.status(HttpStatus.OK)

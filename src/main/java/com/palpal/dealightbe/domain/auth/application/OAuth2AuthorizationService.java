@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import com.palpal.dealightbe.config.OAuth2KakaoRegistrationProperty;
 import com.palpal.dealightbe.domain.auth.application.dto.response.KakaoTokenRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.KakaoUserInfoRes;
-import com.palpal.dealightbe.domain.auth.application.dto.response.RequiredUserInfoRes;
+import com.palpal.dealightbe.domain.auth.application.dto.response.OAuthUserInfoRes;
 import com.palpal.dealightbe.domain.auth.exception.OAuth2AuthorizationException;
 import com.palpal.dealightbe.global.error.ErrorCode;
 
@@ -26,14 +26,14 @@ public class OAuth2AuthorizationService {
 	private final OAuth2KakaoRegistrationProperty oAuth2KakaoRegistrationProperty;
 	private final RestTemplate restTemplate;
 
-	public RequiredUserInfoRes authorizeFromKakao(String code) {
+	public OAuthUserInfoRes authorizeFromKakao(String code) {
 		log.info("카카오 인증, 인가를 진행합니다...");
 		KakaoTokenRes kakaoTokenRes = getTokenFromAuthorizationServer(code);
 		KakaoUserInfoRes kakaoUserInfoRes = getUserInfoFromResourceServer(kakaoTokenRes);
-		RequiredUserInfoRes requiredUserInfoRes = getRequiredUserInfo(kakaoUserInfoRes);
+		OAuthUserInfoRes oAuthUserInfoRes = getRequiredUserInfo("kakao", kakaoUserInfoRes);
 		log.info("카카오 OAuth2 인증, 인가가 모두 완료됐습니다.");
 
-		return requiredUserInfoRes;
+		return oAuthUserInfoRes;
 	}
 
 	private KakaoTokenRes getTokenFromAuthorizationServer(String code) {
@@ -77,14 +77,14 @@ public class OAuth2AuthorizationService {
 		}
 	}
 
-	private RequiredUserInfoRes getRequiredUserInfo(KakaoUserInfoRes kakaoUserInfoRes) {
-		log.info("카카오 Resource Sever로부터 받은 사용자 정보({})에서 서비스에 필요한 데이터만 가져옵니다...", kakaoUserInfoRes);
+	private OAuthUserInfoRes getRequiredUserInfo(String provider, KakaoUserInfoRes kakaoUserInfoRes) {
+		log.info("Resource Sever로부터 받은 사용자 정보({})에서 서비스에 필요한 데이터만 가져옵니다...", kakaoUserInfoRes);
 		long providerId = kakaoUserInfoRes.id();
 		KakaoUserInfoRes.Properties properties = kakaoUserInfoRes.properties();
 		String nickName = properties.nickname();
-		log.info("provider: kakao, providerId: {}, nickName: {}", providerId, nickName);
+		log.info("provider: {}, providerId: {}, nickName: {}", provider, providerId, nickName);
 
-		return new RequiredUserInfoRes("kakao", providerId, nickName);
+		return new OAuthUserInfoRes(provider, providerId, nickName);
 	}
 
 	private HttpHeaders setHeaderForRequest(String accessToken) {

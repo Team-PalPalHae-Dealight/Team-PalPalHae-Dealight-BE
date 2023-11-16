@@ -3,7 +3,7 @@ package com.palpal.dealightbe.domain.auth.application.dto.response;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-public record RequiredUserInfoRes(
+public record OAuthUserInfoRes(
 	String provider,
 	Long providerId,
 	String nickName

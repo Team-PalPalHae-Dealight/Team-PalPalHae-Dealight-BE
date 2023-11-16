@@ -107,6 +107,10 @@ public class Member extends BaseEntity {
 		});
 	}
 
+	public boolean hasSameImage(String imageUrl) {
+		return this.image.equals(imageUrl);
+	}
+
 	@Override
 	public String toString() {
 		return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)

@@ -9,7 +9,7 @@ public record OAuthLoginRes(
 ) {
 
 	public static OAuthLoginRes from(Object data) {
-		if (data instanceof JoinRequireRes) {
+		if (data instanceof OAuthUserInfoRes) {
 			return new OAuthLoginRes("딜라이트 서비스에 가입이 필요합니다.", data);
 		}
 

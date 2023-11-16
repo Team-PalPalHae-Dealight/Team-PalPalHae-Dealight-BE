@@ -13,11 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.auth.application.dto.request.MemberAuthReq;
-import com.palpal.dealightbe.domain.auth.application.dto.response.JoinRequireRes;
-import com.palpal.dealightbe.domain.auth.application.dto.response.LoginRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.MemberAuthRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.OAuthLoginRes;
-import com.palpal.dealightbe.domain.auth.application.dto.response.RequiredUserInfoRes;
+import com.palpal.dealightbe.domain.auth.application.dto.response.OAuthUserInfoRes;
 import com.palpal.dealightbe.domain.auth.domain.Jwt;
 import com.palpal.dealightbe.domain.image.ImageService;
 import com.palpal.dealightbe.domain.member.domain.Member;
@@ -48,27 +46,27 @@ public class AuthService {
 	private final Jwt jwt;
 
 	@Transactional(readOnly = true)
-	public OAuthLoginRes authenticate(RequiredUserInfoRes requiredUserInfoRes) {
-		log.info("사용자 데이터({})를 기반으로 로그인을 진행합니다...", requiredUserInfoRes);
-		String provider = requiredUserInfoRes.provider();
-		long providerId = requiredUserInfoRes.providerId();
+	public OAuthLoginRes authenticate(OAuthUserInfoRes oAuthUserInfoRes) {
+		log.info("사용자 데이터({})를 기반으로 로그인을 진행합니다...", oAuthUserInfoRes);
+		String provider = oAuthUserInfoRes.provider();
+		long providerId = oAuthUserInfoRes.providerId();
 		Optional<Member> optionalMember = memberRepository.findByProviderAndProviderId(provider, providerId);
 
 		if (optionalMember.isEmpty()) {
 			log.info("회원가입이 필요하다는 메시지를 반환합니다...");
-			String nickname = requiredUserInfoRes.nickName();
-			JoinRequireRes joinRequireRes = new JoinRequireRes(provider, providerId, nickname);
+			String nickname = oAuthUserInfoRes.nickName();
+			OAuthUserInfoRes joinRequireRes = new OAuthUserInfoRes(provider, providerId, nickname);
 
 			return OAuthLoginRes.from(joinRequireRes);
 		}
-		LoginRes loginRes = login(optionalMember.get());
+		MemberAuthRes loginRes = login(optionalMember.get());
 
 		return OAuthLoginRes.from(loginRes);
 	}
 
 	public MemberAuthRes signup(MemberAuthReq request) {
-		log.info("요청한 데이터로 회원가입을 진행합니다...");
-		log.info("요청 데이터 -> Provider: {}, ProviderId: {}", request.provider(), request.providerId());
+		log.info("요청한 데이터(Provider: {}, ProviderId: {})로 회원가입을 진행합니다...",
+			request.provider(), request.providerId());
 
 		log.info("회원(ProviderId: {}) 유무를 조회합니다...", request.providerId());
 		memberRepository.findByProviderAndProviderId(request.provider(), request.providerId())
@@ -79,46 +77,34 @@ public class AuthService {
 			});
 
 		log.info("회원(ProviderId: {})이 가입되어 있지 않아 회원가입을 진행합니다...", request.providerId());
-		Member requestMember = createRequestMember(request);
-		log.info("회원의 프로필을 기본 이미지(URL: {})로 지정합니다...", MEMBER_DEFAULT_IMAGE_PATH);
-		requestMember.updateImage(MEMBER_DEFAULT_IMAGE_PATH);
+		Member requestMember = MemberAuthReq.toMember(request);
+
+		setDefaultAddress(requestMember);
+		setDefaultImageUrl(requestMember);
 		Member savedMember = memberRepository.save(requestMember);
 
-		log.info("회원({})의 Role을 생성합니다...", savedMember.getProviderId());
 		List<MemberRole> assignableMemberRoles = createMemberRoles(savedMember);
 		List<MemberRole> savedMemberRoles = memberRoleRepository.saveAll(assignableMemberRoles);
-		log.info("회원({})의 Role을 생성했습니다.", savedMember.getProviderId());
+
 		savedMember.updateMemberRoles(savedMemberRoles);
+
+		String accessToken = jwt.createAccessToken(savedMember);
+		String refreshToken = jwt.createRefreshToken(savedMember);
 		log.info("회원가입에 모두 성공했습니다.");
 
-		return createMemberSignupResponse(savedMember);
-	}
-
-	@Transactional(readOnly = true)
-	public MemberAuthRes reIssueToken(Long providerId, String refreshToken) {
-		log.info("사용자(ProviderId:{})의 AccessToken을 재발급합니다.", providerId);
-		Member member = findMemberByProviderId(providerId);
-		log.info("사용자(Provider: {}, ProviderId: {}, RealName: {})를 조회하는데 성공했습니다.",
-			member.getProvider(), member.getProviderId(), member.getRealName());
-
-		log.info("사용자({})의 Access Token을 재발급합니다...", providerId);
-		String newAccessToken = jwt.createAccessToken(member);
-		log.info("Access Token({}) 재발급에 성공했습니다.", newAccessToken);
-
-		return createMemberAuthRes(member, newAccessToken, refreshToken);
+		return createMemberAuthRes(savedMember, accessToken, refreshToken);
 	}
 
 	public void unregister(Long providerId) {
 		log.info("사용자(ProviderId:{})의 회원탈퇴를 진행합니다...", providerId);
 		Member member = findMemberByProviderId(providerId);
-		log.info("사용자(Provider: {}, ProviderId: {}, RealName: {})를 조회하는데 성공했습니다.",
-			member.getProvider(), member.getProviderId(), member.getRealName());
+		log.info("사용자({})를 조회하는데 성공했습니다.", member);
 
-		String memberImageUrl = member.getImage();
-		if (!memberImageUrl.equals(MEMBER_DEFAULT_IMAGE_PATH)) {
-			log.info("사용자(ProviderId:{})의 이미지를 삭제합니다...", providerId);
-			imageService.delete(memberImageUrl);
-			log.info("이미지(ImageUrl:{}) 삭제에 성공했습니다.", memberImageUrl);
+		if (!member.hasSameImage(MEMBER_DEFAULT_IMAGE_PATH)) {
+			String memberImage = member.getImage();
+			log.info("사용자(ProviderId:{})의 이미지({})를 삭제합니다...", providerId, memberImage);
+			imageService.delete(memberImage);
+			log.info("이미지 삭제에 성공했습니다.");
 		}
 
 		log.info("사용자(ProviderId:{})의 정보를 삭제합니다...", providerId);
@@ -126,89 +112,25 @@ public class AuthService {
 		log.info("회원탈퇴에 성공했습니다.");
 	}
 
-	private LoginRes login(Member member) {
-		log.info("사용자(provider: {}, providerId: {})의 로그인을 진행합니다.", member.getProvider(), member.getProviderId());
-		Long providerId = member.getProviderId();
-		String accessToken = jwt.createAccessToken(member);
-		String refreshToken = jwt.createRefreshToken(member);
+	@Transactional(readOnly = true)
+	public MemberAuthRes reIssueToken(Long providerId, String refreshToken) {
+		log.info("사용자(ProviderId:{})의 AccessToken을 재발급합니다.", providerId);
+		Member member = findMemberByProviderId(providerId);
+		log.info("사용자({})를 조회하는데 성공했습니다.", member);
 
-		return new LoginRes(providerId, accessToken, refreshToken);
-	}
+		log.info("사용자({})의 Access Token을 재발급합니다...", providerId);
+		String newAccessToken = jwt.createAccessToken(member);
+		log.info("Access Token({}) 재발급에 성공했습니다.", newAccessToken);
 
-	private Member findMemberByProviderId(Long providerId) {
-		log.info("사용자(ProviderId:{})정보를 조회합니다...", providerId);
-		return memberRepository.findMemberByProviderId(providerId)
-			.orElseThrow(() -> {
-				log.warn("READ:NOT_FOUND_MEMBER_BY_ID : {}", providerId);
-				return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
-			});
-	}
-
-	private Member createRequestMember(MemberAuthReq request) {
-		log.info("요청 정보로 Member 객체를 만듭니다...");
-		Address defaultAddress = new Address();
-		Member requestMember = MemberAuthReq.toMember(request);
-		requestMember.updateAddress(defaultAddress);
-		log.info("Member(provider: {}, providerId: {}) 객체를 만드는데 성공했습니다.",
-			requestMember.getProvider(), requestMember.getProviderId());
-
-		return requestMember;
-	}
-
-	private List<MemberRole> createMemberRoles(Member savedMember) {
-		log.info("요청 정보(Member: {})로 MemberRole을 만듭니다...", savedMember);
-		Role assignableRole = roleRepository.findByRoleType(RoleType.ROLE_MEMBER)
-			.orElseThrow(() -> {
-				log.warn("POST:CREATE:NOT_FOUND_ROLE_BY_ROLE_TYPE");
-				return new EntityNotFoundException(ErrorCode.NOT_FOUND_ROLE);
-			});
-		List<MemberRole> assignableMemberRoles = createMemberRoles(savedMember, assignableRole);
-		log.info("MemberRole({})를 만드는데 성공했습니다.", assignableMemberRoles);
-
-		return assignableMemberRoles;
-	}
-
-	private List<MemberRole> createMemberRoles(Member member, Role role) {
-		MemberRole memberRole = new MemberRole(member, role);
-		List<MemberRole> memberRoles = new ArrayList<>();
-		memberRoles.add(memberRole);
-
-		return memberRoles;
-	}
-
-	private MemberAuthRes createMemberSignupResponse(Member savedMember) {
-		log.info("회원의 Access Token과 Refresh Token을 생성합니다...");
-		Long userId = savedMember.getProviderId();
-		List<MemberRole> memberRoles = savedMember.getMemberRoles();
-		String roles = memberRoles.stream()
-			.map(memberRole -> memberRole.getRole().getType().name())
-			.collect(Collectors.joining(","));
-		String accessToken = jwt.createAccessToken(savedMember);
-		String refreshToken = jwt.createRefreshToken(savedMember);
-		log.info("UserId({}), Roles({}), Access Token({}), Refresh Token({})", userId, roles, accessToken,
-			refreshToken);
-
-		return new MemberAuthRes(userId, roles, accessToken, refreshToken);
-	}
-
-	private MemberAuthRes createMemberAuthRes(Member member, String newAccessToken, String refreshToken) {
-		Long userId = member.getProviderId();
-		List<MemberRole> memberRoles = member.getMemberRoles();
-		String roles = memberRoles.stream()
-			.map(memberRole -> memberRole.getRole().getType().name())
-			.collect(Collectors.joining(","));
-
-		boolean isRefreshTokenAroundExpiryDate = checkRefreshTokenAroundExpiryDate(refreshToken);
-		if (isRefreshTokenAroundExpiryDate) {
-			log.info("Refresh Token을 재발급합니다...");
+		if (checkRefreshTokenAroundExpiryDate(refreshToken)) {
+			log.info("사용자({})의 Refresh Token을 재발급합니다...", providerId);
 			String newRefreshToken = jwt.createRefreshToken(member);
+			log.info("Refresh Token 재발급에 성공했습니다.");
 
-			log.info("새로 발급한 Refresh Token으로 MemberAuthRes을 생성합니다...");
-			return new MemberAuthRes(userId, roles, newAccessToken, newRefreshToken);
+			return createMemberAuthRes(member, newAccessToken, newRefreshToken);
 		}
 
-		log.info("기존의 Refresh Token으로 MemberAuthRes을 생성합니다...");
-		return new MemberAuthRes(userId, roles, newAccessToken, refreshToken);
+		return createMemberAuthRes(member, newAccessToken, refreshToken);
 	}
 
 	private boolean checkRefreshTokenAroundExpiryDate(String refreshToken) {
@@ -227,5 +149,71 @@ public class AuthService {
 		log.info("Refresh Token 재발급 여부 : {}", isRefreshTokenReIssue);
 
 		return isRefreshTokenReIssue;
+	}
+
+	private MemberAuthRes login(Member member) {
+		log.info("사용자(provider: {}, providerId: {})의 로그인을 진행합니다.", member.getProvider(), member.getProviderId());
+		String accessToken = jwt.createAccessToken(member);
+		String refreshToken = jwt.createRefreshToken(member);
+
+		return createMemberAuthRes(member, accessToken, refreshToken);
+	}
+
+	private void setDefaultAddress(Member newMember) {
+		log.info("새로운 회원에게 기본 위치를 부여합니다...");
+		Address defaultAddress = new Address();
+		newMember.updateAddress(defaultAddress);
+		log.info("기본 위치 지정이 완료됐습니다.");
+	}
+
+	private void setDefaultImageUrl(Member newMember) {
+		log.info("새로운 회원(Provider: {}, ProviderId: {})에게 기본 이미지(Url: {})로 지정합니다...",
+			newMember.getProvider(), newMember.getProviderId(), MEMBER_DEFAULT_IMAGE_PATH);
+		newMember.updateImage(MEMBER_DEFAULT_IMAGE_PATH);
+		log.info(" 기본 이미지 지정이 완료됐습니다.");
+	}
+
+	private List<MemberRole> createMemberRoles(Member savedMember) {
+		log.info("회원(ProviderId: {})의 Role을 생성합니다...", savedMember.getProviderId());
+		Role assignableRole = roleRepository.findByRoleType(RoleType.ROLE_MEMBER)
+			.orElseThrow(() -> {
+				log.warn("POST:CREATE:NOT_FOUND_ROLE_BY_ROLE_TYPE");
+				return new EntityNotFoundException(ErrorCode.NOT_FOUND_ROLE);
+			});
+		MemberRole memberRole = new MemberRole(savedMember, assignableRole);
+		List<MemberRole> assignableMemberRoles = new ArrayList<>();
+		assignableMemberRoles.add(memberRole);
+		log.info("Role를 만드는데 성공했습니다.");
+
+		return assignableMemberRoles;
+	}
+
+	private MemberAuthRes createMemberAuthRes(Member member, String accessToken, String refreshToken) {
+		log.info("회원인증 성공 메시지에 필요한 데이터를 생성합니다...");
+		Long userId = member.getProviderId();
+		String roles = getMemberRoles(member);
+		log.info("회원인증 성공 메시지를 만드는데 완료했습니다.");
+
+		return new MemberAuthRes(userId, roles, accessToken, refreshToken);
+	}
+
+	private String getMemberRoles(Member member) {
+		log.info("회원({})으로부터 Role 데이터를 가져옵니다...", member);
+		List<MemberRole> memberRoles = member.getMemberRoles();
+		String roles = memberRoles.stream()
+			.map(memberRole -> memberRole.getRole().getType().getRole())
+			.collect(Collectors.joining(","));
+		log.info("Role({}) 데이터를 가져오는 것을 완료했습니다.", roles);
+
+		return roles;
+	}
+
+	private Member findMemberByProviderId(Long providerId) {
+		log.info("사용자(ProviderId:{})정보를 조회합니다...", providerId);
+		return memberRepository.findMemberByProviderId(providerId)
+			.orElseThrow(() -> {
+				log.warn("READ:NOT_FOUND_MEMBER_BY_ID : {}", providerId);
+				return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
+			});
 	}
 }
