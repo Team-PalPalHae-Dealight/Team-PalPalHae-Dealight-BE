@@ -53,21 +53,46 @@ public class CartService {
 	public CartsRes findAllByProviderId(Long providerId) {
 		List<Cart> carts = cartRepository.findAllByMemberProviderId(providerId);
 
-		List<Cart> updatedCarts = carts.stream()
-			.map(this::updateStock)
-			.sorted(Comparator.comparing(Cart::getItemId))
-			.toList();
+		List<Cart> updatedCarts = updateCarts(carts);
 
-		return CartsRes.from(updatedCarts);
+		List<Cart> unexpiredCarts = getUnexpiredCarts(updatedCarts);
+
+		return CartsRes.from(unexpiredCarts);
 	}
 
-	private Cart updateStock(Cart cart) {
+	private List<Cart> updateCarts(List<Cart> carts) {
+
+		return carts.stream()
+			.map(this::update)
+			.sorted(Comparator.comparing(Cart::getItemId))
+			.toList();
+	}
+
+	private Cart update(Cart cart) {
 		Long itemId = cart.getItemId();
 		Item item = getItem(itemId);
 
-		cart.updateStock(item.getStock());
+		cart.update(item.getName(), item.getStock(), item.getDiscountPrice(), item.getImage(), item.getStore().getCloseTime());
+
+		if (!cart.getExpirationDateTime().toLocalTime().equals(item.getStore().getCloseTime())) {
+			cart.updateExpirationDateTime();
+		}
 
 		return cartRepository.save(cart);
+	}
+
+	private List<Cart> getUnexpiredCarts(List<Cart> carts) {
+
+		return carts.stream()
+			.peek(this::deleteExpiredCart)
+			.filter(cart -> !cart.isExpired())
+			.toList();
+	}
+
+	private void deleteExpiredCart(Cart cart) {
+		if (cart.isExpired()) {
+			cartRepository.delete(cart);
+		}
 	}
 
 	private void validateOwnStoreItem(Long providerId, Item item) {
@@ -82,8 +107,6 @@ public class CartService {
 
 	private CartRes addItem(Long providerId, Long itemId, List<Cart> carts, CartAdditionType cartAdditionType) {
 		Cart cart = getCartToAddItem(itemId, providerId, carts, cartAdditionType);
-
-		cart.updateExpiration();
 
 		Cart savedCart = cartRepository.save(cart);
 
