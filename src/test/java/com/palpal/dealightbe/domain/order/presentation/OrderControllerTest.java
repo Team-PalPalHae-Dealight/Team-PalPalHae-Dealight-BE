@@ -16,6 +16,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
@@ -88,7 +89,8 @@ public class OrderControllerTest {
 		OrderProductsRes productsRes = new OrderProductsRes(List.of(new OrderProductRes(1L, "달콤한 도넛", 3, 10000, 15000,
 			"https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/donut")));
 
-		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요", LocalTime.of(12, 30),
+		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "member nickName", "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요",
+			LocalTime.of(12, 30),
 			productsRes, 30000, createdAt, RECEIVED.getText());
 
 		@Test
@@ -115,6 +117,7 @@ public class OrderControllerTest {
 				.andExpect(jsonPath("$.orderId").value(1L))
 				.andExpect(jsonPath("$.storeId").value(1L))
 				.andExpect(jsonPath("$.memberId").value(1L))
+				.andExpect(jsonPath("$.memberNickName").value("member nickName"))
 				.andExpect(jsonPath("$.storeName").value("GS25"))
 				.andExpect(jsonPath("$.demand").value(orderCreateReq.demand()))
 				.andExpect(jsonPath("$.orderProductsRes.orderProducts[0].itemId").value(productRes.itemId()))
@@ -133,44 +136,45 @@ public class OrderControllerTest {
 						headerWithName("Authorization").description("Access Token")
 					),
 					requestFields(
-						fieldWithPath("orderProductsReq.orderProducts[]").type(JsonFieldType.ARRAY)
+						fieldWithPath("orderProductsReq.orderProducts[]").type(ARRAY)
 							.description("주문한 상품 정보 목록"),
-						fieldWithPath("orderProductsReq.orderProducts[].itemId").type(JsonFieldType.NUMBER)
+						fieldWithPath("orderProductsReq.orderProducts[].itemId").type(NUMBER)
 							.description("상품의 아이디"),
-						fieldWithPath("orderProductsReq.orderProducts[].quantity").type(JsonFieldType.NUMBER)
+						fieldWithPath("orderProductsReq.orderProducts[].quantity").type(NUMBER)
 							.description("상품의 수량"),
 
-						fieldWithPath("storeId").type(JsonFieldType.NUMBER).description("상품을 구매한 업체 아이디"),
-						fieldWithPath("demand").type(JsonFieldType.STRING).description("상품 구매시 작성한 고객의 요청 사항"),
-						fieldWithPath("arrivalTime").type(JsonFieldType.STRING).description("고객의 도착 예정 시간"),
-						fieldWithPath("totalPrice").type(JsonFieldType.NUMBER).description("주문 총 금액")
+						fieldWithPath("storeId").type(NUMBER).description("상품을 구매한 업체 아이디"),
+						fieldWithPath("demand").type(STRING).description("상품 구매시 작성한 고객의 요청 사항"),
+						fieldWithPath("arrivalTime").type(STRING).description("고객의 도착 예정 시간"),
+						fieldWithPath("totalPrice").type(NUMBER).description("주문 총 금액")
 					),
 					responseFields(
-						fieldWithPath("orderId").type(JsonFieldType.NUMBER).description("등록된 주문의 아이디"),
-						fieldWithPath("storeId").type(JsonFieldType.NUMBER).description("주문이 이루어진 업체 아이디"),
-						fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("고객 아이디"),
-						fieldWithPath("storeName").type(JsonFieldType.STRING).description("업체 이름"),
-						fieldWithPath("demand").type(JsonFieldType.STRING).description("고객의 요구 사항"),
-						fieldWithPath("arrivalTime").type(JsonFieldType.STRING).description("고객의 도착 예정 시간"),
+						fieldWithPath("orderId").type(NUMBER).description("등록된 주문의 아이디"),
+						fieldWithPath("storeId").type(NUMBER).description("주문이 이루어진 업체 아이디"),
+						fieldWithPath("memberId").type(NUMBER).description("고객 아이디"),
+						fieldWithPath("memberNickName").type(STRING).description("고객 닉네임"),
+						fieldWithPath("storeName").type(STRING).description("업체 이름"),
+						fieldWithPath("demand").type(STRING).description("고객의 요구 사항"),
+						fieldWithPath("arrivalTime").type(STRING).description("고객의 도착 예정 시간"),
 
-						fieldWithPath("orderProductsRes.orderProducts[]").type(JsonFieldType.ARRAY)
+						fieldWithPath("orderProductsRes.orderProducts[]").type(ARRAY)
 							.description("주문한 상품 목록"),
-						fieldWithPath("orderProductsRes.orderProducts[].itemId").type(JsonFieldType.NUMBER)
+						fieldWithPath("orderProductsRes.orderProducts[].itemId").type(NUMBER)
 							.description("상품 아이디"),
-						fieldWithPath("orderProductsRes.orderProducts[].name").type(JsonFieldType.STRING)
+						fieldWithPath("orderProductsRes.orderProducts[].name").type(STRING)
 							.description("상품명"),
-						fieldWithPath("orderProductsRes.orderProducts[].quantity").type(JsonFieldType.NUMBER)
+						fieldWithPath("orderProductsRes.orderProducts[].quantity").type(NUMBER)
 							.description("상품 주문 수량"),
-						fieldWithPath("orderProductsRes.orderProducts[].discountPrice").type(JsonFieldType.NUMBER)
+						fieldWithPath("orderProductsRes.orderProducts[].discountPrice").type(NUMBER)
 							.description("상품의 할인된 금액"),
-						fieldWithPath("orderProductsRes.orderProducts[].originalPrice").type(JsonFieldType.NUMBER)
+						fieldWithPath("orderProductsRes.orderProducts[].originalPrice").type(NUMBER)
 							.description("상품 원가"),
-						fieldWithPath("orderProductsRes.orderProducts[].image").type(JsonFieldType.STRING)
+						fieldWithPath("orderProductsRes.orderProducts[].image").type(STRING)
 							.description("상품 이미지"),
 
-						fieldWithPath("totalPrice").type(JsonFieldType.NUMBER).description("총 금액"),
-						fieldWithPath("createdAt").type(JsonFieldType.STRING).description("주문 완료 일자 및 시간"),
-						fieldWithPath("status").type(JsonFieldType.STRING).description("현재 주문 상태"))));
+						fieldWithPath("totalPrice").type(NUMBER).description("총 금액"),
+						fieldWithPath("createdAt").type(STRING).description("주문 완료 일자 및 시간"),
+						fieldWithPath("status").type(STRING).description("현재 주문 상태"))));
 		}
 
 		@Test
@@ -351,12 +355,12 @@ public class OrderControllerTest {
 							headerWithName("Authorization").description("Access Token")
 						),
 						requestFields(
-							fieldWithPath("status").type(JsonFieldType.STRING)
+							fieldWithPath("status").type(STRING)
 								.description("변경 후의 주문 상태(CONFIRMED, COMPLETED, CANCELED)")
 						),
 						responseFields(
-							fieldWithPath("orderId").type(JsonFieldType.NUMBER).description("상태가 변경된 주문의 아이디"),
-							fieldWithPath("status").type(JsonFieldType.STRING).description("변경 완료된 후의 주문 상태")
+							fieldWithPath("orderId").type(NUMBER).description("상태가 변경된 주문의 아이디"),
+							fieldWithPath("status").type(STRING).description("변경 완료된 후의 주문 상태")
 						)
 					));
 		}
@@ -421,7 +425,8 @@ public class OrderControllerTest {
 		OrderProductsRes productsRes = new OrderProductsRes(List.of(new OrderProductRes(1L, "달콤한 도넛", 5, 10000, 15000,
 			"https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/donut")));
 
-		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요", LocalTime.of(12, 30),
+		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "member nickName", "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요",
+			LocalTime.of(12, 30),
 			productsRes, 10000, createdAt, RECEIVED.getText());
 
 		OrderProductRes productRes = productsRes.orderProducts().get(0);
@@ -448,6 +453,7 @@ public class OrderControllerTest {
 				.andExpect(jsonPath("$.orderId").value(1L))
 				.andExpect(jsonPath("$.storeId").value(1L))
 				.andExpect(jsonPath("$.memberId").value(1L))
+				.andExpect(jsonPath("$.memberNickName").value("member nickName"))
 				.andExpect(jsonPath("$.storeName").value("GS25"))
 				.andExpect(jsonPath("$.demand").value(orderCreateReq.demand()))
 				.andExpect(jsonPath("$.orderProductsRes.orderProducts[0].itemId").value(productRes.itemId()))
@@ -469,31 +475,32 @@ public class OrderControllerTest {
 						headerWithName("Authorization").description("Access Token")
 					),
 					responseFields(
-						fieldWithPath("orderId").type(JsonFieldType.NUMBER).description("등록된 주문의 아이디"),
-						fieldWithPath("storeId").type(JsonFieldType.NUMBER).description("주문이 이루어진 업체 아이디"),
-						fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("고객 아이디"),
-						fieldWithPath("storeName").type(JsonFieldType.STRING).description("업체 이름"),
-						fieldWithPath("demand").type(JsonFieldType.STRING).description("고객의 요구 사항"),
-						fieldWithPath("arrivalTime").type(JsonFieldType.STRING).description("고객의 도착 예정 시간"),
+						fieldWithPath("orderId").type(NUMBER).description("등록된 주문의 아이디"),
+						fieldWithPath("storeId").type(NUMBER).description("주문이 이루어진 업체 아이디"),
+						fieldWithPath("memberId").type(NUMBER).description("고객 아이디"),
+						fieldWithPath("memberNickName").type(STRING).description("고객 닉네임"),
+						fieldWithPath("storeName").type(STRING).description("업체 이름"),
+						fieldWithPath("demand").type(STRING).description("고객의 요구 사항"),
+						fieldWithPath("arrivalTime").type(STRING).description("고객의 도착 예정 시간"),
 
-						fieldWithPath("orderProductsRes.orderProducts[]").type(JsonFieldType.ARRAY)
+						fieldWithPath("orderProductsRes.orderProducts[]").type(ARRAY)
 							.description("주문한 상품 목록"),
-						fieldWithPath("orderProductsRes.orderProducts[].itemId").type(JsonFieldType.NUMBER)
+						fieldWithPath("orderProductsRes.orderProducts[].itemId").type(NUMBER)
 							.description("상품 아이디"),
-						fieldWithPath("orderProductsRes.orderProducts[].name").type(JsonFieldType.STRING)
+						fieldWithPath("orderProductsRes.orderProducts[].name").type(STRING)
 							.description("상품명"),
-						fieldWithPath("orderProductsRes.orderProducts[].quantity").type(JsonFieldType.NUMBER)
+						fieldWithPath("orderProductsRes.orderProducts[].quantity").type(NUMBER)
 							.description("상품 주문 수량"),
-						fieldWithPath("orderProductsRes.orderProducts[].discountPrice").type(JsonFieldType.NUMBER)
+						fieldWithPath("orderProductsRes.orderProducts[].discountPrice").type(NUMBER)
 							.description("상품의 할인된 금액"),
-						fieldWithPath("orderProductsRes.orderProducts[].originalPrice").type(JsonFieldType.NUMBER)
+						fieldWithPath("orderProductsRes.orderProducts[].originalPrice").type(NUMBER)
 							.description("상품 원가"),
-						fieldWithPath("orderProductsRes.orderProducts[].image").type(JsonFieldType.STRING)
+						fieldWithPath("orderProductsRes.orderProducts[].image").type(STRING)
 							.description("상품 이미지"),
 
-						fieldWithPath("totalPrice").type(JsonFieldType.NUMBER).description("총 금액"),
-						fieldWithPath("createdAt").type(JsonFieldType.STRING).description("주문 완료 일자 및 시간"),
-						fieldWithPath("status").type(JsonFieldType.STRING).description("현재 주문 상태"))));
+						fieldWithPath("totalPrice").type(NUMBER).description("총 금액"),
+						fieldWithPath("createdAt").type(STRING).description("주문 완료 일자 및 시간"),
+						fieldWithPath("status").type(STRING).description("현재 주문 상태"))));
 		}
 	}
 
@@ -509,7 +516,8 @@ public class OrderControllerTest {
 
 		OrderProductRes productRes = productsRes.orderProducts().get(0);
 
-		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요", LocalTime.of(12, 30),
+		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "member nickName", "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요",
+			LocalTime.of(12, 30),
 			productsRes, 10000, createdAt, RECEIVED.getText());
 
 		OrdersRes ordersRes = new OrdersRes(List.of(orderRes), false);
@@ -564,34 +572,35 @@ public class OrderControllerTest {
 							parameterWithName("size").description("한 번에 조회할 데이터 개수(초기값:10)").optional()
 						),
 						responseFields(
-							fieldWithPath("orders").type(JsonFieldType.ARRAY).description("주문 목록"),
-							fieldWithPath("orders[].orderId").type(JsonFieldType.NUMBER).description("등록된 주문의 아이디"),
-							fieldWithPath("orders[].storeId").type(JsonFieldType.NUMBER).description("주문이 이루어진 업체 아이디"),
-							fieldWithPath("orders[].memberId").type(JsonFieldType.NUMBER).description("고객 아이디"),
-							fieldWithPath("orders[].storeName").type(JsonFieldType.STRING).description("업체 이름"),
-							fieldWithPath("orders[].demand").type(JsonFieldType.STRING).description("고객의 요구 사항"),
-							fieldWithPath("orders[].arrivalTime").type(JsonFieldType.STRING)
+							fieldWithPath("orders").type(ARRAY).description("주문 목록"),
+							fieldWithPath("orders[].orderId").type(NUMBER).description("등록된 주문의 아이디"),
+							fieldWithPath("orders[].storeId").type(NUMBER).description("주문이 이루어진 업체 아이디"),
+							fieldWithPath("orders[].memberId").type(NUMBER).description("고객 아이디"),
+							fieldWithPath("orders[].memberNickName").type(STRING).description("고객 닉네임"),
+							fieldWithPath("orders[].storeName").type(STRING).description("업체 이름"),
+							fieldWithPath("orders[].demand").type(STRING).description("고객의 요구 사항"),
+							fieldWithPath("orders[].arrivalTime").type(STRING)
 								.description("고객의 도착 예정 시간"),
-							fieldWithPath("orders[].orderProductsRes.orderProducts[]").type(JsonFieldType.ARRAY)
+							fieldWithPath("orders[].orderProductsRes.orderProducts[]").type(ARRAY)
 								.description("주문한 상품 목록"),
-							fieldWithPath("orders[].orderProductsRes.orderProducts[].itemId").type(JsonFieldType.NUMBER)
+							fieldWithPath("orders[].orderProductsRes.orderProducts[].itemId").type(NUMBER)
 								.description("상품 아이디"),
-							fieldWithPath("orders[].orderProductsRes.orderProducts[].name").type(JsonFieldType.STRING)
+							fieldWithPath("orders[].orderProductsRes.orderProducts[].name").type(STRING)
 								.description("상품명"),
 							fieldWithPath("orders[].orderProductsRes.orderProducts[].quantity").type(
-									JsonFieldType.NUMBER)
+									NUMBER)
 								.description("상품 주문 수량"),
 							fieldWithPath("orders[].orderProductsRes.orderProducts[].discountPrice")
-								.type(JsonFieldType.NUMBER)
+								.type(NUMBER)
 								.description("상품의 할인된 금액"),
 							fieldWithPath("orders[].orderProductsRes.orderProducts[].originalPrice")
-								.type(JsonFieldType.NUMBER)
+								.type(NUMBER)
 								.description("상품 원가"),
-							fieldWithPath("orders[].orderProductsRes.orderProducts[].image").type(JsonFieldType.STRING)
+							fieldWithPath("orders[].orderProductsRes.orderProducts[].image").type(STRING)
 								.description("상품 이미지"),
-							fieldWithPath("orders[].totalPrice").type(JsonFieldType.NUMBER).description("총 금액"),
-							fieldWithPath("orders[].createdAt").type(JsonFieldType.STRING).description("주문 완료 일자 및 시간"),
-							fieldWithPath("orders[].status").type(JsonFieldType.STRING).description("현재 주문 상태"),
+							fieldWithPath("orders[].totalPrice").type(NUMBER).description("총 금액"),
+							fieldWithPath("orders[].createdAt").type(STRING).description("주문 완료 일자 및 시간"),
+							fieldWithPath("orders[].status").type(STRING).description("현재 주문 상태"),
 							fieldWithPath("hasNext").type(JsonFieldType.BOOLEAN).description("다음 데이터 존재 여부")))
 				);
 		}
@@ -609,7 +618,8 @@ public class OrderControllerTest {
 
 		OrderProductRes productRes = productsRes.orderProducts().get(0);
 
-		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요", LocalTime.of(12, 30),
+		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "member nickName", "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요",
+			LocalTime.of(12, 30),
 			productsRes, 10000, createdAt, RECEIVED.getText());
 
 		OrdersRes ordersRes = new OrdersRes(List.of(orderRes), false);
@@ -662,34 +672,35 @@ public class OrderControllerTest {
 							parameterWithName("size").description("한 번에 조회할 데이터 개수(초기값:10)").optional()
 						),
 						responseFields(
-							fieldWithPath("orders").type(JsonFieldType.ARRAY).description("주문 목록"),
-							fieldWithPath("orders[].orderId").type(JsonFieldType.NUMBER).description("등록된 주문의 아이디"),
-							fieldWithPath("orders[].storeId").type(JsonFieldType.NUMBER).description("주문이 이루어진 업체 아이디"),
-							fieldWithPath("orders[].memberId").type(JsonFieldType.NUMBER).description("고객 아이디"),
-							fieldWithPath("orders[].storeName").type(JsonFieldType.STRING).description("업체 이름"),
-							fieldWithPath("orders[].demand").type(JsonFieldType.STRING).description("고객의 요구 사항"),
-							fieldWithPath("orders[].arrivalTime").type(JsonFieldType.STRING)
+							fieldWithPath("orders").type(ARRAY).description("주문 목록"),
+							fieldWithPath("orders[].orderId").type(NUMBER).description("등록된 주문의 아이디"),
+							fieldWithPath("orders[].storeId").type(NUMBER).description("주문이 이루어진 업체 아이디"),
+							fieldWithPath("orders[].memberId").type(NUMBER).description("고객 아이디"),
+							fieldWithPath("orders[].memberNickName").type(STRING).description("고객 닉네임"),
+							fieldWithPath("orders[].storeName").type(STRING).description("업체 이름"),
+							fieldWithPath("orders[].demand").type(STRING).description("고객의 요구 사항"),
+							fieldWithPath("orders[].arrivalTime").type(STRING)
 								.description("고객의 도착 예정 시간"),
-							fieldWithPath("orders[].orderProductsRes.orderProducts[]").type(JsonFieldType.ARRAY)
+							fieldWithPath("orders[].orderProductsRes.orderProducts[]").type(ARRAY)
 								.description("주문한 상품 목록"),
-							fieldWithPath("orders[].orderProductsRes.orderProducts[].itemId").type(JsonFieldType.NUMBER)
+							fieldWithPath("orders[].orderProductsRes.orderProducts[].itemId").type(NUMBER)
 								.description("상품 아이디"),
-							fieldWithPath("orders[].orderProductsRes.orderProducts[].name").type(JsonFieldType.STRING)
+							fieldWithPath("orders[].orderProductsRes.orderProducts[].name").type(STRING)
 								.description("상품명"),
 							fieldWithPath("orders[].orderProductsRes.orderProducts[].quantity").type(
-									JsonFieldType.NUMBER)
+									NUMBER)
 								.description("상품 주문 수량"),
 							fieldWithPath("orders[].orderProductsRes.orderProducts[].discountPrice")
-								.type(JsonFieldType.NUMBER)
+								.type(NUMBER)
 								.description("상품의 할인된 금액"),
 							fieldWithPath("orders[].orderProductsRes.orderProducts[].originalPrice")
-								.type(JsonFieldType.NUMBER)
+								.type(NUMBER)
 								.description("상품 원가"),
-							fieldWithPath("orders[].orderProductsRes.orderProducts[].image").type(JsonFieldType.STRING)
+							fieldWithPath("orders[].orderProductsRes.orderProducts[].image").type(STRING)
 								.description("상품 이미지"),
-							fieldWithPath("orders[].totalPrice").type(JsonFieldType.NUMBER).description("총 금액"),
-							fieldWithPath("orders[].createdAt").type(JsonFieldType.STRING).description("주문 완료 일자 및 시간"),
-							fieldWithPath("orders[].status").type(JsonFieldType.STRING).description("현재 주문 상태"),
+							fieldWithPath("orders[].totalPrice").type(NUMBER).description("총 금액"),
+							fieldWithPath("orders[].createdAt").type(STRING).description("주문 완료 일자 및 시간"),
+							fieldWithPath("orders[].status").type(STRING).description("현재 주문 상태"),
 							fieldWithPath("hasNext").type(JsonFieldType.BOOLEAN).description("다음 데이터 존재 여부")))
 				);
 		}

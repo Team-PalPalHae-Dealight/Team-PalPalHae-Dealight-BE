@@ -9,6 +9,7 @@ public record OrderRes(
 	Long orderId,
 	Long storeId,
 	Long memberId,
+	String memberNickName,
 	String storeName,
 	String demand,
 	LocalTime arrivalTime,
@@ -19,9 +20,8 @@ public record OrderRes(
 ) {
 	public static OrderRes from(Order order) {
 		return new OrderRes(order.getId(), order.getStore().getId(), order.getMember().getId(),
-			order.getStore().getName(),
+			order.getMember().getNickName(), order.getStore().getName(),
 			order.getDemand(), order.getArrivalTime(), OrderProductsRes.from(order), order.getTotalPrice(),
-			order.getCreatedAt(),
-			order.getOrderStatus().getText());
+			order.getCreatedAt(), order.getOrderStatus().getText());
 	}
 }
