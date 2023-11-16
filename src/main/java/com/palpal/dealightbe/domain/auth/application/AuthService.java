@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,8 +68,7 @@ public class AuthService {
 
 	public MemberAuthRes signup(MemberAuthReq request) {
 		log.info("요청한 데이터로 회원가입을 진행합니다...");
-		log.info("요청 데이터 -> Provider: {}, ProviderId: {}, Role: {}",
-			request.provider(), request.providerId(), request.role());
+		log.info("요청 데이터 -> Provider: {}, ProviderId: {}", request.provider(), request.providerId());
 
 		log.info("회원(ProviderId: {}) 유무를 조회합니다...", request.providerId());
 		memberRepository.findByProviderAndProviderId(request.provider(), request.providerId())
@@ -84,8 +84,8 @@ public class AuthService {
 		requestMember.updateImage(MEMBER_DEFAULT_IMAGE_PATH);
 		Member savedMember = memberRepository.save(requestMember);
 
-		log.info("회원({})의 Role({})을 생성합니다...", savedMember.getProviderId(), request.role());
-		List<MemberRole> assignableMemberRoles = createMemberRoles(request, savedMember);
+		log.info("회원({})의 Role을 생성합니다...", savedMember.getProviderId());
+		List<MemberRole> assignableMemberRoles = createMemberRoles(savedMember);
 		List<MemberRole> savedMemberRoles = memberRoleRepository.saveAll(assignableMemberRoles);
 		log.info("회원({})의 Role을 생성했습니다.", savedMember.getProviderId());
 		savedMember.updateMemberRoles(savedMemberRoles);
@@ -155,27 +155,17 @@ public class AuthService {
 		return requestMember;
 	}
 
-	private List<MemberRole> createMemberRoles(MemberAuthReq request, Member savedMember) {
-		log.info("요청 정보(request: {}, Member: {})로 MemberRole을 만듭니다...", request, savedMember);
-		RoleType roleType = getRoleType(request);
-		Role assignableRole = roleRepository.findByRoleType(roleType)
+	private List<MemberRole> createMemberRoles(Member savedMember) {
+		log.info("요청 정보(Member: {})로 MemberRole을 만듭니다...", savedMember);
+		Role assignableRole = roleRepository.findByRoleType(RoleType.ROLE_MEMBER)
 			.orElseThrow(() -> {
-				log.warn("POST:CREATE:NOT_FOUND_ROLE_BY_ROLE_TYPE : {}", roleType);
+				log.warn("POST:CREATE:NOT_FOUND_ROLE_BY_ROLE_TYPE");
 				return new EntityNotFoundException(ErrorCode.NOT_FOUND_ROLE);
 			});
 		List<MemberRole> assignableMemberRoles = createMemberRoles(savedMember, assignableRole);
 		log.info("MemberRole({})를 만드는데 성공했습니다.", assignableMemberRoles);
 
 		return assignableMemberRoles;
-	}
-
-	private RoleType getRoleType(MemberAuthReq request) {
-		log.info("요청한 RoleType({})을 찾습니다...", request.role());
-		String roleFromString = request.role();
-		RoleType roleType = RoleType.fromString(roleFromString);
-		log.info("요청한 RoleType({})을 찾는데 성공했습니다.", roleType);
-
-		return roleType;
 	}
 
 	private List<MemberRole> createMemberRoles(Member member, Role role) {
@@ -188,28 +178,37 @@ public class AuthService {
 
 	private MemberAuthRes createMemberSignupResponse(Member savedMember) {
 		log.info("회원의 Access Token과 Refresh Token을 생성합니다...");
+		Long userId = savedMember.getProviderId();
+		List<MemberRole> memberRoles = savedMember.getMemberRoles();
+		String roles = memberRoles.stream()
+			.map(memberRole -> memberRole.getRole().getType().name())
+			.collect(Collectors.joining(","));
 		String accessToken = jwt.createAccessToken(savedMember);
 		String refreshToken = jwt.createRefreshToken(savedMember);
-		String nickName = savedMember.getNickName();
-		log.info("Access Token({}), Refresh Token({}), NickName({})",
-			accessToken, refreshToken, nickName);
+		log.info("UserId({}), Roles({}), Access Token({}), Refresh Token({})", userId, roles, accessToken,
+			refreshToken);
 
-		return new MemberAuthRes(nickName, accessToken, refreshToken);
+		return new MemberAuthRes(userId, roles, accessToken, refreshToken);
 	}
 
 	private MemberAuthRes createMemberAuthRes(Member member, String newAccessToken, String refreshToken) {
-		String nickName = member.getNickName();
+		Long userId = member.getProviderId();
+		List<MemberRole> memberRoles = member.getMemberRoles();
+		String roles = memberRoles.stream()
+			.map(memberRole -> memberRole.getRole().getType().name())
+			.collect(Collectors.joining(","));
+
 		boolean isRefreshTokenAroundExpiryDate = checkRefreshTokenAroundExpiryDate(refreshToken);
 		if (isRefreshTokenAroundExpiryDate) {
 			log.info("Refresh Token을 재발급합니다...");
 			String newRefreshToken = jwt.createRefreshToken(member);
 
 			log.info("새로 발급한 Refresh Token으로 MemberAuthRes을 생성합니다...");
-			return new MemberAuthRes(nickName, newAccessToken, newRefreshToken);
+			return new MemberAuthRes(userId, roles, newAccessToken, newRefreshToken);
 		}
 
 		log.info("기존의 Refresh Token으로 MemberAuthRes을 생성합니다...");
-		return new MemberAuthRes(nickName, newAccessToken, refreshToken);
+		return new MemberAuthRes(userId, roles, newAccessToken, refreshToken);
 	}
 
 	private boolean checkRefreshTokenAroundExpiryDate(String refreshToken) {

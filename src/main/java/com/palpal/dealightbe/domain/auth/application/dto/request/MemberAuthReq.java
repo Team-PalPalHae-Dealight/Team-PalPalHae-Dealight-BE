@@ -22,9 +22,8 @@ public record MemberAuthReq(
 	String nickName,
 
 	@NotBlank(message = "사용자 전화번호는 필수 입력값입니다.")
-	@Pattern(regexp = "\\d+",message = "숫자만 입력해주세요.")
-	String phoneNumber,
-	String role
+	@Pattern(regexp = "\\d+", message = "숫자만 입력해주세요.")
+	String phoneNumber
 ) {
 	public static Member toMember(MemberAuthReq request) {
 		String provider = request.provider();
@@ -50,7 +49,6 @@ public record MemberAuthReq(
 			.append("realName", realName)
 			.append("nickName", nickName)
 			.append("phoneNumber", phoneNumber)
-			.append("role", role)
 			.toString();
 	}
 }

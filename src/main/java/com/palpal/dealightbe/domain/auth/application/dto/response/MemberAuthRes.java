@@ -1,7 +1,9 @@
 package com.palpal.dealightbe.domain.auth.application.dto.response;
 
 public record MemberAuthRes(
-	String nickName,
+
+	Long userId,
+	String role,
 	String accessToken,
 	String refreshToken
 ) {
