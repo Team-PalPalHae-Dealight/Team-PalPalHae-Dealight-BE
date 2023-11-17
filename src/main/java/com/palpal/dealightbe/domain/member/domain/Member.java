@@ -60,8 +60,7 @@ public class Member extends BaseEntity {
 
 	@Builder
 	public Member(String realName, String nickName, String phoneNumber, Address address, String provider,
-		Long providerId,
-		List<MemberRole> memberRoles) {
+		Long providerId, List<MemberRole> memberRoles) {
 		this.realName = realName;
 		this.nickName = nickName;
 		this.phoneNumber = phoneNumber;
@@ -106,6 +105,10 @@ public class Member extends BaseEntity {
 		memberRoles.forEach(memberRole -> {
 			memberRole.updateMember(this);
 		});
+	}
+
+	public boolean hasSameImage(String imageUrl) {
+		return this.image.equals(imageUrl);
 	}
 
 	@Override

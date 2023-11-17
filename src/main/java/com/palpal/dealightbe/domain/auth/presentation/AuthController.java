@@ -8,11 +8,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.palpal.dealightbe.domain.auth.application.AuthService;
-import com.palpal.dealightbe.domain.auth.application.dto.request.MemberAuthReq;
+import com.palpal.dealightbe.domain.auth.application.OAuth2AuthorizationService;
+import com.palpal.dealightbe.domain.auth.application.dto.request.MemberSignupAuthReq;
 import com.palpal.dealightbe.domain.auth.application.dto.response.MemberAuthRes;
+import com.palpal.dealightbe.domain.auth.application.dto.response.OAuthLoginRes;
+import com.palpal.dealightbe.domain.auth.application.dto.response.OAuthUserInfoRes;
 import com.palpal.dealightbe.global.aop.ProviderId;
 import com.palpal.dealightbe.global.aop.RefreshToken;
 
@@ -23,10 +27,21 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/auth")
 public class AuthController {
 
+	private final OAuth2AuthorizationService oAuth2AuthorizationService;
 	private final AuthService authService;
 
+	@GetMapping("/kakao")
+	public ResponseEntity<OAuthLoginRes> loginByKakaoOAuth(@RequestParam String code) {
+		OAuthUserInfoRes oAuthUserInfoRes = oAuth2AuthorizationService.authorizeFromKakao(code);
+		OAuthLoginRes oAuthLoginRes = authService.authenticate(oAuthUserInfoRes);
+
+		return ResponseEntity
+			.status(HttpStatus.OK)
+			.body(oAuthLoginRes);
+	}
+
 	@PostMapping("/signup")
-	public ResponseEntity<MemberAuthRes> signup(@RequestBody @Validated MemberAuthReq request) {
+	public ResponseEntity<MemberAuthRes> signup(@RequestBody @Validated MemberSignupAuthReq request) {
 		MemberAuthRes response = authService.signup(request);
 
 		return ResponseEntity

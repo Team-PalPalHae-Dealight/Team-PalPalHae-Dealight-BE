@@ -9,7 +9,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 import com.palpal.dealightbe.domain.member.domain.Member;
 
-public record MemberAuthReq(
+public record MemberSignupAuthReq(
 	@NotBlank(message = "Provider는 비어있을 수 없습니다.")
 	String provider,
 
@@ -22,11 +22,10 @@ public record MemberAuthReq(
 	String nickName,
 
 	@NotBlank(message = "사용자 전화번호는 필수 입력값입니다.")
-	@Pattern(regexp = "\\d+",message = "숫자만 입력해주세요.")
-	String phoneNumber,
-	String role
+	@Pattern(regexp = "\\d+", message = "숫자만 입력해주세요.")
+	String phoneNumber
 ) {
-	public static Member toMember(MemberAuthReq request) {
+	public static Member toMember(MemberSignupAuthReq request) {
 		String provider = request.provider();
 		Long providerId = request.providerId();
 		String realName = request.realName();
@@ -50,7 +49,6 @@ public record MemberAuthReq(
 			.append("realName", realName)
 			.append("nickName", nickName)
 			.append("phoneNumber", phoneNumber)
-			.append("role", role)
 			.toString();
 	}
 }
