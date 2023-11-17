@@ -42,7 +42,6 @@ public class Notification extends BaseEntity {
 	@JoinColumn(name = "order_id")
 	private Order order;
 
-	// @Enumerated(EnumType.STRING)
 	private String content;
 
 	private boolean isRead = false;
