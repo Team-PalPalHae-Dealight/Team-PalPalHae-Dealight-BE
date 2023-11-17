@@ -70,7 +70,8 @@ class MemberControllerTest {
 
 		//given
 		AddressRes addressRes = new AddressRes("서울", 37.5665, 126.9780);
-		MemberProfileRes memberProfileInfo = new MemberProfileRes("유재석", "유산슬", "01012345678", addressRes);
+		MemberProfileRes memberProfileInfo = new MemberProfileRes(1L, "ROLE_MEMBER", "박명수", "유산슬",
+			"01012345678", addressRes);
 
 		given(memberService.getMemberProfile(any()))
 			.willReturn(memberProfileInfo);
@@ -89,12 +90,14 @@ class MemberControllerTest {
 					headerWithName("Authorization").description("Access Token")
 				),
 				responseFields(
-					fieldWithPath("realName").description("고객의 실명"),
-					fieldWithPath("nickName").description("고객의 닉네임"),
-					fieldWithPath("phoneNumber").description("고객의 전화번호"),
-					fieldWithPath("address.name").description("고객의 주소명"),
-					fieldWithPath("address.xCoordinate").description("고객의 주소의 X 좌표"),
-					fieldWithPath("address.yCoordinate").description("고객의 주소의 Y 좌표")
+					fieldWithPath("providerId").description("멤버 providerId"),
+					fieldWithPath("role").description("멤버 권한"),
+					fieldWithPath("realName").description("멤버 실명"),
+					fieldWithPath("nickName").description("멤버 닉네임"),
+					fieldWithPath("phoneNumber").description("멤버 전화번호"),
+					fieldWithPath("address.name").description("멤버 주소명"),
+					fieldWithPath("address.xCoordinate").description("멤버 주소의 X 좌표"),
+					fieldWithPath("address.yCoordinate").description("멤버 주소의 Y 좌표")
 				)
 			));
 	}
