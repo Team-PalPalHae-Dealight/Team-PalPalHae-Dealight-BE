@@ -6,7 +6,7 @@ spring:
 
   datasource:
     url: "jdbc:h2:mem:spring_security;MODE=MYSQL;DB_CLOSE_DELAY=-1"
-    username: sa
+    username: sa애
     password:
     driver-class-name: org.h2.Driver
 
@@ -35,5 +35,5 @@ spring:
       platform: h2 # 본인 DB 종류
 
   redis:
-    host: localhost
+    host: 0.0.0.0
     port: 6379
