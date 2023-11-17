@@ -38,8 +38,8 @@ public class OAuth2AuthorizationService {
 
 	private KakaoTokenRes getTokenFromAuthorizationServer(String code) {
 		log.info("Code(value: {})를 이용해 카카오 Authorization Server로부터 토큰을 발급합니다...", code);
-		HttpHeaders headerForRequest = setHeaderForRequest(null);
-		MultiValueMap<String, String> paramsForTokenRequest = setParamsForTokenRequest(code);
+		HttpHeaders headerForRequest = getHeaderForRequest(null);
+		MultiValueMap<String, String> paramsForTokenRequest = getParamsForTokenRequest(code);
 
 		String kakaoTokenUri = oAuth2KakaoRegistrationProperty.getTokenUri();
 		try {
@@ -60,7 +60,7 @@ public class OAuth2AuthorizationService {
 	private KakaoUserInfoRes getUserInfoFromResourceServer(KakaoTokenRes kakaoTokenRes) {
 		log.info("토큰 데이터({})를 이용해 카카오 Resource Server로부터 사용자 정보를 가져옵니다...", kakaoTokenRes);
 		String accessToken = kakaoTokenRes.accessToken();
-		HttpHeaders headerForRequest = setHeaderForRequest(accessToken);
+		HttpHeaders headerForRequest = getHeaderForRequest(accessToken);
 
 		String userInfoUri = oAuth2KakaoRegistrationProperty.getUserInfoUri();
 		try {
@@ -87,7 +87,7 @@ public class OAuth2AuthorizationService {
 		return new OAuthUserInfoRes(provider, providerId, nickName);
 	}
 
-	private HttpHeaders setHeaderForRequest(String accessToken) {
+	private HttpHeaders getHeaderForRequest(String accessToken) {
 		log.info("요청에 필요한 헤더를 세팅합니다...");
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -100,7 +100,7 @@ public class OAuth2AuthorizationService {
 		return headers;
 	}
 
-	private MultiValueMap<String, String> setParamsForTokenRequest(String code) {
+	private MultiValueMap<String, String> getParamsForTokenRequest(String code) {
 		log.info("토큰 발급에 필요한 파라미터를 세팅합니다...");
 		String grantType = oAuth2KakaoRegistrationProperty.getGrantType();
 		String clientId = oAuth2KakaoRegistrationProperty.getClientId();

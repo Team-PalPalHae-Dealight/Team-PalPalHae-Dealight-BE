@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.palpal.dealightbe.domain.address.domain.Address;
-import com.palpal.dealightbe.domain.auth.application.dto.request.MemberAuthReq;
+import com.palpal.dealightbe.domain.auth.application.dto.request.MemberSignupAuthReq;
 import com.palpal.dealightbe.domain.auth.application.dto.response.MemberAuthRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.OAuthLoginRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.OAuthUserInfoRes;
@@ -54,17 +54,14 @@ public class AuthService {
 
 		if (optionalMember.isEmpty()) {
 			log.info("회원가입이 필요하다는 메시지를 반환합니다...");
-			String nickname = oAuthUserInfoRes.nickName();
-			OAuthUserInfoRes joinRequireRes = new OAuthUserInfoRes(provider, providerId, nickname);
-
-			return OAuthLoginRes.from(joinRequireRes);
+			return OAuthLoginRes.from(oAuthUserInfoRes);
 		}
 		MemberAuthRes loginRes = login(optionalMember.get());
 
 		return OAuthLoginRes.from(loginRes);
 	}
 
-	public MemberAuthRes signup(MemberAuthReq request) {
+	public MemberAuthRes signup(MemberSignupAuthReq request) {
 		log.info("요청한 데이터(Provider: {}, ProviderId: {})로 회원가입을 진행합니다...",
 			request.provider(), request.providerId());
 
@@ -77,7 +74,7 @@ public class AuthService {
 			});
 
 		log.info("회원(ProviderId: {})이 가입되어 있지 않아 회원가입을 진행합니다...", request.providerId());
-		Member requestMember = MemberAuthReq.toMember(request);
+		Member requestMember = MemberSignupAuthReq.toMember(request);
 
 		setDefaultAddress(requestMember);
 		setDefaultImageUrl(requestMember);
