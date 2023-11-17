@@ -556,7 +556,7 @@ class AuthControllerTest {
 				"REFRESH_TOKEN"
 			);
 
-			given(authService.reIssueToken(any(), any()))
+			given(authService.reissueToken(any(), any()))
 				.willReturn(memberAuthRes);
 
 			// when -> then
@@ -597,7 +597,7 @@ class AuthControllerTest {
 			EntityNotFoundException entityNotFoundException = new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
 			doThrow(entityNotFoundException)
 				.when(authService)
-				.reIssueToken(any(), any());
+				.reissueToken(any(), any());
 
 			// when -> then
 			mockMvc.perform(get(reissueTokenApiPath)

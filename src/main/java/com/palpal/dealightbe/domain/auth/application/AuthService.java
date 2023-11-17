@@ -81,7 +81,7 @@ public class AuthService {
 		setDefaultImageUrl(requestMember);
 		Member savedMember = memberRepository.save(requestMember);
 
-		List<MemberRole> assignableMemberRoles = createMemberRoles(savedMember);
+		List<MemberRole> assignableMemberRoles = createMemberRoles(RoleType.ROLE_MEMBER, savedMember);
 		List<MemberRole> savedMemberRoles = memberRoleRepository.saveAll(assignableMemberRoles);
 
 		savedMember.updateMemberRoles(savedMemberRoles);
@@ -118,7 +118,7 @@ public class AuthService {
 	}
 
 	@Transactional(readOnly = true)
-	public MemberAuthRes reIssueToken(Long providerId, String refreshToken) {
+	public MemberAuthRes reissueToken(Long providerId, String refreshToken) {
 		log.info("사용자(ProviderId:{})의 AccessToken을 재발급합니다.", providerId);
 
 		Member member = findMemberByProviderId(providerId);
@@ -142,6 +142,23 @@ public class AuthService {
 		}
 
 		return createMemberAuthRes(member, newAccessToken, refreshToken);
+	}
+
+	public MemberAuthRes updateMemberRoleToStore(Long providerId) {
+		Member member = memberRepository.findMemberByProviderId(providerId)
+			.orElseThrow(() -> {
+				log.warn("READ:NOT_FOUND_MEMBER_BY_PROVIDER_ID : {}", providerId);
+				return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
+			});
+
+		List<MemberRole> assignableMemberRoles = createMemberRoles(RoleType.ROLE_STORE, member);
+		List<MemberRole> savedMemberRoles = memberRoleRepository.saveAll(assignableMemberRoles);
+		member.updateMemberRoles(savedMemberRoles);
+
+		String accessToken = jwt.createAccessToken(member);
+		String refreshToken = jwt.createRefreshToken(member);
+
+		return createMemberAuthRes(member, accessToken, refreshToken);
 	}
 
 	private boolean checkRefreshTokenAroundExpiryDate(String refreshToken) {
@@ -190,14 +207,14 @@ public class AuthService {
 		log.info(" 기본 이미지 지정이 완료됐습니다.");
 	}
 
-	private List<MemberRole> createMemberRoles(Member savedMember) {
-		log.info("회원(ProviderId: {})의 Role을 생성합니다...", savedMember.getProviderId());
-		Role assignableRole = roleRepository.findByRoleType(RoleType.ROLE_MEMBER)
+	private List<MemberRole> createMemberRoles(RoleType roleType, Member member) {
+		log.info("회원(ProviderId: {})의 Role({})을 생성합니다...", member.getProviderId(), roleType.getRole());
+		Role assignableRole = roleRepository.findByRoleType(roleType)
 			.orElseThrow(() -> {
 				log.warn("POST:CREATE:NOT_FOUND_ROLE_BY_ROLE_TYPE");
 				return new EntityNotFoundException(ErrorCode.NOT_FOUND_ROLE);
 			});
-		MemberRole memberRole = new MemberRole(savedMember, assignableRole);
+		MemberRole memberRole = new MemberRole(member, assignableRole);
 		List<MemberRole> assignableMemberRoles = new ArrayList<>();
 		assignableMemberRoles.add(memberRole);
 		log.info("Role를 만드는데 성공했습니다.");

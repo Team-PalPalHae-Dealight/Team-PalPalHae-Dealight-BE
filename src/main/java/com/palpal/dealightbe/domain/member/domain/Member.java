@@ -55,7 +55,7 @@ public class Member extends BaseEntity {
 
 	private String image;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<MemberRole> memberRoles = new ArrayList<>();
 
 	@Builder
