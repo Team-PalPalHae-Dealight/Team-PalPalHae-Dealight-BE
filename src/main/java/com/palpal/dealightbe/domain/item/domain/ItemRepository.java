@@ -14,6 +14,8 @@ public interface ItemRepository extends JpaRepository<Item, Long>, ItemRepositor
 
 	Optional<Item> findByNameAndStoreId(String name, Long storeId);
 
+	void deleteAllByStoreId(Long storeId);
+
 	@Query(value =
 		"""
 			SELECT * 

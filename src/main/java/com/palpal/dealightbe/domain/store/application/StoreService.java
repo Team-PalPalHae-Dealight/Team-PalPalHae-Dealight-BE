@@ -14,6 +14,7 @@ import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.image.ImageService;
 import com.palpal.dealightbe.domain.image.application.dto.request.ImageUploadReq;
 import com.palpal.dealightbe.domain.image.application.dto.response.ImageRes;
+import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
@@ -26,6 +27,7 @@ import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusRe
 import com.palpal.dealightbe.domain.store.application.dto.response.StoresInfoSliceRes;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
+import com.palpal.dealightbe.domain.store.domain.StoreStatus;
 import com.palpal.dealightbe.global.ListSortType;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
@@ -44,6 +46,7 @@ public class StoreService {
 
 	private final StoreRepository storeRepository;
 	private final MemberRepository memberRepository;
+	private final ItemRepository itemRepository;
 	private final AddressService addressService;
 	private final ImageService imageService;
 
@@ -83,6 +86,8 @@ public class StoreService {
 		Store store = validateMemberAndStoreOwner(providerId, storeId);
 
 		store.updateStatus(storeStatus.storeStatus());
+
+		deleteClosedStoreItems(store);
 
 		return StoreStatusRes.from(store);
 	}
@@ -183,5 +188,11 @@ public class StoreService {
 		store.isSameOwnerAndTheRequester(member, store);
 
 		return store;
+	}
+
+	private void deleteClosedStoreItems(Store store) {
+		if (store.getStoreStatus() == StoreStatus.CLOSED) {
+			itemRepository.deleteAllByStoreId(store.getId());
+		}
 	}
 }
