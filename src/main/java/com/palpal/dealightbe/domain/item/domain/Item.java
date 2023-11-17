@@ -1,6 +1,8 @@
 package com.palpal.dealightbe.domain.item.domain;
 
-import static com.palpal.dealightbe.global.error.ErrorCode.*;
+import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_DISCOUNT_PRICE;
+import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_QUANTITY;
+import static com.palpal.dealightbe.global.error.ErrorCode.STORE_HAS_NO_ITEM;
 
 import javax.persistence.Column;
 

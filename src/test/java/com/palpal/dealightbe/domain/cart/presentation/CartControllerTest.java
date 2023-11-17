@@ -578,8 +578,8 @@ class CartControllerTest {
 	@Test
 	void updateFailureTest_notFoundCartItem() throws Exception {
 		//given
-		CartReq cartReq = new CartReq(1L, 0);
-		CartReq cartReq2 = new CartReq(2L, 100);
+		CartReq cartReq = new CartReq(1L, 2);
+		CartReq cartReq2 = new CartReq(2L, 3);
 
 		CartsReq cartsReq = new CartsReq(List.of(cartReq, cartReq2));
 
