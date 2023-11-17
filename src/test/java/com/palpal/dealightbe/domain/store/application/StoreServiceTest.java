@@ -436,31 +436,31 @@ class StoreServiceTest {
 		});
 	}
 
-	// @Test
-	// @DisplayName("업체 기본 검색 - 3km 근방 내 가까운순으로 나온다.")
-	// void searchByKeywordAndWithin3Km() throws Exception {
-	//
-	// 	//given
-	// 	double xCoordinate = 127.0221068;
-	// 	double yCoordinate = 37.5912999;
-	// 	String keyword = "떡볶이";
-	// 	Pageable pageable = PageRequest.of(0, 2);
-	//
-	// 	List<Store> stores = new ArrayList<>();
-	// 	stores.add(store);
-	// 	stores.add(store2);
-	//
-	// 	SliceImpl<Store> storeSlice = new SliceImpl<>(stores);
-	//
-	// 	when(storeRepository.findByDistanceWithin3Km(xCoordinate, yCoordinate, keyword, pageable))
-	// 		.thenReturn(storeSlice);
-	//
-	// 	//when
-	// 	StoresInfoSliceRes search = storeService.search(xCoordinate, yCoordinate, keyword, null, pageable);
-	//
-	// 	//then
-	// 	assertThat(search.storeInfoSliceRes().get(0).name()).isEqualTo(store.getName());
-	// }
+	@Test
+	@DisplayName("업체 기본 검색 - 3km 근방 내 가까운순으로 나온다.")
+	void searchByKeywordAndWithin3Km() throws Exception {
+
+		//given
+		double xCoordinate = 127.0221068;
+		double yCoordinate = 37.5912999;
+		String keyword = "떡볶이";
+		Pageable pageable = PageRequest.of(0, 2);
+
+		List<Store> stores = new ArrayList<>();
+		stores.add(store);
+		stores.add(store2);
+
+		SliceImpl<Store> storeSlice = new SliceImpl<>(stores);
+
+		when(storeRepository.findByDistanceWithin3Km(xCoordinate, yCoordinate, keyword, pageable))
+			.thenReturn(storeSlice);
+
+		//when
+		StoresInfoSliceRes search = storeService.search(xCoordinate, yCoordinate, keyword, "distance", pageable);
+
+		//then
+		assertThat(search.storeInfoSliceRes().get(0).name()).isEqualTo(store.getName());
+	}
 
 	@Test
 	@DisplayName("업체 필터 검색 - 마감 임박순")

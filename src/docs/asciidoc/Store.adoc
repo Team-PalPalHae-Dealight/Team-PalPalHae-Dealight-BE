@@ -123,7 +123,9 @@ include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/http
 include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/response-fields.adoc[]
 
 === 회원가입 한 고객의 업체 등록 유무 -> 업체 등록 O
+
 ==== GET - /api/stores/confirm
+
 .Request
 include::{snippets}/store/store-find-by-provider-id/http-request.adoc[]
 .Response
@@ -131,9 +133,66 @@ include::{snippets}/store/store-find-by-provider-id/http-response.adoc[]
 include::{snippets}/store/store-find-by-provider-id/response-fields.adoc[]
 
 === 회원가입 한 고객의 업체 등록 유무 -> 업체 등록 X
+
 ==== GET - /api/stores/confirm
+
 .Request
 include::{snippets}/store/store-customer-not-register-store/http-request.adoc[]
 .Response
 include::{snippets}/store/store-customer-not-register-store/http-response.adoc[]
 include::{snippets}/store/store-customer-not-register-store/response-fields.adoc[]
+
+=== 검색어로 업체 검색 (기본(거리순) - 정렬X)
+
+==== GET - /api/stores/search?x-Coordinate={xCoordinate}&y-Coordinate={yCoordinate}&keyword={keywords}&size={size}&page={page}
+
+.Request
+include::{snippets}/store/search-by-default-option/http-request.adoc[]
+include::{snippets}/store/search-by-default-option/request-parameters.adoc[]
+.Response
+include::{snippets}/store/search-by-default-option/http-response.adoc[]
+include::{snippets}/store/search-by-default-option/response-fields.adoc[]
+
+=== 검색어로 업체 검색 (거리순)
+
+==== GET - /api/stores/search?x-Coordinate={xCoordinate}&y-Coordinate={yCoordinate}&keyword={keywords}sort-by={sortBy}&size={size}&page={page}
+
+.Request
+include::{snippets}/store/search-by-distance/http-request.adoc[]
+include::{snippets}/store/search-by-distance/request-parameters.adoc[]
+.Response
+include::{snippets}/store/search-by-distance/http-response.adoc[]
+include::{snippets}/store/search-by-distance/response-fields.adoc[]
+
+=== 검색어로 업체 검색 (업체 마감 임박순)
+
+==== GET - /api/stores/search?x-Coordinate={xCoordinate}&y-Coordinate={yCoordinate}&keyword={keywords}sort-by={sortBy}&size={size}&page={page}
+
+.Request
+include::{snippets}/store/search-by-deadline/http-request.adoc[]
+include::{snippets}/store/search-by-deadline/request-parameters.adoc[]
+.Response
+include::{snippets}/store/search-by-deadline/http-response.adoc[]
+include::{snippets}/store/search-by-deadline/response-fields.adoc[]
+
+=== 검색어로 업체 검색 (상품 할인율순)
+
+==== GET - /api/stores/search?x-Coordinate={xCoordinate}&y-Coordinate={yCoordinate}&keyword={keywords}sort-by={sortBy}&size={size}&page={page}
+
+.Request
+include::{snippets}/store/search-by-discount-rate/http-request.adoc[]
+include::{snippets}/store/search-by-discount-rate/request-parameters.adoc[]
+.Response
+include::{snippets}/store/search-by-discount-rate/http-response.adoc[]
+include::{snippets}/store/search-by-discount-rate/response-fields.adoc[]
+
+=== 검색어로 업체 검색시 해당하는 업체X
+
+==== GET - /api/stores/search?x-Coordinate={xCoordinate}&y-Coordinate={yCoordinate}&keyword={keywords}sort-by={sortBy}&size={size}&page={page}
+
+.Request
+include::{snippets}/store/search-by-no-condition/http-request.adoc[]
+include::{snippets}/store/search-by-no-condition/request-parameters.adoc[]
+.Response
+include::{snippets}/store/search-by-no-condition/http-response.adoc[]
+include::{snippets}/store/search-by-no-condition/response-fields.adoc[]

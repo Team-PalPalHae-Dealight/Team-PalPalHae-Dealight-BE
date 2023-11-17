@@ -1,10 +1,11 @@
 package com.palpal.dealightbe.domain.store.application;
 
+import java.util.Collections;
 import java.util.Objects;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +26,7 @@ import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusRe
 import com.palpal.dealightbe.domain.store.application.dto.response.StoresInfoSliceRes;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
-import com.palpal.dealightbe.global.SearchSortType;
+import com.palpal.dealightbe.global.ListSortType;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
@@ -147,9 +148,9 @@ public class StoreService {
 
 	@Transactional(readOnly = true)
 	public StoresInfoSliceRes search(double xCoordinate, double yCoordinate, String keyword, String sortBy, Pageable pageable) {
-		Slice<Store> stores = Page.empty();
+		Slice<Store> stores = new SliceImpl<>(Collections.emptyList(), pageable, false);
 
-		SearchSortType sortType = SearchSortType.findSortType(sortBy);
+		ListSortType sortType = ListSortType.findSortType(sortBy);
 
 		switch (sortType) {
 			case DISTANCE:

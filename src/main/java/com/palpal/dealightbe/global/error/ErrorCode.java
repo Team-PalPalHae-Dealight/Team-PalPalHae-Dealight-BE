@@ -27,6 +27,7 @@ public enum ErrorCode {
 	NOT_FOUND_STORE("ST003", "업체가 존재하지 않습니다."),
 	NOT_MATCH_OWNER_AND_REQUESTER("ST004", "업체 소유자와 요청자가 일치하지 않습니다."),
 	NOT_FOUND_STATUS("ST005", "존재하지 않는 영업 상태 입니다."),
+	CLOSED_STORE("ST006", "영업이 종료된 업체입니다."),
 
 	//상품
 	INVALID_ITEM_DISCOUNT_PRICE("I001", "상품 할인가는 원가보다 클 수 없습니다."),
@@ -56,6 +57,8 @@ public enum ErrorCode {
 	INVALID_CART_QUANTITY("CT002", "상품 당 최소 1개에서 최대 재고 수량까지만 장바구니에 담을 수 있습니다."),
 	ANOTHER_STORE_ITEM_ALREADY_EXISTS_IN_THE_CART("CT003", "이미 다른 업체의 상품이 장바구니에 담겨 있습니다."),
 	INVALID_ATTEMPT_TO_ADD_OWN_STORE_ITEM_TO_CART("CT004", "본인이 등록한 업체의 상품은 장바구니에 담을 수 없습니다."),
+	EXCEEDED_CART_ITEM_SIZE("CT005", "최대 5가지 종류의 상품까지만 장바구니에 담을 수 있습니다."),
+	INVALID_CART_ADDITION_TYPE("CT006", "유효하지 않은 장바구니 담기 타입 입니다."),
 
 	//인증, 인가
 	ACCESS_DENIED("AUTH001", "사용자 인증에 실패했습니다."),
@@ -75,6 +78,12 @@ public enum ErrorCode {
 	INVALID_REVIEW_CREATOR("R002", "리뷰는 상품을 주문한 고객 본인만 작성할 수 있습니다."),
 	ILLEGAL_REVIEW_REQUEST("R003", "완료된 주문에 대해서만 리뷰를 작성할 수 있습니다."),
 	INVALID_REVIEW_MESSAGE("R004", "유효하지 않은 리뷰 메시지가 존재합니다."),
+
+	//알림
+	NOT_FOUND_NOTIFICATION("N001", "존재하지 않는 알림입니다."),
+
+	// SSE
+	SSE_STREAM_ERROR("SSE001", "SSE 스트림 연결 중 오류가 발생했습니다."),
 	;
 
 	private final String code;
