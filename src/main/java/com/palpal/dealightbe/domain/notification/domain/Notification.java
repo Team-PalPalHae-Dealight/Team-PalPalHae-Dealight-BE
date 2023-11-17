@@ -1,8 +1,6 @@
 package com.palpal.dealightbe.domain.notification.domain;
 
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,8 +14,6 @@ import com.palpal.dealightbe.domain.order.domain.Order;
 import com.palpal.dealightbe.domain.order.domain.OrderStatus;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.global.BaseEntity;
-import com.palpal.dealightbe.global.error.ErrorCode;
-import com.palpal.dealightbe.global.error.exception.BusinessException;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -46,17 +42,17 @@ public class Notification extends BaseEntity {
 	@JoinColumn(name = "order_id")
 	private Order order;
 
-	@Enumerated(EnumType.STRING)
-	private OrderStatus type;
+	// @Enumerated(EnumType.STRING)
+	private String content;
 
 	private boolean isRead = false;
 
 	@Builder
-	public Notification(Member member, Store store, Order order, OrderStatus type) {
+	public Notification(Member member, Store store, Order order, String content) {
 		this.member = member;
 		this.store = store;
 		this.order = order;
-		this.type = type;
+		this.content = content;
 	}
 
 	public void markAsRead() {
@@ -64,17 +60,6 @@ public class Notification extends BaseEntity {
 	}
 
 	public static String createMessage(OrderStatus orderStatus, Order order) {
-		switch (orderStatus) {
-			case RECEIVED:
-				return "새 주문이 도착했습니다: " + order.getId();
-			case CONFIRMED:
-				return "주문이 수락되었습니다: " + order.getId();
-			case COMPLETED:
-				return "주문이 완료되었습니다: " + order.getId();
-			case CANCELED:
-				return "주문이 취소되었습니다: " + order.getId();
-			default:
-				throw new BusinessException(ErrorCode.INVALID_ORDER_STATUS);
-		}
+		return orderStatus.createMessage(order.getId());
 	}
 }
