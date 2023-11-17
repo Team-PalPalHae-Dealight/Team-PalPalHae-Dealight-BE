@@ -230,11 +230,11 @@ public class Order extends BaseEntity {
 		Pair<String, String> inputSequence = Pair.of(originalStatus, changedStatus);
 
 		if (isMember(updater) && !orderStatusSequenceOfMember.contains(inputSequence)) {
-			log.warn("PATCH:UPDATE:MEMBER:CANNOT_CHANGE_STATUS:{} -> {}", originalStatus, changedStatus);
+			log.warn("PATCH:UPDATE:ORDER:CANNOT_CHANGE_STATUS(MEMBER):{} -> {}", originalStatus, changedStatus);
 			throw new BusinessException(INVALID_ORDER_STATUS);
 		}
 		if (isStoreOwner(updater) && !orderStatusSequenceOfStore.contains(inputSequence)) {
-			log.warn("PATCH:UPDATE:STORE:CANNOT_CHANGE_STATUS:{} -> {}", originalStatus, changedStatus);
+			log.warn("PATCH:UPDATE:ORDER:CANNOT_CHANGE_STATUS(STORE):{} -> {}", originalStatus, changedStatus);
 			throw new BusinessException(INVALID_ORDER_STATUS);
 		}
 	}
