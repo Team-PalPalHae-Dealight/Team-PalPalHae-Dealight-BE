@@ -57,7 +57,7 @@ public class NotificationService {
 	}
 
 	private void resendMissedEvents(Long id, String userType, String lastEventId, SseEmitter emitter) {
-		Map<String, Object> events = emitterRepository.findAllEventCacheStartWithId(userType + "_" + id);
+		Map<String, Notification> events = emitterRepository.findAllEventCacheStartWithId(userType + "_" + id);
 		events.entrySet().stream()
 			.filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
 			.forEach(entry -> sendEventToEmitter(emitter, entry.getKey(), entry.getValue()));
