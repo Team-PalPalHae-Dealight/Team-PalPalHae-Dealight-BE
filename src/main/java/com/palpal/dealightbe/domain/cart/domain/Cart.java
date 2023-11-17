@@ -1,6 +1,6 @@
 package com.palpal.dealightbe.domain.cart.domain;
 
-import static com.palpal.dealightbe.global.error.ErrorCode.*;
+import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_CART_QUANTITY;
 
 import lombok.AccessLevel;
 import lombok.Builder;
