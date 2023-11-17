@@ -13,3 +13,8 @@ services:
       TZ: "Asia/Seoul"
     networks:
       - dealight-network
+
+networks:
+  default:
+    external:
+      name: dealight-network
