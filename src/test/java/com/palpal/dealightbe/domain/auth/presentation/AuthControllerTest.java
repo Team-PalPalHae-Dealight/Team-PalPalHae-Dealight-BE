@@ -170,7 +170,7 @@ class AuthControllerTest {
 					.isInstanceOf(MissingServletRequestParameterException.class))
 				.andDo(print())
 				.andDo(document(
-					"auth/auth/auth-null-authorization-code-fail",
+					"auth/auth-null-authorization-code-fail",
 					preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
 					requestParameters(
