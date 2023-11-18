@@ -373,7 +373,7 @@ class ItemControllerTest {
 	@Test
 	public void itemCreateFailureTest_duplicatedItemName() throws Exception {
 		//given
-		ItemReq itemReq = new ItemReq("떡볶이", 2, 4500, 4000, "기본 떡볶이 입니다.", "통신사 할인 불가능 합니다.");
+		ItemReq itemReq = new ItemReq("떡볶이", 2, 4000, 4500, "기본 떡볶이 입니다.", "통신사 할인 불가능 합니다.");
 
 		MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "file".getBytes());
 		MockMultipartFile request = new MockMultipartFile("itemReq", "itemReq",

@@ -207,7 +207,7 @@ class CartControllerTest {
 					fieldWithPath("quantity").type(NUMBER).description("장바구니에 담은 개수"),
 					fieldWithPath("storeName").type(STRING).description("상호명"),
 					fieldWithPath("storeCloseTime").type(STRING).description("마감 시간"),
-					fieldWithPath("expirationDateTime").type(STRING).description("장바구니 만료 시간")
+					fieldWithPath("expirationDateTime").type(STRING).description("장바구니 만료 시점")
 				)
 			));
 	}
@@ -464,7 +464,7 @@ class CartControllerTest {
 					fieldWithPath("carts[0].quantity").type(NUMBER).description("장바구니에 담은 개수"),
 					fieldWithPath("carts[0].storeName").type(STRING).description("상호명"),
 					fieldWithPath("carts[0].storeCloseTime").type(STRING).description("마감 시간"),
-					fieldWithPath("carts[0].expirationDateTime").type(STRING).description("장바구니 만료 시간")
+					fieldWithPath("carts[0].expirationDateTime").type(STRING).description("장바구니 만료 시점")
 				)
 			));
 	}
@@ -527,7 +527,7 @@ class CartControllerTest {
 					fieldWithPath("carts[0].quantity").type(NUMBER).description("장바구니에 담은 개수"),
 					fieldWithPath("carts[0].storeName").type(STRING).description("상호명"),
 					fieldWithPath("carts[0].storeCloseTime").type(STRING).description("마감 시간"),
-					fieldWithPath("carts[0].expirationDateTime").type(STRING).description("장바구니 만료 시간")
+					fieldWithPath("carts[0].expirationDateTime").type(STRING).description("장바구니 만료 시점")
 				)
 			));
 	}

@@ -205,6 +205,7 @@ include::{snippets}/item/item-update/request-part-itemReq-fields.adoc[]
 .Response - 성공
 include::{snippets}/item/item-update/http-response.adoc[]
 
+.response fields
 include::{snippets}/item/item-update/response-fields.adoc[]
 
 ---
