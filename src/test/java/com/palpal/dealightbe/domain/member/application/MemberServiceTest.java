@@ -8,6 +8,8 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -29,6 +31,9 @@ import com.palpal.dealightbe.domain.member.application.dto.response.MemberProfil
 import com.palpal.dealightbe.domain.member.application.dto.response.MemberUpdateRes;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
+import com.palpal.dealightbe.domain.member.domain.MemberRole;
+import com.palpal.dealightbe.domain.member.domain.Role;
+import com.palpal.dealightbe.domain.member.domain.RoleType;
 import com.palpal.dealightbe.domain.store.application.StoreService;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
@@ -57,11 +62,24 @@ class MemberServiceTest {
 			.yCoordinate(126.9780)
 			.build();
 
+		Role roleMember = Role.builder()
+			.id(1L)
+			.type(RoleType.ROLE_MEMBER)
+			.build();
+
+		MemberRole memberRole = new MemberRole(null, roleMember);
+
+		List<MemberRole> memberRoles = new ArrayList<>();
+		memberRoles.add(memberRole);
+
 		Member mockMember = Member.builder()
 			.realName("유재석")
 			.nickName("유산슬")
 			.phoneNumber("01012345678")
+			.memberRoles(memberRoles)
 			.build();
+
+		memberRole.updateMember(mockMember);
 
 		mockMember.updateAddress(mockAddress);
 
