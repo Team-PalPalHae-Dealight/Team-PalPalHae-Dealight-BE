@@ -72,7 +72,7 @@ public class AuthController {
 	}
 
 	@ProviderId
-	@PatchMapping("/role/store")
+	@PatchMapping("/role")
 	public ResponseEntity<MemberAuthRes> updateMemberRoleToStore(Long providerId) {
 		MemberAuthRes memberAuthRes = authService.updateMemberRoleToStore(providerId);
 

@@ -635,7 +635,7 @@ class AuthControllerTest {
 	@DisplayName("<권한변경>")
 	class changeRoleMemberToStore {
 
-		String changeRoleApiPath = "/api/auth/role/store";
+		String changeRoleApiPath = "/api/auth/role";
 
 		@DisplayName("ROLE_MEMBER를 ROLE_STORE로 변경")
 		@Test
