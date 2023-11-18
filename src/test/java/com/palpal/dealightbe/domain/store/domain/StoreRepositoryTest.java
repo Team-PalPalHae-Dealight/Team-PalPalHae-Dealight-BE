@@ -223,7 +223,7 @@ public class StoreRepositoryTest {
 		//then
 		assertThat(stores).isNotNull();
 		assertThat(stores).hasSize(2);
-		assertThat(stores.getContent().get(0).getName()).isEqualTo(store.getName());
+		assertThat(stores.getContent().get(0).getName()).isEqualTo(store2.getName());
 	}
 
 	@Test

@@ -108,7 +108,7 @@ public class Member extends BaseEntity {
 	}
 
 	public boolean hasSameImage(String imageUrl) {
-		return this.image.equals(imageUrl);
+		return this.image != null && this.image.equals(imageUrl);
 	}
 
 	@Override

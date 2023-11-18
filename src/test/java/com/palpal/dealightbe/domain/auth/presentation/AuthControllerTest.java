@@ -630,4 +630,55 @@ class AuthControllerTest {
 				));
 		}
 	}
+
+	@Nested
+	@DisplayName("<권한변경>")
+	class changeRoleMemberToStore {
+
+		String changeRoleApiPath = "/api/auth/role/store";
+
+		@DisplayName("ROLE_MEMBER를 ROLE_STORE로 변경")
+		@Test
+		void changeRoleSuccess() throws Exception {
+			// given
+			Long providerId = 12345L;
+			String accessToken = "ACCESS_TOKEN";
+			String refreshToken = "REFRESH_TOKEN";
+			MemberAuthRes memberAuthRes = new MemberAuthRes(providerId, "store", accessToken, refreshToken);
+
+			given(authService.updateMemberRoleToStore(any()))
+				.willReturn(memberAuthRes);
+
+			// when -> then
+			mockMvc.perform(patch(changeRoleApiPath)
+					.header("Authorization", "Bearer {ACCESS_TOKEN}")
+					.with(csrf())
+					.with(user("user").roles("MEMBER"))
+				)
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.userId").value(providerId))
+				.andExpect(jsonPath("$.role").value("store"))
+				.andExpect(jsonPath("$.accessToken").value(accessToken))
+				.andExpect(jsonPath("$.refreshToken").value(refreshToken))
+				.andDo(document(
+					"auth/auth-change-role-success",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestHeaders(
+						headerWithName("Authorization").description("Access Token")
+					),
+					responseFields(
+						fieldWithPath("userId").type(JsonFieldType.NUMBER)
+							.description("회원의 ID"),
+						fieldWithPath("role").type(JsonFieldType.STRING)
+							.description("변경된 회원의 Role"),
+						fieldWithPath("accessToken").type(JsonFieldType.STRING)
+							.description("Access Token"),
+						fieldWithPath("refreshToken").type(JsonFieldType.STRING)
+							.description("Refresh Token")
+					)
+				));
+		}
+	}
 }

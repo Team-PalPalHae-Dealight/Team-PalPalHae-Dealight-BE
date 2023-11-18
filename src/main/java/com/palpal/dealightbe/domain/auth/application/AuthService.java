@@ -98,20 +98,16 @@ public class AuthService {
 		log.info("사용자(ProviderId:{})의 회원탈퇴를 진행합니다...", providerId);
 
 		Member member = findMemberByProviderId(providerId);
-
 		log.info("사용자({})를 조회하는데 성공했습니다.", member);
 
 		if (!member.hasSameImage(MEMBER_DEFAULT_IMAGE_PATH)) {
 			String memberImage = member.getImage();
 			log.info("사용자(ProviderId:{})의 이미지({})를 삭제합니다...", providerId, memberImage);
-
 			imageService.delete(memberImage);
-
 			log.info("이미지 삭제에 성공했습니다.");
 		}
 
 		log.info("사용자(ProviderId:{})의 정보를 삭제합니다...", providerId);
-
 		memberRepository.delete(member);
 
 		log.info("회원탈퇴에 성공했습니다.");
