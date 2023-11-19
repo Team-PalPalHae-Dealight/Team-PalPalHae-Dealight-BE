@@ -1,14 +1,9 @@
-ifndef::snippets[]
-:snippets: ../../../build/generated-snippets
-endif::[]
-
 = REST Docs 상품 API
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs
 :toc: left
 :toclevels: 2
-:sectlinks:
 
 [[User-API]]
 == Item API
