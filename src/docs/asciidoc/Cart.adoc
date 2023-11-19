@@ -1,14 +1,9 @@
-ifndef::snippets[]
-:snippets: ../../../build/generated-snippets
-endif::[]
-
 = REST Docs 장바구니 API
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs
 :toc: left
 :toclevels: 2
-:sectlinks:
 
 [[User-API]]
 == Cart API
