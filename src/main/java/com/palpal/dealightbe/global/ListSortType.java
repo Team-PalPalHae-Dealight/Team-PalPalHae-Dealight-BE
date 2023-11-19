@@ -1,16 +1,19 @@
 package com.palpal.dealightbe.global;
 
 import java.util.Arrays;
-import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-public enum SearchSortType {
+@AllArgsConstructor
+public enum ListSortType {
 	DEADLINE("deadline"),
 	DISCOUNT_RATE("discount-rate"),
 	DISTANCE("distance"),
@@ -18,15 +21,17 @@ public enum SearchSortType {
 
 	private final String type;
 
-	SearchSortType(String type) {
-		this.type = type;
+	@JsonValue
+	public String getType() {
+		return type;
 	}
 
-	public static SearchSortType findSortType(String sortType) {
+	@JsonCreator
+	public static ListSortType findSortType(String sortType) {
 
-		return Arrays.stream(SearchSortType.values())
-			.filter(searchSortType -> Objects.equals(searchSortType.type, sortType))
-			.findAny()
+		return Arrays.stream(ListSortType.values())
+			.filter(listSortType -> listSortType.type.equalsIgnoreCase(sortType) || listSortType.toString().equalsIgnoreCase(sortType))
+			.findFirst()
 			.orElseThrow(() -> {
 				log.error("INVALID_SEARCH_SORT_TYPE : {}", sortType);
 				return new BusinessException(ErrorCode.INVALID_SEARCH_SORT_TYPE);

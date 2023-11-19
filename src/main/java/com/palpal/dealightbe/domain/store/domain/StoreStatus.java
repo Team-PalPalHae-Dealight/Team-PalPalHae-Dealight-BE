@@ -1,5 +1,7 @@
 package com.palpal.dealightbe.domain.store.domain;
 
+import java.util.Arrays;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.palpal.dealightbe.global.error.ErrorCode;
@@ -23,12 +25,12 @@ public enum StoreStatus {
 
 	@JsonCreator
 	public static StoreStatus fromString(String text) {
-		for (StoreStatus status : StoreStatus.values()) {
-			if (status.name.equalsIgnoreCase(text) || status.toString().equalsIgnoreCase(text)) {
-				return status;
-			}
-		}
-		log.warn("PATCH:UPDATE:NOT_FOUND_STORE_STATUS : {}", text);
-		throw new BusinessException(ErrorCode.NOT_FOUND_STATUS);
+		return Arrays.stream(StoreStatus.values())
+			.filter(status -> status.name.equalsIgnoreCase(text) || status.toString().equalsIgnoreCase(text))
+			.findFirst()
+			.orElseGet(() -> {
+				log.warn("PATCH:UPDATE:NOT_FOUND_STORE_STATUS : {}", text);
+				throw new BusinessException(ErrorCode.NOT_FOUND_STATUS);
+			});
 	}
 }
