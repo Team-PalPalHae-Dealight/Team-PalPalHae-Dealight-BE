@@ -16,7 +16,7 @@
 - check (장바구니에 타 업체 상품 존재 시 에러 메시지 반환)
 - clear (장바구니에 타 업체 상품 존재 시 초기화 후 담기)
 
-.Request - 성공
+.Request Success - 성공
 include::{snippets}/cart/cart-add-item/http-request.adoc[]
 
 .request header
@@ -25,7 +25,7 @@ include::{snippets}/cart/cart-add-item/request-headers.adoc[]
 .request parameter
 include::{snippets}/cart/cart-add-item/request-parameters.adoc[]
 
-.Response - 성공
+.Response Success - 성공
 include::{snippets}/cart/cart-add-item/http-response.adoc[]
 
 .response fields
@@ -122,13 +122,13 @@ include::{snippets}/cart/cart-add-item-item-not-found/response-fields.adoc[]
 
 ==== /api/carts
 
-.Request - 성공
+.Request Success - 성공
 include::{snippets}/cart/cart-find-all-by-provider-id/http-request.adoc[]
 
 .request header
 include::{snippets}/cart/cart-find-all-by-provider-id/request-headers.adoc[]
 
-.Response - 성공
+.Response Success - 성공
 include::{snippets}/cart/cart-find-all-by-provider-id/http-response.adoc[]
 
 .response fields
@@ -140,7 +140,7 @@ include::{snippets}/cart/cart-find-all-by-provider-id/response-fields.adoc[]
 
 ==== /api/carts
 
-.Request - 성공
+.Request Success - 성공
 include::{snippets}/cart/cart-update/http-request.adoc[]
 
 .request header
@@ -149,7 +149,7 @@ include::{snippets}/cart/cart-update/request-headers.adoc[]
 .request fields
 include::{snippets}/cart/cart-update/request-fields.adoc[]
 
-.Response - 성공
+.Response Success - 성공
 include::{snippets}/cart/cart-update/http-response.adoc[]
 
 .response fields
@@ -195,7 +195,7 @@ include::{snippets}/cart/cart-update-not-found-cart-item/response-fields.adoc[]
 
 ==== /api/carts/items?id={itemId}
 
-.Request - 성공
+.Request Success - 성공
 include::{snippets}/cart/cart-delete-one/http-request.adoc[]
 
 .request header
@@ -204,7 +204,7 @@ include::{snippets}/cart/cart-delete-one/request-headers.adoc[]
 .path parameter
 include::{snippets}/cart/cart-delete-one/request-parameters.adoc[]
 
-.Response - 성공
+.Response Success - 성공
 include::{snippets}/cart/cart-delete-one/http-response.adoc[]
 
 ---
@@ -227,13 +227,13 @@ include::{snippets}/cart/cart-delete-one-not-found-cart-item/response-fields.ado
 
 ==== /api/carts
 
-.Request - 성공
+.Request Success - 성공
 include::{snippets}/cart/cart-delete-all/http-request.adoc[]
 
 .request header
 include::{snippets}/cart/cart-delete-all/request-headers.adoc[]
 
-.Response - 성공
+.Response Success - 성공
 include::{snippets}/cart/cart-delete-all/http-response.adoc[]
 
 ---
