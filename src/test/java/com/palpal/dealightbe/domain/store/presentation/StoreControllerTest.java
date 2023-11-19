@@ -577,7 +577,7 @@ class StoreControllerTest {
 		StoresInfoSliceRes storesInfoSliceRes = new StoresInfoSliceRes(
 			List.of(store1, store2), false);
 
-		when(storeService.search(anyDouble(), anyDouble(), any(), any(), any()))
+		when(storeService.search(anyDouble(), anyDouble(), any(), any(), any(), any()))
 			.thenReturn(storesInfoSliceRes);
 
 		//when -> then
@@ -628,7 +628,7 @@ class StoreControllerTest {
 		StoresInfoSliceRes storesInfoSliceRes = new StoresInfoSliceRes(
 			List.of(store1, store2), false);
 
-		when(storeService.search(anyDouble(), anyDouble(), eq(keyword), eq(sortBy), eq(pageable)))
+		when(storeService.search(anyDouble(), anyDouble(), eq(keyword), eq(sortBy), any(), eq(pageable)))
 			.thenReturn(storesInfoSliceRes);
 
 		//when -> then
@@ -681,7 +681,7 @@ class StoreControllerTest {
 		StoresInfoSliceRes storesInfoSliceRes = new StoresInfoSliceRes(
 			List.of(store2, store1), false);
 
-		when(storeService.search(anyDouble(), anyDouble(), any(), any(), any()))
+		when(storeService.search(anyDouble(), anyDouble(), any(), any(), any(), any()))
 			.thenReturn(storesInfoSliceRes);
 
 		//when -> then
@@ -734,7 +734,7 @@ class StoreControllerTest {
 		StoresInfoSliceRes storesInfoSliceRes = new StoresInfoSliceRes(
 			List.of(store2, store1), false);
 
-		when(storeService.search(anyDouble(), anyDouble(), any(), any(), any()))
+		when(storeService.search(anyDouble(), anyDouble(), any(), any(), any(), any()))
 			.thenReturn(storesInfoSliceRes);
 
 		//when -> then
@@ -784,7 +784,7 @@ class StoreControllerTest {
 
 		StoresInfoSliceRes storesInfoSliceRes = new StoresInfoSliceRes(List.of(), false);
 
-		when(storeService.search(anyDouble(), anyDouble(), any(), any(), any()))
+		when(storeService.search(anyDouble(), anyDouble(), any(), any(), any(), any()))
 			.thenReturn(storesInfoSliceRes);
 
 		//when -> then

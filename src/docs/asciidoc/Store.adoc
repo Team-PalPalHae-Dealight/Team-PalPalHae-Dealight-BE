@@ -144,7 +144,7 @@ include::{snippets}/store/store-customer-not-register-store/response-fields.adoc
 
 === 검색어로 업체 검색 (기본(거리순) - 정렬X)
 
-==== GET - /api/stores/search?x-Coordinate={xCoordinate}&y-Coordinate={yCoordinate}&keyword={keywords}&size={size}&page={page}
+==== GET - /api/stores/search?x-coordinate={xCoordinate}&y-Coordinate={yCoordinate}&keyword={keywords}&size={size}&page={page}
 
 .Request
 include::{snippets}/store/search-by-default-option/http-request.adoc[]
@@ -155,7 +155,7 @@ include::{snippets}/store/search-by-default-option/response-fields.adoc[]
 
 === 검색어로 업체 검색 (거리순)
 
-==== GET - /api/stores/search?x-Coordinate={xCoordinate}&y-Coordinate={yCoordinate}&keyword={keywords}sort-by={sortBy}&size={size}&page={page}
+==== GET - /api/stores/search?x-coordinate={xcoordinate}&y-coordinate={yCoordinate}&keyword={keywords}sort-by={sortBy}&size={size}&page={page}
 
 .Request
 include::{snippets}/store/search-by-distance/http-request.adoc[]
@@ -166,7 +166,7 @@ include::{snippets}/store/search-by-distance/response-fields.adoc[]
 
 === 검색어로 업체 검색 (업체 마감 임박순)
 
-==== GET - /api/stores/search?x-Coordinate={xCoordinate}&y-Coordinate={yCoordinate}&keyword={keywords}sort-by={sortBy}&size={size}&page={page}
+==== GET - /api/stores/search?x-coordinate={xcoordinate}&y-coordinate={yCoordinate}&keyword={keywords}sort-by={sortBy}&size={size}&page={page}
 
 .Request
 include::{snippets}/store/search-by-deadline/http-request.adoc[]
@@ -177,7 +177,7 @@ include::{snippets}/store/search-by-deadline/response-fields.adoc[]
 
 === 검색어로 업체 검색 (상품 할인율순)
 
-==== GET - /api/stores/search?x-Coordinate={xCoordinate}&y-Coordinate={yCoordinate}&keyword={keywords}sort-by={sortBy}&size={size}&page={page}
+==== GET - /api/stores/search?x-coordinate={xCoordinate}&y-coordinate={yCoordinate}&keyword={keywords}sort-by={sortBy}&size={size}&page={page}
 
 .Request
 include::{snippets}/store/search-by-discount-rate/http-request.adoc[]
@@ -188,7 +188,7 @@ include::{snippets}/store/search-by-discount-rate/response-fields.adoc[]
 
 === 검색어로 업체 검색시 해당하는 업체X
 
-==== GET - /api/stores/search?x-Coordinate={xCoordinate}&y-Coordinate={yCoordinate}&keyword={keywords}sort-by={sortBy}&size={size}&page={page}
+==== GET - /api/stores/search?x-coordinate={xCoordinate}&y-coordinate={yCoordinate}&keyword={keywords}sort-by={sortBy}&size={size}&page={page}
 
 .Request
 include::{snippets}/store/search-by-no-condition/http-request.adoc[]
