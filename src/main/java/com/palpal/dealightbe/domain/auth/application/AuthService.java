@@ -141,11 +141,7 @@ public class AuthService {
 	}
 
 	public MemberAuthRes updateMemberRoleToStore(Long providerId) {
-		Member member = memberRepository.findMemberByProviderId(providerId)
-			.orElseThrow(() -> {
-				log.warn("READ:NOT_FOUND_MEMBER_BY_PROVIDER_ID : {}", providerId);
-				return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
-			});
+		Member member = findMemberByProviderId(providerId);
 
 		List<MemberRole> assignableMemberRoles = createMemberRoles(RoleType.ROLE_STORE, member);
 		List<MemberRole> savedMemberRoles = memberRoleRepository.saveAll(assignableMemberRoles);
