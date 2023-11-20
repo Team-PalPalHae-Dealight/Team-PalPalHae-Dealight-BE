@@ -117,7 +117,7 @@ class AuthControllerTest {
 				.andExpect(status().isBadRequest())
 				.andDo(print())
 				.andDo(document(
-					"auth/auth-duplicate-nickName-check-fail",
+					"auth/auth-duplicate-nickName-check-fail-already-exist",
 					preprocessRequest(prettyPrint()),
 					responseFields(
 						fieldWithPath("timestamp").type(STRING).description("예외 시간"),
@@ -146,7 +146,7 @@ class AuthControllerTest {
 				.andExpect(status().isBadRequest())
 				.andDo(print())
 				.andDo(document(
-					"auth/auth-duplicate-nickName-check-fail",
+					"auth/auth-duplicate-nickName-check-fail-not-valid-form",
 					preprocessRequest(prettyPrint()),
 					responseFields(
 						fieldWithPath("timestamp").type(STRING).description("예외 시간"),
