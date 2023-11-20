@@ -4,12 +4,16 @@ import static com.palpal.dealightbe.global.error.ErrorCode.DUPLICATED_ITEM_NAME;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_DISCOUNT_PRICE;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.STORE_HAS_NO_ITEM;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
@@ -339,7 +343,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.message").value("상품 할인가는 원가보다 클 수 없습니다."))
 			.andDo(print())
 			.andDo(document("item/item-create-fail-invalid-discount-price",
-				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestHeaders(
 					headerWithName("Authorization").description("Access Token")
@@ -369,7 +373,7 @@ class ItemControllerTest {
 	@Test
 	public void itemCreateFailureTest_duplicatedItemName() throws Exception {
 		//given
-		ItemReq itemReq = new ItemReq("떡볶이", 2, 4500, 4000, "기본 떡볶이 입니다.", "통신사 할인 불가능 합니다.");
+		ItemReq itemReq = new ItemReq("떡볶이", 2, 4000, 4500, "기본 떡볶이 입니다.", "통신사 할인 불가능 합니다.");
 
 		MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "file".getBytes());
 		MockMultipartFile request = new MockMultipartFile("itemReq", "itemReq",
@@ -591,7 +595,7 @@ class ItemControllerTest {
 			));
 	}
 
-	@DisplayName("상품 목록 조회(고객 시점) - 마감순 성공 테스트")
+	@DisplayName("상품 목록 조회(고객 시점)")
 	@Test
 	public void itemFindAllForMemberSuccessSortByDeadlineTest() throws Exception {
 		//given
@@ -641,176 +645,13 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.items[0].storeAddress.yCoordinate").value(addressRes.yCoordinate()))
 			.andExpect(jsonPath("$.hasNext").value(hasNext))
 			.andDo(print())
-			.andDo(document("item/item-find-all-for-member-sort-by-deadline",
+			.andDo(document("item/item-find-all-for-member",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestParameters(
 					List.of(parameterWithName("x-coordinate").description("경도"),
 						parameterWithName("y-coordinate").description("위도"),
-						parameterWithName("sort-by").description("정렬 기준(마감순) : deadline"),
-						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
-						parameterWithName("page").description("페이지 번호")
-					)),
-				responseFields(
-					fieldWithPath("items").type(ARRAY).description("상품 목록"),
-					fieldWithPath("items[0].itemId").type(NUMBER).description("상품 ID"),
-					fieldWithPath("items[0].storeId").type(NUMBER).description("업체 ID"),
-					fieldWithPath("items[0].itemName").description("상품 이름"),
-					fieldWithPath("items[0].stock").type(NUMBER).description("재고 수"),
-					fieldWithPath("items[0].discountPrice").type(NUMBER).description("할인가"),
-					fieldWithPath("items[0].originalPrice").type(NUMBER).description("원가"),
-					fieldWithPath("items[0].description").type(STRING).description("상세 설명"),
-					fieldWithPath("items[0].information").type(STRING).description("안내 사항"),
-					fieldWithPath("items[0].image").type(STRING).description("상품 이미지 경로"),
-					fieldWithPath("items[0].storeName").type(STRING).description("상호명"),
-					fieldWithPath("items[0].storeOpenTime").type(STRING).description("오픈 시간"),
-					fieldWithPath("items[0].storeCloseTime").type(STRING).description("마감 시간"),
-					fieldWithPath("items[0].storeAddress.name").type(STRING).description("업체 주소"),
-					fieldWithPath("items[0].storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
-					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도"),
-					fieldWithPath("hasNext").type(BOOLEAN).description("다음 데이터 존재 여부")
-				)
-			));
-	}
-
-	@DisplayName("상품 목록 조회(고객 시점) - 할인율순 성공 테스트")
-	@Test
-	public void itemFindAllForMemberSuccessSortByDiscountRateTest() throws Exception {
-		//given
-		double xCoordinate = 127.0221068;
-		double yCoordinate = 37.5912999;
-		String sortBy = "discount-rate";
-
-		int size = 5;
-		int page = 0;
-		PageRequest pageRequest = PageRequest.of(page, size);
-
-		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
-		AddressRes addressRes2 = new AddressRes(address2.getName(), address2.getXCoordinate(), address2.getYCoordinate());
-
-		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), item.getStore().getName(), item.getStore().getOpenTime(), item.getStore().getCloseTime(), addressRes);
-		ItemRes itemRes2 = new ItemRes(2L, 2L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage(), item2.getStore().getName(), item2.getStore().getOpenTime(), item2.getStore().getCloseTime(), addressRes2);
-		List<ItemRes> itemResList = List.of(itemRes, itemRes2);
-		boolean hasNext = false;
-		ItemsRes itemsRes = new ItemsRes(itemResList, hasNext);
-
-		when(itemService.findAllForMember(anyDouble(), anyDouble(), eq(sortBy), eq(pageRequest))).thenReturn(itemsRes);
-
-		//when
-		//then
-		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/items/members")
-				.contentType(MediaType.APPLICATION_JSON)
-				.param("x-coordinate", String.valueOf(xCoordinate))
-				.param("y-coordinate", String.valueOf(yCoordinate))
-				.param("sort-by", sortBy)
-				.param("size", String.valueOf(size))
-				.param("page", String.valueOf(1)))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.items[0].itemId").value(itemRes.itemId()))
-			.andExpect(jsonPath("$.items[0].storeId").value(itemRes.storeId()))
-			.andExpect(jsonPath("$.items[0].itemName").value(itemRes.itemName()))
-			.andExpect(jsonPath("$.items[0].stock").value(itemRes.stock()))
-			.andExpect(jsonPath("$.items[0].discountPrice").value(itemRes.discountPrice()))
-			.andExpect(jsonPath("$.items[0].originalPrice").value(itemRes.originalPrice()))
-			.andExpect(jsonPath("$.items[0].description").value(itemRes.description()))
-			.andExpect(jsonPath("$.items[0].information").value(itemRes.information()))
-			.andExpect(jsonPath("$.items[0].image").value(itemRes.image()))
-			.andExpect(jsonPath("$.items[0].storeName").value(itemRes.storeName()))
-			.andExpect(jsonPath("$.items[0].storeOpenTime").value(itemRes.storeOpenTime().toString()))
-			.andExpect(jsonPath("$.items[0].storeCloseTime").value(itemRes.storeCloseTime().toString()))
-			.andExpect(jsonPath("$.items[0].storeAddress.name").value(addressRes.name()))
-			.andExpect(jsonPath("$.items[0].storeAddress.xCoordinate").value(addressRes.xCoordinate()))
-			.andExpect(jsonPath("$.items[0].storeAddress.yCoordinate").value(addressRes.yCoordinate()))
-			.andExpect(jsonPath("$.hasNext").value(hasNext))
-			.andDo(print())
-			.andDo(document("item/item-find-all-for-member-sort-by-discount-rate",
-				preprocessRequest(prettyPrint()),
-				preprocessResponse(prettyPrint()),
-				requestParameters(
-					List.of(parameterWithName("x-coordinate").description("경도"),
-						parameterWithName("y-coordinate").description("위도"),
-						parameterWithName("sort-by").description("정렬 기준(할인율순) : discount-rate"),
-						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
-						parameterWithName("page").description("페이지 번호")
-					)),
-				responseFields(
-					fieldWithPath("items").type(ARRAY).description("상품 목록"),
-					fieldWithPath("items[0].itemId").type(NUMBER).description("상품 ID"),
-					fieldWithPath("items[0].storeId").type(NUMBER).description("업체 ID"),
-					fieldWithPath("items[0].itemName").description("상품 이름"),
-					fieldWithPath("items[0].stock").type(NUMBER).description("재고 수"),
-					fieldWithPath("items[0].discountPrice").type(NUMBER).description("할인가"),
-					fieldWithPath("items[0].originalPrice").type(NUMBER).description("원가"),
-					fieldWithPath("items[0].description").type(STRING).description("상세 설명"),
-					fieldWithPath("items[0].information").type(STRING).description("안내 사항"),
-					fieldWithPath("items[0].image").type(STRING).description("상품 이미지 경로"),
-					fieldWithPath("items[0].storeName").type(STRING).description("상호명"),
-					fieldWithPath("items[0].storeOpenTime").type(STRING).description("오픈 시간"),
-					fieldWithPath("items[0].storeCloseTime").type(STRING).description("마감 시간"),
-					fieldWithPath("items[0].storeAddress.name").type(STRING).description("업체 주소"),
-					fieldWithPath("items[0].storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
-					fieldWithPath("items[0].storeAddress.yCoordinate").type(NUMBER).description("업체 주소 위도"),
-					fieldWithPath("hasNext").type(BOOLEAN).description("다음 데이터 존재 여부")
-				)
-			));
-	}
-
-	@DisplayName("상품 목록 조회(고객 시점) - 거리순 성공 테스트")
-	@Test
-	public void itemFindAllForMemberSuccessSortByDistanceRateTest() throws Exception {
-		//given
-		double xCoordinate = 127.0221068;
-		double yCoordinate = 37.5912999;
-		String sortBy = "distance";
-
-		int size = 5;
-		int page = 0;
-		PageRequest pageRequest = PageRequest.of(page, size);
-
-		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
-		AddressRes addressRes2 = new AddressRes(address2.getName(), address2.getXCoordinate(), address2.getYCoordinate());
-
-		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), item.getStore().getName(), item.getStore().getOpenTime(), item.getStore().getCloseTime(), addressRes);
-		ItemRes itemRes2 = new ItemRes(2L, 2L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage(), item2.getName(), item2.getStore().getOpenTime(), item2.getStore().getCloseTime(), addressRes2);
-		List<ItemRes> itemResList = List.of(itemRes, itemRes2);
-		boolean hasNext = false;
-		ItemsRes itemsRes = new ItemsRes(itemResList, hasNext);
-
-		when(itemService.findAllForMember(anyDouble(), anyDouble(), eq(sortBy), eq(pageRequest))).thenReturn(itemsRes);
-
-		//when
-		//then
-		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/items/members")
-				.contentType(MediaType.APPLICATION_JSON)
-				.param("x-coordinate", String.valueOf(xCoordinate))
-				.param("y-coordinate", String.valueOf(yCoordinate))
-				.param("sort-by", sortBy)
-				.param("size", String.valueOf(size))
-				.param("page", String.valueOf(1)))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.items[0].itemId").value(itemRes.itemId()))
-			.andExpect(jsonPath("$.items[0].storeId").value(itemRes.storeId()))
-			.andExpect(jsonPath("$.items[0].itemName").value(itemRes.itemName()))
-			.andExpect(jsonPath("$.items[0].stock").value(itemRes.stock()))
-			.andExpect(jsonPath("$.items[0].discountPrice").value(itemRes.discountPrice()))
-			.andExpect(jsonPath("$.items[0].originalPrice").value(itemRes.originalPrice()))
-			.andExpect(jsonPath("$.items[0].description").value(itemRes.description()))
-			.andExpect(jsonPath("$.items[0].information").value(itemRes.information()))
-			.andExpect(jsonPath("$.items[0].image").value(itemRes.image()))
-			.andExpect(jsonPath("$.items[0].storeName").value(itemRes.storeName()))
-			.andExpect(jsonPath("$.items[0].storeOpenTime").value(itemRes.storeOpenTime().toString()))
-			.andExpect(jsonPath("$.items[0].storeCloseTime").value(itemRes.storeCloseTime().toString()))
-			.andExpect(jsonPath("$.items[0].storeAddress.name").value(addressRes.name()))
-			.andExpect(jsonPath("$.items[0].storeAddress.xCoordinate").value(addressRes.xCoordinate()))
-			.andExpect(jsonPath("$.items[0].storeAddress.yCoordinate").value(addressRes.yCoordinate()))
-			.andDo(print())
-			.andDo(document("item/item-find-all-for-member-sort-by-distance",
-				preprocessRequest(prettyPrint()),
-				preprocessResponse(prettyPrint()),
-				requestParameters(
-					List.of(parameterWithName("x-coordinate").description("경도"),
-						parameterWithName("y-coordinate").description("위도"),
-						parameterWithName("sort-by").description("정렬 기준(거리순) : distance"),
+						parameterWithName("sort-by").description("정렬 기준"),
 						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),

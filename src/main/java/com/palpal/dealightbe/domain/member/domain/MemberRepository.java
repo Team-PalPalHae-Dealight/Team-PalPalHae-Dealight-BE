@@ -17,4 +17,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 		""")
 	Optional<Member> findByProviderAndProviderId(@Param("provider") String provider,
 		@Param("providerId") Long providerId);
+	
+	boolean existsByNickName(String nickName);
 }

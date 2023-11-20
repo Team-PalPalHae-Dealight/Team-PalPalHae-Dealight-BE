@@ -1,5 +1,6 @@
 package com.palpal.dealightbe.domain.cart.application.dto.response;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -18,7 +19,10 @@ public record CartRes(
 	String storeName,
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
-	LocalTime storeCloseTime
+	LocalTime storeCloseTime,
+
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+	LocalDateTime expirationDateTime
 ) {
 
 	public static CartRes from(Cart cart) {
@@ -34,7 +38,8 @@ public record CartRes(
 			cart.getItemImage(),
 			cart.getQuantity(),
 			cart.getStoreName(),
-			cart.getStoreCloseTime()
+			cart.getStoreCloseTime(),
+			cart.getExpirationDateTime()
 		);
 	}
 }

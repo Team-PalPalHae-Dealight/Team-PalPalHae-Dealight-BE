@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -55,13 +56,12 @@ public class Member extends BaseEntity {
 
 	private String image;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<MemberRole> memberRoles = new ArrayList<>();
 
 	@Builder
 	public Member(String realName, String nickName, String phoneNumber, Address address, String provider,
-		Long providerId,
-		List<MemberRole> memberRoles) {
+		Long providerId, List<MemberRole> memberRoles) {
 		this.realName = realName;
 		this.nickName = nickName;
 		this.phoneNumber = phoneNumber;
@@ -106,6 +106,10 @@ public class Member extends BaseEntity {
 		memberRoles.forEach(memberRole -> {
 			memberRole.updateMember(this);
 		});
+	}
+
+	public boolean hasSameImage(String imageUrl) {
+		return this.image != null && this.image.equals(imageUrl);
 	}
 
 	@Override

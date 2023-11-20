@@ -41,6 +41,7 @@ public class StoreService {
 
 	private final StoreRepository storeRepository;
 	private final MemberRepository memberRepository;
+	private final ItemRepository itemRepository;
 	private final AddressService addressService;
 	private final ImageService imageService;
 
@@ -80,6 +81,8 @@ public class StoreService {
 		Store store = validateMemberAndStoreOwner(providerId, storeId);
 
 		store.updateStatus(storeStatus.storeStatus());
+
+		deleteClosedStoreItems(store);
 
 		return StoreStatusRes.from(store);
 	}
@@ -166,5 +169,11 @@ public class StoreService {
 		store.isSameOwnerAndTheRequester(member, store);
 
 		return store;
+	}
+
+	private void deleteClosedStoreItems(Store store) {
+		if (store.getStoreStatus() == StoreStatus.CLOSED) {
+			itemRepository.deleteAllByStoreId(store.getId());
+		}
 	}
 }

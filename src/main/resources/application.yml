@@ -35,5 +35,5 @@ spring:
       platform: h2 # 본인 DB 종류
 
   redis:
-    host: localhost
+    host: dealight-cart-redis
     port: 6379

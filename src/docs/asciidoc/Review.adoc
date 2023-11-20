@@ -25,9 +25,13 @@ include::{snippets}/review/review-create-fail-empty/response-body.adoc[]
 
 ---
 
-=== 1. 리뷰 등록
+== 1. 리뷰 등록
 
 /api/reviews/orders?id={orderId}
+
+include::{snippets}/review/review-create-success/http-request.adoc[]
+
+=== 성공
 
 ==== 요청
 
@@ -46,11 +50,21 @@ include::{snippets}/review/review-create-success/request-fields.adoc[]
 include::{snippets}/review/review-create-success/response-body.adoc[]
 include::{snippets}/review/review-create-success/response-fields.adoc[]
 
+=== 실패
+
+- 완료되지 않은 주문에 대해서 리뷰를 작성하려하는 경우
+include::{snippets}/review/review-create-fail-not-completed/response-body.adoc[]
+include::{snippets}/review/review-create-fail-not-completed/response-fields.adoc[]
+
 ---
 
-=== 2. 리뷰 통계 조회 - 업체별
+== 2. 리뷰 통계 조회 - 업체별
 
 /api/reviews/stores?id={storeId}
+
+include::{snippets}/review/review-find-by-store-id-success/http-request.adoc[]
+
+=== 성공
 
 ==== 요청
 
@@ -68,11 +82,23 @@ include::{snippets}/review/review-find-by-store-id-success/request-body.adoc[]
 include::{snippets}/review/review-find-by-store-id-success/response-body.adoc[]
 include::{snippets}/review/review-find-by-store-id-success/response-fields.adoc[]
 
+=== 실패
+
+- 업체 당사자가 아닌 다른 사람이 리뷰를 조회한 경우
+include::{snippets}/review/review-find-by-store-fail-unauthorized/response-body.adoc[]
+include::{snippets}/review/review-find-by-store-fail-unauthorized/response-fields.adoc[]
+
+
+
 ---
 
-=== 3. 리뷰 조회 - 주문별
+== 3. 리뷰 조회 - 주문별
 
 /api/reviews/orders?id={orderId}
+
+include::{snippets}/review/review-find-by-order-id-success/http-request.adoc[]
+
+=== 성공
 
 ==== 요청
 
@@ -91,11 +117,21 @@ include::{snippets}/review/review-find-by-order-id-success/request-body.adoc[]
 include::{snippets}/review/review-find-by-order-id-success/response-body.adoc[]
 include::{snippets}/review/review-find-by-order-id-success/response-fields.adoc[]
 
+=== 실패
+
+- 주문한 고객이 아닌 다른 사람이 리뷰를 조회한 경우
+include::{snippets}/review/review-find-by-order-fail-unauthorized/response-body.adoc[]
+include::{snippets}/review/review-find-by-order-fail-unauthorized/response-fields.adoc[]
+
+
+
 ---
 
 === 4. 리뷰 선택지 조회
 
 /api/reviews/contents
+
+include::{snippets}/review/review-contents-success/http-request.adoc[]
 
 ==== 요청
 

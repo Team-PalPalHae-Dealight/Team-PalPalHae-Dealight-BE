@@ -5,14 +5,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.palpal.dealightbe.domain.auth.application.AuthService;
-import com.palpal.dealightbe.domain.auth.application.dto.request.MemberAuthReq;
+import com.palpal.dealightbe.domain.auth.application.OAuth2AuthorizationService;
+import com.palpal.dealightbe.domain.auth.application.dto.request.MemberNickNameCheckReq;
+import com.palpal.dealightbe.domain.auth.application.dto.request.MemberSignupAuthReq;
 import com.palpal.dealightbe.domain.auth.application.dto.response.MemberAuthRes;
+import com.palpal.dealightbe.domain.auth.application.dto.response.OAuthLoginRes;
+import com.palpal.dealightbe.domain.auth.application.dto.response.OAuthUserInfoRes;
 import com.palpal.dealightbe.global.aop.ProviderId;
 import com.palpal.dealightbe.global.aop.RefreshToken;
 
@@ -23,10 +29,30 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/auth")
 public class AuthController {
 
+	private final OAuth2AuthorizationService oAuth2AuthorizationService;
 	private final AuthService authService;
 
+	@GetMapping("/kakao")
+	public ResponseEntity<OAuthLoginRes> loginByKakaoOAuth(@RequestParam String code) {
+		OAuthUserInfoRes oAuthUserInfoRes = oAuth2AuthorizationService.authorizeFromKakao(code);
+		OAuthLoginRes oAuthLoginRes = authService.authenticate(oAuthUserInfoRes);
+
+		return ResponseEntity
+			.status(HttpStatus.OK)
+			.body(oAuthLoginRes);
+	}
+
+	@PostMapping("/duplicate")
+	public ResponseEntity<Void> checkDuplicateNickName(@RequestBody @Validated MemberNickNameCheckReq request) {
+		authService.checkDuplicateNickName(request);
+
+		return ResponseEntity
+			.noContent()
+			.build();
+	}
+
 	@PostMapping("/signup")
-	public ResponseEntity<MemberAuthRes> signup(@RequestBody @Validated MemberAuthReq request) {
+	public ResponseEntity<MemberAuthRes> signup(@RequestBody @Validated MemberSignupAuthReq request) {
 		MemberAuthRes response = authService.signup(request);
 
 		return ResponseEntity
@@ -38,7 +64,7 @@ public class AuthController {
 	@ProviderId
 	@GetMapping("/reissue")
 	public ResponseEntity<MemberAuthRes> reissueToken(Long providerId, String refreshToken) {
-		MemberAuthRes response = authService.reIssueToken(providerId, refreshToken);
+		MemberAuthRes response = authService.reissueToken(providerId, refreshToken);
 
 		return ResponseEntity
 			.status(HttpStatus.CREATED)
@@ -53,5 +79,13 @@ public class AuthController {
 		return ResponseEntity
 			.noContent()
 			.build();
+	}
+
+	@ProviderId
+	@PatchMapping("/role")
+	public ResponseEntity<MemberAuthRes> updateMemberRoleToStore(Long providerId) {
+		MemberAuthRes memberAuthRes = authService.updateMemberRoleToStore(providerId);
+
+		return ResponseEntity.ok(memberAuthRes);
 	}
 }

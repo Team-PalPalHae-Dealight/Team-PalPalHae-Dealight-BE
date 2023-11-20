@@ -1,6 +1,6 @@
 # blue
 # blue 컨테이너는 8080으로 포트를 노출해서 실행
-version: "3"
+version: "3.3"
 services:
   dealight-blue:
     container_name: dealight-blue-container
@@ -11,3 +11,9 @@ services:
       - "8080:8080"
     environment:
       TZ: "Asia/Seoul"
+    networks:
+      - dealight-network
+
+networks:
+  dealight-network:
+    external: true

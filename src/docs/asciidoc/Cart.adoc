@@ -12,116 +12,233 @@ endif::[]
 
 [[User-API]]
 == Cart API
-===  타 업체 상품 존재 시 예외 처리 api : 장바구니 담기
+=== 장바구니 담기
+
+==== /api/carts/items?id={itemId}&type={cartAdditionType}
+
+<cartAdditionType>
+
+- check (장바구니에 타 업체 상품 존재 시 에러 메시지 반환)
+- clear (장바구니에 타 업체 상품 존재 시 초기화 후 담기)
+
+.Request - 성공
+include::{snippets}/cart/cart-add-item/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-add-item/request-headers.adoc[]
+
+.request parameter
+include::{snippets}/cart/cart-add-item/request-parameters.adoc[]
+
+.Response - 성공
+include::{snippets}/cart/cart-add-item/http-response.adoc[]
+
+.response fields
+include::{snippets}/cart/cart-add-item/response-fields.adoc[]
+
+---
+
+.Request Fail - 유효하지 않은 장바구니 담기 타입
+include::{snippets}/cart/cart-add-item-invalid-cart-addition-type/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-add-item-invalid-cart-addition-type/request-headers.adoc[]
+
+.request parameter
+include::{snippets}/cart/cart-add-item-invalid-cart-addition-type/request-parameters.adoc[]
+
+.Response Fail - 유효하지 않은 장바구니 담기 타입
+include::{snippets}/cart/cart-add-item-invalid-cart-addition-type/http-response.adoc[]
+
+.response fields
+include::{snippets}/cart/cart-add-item-invalid-cart-addition-type/response-fields.adoc[]
+
+---
+
+.Request Fail - 본인이 등록한 업체의 상품 담기 불가
+include::{snippets}/cart/cart-add-item-invalid-attempt-own-store-item/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-add-item-invalid-attempt-own-store-item/request-headers.adoc[]
+
+.request parameter
+include::{snippets}/cart/cart-add-item-invalid-attempt-own-store-item/request-parameters.adoc[]
+
+.Response Fail - 본인이 등록한 업체의 상품 담기 불가
+include::{snippets}/cart/cart-add-item-invalid-attempt-own-store-item/http-response.adoc[]
+
+.response fields
+include::{snippets}/cart/cart-add-item-invalid-attempt-own-store-item/response-fields.adoc[]
+
+---
+
+.Request Fail - 타 업체 상품이 존재하는 경우
+include::{snippets}/cart/cart-add-item-another-store-item-exists/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-add-item-another-store-item-exists/request-headers.adoc[]
+
+.request parameter
+include::{snippets}/cart/cart-add-item-another-store-item-exists/request-parameters.adoc[]
+
+.Response Fail - 타 업체 상품이 존재하는 경우
+include::{snippets}/cart/cart-add-item-another-store-item-exists/http-response.adoc[]
+
+.response fields
+include::{snippets}/cart/cart-add-item-another-store-item-exists/response-fields.adoc[]
+
+---
+
+.Request Fail - 최대 5개 종류를 초과하여 장바구니 담기 시도하는 경우
+include::{snippets}/cart/cart-add-item-exceeded-cart-item-size/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-add-item-exceeded-cart-item-size/request-headers.adoc[]
+
+.request parameter
+include::{snippets}/cart/cart-add-item-exceeded-cart-item-size/request-parameters.adoc[]
+
+.Response Fail - 최대 5개 종류를 초과하여 장바구니 담기 시도하는 경우
+include::{snippets}/cart/cart-add-item-exceeded-cart-item-size/http-response.adoc[]
+
+.response fields
+include::{snippets}/cart/cart-add-item-exceeded-cart-item-size/response-fields.adoc[]
+
+---
+
+.Request Fail - 상품이 존재하지 않는 경우
+include::{snippets}/cart/cart-add-item-item-not-found/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-add-item-item-not-found/request-headers.adoc[]
+
+.request parameter
+include::{snippets}/cart/cart-add-item-item-not-found/request-parameters.adoc[]
+
+.Response Fail - 상품이 존재하지 않는 경우
+include::{snippets}/cart/cart-add-item-item-not-found/http-response.adoc[]
+
+.response fields
+include::{snippets}/cart/cart-add-item-item-not-found/response-fields.adoc[]
+
+---
+
+=== 장바구니 조회
+
+==== /api/carts
+
+.Request - 성공
+include::{snippets}/cart/cart-find-all-by-provider-id/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-find-all-by-provider-id/request-headers.adoc[]
+
+.Response - 성공
+include::{snippets}/cart/cart-find-all-by-provider-id/http-response.adoc[]
+
+.response fields
+include::{snippets}/cart/cart-find-all-by-provider-id/response-fields.adoc[]
+
+---
+
+=== 장바구니 수정
+
+==== /api/carts
+
+.Request - 성공
+include::{snippets}/cart/cart-update/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-update/request-headers.adoc[]
+
+.request fields
+include::{snippets}/cart/cart-update/request-fields.adoc[]
+
+.Response - 성공
+include::{snippets}/cart/cart-update/http-response.adoc[]
+
+.response fields
+include::{snippets}/cart/cart-update/response-fields.adoc[]
+
+---
+
+.Request Fail - 장바구니의 최소, 최대 수량 조건에 맞지 않는 경우
+include::{snippets}/cart/cart-update-invalid-cart-quantity/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-update-invalid-cart-quantity/request-headers.adoc[]
+
+.request fields
+include::{snippets}/cart/cart-update-invalid-cart-quantity/request-fields.adoc[]
+
+.Response Fail - 장바구니의 최소, 최대 수량 조건에 맞지 않는 경우
+include::{snippets}/cart/cart-update-invalid-cart-quantity/http-response.adoc[]
+
+.response fields
+include::{snippets}/cart/cart-update-invalid-cart-quantity/response-fields.adoc[]
+
+---
+
+.Request Fail - 장바구니의 상품이 존재하지 않는 경우
+include::{snippets}/cart/cart-update-not-found-cart-item/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-update-not-found-cart-item/request-headers.adoc[]
+
+.request fields
+include::{snippets}/cart/cart-update-not-found-cart-item/request-fields.adoc[]
+
+.Response Fail - 장바구니의 상품이 존재하지 않는 경우
+include::{snippets}/cart/cart-update-not-found-cart-item/http-response.adoc[]
+
+.response fields
+include::{snippets}/cart/cart-update-not-found-cart-item/response-fields.adoc[]
+
+---
+
+=== 장바구니 요소 삭제
 
 ==== /api/carts/items?id={itemId}
 
 .Request - 성공
-include::{snippets}/cart/cart-check-and-add-item/http-request.adoc[]
+include::{snippets}/cart/cart-delete-one/http-request.adoc[]
 
 .request header
-include::{snippets}/cart/cart-check-and-add-item/request-headers.adoc[]
+include::{snippets}/cart/cart-delete-one/request-headers.adoc[]
 
-.request parameter
-include::{snippets}/cart/cart-check-and-add-item/request-parameters.adoc[]
+.path parameter
+include::{snippets}/cart/cart-delete-one/request-parameters.adoc[]
 
 .Response - 성공
-include::{snippets}/cart/cart-check-and-add-item/http-response.adoc[]
+include::{snippets}/cart/cart-delete-one/http-response.adoc[]
 
-.response fields
-include::{snippets}/cart/cart-check-and-add-item/response-fields.adoc[]
+---
 
-.Request Fail - 본인이 등록한 업체의 상품 담기 불가
-include::{snippets}/cart/cart-check-and-add-item-invalid-attempt-own-store-item/http-request.adoc[]
-
-.request header
-include::{snippets}/cart/cart-check-and-add-item-invalid-attempt-own-store-item/request-headers.adoc[]
-
-.request parameter
-include::{snippets}/cart/cart-check-and-add-item-invalid-attempt-own-store-item/request-parameters.adoc[]
-
-.Response Fail - 본인이 등록한 업체의 상품 담기 불가
-include::{snippets}/cart/cart-check-and-add-item-invalid-attempt-own-store-item/http-response.adoc[]
-
-.response fields
-include::{snippets}/cart/cart-check-and-add-item-invalid-attempt-own-store-item/response-fields.adoc[]
-
-.Request Fail - 타 업체 상품 존재
-include::{snippets}/cart/cart-check-and-add-item-another-store-item-exists/http-request.adoc[]
+.Request Fail - 장바구니의 상품이 존재하지 않는 경우
+include::{snippets}/cart/cart-delete-one-not-found-cart-item/http-request.adoc[]
 
 .request header
-include::{snippets}/cart/cart-check-and-add-item-another-store-item-exists/request-headers.adoc[]
+include::{snippets}/cart/cart-delete-one-not-found-cart-item/request-headers.adoc[]
 
-.request parameter
-include::{snippets}/cart/cart-check-and-add-item-another-store-item-exists/request-parameters.adoc[]
+.path parameter
+include::{snippets}/cart/cart-delete-one/request-parameters.adoc[]
 
-.Response Fail - 타 업체 상품 존재
-include::{snippets}/cart/cart-check-and-add-item-another-store-item-exists/http-response.adoc[]
+.Response Fail - 요청된 상품이 해당 업체에 등록되지 않은 상품인 경우
+include::{snippets}/cart/cart-delete-one-not-found-cart-item/http-response.adoc[]
 
-.response fields
-include::{snippets}/cart/cart-check-and-add-item-another-store-item-exists/response-fields.adoc[]
+include::{snippets}/cart/cart-delete-one-not-found-cart-item/response-fields.adoc[]
 
-.Request Fail - 상품이 존재하지 않는 경우
-include::{snippets}/cart/cart-check-and-add-item-item-not-found/http-request.adoc[]
+=== 장바구니 초기화
 
-.request header
-include::{snippets}/cart/cart-check-and-add-item-item-not-found/request-headers.adoc[]
-
-.request parameter
-include::{snippets}/cart/cart-check-and-add-item-item-not-found/request-parameters.adoc[]
-
-.Response Fail - 상품이 존재하지 않는 경우
-include::{snippets}/cart/cart-check-and-add-item-item-not-found/http-response.adoc[]
-
-.response fields
-include::{snippets}/cart/cart-check-and-add-item-item-not-found/response-fields.adoc[]
-
-
-===  타 업체 상품 존재 시 초기화 api : 장바구니 담기
-
-==== /api/carts/clear/items?id={itemId}
+==== /api/carts
 
 .Request - 성공
-include::{snippets}/cart/cart-clear-and-add-item/http-request.adoc[]
+include::{snippets}/cart/cart-delete-all/http-request.adoc[]
 
 .request header
-include::{snippets}/cart/cart-clear-and-add-item/request-headers.adoc[]
-
-.request parameter
-include::{snippets}/cart/cart-clear-and-add-item/request-parameters.adoc[]
+include::{snippets}/cart/cart-delete-all/request-headers.adoc[]
 
 .Response - 성공
-include::{snippets}/cart/cart-clear-and-add-item/http-response.adoc[]
+include::{snippets}/cart/cart-delete-all/http-response.adoc[]
 
-.response fields
-include::{snippets}/cart/cart-clear-and-add-item/response-fields.adoc[]
-
-.Request Fail - 본인이 등록한 업체의 상품 담기 불가
-include::{snippets}/cart/cart-clear-and-add-item-invalid-attempt-own-store-item/http-request.adoc[]
-
-.request header
-include::{snippets}/cart/cart-clear-and-add-item-invalid-attempt-own-store-item/request-headers.adoc[]
-
-.request parameter
-include::{snippets}/cart/cart-clear-and-add-item-invalid-attempt-own-store-item/request-parameters.adoc[]
-
-.Response Fail - 본인이 등록한 업체의 상품 담기 불가
-include::{snippets}/cart/cart-clear-and-add-item-invalid-attempt-own-store-item/http-response.adoc[]
-
-.response fields
-include::{snippets}/cart/cart-clear-and-add-item-invalid-attempt-own-store-item/response-fields.adoc[]
-
-.Request Fail - 상품이 존재하지 않는 경우
-include::{snippets}/cart/cart-clear-and-add-item-item-not-found/http-request.adoc[]
-
-.request header
-include::{snippets}/cart/cart-clear-and-add-item-item-not-found/request-headers.adoc[]
-
-.request parameter
-include::{snippets}/cart/cart-clear-and-add-item-item-not-found/request-parameters.adoc[]
-
-.Response Fail - 상품이 존재하지 않는 경우
-include::{snippets}/cart/cart-clear-and-add-item-item-not-found/http-response.adoc[]
-
-.response fields
-include::{snippets}/cart/cart-clear-and-add-item-item-not-found/response-fields.adoc[]
+---

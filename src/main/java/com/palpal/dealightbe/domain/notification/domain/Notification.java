@@ -47,19 +47,16 @@ public class Notification extends BaseEntity {
 	private Order order;
 
 	@Enumerated(EnumType.STRING)
-	private NotificationType type;
-
-	private String message;
+	private OrderStatus type;
 
 	private boolean isRead = false;
 
 	@Builder
-	public Notification(Member member, Store store, Order order, NotificationType type, String message) {
+	public Notification(Member member, Store store, Order order, OrderStatus type) {
 		this.member = member;
 		this.store = store;
 		this.order = order;
 		this.type = type;
-		this.message = message;
 	}
 
 	public void markAsRead() {

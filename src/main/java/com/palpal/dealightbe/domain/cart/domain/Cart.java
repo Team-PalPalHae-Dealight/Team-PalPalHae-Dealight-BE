@@ -1,6 +1,6 @@
 package com.palpal.dealightbe.domain.cart.domain;
 
-import static com.palpal.dealightbe.global.error.ErrorCode.*;
+import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_CART_QUANTITY;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -10,11 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
-import org.springframework.data.redis.core.TimeToLive;
 import org.springframework.data.redis.core.index.Indexed;
 
 import com.palpal.dealightbe.global.error.exception.BusinessException;
@@ -22,7 +20,7 @@ import com.palpal.dealightbe.global.error.exception.BusinessException;
 @Slf4j
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@RedisHash("carts")
+@RedisHash(value = "carts", timeToLive = 86400)
 public class Cart {
 
 	private static final int INITIAL_QUANTITY = 1;
@@ -52,8 +50,7 @@ public class Cart {
 
 	private LocalTime storeCloseTime;
 
-	@TimeToLive
-	private Long expiration;
+	private LocalDateTime expirationDateTime;
 
 	@Builder
 	public Cart(Long itemId, Long storeId, Long memberProviderId, String itemName, int stock, int discountPrice, String itemImage, String storeName, LocalTime storeCloseTime) {
@@ -67,17 +64,31 @@ public class Cart {
 		this.quantity = INITIAL_QUANTITY;
 		this.storeName = storeName;
 		this.storeCloseTime = storeCloseTime;
-		this.expiration = calculateExpiration();
-	}
-
-	public void updateExpiration() {
-		this.expiration = calculateExpiration();
+		this.expirationDateTime = calculateExpirationDateTime();
 	}
 
 	public void updateQuantity(int quantity) {
 		validateQuantity(quantity, this.stock);
 
 		this.quantity = quantity;
+	}
+
+	public void updateExpirationDateTime() {
+		this.expirationDateTime = calculateExpirationDateTime();
+	}
+
+	public void update(String itemName, int stock, int discountPrice, String itemImage, LocalTime storeCloseTime) {
+		this.itemName = itemName;
+		this.stock = stock;
+		this.discountPrice = discountPrice;
+		this.itemImage = itemImage;
+		this.storeCloseTime = storeCloseTime;
+	}
+
+	public boolean isExpired() {
+		LocalDateTime currentDateTime = LocalDateTime.now();
+
+		return currentDateTime.isAfter(this.expirationDateTime);
 	}
 
 	private void validateQuantity(int quantity, int stock) {
@@ -87,14 +98,9 @@ public class Cart {
 		}
 	}
 
-	private Long calculateExpiration() {
+	private LocalDateTime calculateExpirationDateTime() {
 		LocalDateTime currentDateTime = LocalDateTime.now();
-		LocalDateTime closeDateTime = getCloseDateTime(currentDateTime);
 
-		return currentDateTime.until(closeDateTime, ChronoUnit.SECONDS);
-	}
-
-	private LocalDateTime getCloseDateTime(LocalDateTime currentDateTime) {
 		if (this.storeCloseTime.isBefore(currentDateTime.toLocalTime())) {
 			return currentDateTime.toLocalDate().atTime(this.storeCloseTime).plusDays(1);
 		}

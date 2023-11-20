@@ -1,9 +1,14 @@
 package com.palpal.dealightbe.domain.order.presentation;
 
 import static com.palpal.dealightbe.domain.order.domain.OrderStatus.RECEIVED;
+import static com.palpal.dealightbe.global.error.ErrorCode.CLOSED_STORE;
+import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ORDER_STATUS;
+import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_STORE;
+import static com.palpal.dealightbe.global.error.ErrorCode.UNAUTHORIZED_REQUEST;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
@@ -16,6 +21,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
@@ -42,6 +48,7 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -57,6 +64,9 @@ import com.palpal.dealightbe.domain.order.application.dto.response.OrderProducts
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderRes;
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderStatusUpdateRes;
 import com.palpal.dealightbe.domain.order.application.dto.response.OrdersRes;
+import com.palpal.dealightbe.domain.store.application.StoreService;
+import com.palpal.dealightbe.global.error.exception.BusinessException;
+import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
 @AutoConfigureRestDocs
 @WebMvcTest(
@@ -74,6 +84,9 @@ public class OrderControllerTest {
 	@MockBean
 	private OrderService orderService;
 
+	@MockBean
+	private StoreService storeService;
+
 	@Nested
 	@DisplayName("<주문 생성>")
 	class createTest {
@@ -88,7 +101,8 @@ public class OrderControllerTest {
 		OrderProductsRes productsRes = new OrderProductsRes(List.of(new OrderProductRes(1L, "달콤한 도넛", 3, 10000, 15000,
 			"https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/donut")));
 
-		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요", LocalTime.of(12, 30),
+		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "member nickName", "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요",
+			LocalTime.of(12, 30),
 			productsRes, 30000, createdAt, RECEIVED.getText());
 
 		@Test
@@ -115,6 +129,7 @@ public class OrderControllerTest {
 				.andExpect(jsonPath("$.orderId").value(1L))
 				.andExpect(jsonPath("$.storeId").value(1L))
 				.andExpect(jsonPath("$.memberId").value(1L))
+				.andExpect(jsonPath("$.memberNickName").value("member nickName"))
 				.andExpect(jsonPath("$.storeName").value("GS25"))
 				.andExpect(jsonPath("$.demand").value(orderCreateReq.demand()))
 				.andExpect(jsonPath("$.orderProductsRes.orderProducts[0].itemId").value(productRes.itemId()))
@@ -133,44 +148,45 @@ public class OrderControllerTest {
 						headerWithName("Authorization").description("Access Token")
 					),
 					requestFields(
-						fieldWithPath("orderProductsReq.orderProducts[]").type(JsonFieldType.ARRAY)
+						fieldWithPath("orderProductsReq.orderProducts[]").type(ARRAY)
 							.description("주문한 상품 정보 목록"),
-						fieldWithPath("orderProductsReq.orderProducts[].itemId").type(JsonFieldType.NUMBER)
+						fieldWithPath("orderProductsReq.orderProducts[].itemId").type(NUMBER)
 							.description("상품의 아이디"),
-						fieldWithPath("orderProductsReq.orderProducts[].quantity").type(JsonFieldType.NUMBER)
+						fieldWithPath("orderProductsReq.orderProducts[].quantity").type(NUMBER)
 							.description("상품의 수량"),
 
-						fieldWithPath("storeId").type(JsonFieldType.NUMBER).description("상품을 구매한 업체 아이디"),
-						fieldWithPath("demand").type(JsonFieldType.STRING).description("상품 구매시 작성한 고객의 요청 사항"),
-						fieldWithPath("arrivalTime").type(JsonFieldType.STRING).description("고객의 도착 예정 시간"),
-						fieldWithPath("totalPrice").type(JsonFieldType.NUMBER).description("주문 총 금액")
+						fieldWithPath("storeId").type(NUMBER).description("상품을 구매한 업체 아이디"),
+						fieldWithPath("demand").type(STRING).description("상품 구매시 작성한 고객의 요청 사항"),
+						fieldWithPath("arrivalTime").type(STRING).description("고객의 도착 예정 시간"),
+						fieldWithPath("totalPrice").type(NUMBER).description("주문 총 금액")
 					),
 					responseFields(
-						fieldWithPath("orderId").type(JsonFieldType.NUMBER).description("등록된 주문의 아이디"),
-						fieldWithPath("storeId").type(JsonFieldType.NUMBER).description("주문이 이루어진 업체 아이디"),
-						fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("고객 아이디"),
-						fieldWithPath("storeName").type(JsonFieldType.STRING).description("업체 이름"),
-						fieldWithPath("demand").type(JsonFieldType.STRING).description("고객의 요구 사항"),
-						fieldWithPath("arrivalTime").type(JsonFieldType.STRING).description("고객의 도착 예정 시간"),
+						fieldWithPath("orderId").type(NUMBER).description("등록된 주문의 아이디"),
+						fieldWithPath("storeId").type(NUMBER).description("주문이 이루어진 업체 아이디"),
+						fieldWithPath("memberId").type(NUMBER).description("고객 아이디"),
+						fieldWithPath("memberNickName").type(STRING).description("고객 닉네임"),
+						fieldWithPath("storeName").type(STRING).description("업체 이름"),
+						fieldWithPath("demand").type(STRING).description("고객의 요구 사항"),
+						fieldWithPath("arrivalTime").type(STRING).description("고객의 도착 예정 시간"),
 
-						fieldWithPath("orderProductsRes.orderProducts[]").type(JsonFieldType.ARRAY)
+						fieldWithPath("orderProductsRes.orderProducts[]").type(ARRAY)
 							.description("주문한 상품 목록"),
-						fieldWithPath("orderProductsRes.orderProducts[].itemId").type(JsonFieldType.NUMBER)
+						fieldWithPath("orderProductsRes.orderProducts[].itemId").type(NUMBER)
 							.description("상품 아이디"),
-						fieldWithPath("orderProductsRes.orderProducts[].name").type(JsonFieldType.STRING)
+						fieldWithPath("orderProductsRes.orderProducts[].name").type(STRING)
 							.description("상품명"),
-						fieldWithPath("orderProductsRes.orderProducts[].quantity").type(JsonFieldType.NUMBER)
+						fieldWithPath("orderProductsRes.orderProducts[].quantity").type(NUMBER)
 							.description("상품 주문 수량"),
-						fieldWithPath("orderProductsRes.orderProducts[].discountPrice").type(JsonFieldType.NUMBER)
+						fieldWithPath("orderProductsRes.orderProducts[].discountPrice").type(NUMBER)
 							.description("상품의 할인된 금액"),
-						fieldWithPath("orderProductsRes.orderProducts[].originalPrice").type(JsonFieldType.NUMBER)
+						fieldWithPath("orderProductsRes.orderProducts[].originalPrice").type(NUMBER)
 							.description("상품 원가"),
-						fieldWithPath("orderProductsRes.orderProducts[].image").type(JsonFieldType.STRING)
+						fieldWithPath("orderProductsRes.orderProducts[].image").type(STRING)
 							.description("상품 이미지"),
 
-						fieldWithPath("totalPrice").type(JsonFieldType.NUMBER).description("총 금액"),
-						fieldWithPath("createdAt").type(JsonFieldType.STRING).description("주문 완료 일자 및 시간"),
-						fieldWithPath("status").type(JsonFieldType.STRING).description("현재 주문 상태"))));
+						fieldWithPath("totalPrice").type(NUMBER).description("총 금액"),
+						fieldWithPath("createdAt").type(STRING).description("주문 완료 일자 및 시간"),
+						fieldWithPath("status").type(STRING).description("현재 주문 상태"))));
 		}
 
 		@Test
@@ -264,7 +280,7 @@ public class OrderControllerTest {
 		}
 
 		@Test
-		@DisplayName("실패 - 주문시 상품이 0개인 경우 않은 경우 예외가 발생한다.")
+		@DisplayName("실패 - 주문시 상품이 0개인 경우 예외가 발생한다.")
 		void create_fail_totalPrice_zero() throws Exception {
 			// given
 			OrderCreateReq orderCreateReq = new OrderCreateReq(
@@ -289,7 +305,7 @@ public class OrderControllerTest {
 				.andExpect(result -> {
 					assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException);
 				})
-				.andDo(document("order/order-create-item",
+				.andDo(document("order/order-create-fail-empty-item",
 					preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
 					requestHeaders(
@@ -302,6 +318,94 @@ public class OrderControllerTest {
 						fieldWithPath("errors[].field").type(STRING).description("잘못 입력된 필드"),
 						fieldWithPath("errors[].value").type(STRING).description("입력된 값"),
 						fieldWithPath("errors[].reason").type(STRING).description("원인"),
+						fieldWithPath("message").type(STRING).description("오류 메시지")
+					)
+				));
+		}
+
+		@Test
+		@DisplayName("실패 - 업체 아이디가 잘못 입력된 경우")
+		void create_fail_invalid_storeId() throws Exception {
+			// given
+			OrderCreateReq orderCreateReq = new OrderCreateReq(
+				new OrderProductsReq(List.of(new OrderProductReq(1L, 3))), 111L, "도착할 때까지 상품 냉장고에 보관 부탁드려요",
+				LocalTime.of(12, 30), 10000);
+
+			given(orderService.create(eq(orderCreateReq), any()))
+				.willThrow(new EntityNotFoundException(NOT_FOUND_STORE));
+
+			// when
+			// then
+			mockMvc.perform(
+					post(createApiPath)
+						.with(csrf())
+						.with(user("username").roles("MEMBER"))
+						.header("Authorization", "Bearer {ACCESS_TOKEN}")
+						.content(objectMapper.writeValueAsString(orderCreateReq))
+						.contentType(APPLICATION_JSON)
+				)
+				.andDo(print())
+				.andExpect(status().is4xxClientError())
+				.andExpect(result -> {
+					assertTrue(result.getResolvedException() instanceof EntityNotFoundException);
+				})
+				.andDo(document("order/order-create-fail-invalid-store-id",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestHeaders(
+						headerWithName("Authorization").description("Access Token")
+					),
+					requestHeaders(
+						headerWithName("Authorization").description("Access Token")
+					),
+					responseFields(
+						fieldWithPath("timestamp").type(STRING).description("예외 발생 시간"),
+						fieldWithPath("code").type(STRING).description("오류 코드"),
+						fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+						fieldWithPath("message").type(STRING).description("오류 메시지")
+					)
+				));
+		}
+
+		@Test
+		@DisplayName("실패 - 영업 종료된 업체에 주문할 수 없다")
+		void craete_fail_closed_store() throws Exception {
+			// given
+			OrderCreateReq orderCreateReq = new OrderCreateReq(
+				new OrderProductsReq(List.of(new OrderProductReq(1L, 3))), 111L, "도착할 때까지 상품 냉장고에 보관 부탁드려요",
+				LocalTime.of(12, 30), 10000);
+
+			given(orderService.create(eq(orderCreateReq), any()))
+				.willThrow(new BusinessException(CLOSED_STORE));
+
+			// when
+			// then
+			mockMvc.perform(
+					post(createApiPath)
+						.with(csrf())
+						.with(user("username").roles("MEMBER"))
+						.header("Authorization", "Bearer {ACCESS_TOKEN}")
+						.content(objectMapper.writeValueAsString(orderCreateReq))
+						.contentType(APPLICATION_JSON)
+				)
+				.andDo(print())
+				.andExpect(status().is4xxClientError())
+				.andExpect(result -> {
+					assertTrue(result.getResolvedException() instanceof BusinessException);
+				})
+				.andDo(document("order/order-create-fail-closed-store",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestHeaders(
+						headerWithName("Authorization").description("Access Token")
+					),
+					requestHeaders(
+						headerWithName("Authorization").description("Access Token")
+					),
+					responseFields(
+						fieldWithPath("timestamp").type(STRING).description("예외 발생 시간"),
+						fieldWithPath("code").type(STRING).description("오류 코드"),
+						fieldWithPath("errors").type(ARRAY).description("오류 목록"),
 						fieldWithPath("message").type(STRING).description("오류 메시지")
 					)
 				));
@@ -351,12 +455,12 @@ public class OrderControllerTest {
 							headerWithName("Authorization").description("Access Token")
 						),
 						requestFields(
-							fieldWithPath("status").type(JsonFieldType.STRING)
+							fieldWithPath("status").type(STRING)
 								.description("변경 후의 주문 상태(CONFIRMED, COMPLETED, CANCELED)")
 						),
 						responseFields(
-							fieldWithPath("orderId").type(JsonFieldType.NUMBER).description("상태가 변경된 주문의 아이디"),
-							fieldWithPath("status").type(JsonFieldType.STRING).description("변경 완료된 후의 주문 상태")
+							fieldWithPath("orderId").type(NUMBER).description("상태가 변경된 주문의 아이디"),
+							fieldWithPath("status").type(STRING).description("변경 완료된 후의 주문 상태")
 						)
 					));
 		}
@@ -405,6 +509,48 @@ public class OrderControllerTest {
 					)
 				));
 		}
+
+		@Test
+		@DisplayName("실패 - 유효하지 않은 순서로 상태 변경을 요청하는 경우 예외가 발생한다.")
+		void updateStatus_fail_invalid_sequence() throws Exception {
+			// given
+			long orderId = 1L;
+			long memberProviderId = 1L;
+
+			OrderStatusUpdateReq invalidOrderStatusUpdateReq = new OrderStatusUpdateReq("COMPLETED");
+
+			given(orderService.updateStatus(anyLong(), eq(invalidOrderStatusUpdateReq), any()))
+				.willThrow(new BusinessException(INVALID_ORDER_STATUS));
+
+			// when
+			// then
+			mockMvc.perform(
+					patch(updateStatusApiPath, orderId, memberProviderId)
+						.with(csrf())
+						.with(user("username").roles("MEMBER"))
+						.header("Authorization", "Bearer {ACCESS_TOKEN}")
+						.content(objectMapper.writeValueAsString(invalidOrderStatusUpdateReq))
+						.contentType(APPLICATION_JSON)
+				)
+				.andDo(print())
+				.andExpect(status().is4xxClientError())
+				.andExpect(result -> {
+					assertTrue(result.getResolvedException() instanceof BusinessException);
+				})
+				.andDo(document("order/order-create-fail-invalid-status",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestHeaders(
+						headerWithName("Authorization").description("Access Token")
+					),
+					responseFields(
+						fieldWithPath("timestamp").type(STRING).description("예외 발생 시간"),
+						fieldWithPath("code").type(STRING).description("오류 코드"),
+						fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+						fieldWithPath("message").type(STRING).description("오류 메시지")
+					)
+				));
+		}
 	}
 
 	@Nested
@@ -421,7 +567,8 @@ public class OrderControllerTest {
 		OrderProductsRes productsRes = new OrderProductsRes(List.of(new OrderProductRes(1L, "달콤한 도넛", 5, 10000, 15000,
 			"https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/donut")));
 
-		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요", LocalTime.of(12, 30),
+		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "member nickName", "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요",
+			LocalTime.of(12, 30),
 			productsRes, 10000, createdAt, RECEIVED.getText());
 
 		OrderProductRes productRes = productsRes.orderProducts().get(0);
@@ -448,6 +595,7 @@ public class OrderControllerTest {
 				.andExpect(jsonPath("$.orderId").value(1L))
 				.andExpect(jsonPath("$.storeId").value(1L))
 				.andExpect(jsonPath("$.memberId").value(1L))
+				.andExpect(jsonPath("$.memberNickName").value("member nickName"))
 				.andExpect(jsonPath("$.storeName").value("GS25"))
 				.andExpect(jsonPath("$.demand").value(orderCreateReq.demand()))
 				.andExpect(jsonPath("$.orderProductsRes.orderProducts[0].itemId").value(productRes.itemId()))
@@ -469,31 +617,69 @@ public class OrderControllerTest {
 						headerWithName("Authorization").description("Access Token")
 					),
 					responseFields(
-						fieldWithPath("orderId").type(JsonFieldType.NUMBER).description("등록된 주문의 아이디"),
-						fieldWithPath("storeId").type(JsonFieldType.NUMBER).description("주문이 이루어진 업체 아이디"),
-						fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("고객 아이디"),
-						fieldWithPath("storeName").type(JsonFieldType.STRING).description("업체 이름"),
-						fieldWithPath("demand").type(JsonFieldType.STRING).description("고객의 요구 사항"),
-						fieldWithPath("arrivalTime").type(JsonFieldType.STRING).description("고객의 도착 예정 시간"),
+						fieldWithPath("orderId").type(NUMBER).description("등록된 주문의 아이디"),
+						fieldWithPath("storeId").type(NUMBER).description("주문이 이루어진 업체 아이디"),
+						fieldWithPath("memberId").type(NUMBER).description("고객 아이디"),
+						fieldWithPath("memberNickName").type(STRING).description("고객 닉네임"),
+						fieldWithPath("storeName").type(STRING).description("업체 이름"),
+						fieldWithPath("demand").type(STRING).description("고객의 요구 사항"),
+						fieldWithPath("arrivalTime").type(STRING).description("고객의 도착 예정 시간"),
 
-						fieldWithPath("orderProductsRes.orderProducts[]").type(JsonFieldType.ARRAY)
+						fieldWithPath("orderProductsRes.orderProducts[]").type(ARRAY)
 							.description("주문한 상품 목록"),
-						fieldWithPath("orderProductsRes.orderProducts[].itemId").type(JsonFieldType.NUMBER)
+						fieldWithPath("orderProductsRes.orderProducts[].itemId").type(NUMBER)
 							.description("상품 아이디"),
-						fieldWithPath("orderProductsRes.orderProducts[].name").type(JsonFieldType.STRING)
+						fieldWithPath("orderProductsRes.orderProducts[].name").type(STRING)
 							.description("상품명"),
-						fieldWithPath("orderProductsRes.orderProducts[].quantity").type(JsonFieldType.NUMBER)
+						fieldWithPath("orderProductsRes.orderProducts[].quantity").type(NUMBER)
 							.description("상품 주문 수량"),
-						fieldWithPath("orderProductsRes.orderProducts[].discountPrice").type(JsonFieldType.NUMBER)
+						fieldWithPath("orderProductsRes.orderProducts[].discountPrice").type(NUMBER)
 							.description("상품의 할인된 금액"),
-						fieldWithPath("orderProductsRes.orderProducts[].originalPrice").type(JsonFieldType.NUMBER)
+						fieldWithPath("orderProductsRes.orderProducts[].originalPrice").type(NUMBER)
 							.description("상품 원가"),
-						fieldWithPath("orderProductsRes.orderProducts[].image").type(JsonFieldType.STRING)
+						fieldWithPath("orderProductsRes.orderProducts[].image").type(STRING)
 							.description("상품 이미지"),
 
-						fieldWithPath("totalPrice").type(JsonFieldType.NUMBER).description("총 금액"),
-						fieldWithPath("createdAt").type(JsonFieldType.STRING).description("주문 완료 일자 및 시간"),
-						fieldWithPath("status").type(JsonFieldType.STRING).description("현재 주문 상태"))));
+						fieldWithPath("totalPrice").type(NUMBER).description("총 금액"),
+						fieldWithPath("createdAt").type(STRING).description("주문 완료 일자 및 시간"),
+						fieldWithPath("status").type(STRING).description("현재 주문 상태"))));
+		}
+
+		@Test
+		@DisplayName("실패 - 주문한 고객 본인이나 업체 주인이 아니면 상세정보를 조회할 수 없다")
+		void findById_fail_unauthorized() throws Exception {
+			// given
+			long orderId = 1L;
+
+			given(orderService.findById(eq(orderId), any()))
+				.willThrow(new BusinessException(UNAUTHORIZED_REQUEST));
+
+			// when
+			// then
+			mockMvc.perform(
+					get(findByIdApiPath, orderId)
+						.with(csrf())
+						.with(user("username").roles("MEMBER"))
+						.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				)
+				.andDo(print())
+				.andExpect(status().is4xxClientError())
+				.andExpect(result -> {
+					assertTrue(result.getResolvedException() instanceof BusinessException);
+				})
+				.andDo(document("order/order-create-fail-unauthorized",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestHeaders(
+						headerWithName("Authorization").description("Access Token")
+					),
+					responseFields(
+						fieldWithPath("timestamp").type(STRING).description("예외 발생 시간"),
+						fieldWithPath("code").type(STRING).description("오류 코드"),
+						fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+						fieldWithPath("message").type(STRING).description("오류 메시지")
+					)
+				));
 		}
 	}
 
@@ -509,7 +695,8 @@ public class OrderControllerTest {
 
 		OrderProductRes productRes = productsRes.orderProducts().get(0);
 
-		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요", LocalTime.of(12, 30),
+		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "member nickName", "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요",
+			LocalTime.of(12, 30),
 			productsRes, 10000, createdAt, RECEIVED.getText());
 
 		OrdersRes ordersRes = new OrdersRes(List.of(orderRes), false);
@@ -564,36 +751,75 @@ public class OrderControllerTest {
 							parameterWithName("size").description("한 번에 조회할 데이터 개수(초기값:10)").optional()
 						),
 						responseFields(
-							fieldWithPath("orders").type(JsonFieldType.ARRAY).description("주문 목록"),
-							fieldWithPath("orders[].orderId").type(JsonFieldType.NUMBER).description("등록된 주문의 아이디"),
-							fieldWithPath("orders[].storeId").type(JsonFieldType.NUMBER).description("주문이 이루어진 업체 아이디"),
-							fieldWithPath("orders[].memberId").type(JsonFieldType.NUMBER).description("고객 아이디"),
-							fieldWithPath("orders[].storeName").type(JsonFieldType.STRING).description("업체 이름"),
-							fieldWithPath("orders[].demand").type(JsonFieldType.STRING).description("고객의 요구 사항"),
-							fieldWithPath("orders[].arrivalTime").type(JsonFieldType.STRING)
+							fieldWithPath("orders").type(ARRAY).description("주문 목록"),
+							fieldWithPath("orders[].orderId").type(NUMBER).description("등록된 주문의 아이디"),
+							fieldWithPath("orders[].storeId").type(NUMBER).description("주문이 이루어진 업체 아이디"),
+							fieldWithPath("orders[].memberId").type(NUMBER).description("고객 아이디"),
+							fieldWithPath("orders[].memberNickName").type(STRING).description("고객 닉네임"),
+							fieldWithPath("orders[].storeName").type(STRING).description("업체 이름"),
+							fieldWithPath("orders[].demand").type(STRING).description("고객의 요구 사항"),
+							fieldWithPath("orders[].arrivalTime").type(STRING)
 								.description("고객의 도착 예정 시간"),
-							fieldWithPath("orders[].orderProductsRes.orderProducts[]").type(JsonFieldType.ARRAY)
+							fieldWithPath("orders[].orderProductsRes.orderProducts[]").type(ARRAY)
 								.description("주문한 상품 목록"),
-							fieldWithPath("orders[].orderProductsRes.orderProducts[].itemId").type(JsonFieldType.NUMBER)
+							fieldWithPath("orders[].orderProductsRes.orderProducts[].itemId").type(NUMBER)
 								.description("상품 아이디"),
-							fieldWithPath("orders[].orderProductsRes.orderProducts[].name").type(JsonFieldType.STRING)
+							fieldWithPath("orders[].orderProductsRes.orderProducts[].name").type(STRING)
 								.description("상품명"),
 							fieldWithPath("orders[].orderProductsRes.orderProducts[].quantity").type(
-									JsonFieldType.NUMBER)
+									NUMBER)
 								.description("상품 주문 수량"),
 							fieldWithPath("orders[].orderProductsRes.orderProducts[].discountPrice")
-								.type(JsonFieldType.NUMBER)
+								.type(NUMBER)
 								.description("상품의 할인된 금액"),
 							fieldWithPath("orders[].orderProductsRes.orderProducts[].originalPrice")
-								.type(JsonFieldType.NUMBER)
+								.type(NUMBER)
 								.description("상품 원가"),
-							fieldWithPath("orders[].orderProductsRes.orderProducts[].image").type(JsonFieldType.STRING)
+							fieldWithPath("orders[].orderProductsRes.orderProducts[].image").type(STRING)
 								.description("상품 이미지"),
-							fieldWithPath("orders[].totalPrice").type(JsonFieldType.NUMBER).description("총 금액"),
-							fieldWithPath("orders[].createdAt").type(JsonFieldType.STRING).description("주문 완료 일자 및 시간"),
-							fieldWithPath("orders[].status").type(JsonFieldType.STRING).description("현재 주문 상태"),
+							fieldWithPath("orders[].totalPrice").type(NUMBER).description("총 금액"),
+							fieldWithPath("orders[].createdAt").type(STRING).description("주문 완료 일자 및 시간"),
+							fieldWithPath("orders[].status").type(STRING).description("현재 주문 상태"),
 							fieldWithPath("hasNext").type(JsonFieldType.BOOLEAN).description("다음 데이터 존재 여부")))
 				);
+		}
+
+		@Test
+		@DisplayName("실패 - 업체의 주인외의 다른 사람이 업체의 주문 목록을 조회할 수 없다")
+		void findByStoreId_fail_unauthorized() throws Exception {
+			// given
+			long orderId = 1L;
+
+			given(orderService.findAllByStoreId(anyLong(), any(), any(), any(PageRequest.class)))
+				.willThrow(new BusinessException(UNAUTHORIZED_REQUEST));
+
+			// when
+			// then
+			mockMvc.perform(
+					get(findByStoreIdPath, orderId)
+						.with(csrf())
+						.with(user("username").roles("MEMBER"))
+						.header("Authorization", "Bearer {ACCESS_TOKEN}")
+						.param("id", "1")
+				)
+				.andDo(print())
+				.andExpect(status().is4xxClientError())
+				.andExpect(result -> {
+					assertTrue(result.getResolvedException() instanceof BusinessException);
+				})
+				.andDo(document("order/order-find-by-store-fail-unauthorized",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestHeaders(
+						headerWithName("Authorization").description("Access Token")
+					),
+					responseFields(
+						fieldWithPath("timestamp").type(STRING).description("예외 발생 시간"),
+						fieldWithPath("code").type(STRING).description("오류 코드"),
+						fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+						fieldWithPath("message").type(STRING).description("오류 메시지")
+					)
+				));
 		}
 	}
 
@@ -609,14 +835,15 @@ public class OrderControllerTest {
 
 		OrderProductRes productRes = productsRes.orderProducts().get(0);
 
-		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요", LocalTime.of(12, 30),
+		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "member nickName", "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요",
+			LocalTime.of(12, 30),
 			productsRes, 10000, createdAt, RECEIVED.getText());
 
 		OrdersRes ordersRes = new OrdersRes(List.of(orderRes), false);
 
 		@Test
-		@DisplayName("성공 - 업체의 주문 목록을 조회한다")
-		void findByStoreId_success() throws Exception {
+		@DisplayName("성공 - 고객의 주문 목록을 조회한다")
+		void findByMemberProviderId_success() throws Exception {
 			// given
 			given(orderService.findAllByMemberProviderId(any(), any(), any()))
 				.willReturn(ordersRes);
@@ -662,34 +889,35 @@ public class OrderControllerTest {
 							parameterWithName("size").description("한 번에 조회할 데이터 개수(초기값:10)").optional()
 						),
 						responseFields(
-							fieldWithPath("orders").type(JsonFieldType.ARRAY).description("주문 목록"),
-							fieldWithPath("orders[].orderId").type(JsonFieldType.NUMBER).description("등록된 주문의 아이디"),
-							fieldWithPath("orders[].storeId").type(JsonFieldType.NUMBER).description("주문이 이루어진 업체 아이디"),
-							fieldWithPath("orders[].memberId").type(JsonFieldType.NUMBER).description("고객 아이디"),
-							fieldWithPath("orders[].storeName").type(JsonFieldType.STRING).description("업체 이름"),
-							fieldWithPath("orders[].demand").type(JsonFieldType.STRING).description("고객의 요구 사항"),
-							fieldWithPath("orders[].arrivalTime").type(JsonFieldType.STRING)
+							fieldWithPath("orders").type(ARRAY).description("주문 목록"),
+							fieldWithPath("orders[].orderId").type(NUMBER).description("등록된 주문의 아이디"),
+							fieldWithPath("orders[].storeId").type(NUMBER).description("주문이 이루어진 업체 아이디"),
+							fieldWithPath("orders[].memberId").type(NUMBER).description("고객 아이디"),
+							fieldWithPath("orders[].memberNickName").type(STRING).description("고객 닉네임"),
+							fieldWithPath("orders[].storeName").type(STRING).description("업체 이름"),
+							fieldWithPath("orders[].demand").type(STRING).description("고객의 요구 사항"),
+							fieldWithPath("orders[].arrivalTime").type(STRING)
 								.description("고객의 도착 예정 시간"),
-							fieldWithPath("orders[].orderProductsRes.orderProducts[]").type(JsonFieldType.ARRAY)
+							fieldWithPath("orders[].orderProductsRes.orderProducts[]").type(ARRAY)
 								.description("주문한 상품 목록"),
-							fieldWithPath("orders[].orderProductsRes.orderProducts[].itemId").type(JsonFieldType.NUMBER)
+							fieldWithPath("orders[].orderProductsRes.orderProducts[].itemId").type(NUMBER)
 								.description("상품 아이디"),
-							fieldWithPath("orders[].orderProductsRes.orderProducts[].name").type(JsonFieldType.STRING)
+							fieldWithPath("orders[].orderProductsRes.orderProducts[].name").type(STRING)
 								.description("상품명"),
 							fieldWithPath("orders[].orderProductsRes.orderProducts[].quantity").type(
-									JsonFieldType.NUMBER)
+									NUMBER)
 								.description("상품 주문 수량"),
 							fieldWithPath("orders[].orderProductsRes.orderProducts[].discountPrice")
-								.type(JsonFieldType.NUMBER)
+								.type(NUMBER)
 								.description("상품의 할인된 금액"),
 							fieldWithPath("orders[].orderProductsRes.orderProducts[].originalPrice")
-								.type(JsonFieldType.NUMBER)
+								.type(NUMBER)
 								.description("상품 원가"),
-							fieldWithPath("orders[].orderProductsRes.orderProducts[].image").type(JsonFieldType.STRING)
+							fieldWithPath("orders[].orderProductsRes.orderProducts[].image").type(STRING)
 								.description("상품 이미지"),
-							fieldWithPath("orders[].totalPrice").type(JsonFieldType.NUMBER).description("총 금액"),
-							fieldWithPath("orders[].createdAt").type(JsonFieldType.STRING).description("주문 완료 일자 및 시간"),
-							fieldWithPath("orders[].status").type(JsonFieldType.STRING).description("현재 주문 상태"),
+							fieldWithPath("orders[].totalPrice").type(NUMBER).description("총 금액"),
+							fieldWithPath("orders[].createdAt").type(STRING).description("주문 완료 일자 및 시간"),
+							fieldWithPath("orders[].status").type(STRING).description("현재 주문 상태"),
 							fieldWithPath("hasNext").type(JsonFieldType.BOOLEAN).description("다음 데이터 존재 여부")))
 				);
 		}
