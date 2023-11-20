@@ -70,7 +70,7 @@ class MemberControllerTest {
 
 		//given
 		AddressRes addressRes = new AddressRes("서울", 37.5665, 126.9780);
-		MemberProfileRes memberProfileInfo = new MemberProfileRes(1L, "ROLE_MEMBER", "박명수", "유산슬",
+		MemberProfileRes memberProfileInfo = new MemberProfileRes(1L, "member", "박명수", "유산슬",
 			"01012345678", addressRes);
 
 		given(memberService.getMemberProfile(any()))

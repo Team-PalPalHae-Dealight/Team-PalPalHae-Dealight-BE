@@ -15,7 +15,7 @@ public record MemberProfileRes(
 	public static MemberProfileRes from(Member member) {
 		return new MemberProfileRes(
 			member.getProviderId(),
-			member.getMemberRoles().get(0).getRole().getType().name(),
+			member.getMemberRoles().get(0).getRole().getType().getRole(),
 			member.getRealName(),
 			member.getNickName(),
 			member.getPhoneNumber(),
