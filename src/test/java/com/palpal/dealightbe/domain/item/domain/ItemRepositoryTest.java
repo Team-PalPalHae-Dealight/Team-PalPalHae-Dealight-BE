@@ -56,83 +56,28 @@ class ItemRepositoryTest {
 	void setUp() {
 		String storeDefaultImageUrl = "https://fake-image.com/store.png";
 
-		Member member1 = Member.builder()
-			.nickName("닉네임")
-			.realName("이름")
-			.phoneNumber("010010101")
-			.provider("kakao")
-			.providerId(123L)
-			.build();
-
+		Member member1 = createMember("닉네임", 123L);
 		memberRepository.save(member1);
 
-		Member member2 = Member.builder()
-			.nickName("닉네임2")
-			.realName("이름")
-			.phoneNumber("0100101021")
-			.provider("kakao")
-			.providerId(1234L)
-			.build();
-
+		Member member2 = createMember("닉네임2", 1234L);
 		memberRepository.save(member2);
 
-		Member member3 = Member.builder()
-			.nickName("닉네임3")
-			.realName("이름")
-			.phoneNumber("02100101021")
-			.provider("kakao")
-			.providerId(12345L)
-			.build();
-
+		Member member3 = createMember("닉네임3", 12345L);
 		memberRepository.save(member3);
 
-		Member member4 = Member.builder()
-			.nickName("닉네임4")
-			.realName("이름")
-			.phoneNumber("02100101021")
-			.provider("kakao")
-			.providerId(123456L)
-			.build();
-
+		Member member4 = createMember("닉네임4", 123456L);
 		memberRepository.save(member4);
 
-		Member member5 = Member.builder()
-			.nickName("닉네임5")
-			.realName("이름")
-			.phoneNumber("02100101021")
-			.provider("kakao")
-			.providerId(1234567L)
-			.build();
-
+		Member member5 = createMember("닉네임5", 1234567L);
 		memberRepository.save(member5);
 
-		Member member6 = Member.builder()
-			.nickName("닉네임6")
-			.realName("이름")
-			.phoneNumber("02100101021")
-			.provider("kakao")
-			.providerId(123458L)
-			.build();
-
+		Member member6 = createMember("닉네임6", 123458L);
 		memberRepository.save(member6);
 
-		Address address1 = Address.builder()
-			.name("동네분식 주소")
-			.xCoordinate(127.016539)
-			.yCoordinate(37.592709)
-			.build();
-
+		Address address1 = createAddress("동네분식 주소", 127.016539, 37.592709);
 		addressRepository.save(address1);
 
-		Store store1 = Store.builder()
-			.name("동네분식")
-			.storeNumber("0000000")
-			.telephone("00000000")
-			.openTime(LocalTime.of(13, 0))
-			.closeTime(LocalTime.of(20, 0))
-			.dayOff(Collections.singleton(DayOff.MON))
-			.address(address1)
-			.build();
+		Store store1 = createStore("동네 분식", LocalTime.of(13, 0), LocalTime.of(20, 0), address1);
 
 		store1.updateImage(storeDefaultImageUrl);
 		store1.updateStatus(StoreStatus.OPENED);
@@ -152,23 +97,10 @@ class ItemRepositoryTest {
 
 		itemRepository.save(item1);
 
-		Address address2 = Address.builder()
-			.name("먼분식 주소")
-			.xCoordinate(126.977041)
-			.yCoordinate(37.579617)
-			.build();
-
+		Address address2 = createAddress("먼분식 주소", 126.977041, 37.579617);
 		addressRepository.save(address2);
 
-		Store store2 = Store.builder()
-			.name("먼분식")
-			.storeNumber("0000000")
-			.telephone("00000000")
-			.openTime(LocalTime.of(13, 0))
-			.closeTime(LocalTime.of(22, 0))
-			.dayOff(Collections.singleton(DayOff.MON))
-			.address(address2)
-			.build();
+		Store store2 = createStore("먼분식", LocalTime.of(13, 0), LocalTime.of(22, 0), address2);
 
 		store2.updateImage(storeDefaultImageUrl);
 		store2.updateStatus(StoreStatus.OPENED);
@@ -188,23 +120,10 @@ class ItemRepositoryTest {
 
 		itemRepository.save(item2);
 
-		Address address3 = Address.builder()
-			.name("가까운 분식 주소")
-			.xCoordinate(127.0324773)
-			.yCoordinate(37.5893876)
-			.build();
-
+		Address address3 = createAddress("가까운 분식 주소", 127.0324773, 37.5893876);
 		addressRepository.save(address3);
 
-		Store store3 = Store.builder()
-			.name("가까운 분식")
-			.storeNumber("0000000")
-			.telephone("00000000")
-			.openTime(LocalTime.of(13, 0))
-			.closeTime(LocalTime.of(2, 0))
-			.dayOff(Collections.singleton(DayOff.MON))
-			.address(address3)
-			.build();
+		Store store3 = createStore("가까운 분식", LocalTime.of(13, 0), LocalTime.of(2, 0), address3);
 
 		store3.updateImage(storeDefaultImageUrl);
 		store3.updateStatus(StoreStatus.OPENED);
@@ -224,23 +143,10 @@ class ItemRepositoryTest {
 
 		itemRepository.save(item3);
 
-		Address address4 = Address.builder()
-			.name("공원 분식 주소")
-			.xCoordinate(127.0028245)
-			.yCoordinate(37.5805009)
-			.build();
-
+		Address address4 = createAddress("이공원 분식 주소", 127.0028245, 37.5805009);
 		addressRepository.save(address4);
 
-		Store store4 = Store.builder()
-			.name("공원 분식")
-			.storeNumber("0000000")
-			.telephone("00000000")
-			.openTime(LocalTime.of(13, 0))
-			.closeTime(LocalTime.of(17, 30))
-			.dayOff(Collections.singleton(DayOff.MON))
-			.address(address4)
-			.build();
+		Store store4 = createStore("이공원 분식", LocalTime.of(13, 0), LocalTime.of(17, 30), address4);
 
 		store4.updateImage(storeDefaultImageUrl);
 		store4.updateStatus(StoreStatus.OPENED);
@@ -260,23 +166,10 @@ class ItemRepositoryTest {
 
 		itemRepository.save(item4);
 
-		Address address5 = Address.builder()
-			.name("공원 분식 주소")
-			.xCoordinate(127.006008)
-			.yCoordinate(37.588403)
-			.build();
-
+		Address address5 = createAddress("공원 분식 주소", 127.006008, 37.588403);
 		addressRepository.save(address5);
 
-		Store store5 = Store.builder()
-			.name("공원 분식")
-			.storeNumber("0000000")
-			.telephone("00000000")
-			.openTime(LocalTime.of(13, 0))
-			.closeTime(LocalTime.of(18, 0))
-			.dayOff(Collections.singleton(DayOff.MON))
-			.address(address5)
-			.build();
+		Store store5 = createStore("공원 분식", LocalTime.of(13, 0), LocalTime.of(18, 0), address5);
 
 		store5.updateImage(storeDefaultImageUrl);
 		store5.updateStatus(StoreStatus.OPENED);
@@ -296,23 +189,10 @@ class ItemRepositoryTest {
 
 		itemRepository.save(item5);
 
-		Address address6 = Address.builder()
-			.name("근처 분식 주소")
-			.xCoordinate(127.0581605)
-			.yCoordinate(37.5972565)
-			.build();
-
+		Address address6 = createAddress("근처 분식 주소", 127.0581605, 37.5972565);
 		addressRepository.save(address6);
 
-		Store store6 = Store.builder()
-			.name("근처 분식")
-			.storeNumber("0000000")
-			.telephone("00000000")
-			.openTime(LocalTime.of(13, 0))
-			.closeTime(LocalTime.of(23, 0))
-			.dayOff(Collections.singleton(DayOff.MON))
-			.address(address6)
-			.build();
+		Store store6 = createStore("근처 분식", LocalTime.of(13, 0), LocalTime.of(23, 0), address6);
 
 		store6.updateImage(storeDefaultImageUrl);
 		store6.updateStatus(StoreStatus.OPENED);
@@ -396,10 +276,10 @@ class ItemRepositoryTest {
 	}
 
 	private Long calculateExpirationSeconds(LocalTime storeCloseTime) {
-		LocalDateTime currentDateTime2 = LocalDateTime.now();
-		LocalDateTime closeDateTime = getCloseDateTime(currentDateTime2, storeCloseTime);
+		LocalDateTime currentDateTime = LocalDateTime.now();
+		LocalDateTime closeDateTime = getCloseDateTime(currentDateTime, storeCloseTime);
 
-		return currentDateTime2.until(closeDateTime, ChronoUnit.SECONDS);
+		return currentDateTime.until(closeDateTime, ChronoUnit.SECONDS);
 	}
 
 	private LocalDateTime getCloseDateTime(LocalDateTime currentDateTime, LocalTime storeCloseTime) {
@@ -416,5 +296,35 @@ class ItemRepositoryTest {
 				.compareTo(calculateExpirationSeconds(y.getStore().getCloseTime())));
 
 		return items;
+	}
+
+	private Member createMember(String nickname, Long providerId) {
+		return Member.builder()
+			.nickName(nickname)
+			.realName("이름")
+			.phoneNumber("010010101")
+			.provider("kakao")
+			.providerId(providerId)
+			.build();
+	}
+
+	private Address createAddress(String AddressName, double xCoordinate, double yCoordinate) {
+		return Address.builder()
+			.name(AddressName)
+			.xCoordinate(xCoordinate)
+			.yCoordinate(yCoordinate)
+			.build();
+	}
+
+	private Store createStore(String storeName, LocalTime openTime, LocalTime closeTime, Address address) {
+		return Store.builder()
+			.name(storeName)
+			.storeNumber("0000000")
+			.telephone("00000000")
+			.openTime(openTime)
+			.closeTime(closeTime)
+			.dayOff(Collections.singleton(DayOff.MON))
+			.address(address)
+			.build();
 	}
 }
