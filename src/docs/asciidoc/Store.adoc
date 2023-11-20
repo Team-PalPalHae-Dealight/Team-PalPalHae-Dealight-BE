@@ -15,7 +15,7 @@ endif::[]
 
 === 업체 등록
 
-==== POST - /api/stores/{memberId}
+==== POST - /api/stores
 
 .Request
 include::{snippets}/store/store-register/http-request.adoc[]
