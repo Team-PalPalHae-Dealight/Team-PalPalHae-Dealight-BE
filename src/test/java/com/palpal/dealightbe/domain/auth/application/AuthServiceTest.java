@@ -24,6 +24,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import com.palpal.dealightbe.domain.address.domain.Address;
+import com.palpal.dealightbe.domain.auth.application.dto.request.MemberNickNameCheckReq;
 import com.palpal.dealightbe.domain.auth.application.dto.request.MemberSignupAuthReq;
 import com.palpal.dealightbe.domain.auth.application.dto.response.MemberAuthRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.OAuthLoginRes;
@@ -219,6 +220,19 @@ class AuthServiceTest {
 
 		// when -> then
 		assertThatThrownBy(() -> authService.signup(request))
+			.isInstanceOf(BusinessException.class);
+	}
+
+	@DisplayName("닉네임 중복 검사 실패")
+	@Test
+	void successNickNameDuplicateCheck() {
+		// given
+		MemberNickNameCheckReq request = new MemberNickNameCheckReq("고요송");
+		given(memberRepository.existsByNickName("고요송"))
+			.willReturn(true);
+
+		// when -> then
+		assertThatThrownBy(() -> authService.checkDuplicateNickName(request))
 			.isInstanceOf(BusinessException.class);
 	}
 }
