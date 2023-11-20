@@ -34,7 +34,7 @@ public enum ListSortType {
 			.findFirst()
 			.orElseThrow(() -> {
 				log.error("INVALID_SEARCH_SORT_TYPE : {}", sortType);
-				return new BusinessException(ErrorCode.INVALID_SEARCH_SORT_TYPE);
+				return new BusinessException(ErrorCode.INVALID_LIST_SORT_TYPE);
 			});
 	}
 }
