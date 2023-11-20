@@ -61,14 +61,13 @@ public class Member extends BaseEntity {
 
 	@Builder
 	public Member(String realName, String nickName, String phoneNumber, Address address, String provider,
-		Long providerId, List<MemberRole> memberRoles) {
+		Long providerId) {
 		this.realName = realName;
 		this.nickName = nickName;
 		this.phoneNumber = phoneNumber;
 		this.address = getValidAddress(address);
 		this.provider = provider;
 		this.providerId = providerId;
-		this.memberRoles = memberRoles;
 	}
 
 	private Address getValidAddress(Address address) {
@@ -102,14 +101,28 @@ public class Member extends BaseEntity {
 			throw new BusinessException(ErrorCode.INVALID_ROLE_UPDATE);
 		}
 
-		this.memberRoles = memberRoles;
+		if (!this.memberRoles.isEmpty()) {
+			this.memberRoles.forEach(memberRole -> {
+				memberRole.updateMember(null);
+			});
+			this.memberRoles.clear();
+		}
+
 		memberRoles.forEach(memberRole -> {
+			this.memberRoles.add(memberRole);
 			memberRole.updateMember(this);
 		});
 	}
 
 	public boolean hasSameImage(String imageUrl) {
 		return this.image != null && this.image.equals(imageUrl);
+	}
+
+	public boolean isRoleStore() {
+		MemberRole memberRole = memberRoles.get(0);
+		Role role = memberRole.getRole();
+
+		return role.getType() == RoleType.ROLE_STORE;
 	}
 
 	@Override

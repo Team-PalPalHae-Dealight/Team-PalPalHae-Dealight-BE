@@ -15,6 +15,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.palpal.dealightbe.config.JwtConfig;
+import com.palpal.dealightbe.domain.auth.exception.InvalidRoleException;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRole;
 import com.palpal.dealightbe.domain.member.domain.Role;
@@ -205,9 +206,9 @@ class JwtTest {
 
 		// when -> then
 		assertThatThrownBy(() -> jwt.createAccessToken(invalidMember))
-			.isInstanceOf(NullPointerException.class);
+			.isInstanceOf(InvalidRoleException.class);
 		assertThatThrownBy(() -> jwt.createRefreshToken(invalidMember))
-			.isInstanceOf(NullPointerException.class);
+			.isInstanceOf(InvalidRoleException.class);
 	}
 
 	@DisplayName("토큰이 유효기간을 넘길 경우 토큰 검증 실패")

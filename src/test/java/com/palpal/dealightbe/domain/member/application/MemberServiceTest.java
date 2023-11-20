@@ -76,9 +76,9 @@ class MemberServiceTest {
 			.realName("유재석")
 			.nickName("유산슬")
 			.phoneNumber("01012345678")
-			.memberRoles(memberRoles)
 			.build();
 
+		mockMember.updateMemberRoles(memberRoles);
 		memberRole.updateMember(mockMember);
 
 		mockMember.updateAddress(mockAddress);

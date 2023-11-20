@@ -10,15 +10,17 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import com.palpal.dealightbe.config.JwtConfig;
+import com.palpal.dealightbe.domain.auth.exception.InvalidRoleException;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRole;
 import com.palpal.dealightbe.domain.member.domain.Role;
 import com.palpal.dealightbe.domain.member.domain.RoleType;
+import com.palpal.dealightbe.global.error.ErrorCode;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
@@ -62,6 +64,10 @@ public class Jwt {
 			.collect(Collectors.joining(","));
 		log.info("유저({})의 권한({})", providerId, authorities);
 
+		if (!StringUtils.hasText(authorities)) {
+			throw new InvalidRoleException(ErrorCode.ROLE_CLAIM_IS_EMPTY);
+		}
+
 		return Jwts.builder()
 			.setSubject(subject)
 			.setIssuer(issuer)
@@ -91,6 +97,10 @@ public class Jwt {
 			})
 			.collect(Collectors.joining(","));
 		log.info("유저({})의 권한({})", providerId, authorities);
+
+		if (!StringUtils.hasText(authorities)) {
+			throw new InvalidRoleException(ErrorCode.ROLE_CLAIM_IS_EMPTY);
+		}
 
 		return Jwts.builder()
 			.setSubject(subject)

@@ -73,6 +73,8 @@ public enum ErrorCode {
 	UNABLE_TO_CREATE_AUTHENTICATION("AUTH009", "토큰에 정보가 부족하여 인증생성에 실패했습니다."),
 	UNABLE_TO_GET_TOKEN_FROM_AUTH_SERVER("AUTH010", "OAuth 서버로부터 토큰을 가져올 수 없습니다."),
 	UNABLE_TO_GET_USER_INFO_FROM_RESOURCE_SERVER("AUTH011", "OAuth 서버로부터 유저 정보를 가져올 수 없습니다."),
+	NEED_NOT_CHANGE_ROLE("AUTH012", "사용자는 이미 ROLE_STORE 입니다."),
+	ROLE_CLAIM_IS_EMPTY("AUTH013", "토큰 생성시 Role 정보가 없습니다."),
 
 	//리뷰
 	NOT_FOUND_REVIEW("R001", "존재하지 않는 리뷰입니다."),

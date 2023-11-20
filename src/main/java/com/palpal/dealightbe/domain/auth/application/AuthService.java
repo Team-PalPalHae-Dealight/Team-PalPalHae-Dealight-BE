@@ -17,6 +17,7 @@ import com.palpal.dealightbe.domain.auth.application.dto.response.MemberAuthRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.OAuthLoginRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.OAuthUserInfoRes;
 import com.palpal.dealightbe.domain.auth.domain.Jwt;
+import com.palpal.dealightbe.domain.auth.exception.InvalidRoleException;
 import com.palpal.dealightbe.domain.image.ImageService;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
@@ -152,6 +153,10 @@ public class AuthService {
 
 	public MemberAuthRes updateMemberRoleToStore(Long providerId) {
 		Member member = findMemberByProviderId(providerId);
+
+		if (member.isRoleStore()) {
+			throw new InvalidRoleException(ErrorCode.NEED_NOT_CHANGE_ROLE);
+		}
 
 		List<MemberRole> assignableMemberRoles = createMemberRoles(RoleType.ROLE_STORE, member);
 		List<MemberRole> savedMemberRoles = memberRoleRepository.saveAll(assignableMemberRoles);
