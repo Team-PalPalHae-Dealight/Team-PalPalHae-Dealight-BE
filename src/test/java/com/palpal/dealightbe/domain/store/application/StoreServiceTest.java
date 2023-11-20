@@ -444,6 +444,8 @@ class StoreServiceTest {
 		double xCoordinate = 127.0221068;
 		double yCoordinate = 37.5912999;
 		String keyword = "떡볶이";
+		Long cursor = 10L;
+		String sortBy = "distance";
 		Pageable pageable = PageRequest.of(0, 2);
 
 		List<Store> stores = new ArrayList<>();
@@ -452,11 +454,11 @@ class StoreServiceTest {
 
 		SliceImpl<Store> storeSlice = new SliceImpl<>(stores);
 
-		when(storeRepository.findByDistanceWithin3Km(xCoordinate, yCoordinate, keyword, pageable))
+		when(storeRepository.findByKeywordAndDistanceWithin3KmAndSortCondition(xCoordinate, yCoordinate, keyword, sortBy, cursor, pageable))
 			.thenReturn(storeSlice);
 
 		//when
-		StoresInfoSliceRes search = storeService.search(xCoordinate, yCoordinate, keyword, "distance", pageable);
+		StoresInfoSliceRes search = storeService.search(xCoordinate, yCoordinate, keyword, "distance", cursor, pageable);
 
 		//then
 		assertThat(search.storeInfoSliceRes().get(0).name()).isEqualTo(store.getName());
@@ -471,6 +473,8 @@ class StoreServiceTest {
 		double yCoordinate = 37.5912999;
 		String keyword = "떡볶이";
 		String sortBy = "deadline";
+		Long cursor = 10L;
+
 		Pageable pageable = PageRequest.of(0, 2);
 
 		List<Store> stores = new ArrayList<>();
@@ -479,11 +483,11 @@ class StoreServiceTest {
 
 		SliceImpl<Store> storeSlice = new SliceImpl<>(stores);
 
-		when(storeRepository.findByDeadLine(xCoordinate, yCoordinate, keyword, pageable))
+		when(storeRepository.findByKeywordAndDistanceWithin3KmAndSortCondition(xCoordinate, yCoordinate, keyword, sortBy, cursor, pageable))
 			.thenReturn(storeSlice);
 
 		//when
-		StoresInfoSliceRes search = storeService.search(xCoordinate, yCoordinate, keyword, sortBy, pageable);
+		StoresInfoSliceRes search = storeService.search(xCoordinate, yCoordinate, keyword, sortBy, cursor, pageable);
 
 		//then
 		assertThat(search.storeInfoSliceRes().size()).isEqualTo(2);
@@ -498,6 +502,7 @@ class StoreServiceTest {
 		double yCoordinate = 37.5912999;
 		String keyword = "떡볶이";
 		String sortBy = "discount-rate";
+		Long cursor = 10L;
 		Pageable pageable = PageRequest.of(0, 2);
 
 		List<Store> stores = new ArrayList<>();
@@ -506,11 +511,11 @@ class StoreServiceTest {
 
 		SliceImpl<Store> storeSlice = new SliceImpl<>(stores);
 
-		when(storeRepository.findByDiscountRate(xCoordinate, yCoordinate, keyword, pageable))
+		when(storeRepository.findByKeywordAndDistanceWithin3KmAndSortCondition(xCoordinate, yCoordinate, keyword, sortBy, cursor, pageable))
 			.thenReturn(storeSlice);
 
 		//when
-		StoresInfoSliceRes search = storeService.search(xCoordinate, yCoordinate, keyword, sortBy, pageable);
+		StoresInfoSliceRes search = storeService.search(xCoordinate, yCoordinate, keyword, sortBy, cursor, pageable);
 
 		//then
 		assertThat(search.storeInfoSliceRes().size()).isEqualTo(2);

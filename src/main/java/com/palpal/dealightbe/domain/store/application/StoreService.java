@@ -1,11 +1,9 @@
 package com.palpal.dealightbe.domain.store.application;
 
-import java.util.Collections;
 import java.util.Objects;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +12,6 @@ import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.image.ImageService;
 import com.palpal.dealightbe.domain.image.application.dto.request.ImageUploadReq;
 import com.palpal.dealightbe.domain.image.application.dto.response.ImageRes;
-import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
@@ -27,8 +24,6 @@ import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusRe
 import com.palpal.dealightbe.domain.store.application.dto.response.StoresInfoSliceRes;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
-import com.palpal.dealightbe.domain.store.domain.StoreStatus;
-import com.palpal.dealightbe.global.ListSortType;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
@@ -152,22 +147,8 @@ public class StoreService {
 	}
 
 	@Transactional(readOnly = true)
-	public StoresInfoSliceRes search(double xCoordinate, double yCoordinate, String keyword, String sortBy, Pageable pageable) {
-		Slice<Store> stores = new SliceImpl<>(Collections.emptyList(), pageable, false);
-
-		ListSortType sortType = ListSortType.findSortType(sortBy);
-
-		switch (sortType) {
-			case DISTANCE:
-				stores = storeRepository.findByDistanceWithin3Km(xCoordinate, yCoordinate, keyword, pageable);
-				break;
-			case DISCOUNT_RATE:
-				stores = storeRepository.findByDiscountRate(xCoordinate, yCoordinate, keyword, pageable);
-				break;
-			case DEADLINE:
-				stores = storeRepository.findByDeadLine(xCoordinate, yCoordinate, keyword, pageable);
-				break;
-		}
+	public StoresInfoSliceRes search(double xCoordinate, double yCoordinate, String keyword, String sortBy, Long cursor, Pageable pageable) {
+		Slice<Store> stores = storeRepository.findByKeywordAndDistanceWithin3KmAndSortCondition(xCoordinate, yCoordinate, keyword, sortBy, cursor, pageable);
 
 		return StoresInfoSliceRes.from(stores);
 	}
