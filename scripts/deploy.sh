@@ -37,3 +37,6 @@ else
   sudo docker compose -f docker-compose.blue.yml down
   sudo docker image prune -af
 fi
+
+# nginx reload
+sudo systemctl reload nginx
