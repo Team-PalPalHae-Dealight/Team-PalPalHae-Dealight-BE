@@ -42,7 +42,7 @@ public class AuthController {
 	}
 
 	@PostMapping("/duplicate")
-	public ResponseEntity<Void> checkDuplicateNickName(@Validated MemberNickNameCheckReq request) {
+	public ResponseEntity<Void> checkDuplicateNickName(@RequestBody @Validated MemberNickNameCheckReq request) {
 		authService.checkDuplicateNickName(request);
 
 		return ResponseEntity
