@@ -35,7 +35,7 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
 	public Slice<Store> findByKeywordAndDistanceWithin3KmAndSortCondition(double xCoordinate, double yCoordinate, String keyword, String sortBy, Long cursor, Pageable pageable) {
 		BooleanExpression distancePredicate = getDistancePredicate(xCoordinate, yCoordinate);
 
-		BooleanExpression keywordPredicate = getBooleanExpression(keyword);
+		BooleanExpression keywordPredicate = getKeywordPredicate(keyword);
 
 		orderSpecifiers(xCoordinate, yCoordinate, sortBy);
 
@@ -91,7 +91,7 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
 		return Expressions.booleanTemplate(HAVERSINE + " <= 3", yCoordinate, address, xCoordinate);
 	}
 
-	private BooleanExpression getBooleanExpression(String keyword) {
+	private BooleanExpression getKeywordPredicate(String keyword) {
 		BooleanExpression keywordPredicate = store.name.like("%" + keyword + "%")
 			.or(item.name.like("%" + keyword + "%"));
 		return keywordPredicate;
