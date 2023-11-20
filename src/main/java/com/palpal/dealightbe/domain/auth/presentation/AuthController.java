@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.palpal.dealightbe.domain.auth.application.AuthService;
 import com.palpal.dealightbe.domain.auth.application.OAuth2AuthorizationService;
+import com.palpal.dealightbe.domain.auth.application.dto.request.MemberNickNameCheckReq;
 import com.palpal.dealightbe.domain.auth.application.dto.request.MemberSignupAuthReq;
 import com.palpal.dealightbe.domain.auth.application.dto.response.MemberAuthRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.OAuthLoginRes;
@@ -39,6 +40,15 @@ public class AuthController {
 		return ResponseEntity
 			.status(HttpStatus.OK)
 			.body(oAuthLoginRes);
+	}
+
+	@PostMapping("/duplicate")
+	public ResponseEntity<Void> checkDuplicateNickName(@RequestBody @Validated MemberNickNameCheckReq request) {
+		authService.checkDuplicateNickName(request);
+
+		return ResponseEntity
+			.noContent()
+			.build();
 	}
 
 	@PostMapping("/signup")

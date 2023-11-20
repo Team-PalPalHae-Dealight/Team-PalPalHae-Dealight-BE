@@ -10,8 +10,51 @@ endif::[]
 :toclevels: 2
 :sectlinks:
 
-== POST: 회원가입
 
+== POST: 닉네임 중복 검사
+=== 성공
+
+.Request
+include::{snippets}/auth/auth-duplicate-nickName-check-success/http-request.adoc[]
+.Request Fields
+include::{snippets}/auth/auth-duplicate-nickName-check-success/request-fields.adoc[]
+.Request Body
+include::{snippets}/auth/auth-duplicate-nickName-check-success/request-body.adoc[]
+
+.Response
+include::{snippets}/auth/auth-duplicate-nickName-check-success/http-response.adoc[]
+---
+
+=== 실패: 이미 존재하는 닉네임
+
+.Request
+include::{snippets}/auth/auth-duplicate-nickName-check-fail-already-exist/http-request.adoc[]
+.Request Body
+include::{snippets}/auth/auth-duplicate-nickName-check-fail-already-exist/request-body.adoc[]
+
+.Response
+include::{snippets}/auth/auth-duplicate-nickName-check-fail-already-exist/http-response.adoc[]
+.Response Fields
+include::{snippets}/auth/auth-duplicate-nickName-check-fail-already-exist/response-fields.adoc[]
+.Response Body
+include::{snippets}/auth/auth-duplicate-nickName-check-fail-already-exist/response-body.adoc[]
+---
+
+=== 실패: 조건에 맞지 않는 닉네임
+
+.Request
+include::{snippets}/auth/auth-duplicate-nickName-check-fail-not-valid-form/http-request.adoc[]
+.Request Body
+include::{snippets}/auth/auth-duplicate-nickName-check-fail-not-valid-form/request-body.adoc[]
+
+.Response
+include::{snippets}/auth/auth-duplicate-nickName-check-fail-not-valid-form/http-response.adoc[]
+.Response Fields
+include::{snippets}/auth/auth-duplicate-nickName-check-fail-not-valid-form/response-fields.adoc[]
+.Response Body
+include::{snippets}/auth/auth-duplicate-nickName-check-fail-not-valid-form/response-body.adoc[]
+
+== POST: 회원가입
 === 성공
 
 .Request
@@ -124,7 +167,6 @@ include::{snippets}/auth/auth-null-authorization-code-fail//response-fields.adoc
 include::{snippets}/auth/auth-null-authorization-code-fail//response-body.adoc[]
 
 === 실패: Authorization Code가 잘못된 경우
-
 .Request
 include::{snippets}/auth/auth-invalid-authorization-code/http-request.adoc[]
 .Request Parameters

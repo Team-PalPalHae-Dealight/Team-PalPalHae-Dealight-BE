@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.palpal.dealightbe.domain.address.domain.Address;
+import com.palpal.dealightbe.domain.auth.application.dto.request.MemberNickNameCheckReq;
 import com.palpal.dealightbe.domain.auth.application.dto.request.MemberSignupAuthReq;
 import com.palpal.dealightbe.domain.auth.application.dto.response.MemberAuthRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.OAuthLoginRes;
@@ -139,6 +140,15 @@ public class AuthService {
 
 		return createMemberAuthRes(member, newAccessToken, refreshToken);
 	}
+
+
+	@Transactional(readOnly = true)
+	public void checkDuplicateNickName(MemberNickNameCheckReq request) {
+		String nickName = request.nickName();
+		boolean isDuplicate = memberRepository.existsByNickName(nickName);
+		if (isDuplicate) {
+			throw new BusinessException(ErrorCode.DUPLICATED_NICK_NAME);
+		}
 
 	public MemberAuthRes updateMemberRoleToStore(Long providerId) {
 		Member member = findMemberByProviderId(providerId);
