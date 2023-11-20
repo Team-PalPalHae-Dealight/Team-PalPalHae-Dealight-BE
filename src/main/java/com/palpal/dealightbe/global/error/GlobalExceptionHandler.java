@@ -64,7 +64,7 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(InvalidRoleException.class)
 	public ResponseEntity<ErrorResponse> handleInvalidRoleException(InvalidRoleException e) {
-		ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.REQUIRE_QUERY_PARAM);
+		ErrorResponse errorResponse = ErrorResponse.of(e.getErrorCode());
 
 		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 	}
