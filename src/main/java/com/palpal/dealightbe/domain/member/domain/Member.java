@@ -55,7 +55,7 @@ public class Member extends BaseEntity {
 
 	private String image;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<MemberRole> memberRoles = new ArrayList<>();
 
 	@Builder
@@ -108,7 +108,7 @@ public class Member extends BaseEntity {
 	}
 
 	public boolean hasSameImage(String imageUrl) {
-		return this.image.equals(imageUrl);
+		return this.image != null && this.image.equals(imageUrl);
 	}
 
 	@Override

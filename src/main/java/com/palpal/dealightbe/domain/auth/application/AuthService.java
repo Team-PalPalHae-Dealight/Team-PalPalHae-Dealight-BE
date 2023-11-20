@@ -81,7 +81,7 @@ public class AuthService {
 		setDefaultImageUrl(requestMember);
 		Member savedMember = memberRepository.save(requestMember);
 
-		List<MemberRole> assignableMemberRoles = createMemberRoles(savedMember);
+		List<MemberRole> assignableMemberRoles = createMemberRoles(RoleType.ROLE_MEMBER, savedMember);
 		List<MemberRole> savedMemberRoles = memberRoleRepository.saveAll(assignableMemberRoles);
 
 		savedMember.updateMemberRoles(savedMemberRoles);
@@ -98,27 +98,23 @@ public class AuthService {
 		log.info("사용자(ProviderId:{})의 회원탈퇴를 진행합니다...", providerId);
 
 		Member member = findMemberByProviderId(providerId);
-
 		log.info("사용자({})를 조회하는데 성공했습니다.", member);
 
 		if (!member.hasSameImage(MEMBER_DEFAULT_IMAGE_PATH)) {
 			String memberImage = member.getImage();
 			log.info("사용자(ProviderId:{})의 이미지({})를 삭제합니다...", providerId, memberImage);
-
 			imageService.delete(memberImage);
-
 			log.info("이미지 삭제에 성공했습니다.");
 		}
 
 		log.info("사용자(ProviderId:{})의 정보를 삭제합니다...", providerId);
-
 		memberRepository.delete(member);
 
 		log.info("회원탈퇴에 성공했습니다.");
 	}
 
 	@Transactional(readOnly = true)
-	public MemberAuthRes reIssueToken(Long providerId, String refreshToken) {
+	public MemberAuthRes reissueToken(Long providerId, String refreshToken) {
 		log.info("사용자(ProviderId:{})의 AccessToken을 재발급합니다.", providerId);
 
 		Member member = findMemberByProviderId(providerId);
@@ -142,6 +138,19 @@ public class AuthService {
 		}
 
 		return createMemberAuthRes(member, newAccessToken, refreshToken);
+	}
+
+	public MemberAuthRes updateMemberRoleToStore(Long providerId) {
+		Member member = findMemberByProviderId(providerId);
+
+		List<MemberRole> assignableMemberRoles = createMemberRoles(RoleType.ROLE_STORE, member);
+		List<MemberRole> savedMemberRoles = memberRoleRepository.saveAll(assignableMemberRoles);
+		member.updateMemberRoles(savedMemberRoles);
+
+		String accessToken = jwt.createAccessToken(member);
+		String refreshToken = jwt.createRefreshToken(member);
+
+		return createMemberAuthRes(member, accessToken, refreshToken);
 	}
 
 	private boolean checkRefreshTokenAroundExpiryDate(String refreshToken) {
@@ -190,14 +199,14 @@ public class AuthService {
 		log.info(" 기본 이미지 지정이 완료됐습니다.");
 	}
 
-	private List<MemberRole> createMemberRoles(Member savedMember) {
-		log.info("회원(ProviderId: {})의 Role을 생성합니다...", savedMember.getProviderId());
-		Role assignableRole = roleRepository.findByRoleType(RoleType.ROLE_MEMBER)
+	private List<MemberRole> createMemberRoles(RoleType roleType, Member member) {
+		log.info("회원(ProviderId: {})의 Role({})을 생성합니다...", member.getProviderId(), roleType.getRole());
+		Role assignableRole = roleRepository.findByRoleType(roleType)
 			.orElseThrow(() -> {
 				log.warn("POST:CREATE:NOT_FOUND_ROLE_BY_ROLE_TYPE");
 				return new EntityNotFoundException(ErrorCode.NOT_FOUND_ROLE);
 			});
-		MemberRole memberRole = new MemberRole(savedMember, assignableRole);
+		MemberRole memberRole = new MemberRole(member, assignableRole);
 		List<MemberRole> assignableMemberRoles = new ArrayList<>();
 		assignableMemberRoles.add(memberRole);
 		log.info("Role를 만드는데 성공했습니다.");
