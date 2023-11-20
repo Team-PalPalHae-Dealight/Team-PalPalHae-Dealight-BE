@@ -568,6 +568,8 @@ class StoreControllerTest {
 		double xCoordinate = 127.0279372;
 		double yCoordinate = 37.4980136;
 		String keyword = "떡볶이";
+		Long lastId = 5L;
+
 		int size = 5;
 		int page = 0;
 		Pageable pageable = PageRequest.of(page, size);
@@ -586,6 +588,7 @@ class StoreControllerTest {
 				.param("x-coordinate", String.valueOf(xCoordinate))
 				.param("y-coordinate", String.valueOf(yCoordinate))
 				.param("keyword", keyword)
+				.param("last-id", String.valueOf(lastId))
 				.param("size", String.valueOf(size))
 				.param("page", String.valueOf(page)))
 			.andExpect(status().isOk())
@@ -597,6 +600,7 @@ class StoreControllerTest {
 					List.of(parameterWithName("x-coordinate").description("경도"),
 						parameterWithName("y-coordinate").description("위도"),
 						parameterWithName("keyword").description("검색어"),
+						parameterWithName("last-id").description("페이지의 마지막 업체ID"),
 						parameterWithName("size").description("한 페이지 당 업체 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
@@ -619,6 +623,7 @@ class StoreControllerTest {
 		double yCoordinate = 37.4980136;
 		String sortBy = "distance";
 		String keyword = "떡볶이";
+		Long lastId = 5L;
 		int size = 5;
 		int page = 0;
 		Pageable pageable = PageRequest.of(page, size);
@@ -638,6 +643,7 @@ class StoreControllerTest {
 				.param("y-coordinate", String.valueOf(yCoordinate))
 				.param("keyword", keyword)
 				.param("sort-by", sortBy)
+				.param("last-id", String.valueOf(lastId))
 				.param("size", String.valueOf(size))
 				.param("page", String.valueOf(page)))
 			.andExpect(status().isOk())
@@ -650,6 +656,7 @@ class StoreControllerTest {
 						parameterWithName("y-coordinate").description("위도"),
 						parameterWithName("keyword").description("검색어"),
 						parameterWithName("sort-by").description("정렬 기준(기본 및 거리순) : distance"),
+						parameterWithName("last-id").description("페이지의 마지막 업체ID"),
 						parameterWithName("size").description("한 페이지 당 업체 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
@@ -672,6 +679,7 @@ class StoreControllerTest {
 		double yCoordinate = 37.4980136;
 		String sortBy = "deadline";
 		String keyword = "떡볶이";
+		Long lastId = 5L;
 		int size = 5;
 		int page = 0;
 		Pageable pageable = PageRequest.of(page, size);
@@ -691,6 +699,7 @@ class StoreControllerTest {
 				.param("y-coordinate", String.valueOf(yCoordinate))
 				.param("keyword", keyword)
 				.param("sort-by", sortBy)
+				.param("last-id", String.valueOf(lastId))
 				.param("size", String.valueOf(size))
 				.param("page", String.valueOf(page)))
 			.andExpect(status().isOk())
@@ -703,6 +712,7 @@ class StoreControllerTest {
 						parameterWithName("y-coordinate").description("위도"),
 						parameterWithName("keyword").description("검색어"),
 						parameterWithName("sort-by").description("정렬 기준(마감 임박순) : deadline"),
+						parameterWithName("last-id").description("페이지의 마지막 업체ID"),
 						parameterWithName("size").description("한 페이지 당 업체 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
@@ -725,6 +735,7 @@ class StoreControllerTest {
 		double yCoordinate = 37.4980136;
 		String sortBy = "discount-rate";
 		String keyword = "떡볶이";
+		Long lastId = 5L;
 		int size = 5;
 		int page = 0;
 		Pageable pageable = PageRequest.of(page, size);
@@ -744,6 +755,7 @@ class StoreControllerTest {
 				.param("y-coordinate", String.valueOf(yCoordinate))
 				.param("keyword", keyword)
 				.param("sort-by", sortBy)
+				.param("last-id", String.valueOf(lastId))
 				.param("size", String.valueOf(size))
 				.param("page", String.valueOf(page)))
 			.andExpect(status().isOk())
@@ -756,6 +768,7 @@ class StoreControllerTest {
 						parameterWithName("y-coordinate").description("위도"),
 						parameterWithName("keyword").description("검색어"),
 						parameterWithName("sort-by").description("정렬 기준(할인률순) : discount-rate"),
+						parameterWithName("last-id").description("페이지의 마지막 업체ID"),
 						parameterWithName("size").description("한 페이지 당 업체 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
@@ -778,6 +791,7 @@ class StoreControllerTest {
 		double yCoordinate = 37.4980136;
 		String sortBy = "discount-rate";
 		String keyword = "감자";
+		Long lastId = 5L;
 		int size = 5;
 		int page = 0;
 		Pageable pageable = PageRequest.of(page, size);
@@ -794,6 +808,7 @@ class StoreControllerTest {
 				.param("y-coordinate", String.valueOf(yCoordinate))
 				.param("keyword", keyword)
 				.param("sort-by", sortBy)
+				.param("last-id", String.valueOf(lastId))
 				.param("size", String.valueOf(size))
 				.param("page", String.valueOf(page)))
 			.andExpect(status().isOk())
@@ -806,6 +821,7 @@ class StoreControllerTest {
 						parameterWithName("y-coordinate").description("위도"),
 						parameterWithName("keyword").description("검색어"),
 						parameterWithName("sort-by").description("정렬 기준(할인률순) : discount-rate"),
+						parameterWithName("last-id").description("페이지의 마지막 업체ID"),
 						parameterWithName("size").description("한 페이지 당 업체 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
