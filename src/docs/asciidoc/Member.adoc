@@ -13,8 +13,6 @@
 
 include::{snippets}/member/member-get-profile/http-request.adoc[]
 
-include::{snippets}/member/member-get-profile/path-parameters.adoc[]
-
 === Response
 
 include::{snippets}/member/member-get-profile/http-response.adoc[]
@@ -35,7 +33,6 @@ include::{snippets}/member/member-get-profile-not-found/http-response.adoc[]
 
 === Request
 
-include::{snippets}/member/member-update-profile/path-parameters.adoc[]
 include::{snippets}/member/member-update-profile/http-request.adoc[]
 include::{snippets}/member/member-update-profile/request-fields.adoc[]
 
@@ -61,7 +58,6 @@ include::{snippets}/member/member-update-profile-not-found/http-response.adoc[]
 
 === Request
 
-include::{snippets}/member/member-update-address/path-parameters.adoc[]
 include::{snippets}/member/member-update-address/http-request.adoc[]
 include::{snippets}/member/member-update-address/request-fields.adoc[]
 
@@ -88,7 +84,6 @@ include::{snippets}/member/member-update-address-not-found/http-response.adoc[]
 ==== Request
 
 include::{snippets}/member/member-upload-image/http-request.adoc[]
-include::{snippets}/member/member-upload-image/path-parameters.adoc[]
 include::{snippets}/member/member-upload-image/request-parts.adoc[]
 
 ==== Response
@@ -103,7 +98,6 @@ include::{snippets}/member/member-upload-image/response-fields.adoc[]
 ==== Request
 
 include::{snippets}/member/member-upload-image-not-found/http-request.adoc[]
-include::{snippets}/member/member-upload-image-not-found/path-parameters.adoc[]
 include::{snippets}/member/member-upload-image-not-found/request-parts.adoc[]
 
 ==== Response
@@ -117,7 +111,6 @@ include::{snippets}/member/member-upload-image-not-found/http-response.adoc[]
 ==== Request
 
 include::{snippets}/member/member-delete-image-success/http-request.adoc[]
-include::{snippets}/member/member-delete-image-success/path-parameters.adoc[]
 
 ==== Response
 
@@ -130,7 +123,6 @@ include::{snippets}/member/member-delete-image-success/http-response.adoc[]
 ==== Request
 
 include::{snippets}/member/member-delete-image-not-found/http-request.adoc[]
-include::{snippets}/member/member-delete-image-not-found/path-parameters.adoc[]
 
 ==== Response
 
