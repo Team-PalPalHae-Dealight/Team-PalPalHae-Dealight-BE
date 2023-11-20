@@ -56,7 +56,7 @@ public class SecurityConfig {
 			).permitAll()
 			// 서비스 URL
 			.antMatchers(HttpMethod.OPTIONS,
-				"/api/auth/signup"
+				"/api/auth/signup", "/api/auth/duplicate"
 			).permitAll()
 			.antMatchers(HttpMethod.OPTIONS,
 				"/api/**"

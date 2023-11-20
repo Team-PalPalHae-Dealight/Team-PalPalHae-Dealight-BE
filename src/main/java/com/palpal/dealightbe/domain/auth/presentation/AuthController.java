@@ -41,7 +41,7 @@ public class AuthController {
 			.body(oAuthLoginRes);
 	}
 
-	@GetMapping("/duplicate")
+	@PostMapping("/duplicate")
 	public ResponseEntity<Void> checkDuplicateNickName(@Validated MemberNickNameCheckReq request) {
 		authService.checkDuplicateNickName(request);
 

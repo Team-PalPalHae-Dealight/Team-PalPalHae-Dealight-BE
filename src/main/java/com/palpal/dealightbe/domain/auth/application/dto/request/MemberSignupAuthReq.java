@@ -19,6 +19,8 @@ public record MemberSignupAuthReq(
 	String realName,
 
 	@NotBlank(message = "닉네임은 필수 입력값입니다.")
+	@Pattern(regexp = "^[a-zA-Z0-9가-힣]+$\n",
+		message = "닉네임은 한글, 알파벳, 숫자만 사용할 수 있습니다.")
 	String nickName,
 
 	@NotBlank(message = "사용자 전화번호는 필수 입력값입니다.")
