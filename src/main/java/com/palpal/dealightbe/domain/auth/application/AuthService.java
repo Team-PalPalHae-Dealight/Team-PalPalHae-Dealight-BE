@@ -141,7 +141,6 @@ public class AuthService {
 		return createMemberAuthRes(member, newAccessToken, refreshToken);
 	}
 
-
 	@Transactional(readOnly = true)
 	public void checkDuplicateNickName(MemberNickNameCheckReq request) {
 		String nickName = request.nickName();
@@ -149,6 +148,7 @@ public class AuthService {
 		if (isDuplicate) {
 			throw new BusinessException(ErrorCode.DUPLICATED_NICK_NAME);
 		}
+	}
 
 	public MemberAuthRes updateMemberRoleToStore(Long providerId) {
 		Member member = findMemberByProviderId(providerId);
