@@ -44,17 +44,14 @@ public class Member extends BaseEntity {
 	@JoinColumn(name = "address_id")
 	private Address address;
 
-	@Column(nullable = false)
 	private String realName;
 
-	@Column(nullable = false, unique = true)
 	private String nickName;
 
 	private String phoneNumber;
 
 	private String provider;
 
-	@Column(nullable = false, unique = true)
 	private Long providerId;
 
 	private String image;

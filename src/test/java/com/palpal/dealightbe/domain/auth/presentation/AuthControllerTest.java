@@ -12,11 +12,13 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -28,15 +30,18 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palpal.dealightbe.domain.auth.application.AuthService;
 import com.palpal.dealightbe.domain.auth.application.OAuth2AuthorizationService;
+import com.palpal.dealightbe.domain.auth.application.dto.request.MemberNickNameCheckReq;
 import com.palpal.dealightbe.domain.auth.application.dto.request.MemberSignupAuthReq;
 import com.palpal.dealightbe.domain.auth.application.dto.response.MemberAuthRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.OAuthLoginRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.OAuthUserInfoRes;
 import com.palpal.dealightbe.domain.auth.exception.OAuth2AuthorizationException;
 import com.palpal.dealightbe.domain.auth.exception.RequiredAuthenticationException;
+import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
@@ -58,6 +63,105 @@ class AuthControllerTest {
 	private OAuth2AuthorizationService oAuth2AuthorizationService;
 
 	@Nested
+	@DisplayName("<닉네임 중복검사>")
+	class nickNameDuplicateTest {
+
+		String duplicateApi = "/api/auth/duplicate";
+
+		@DisplayName("중복 닉네임이 없다면 성공")
+		@ValueSource(strings = {"예", "예성", "요송", "요송송", "yosongsong", "요songsong", "ye성성"})
+		@ParameterizedTest
+		void successIfNoDuplicateNickName(String nickName) throws Exception {
+			// given
+			MemberNickNameCheckReq request = new MemberNickNameCheckReq(nickName);
+
+			doNothing().when(authService)
+				.checkDuplicateNickName(request);
+
+			// when -> then
+			mockMvc.perform(post(duplicateApi)
+					.with(user("user").roles("MEMBER"))
+					.with(csrf())
+					.contentType(MediaType.APPLICATION_JSON_VALUE)
+					.content(objectMapper.writeValueAsString(request))
+				)
+				.andExpect(status().isNoContent())
+				.andDo(print())
+				.andDo(document(
+					"auth/auth-duplicate-nickName-check-success",
+					preprocessRequest(prettyPrint()),
+					requestFields(
+						fieldWithPath("nickName").type(JsonFieldType.STRING)
+							.description("중복검사 대상 닉네임")
+					)
+				));
+		}
+
+		@DisplayName("중복 닉네임이 존재한다면 실패")
+		@Test
+		void failIfDuplicateNickNameIsExist() throws Exception {
+			// given
+			MemberNickNameCheckReq request = new MemberNickNameCheckReq("요송");
+			BusinessException businessException = new BusinessException(ErrorCode.DUPLICATED_NICK_NAME);
+
+			doThrow(businessException).when(authService)
+				.checkDuplicateNickName(request);
+
+			// when -> then
+			mockMvc.perform(post(duplicateApi)
+					.with(user("user").roles("MEMBER"))
+					.with(csrf())
+					.contentType(MediaType.APPLICATION_JSON_VALUE)
+					.content(objectMapper.writeValueAsString(request))
+				)
+				.andExpect(status().isBadRequest())
+				.andDo(print())
+				.andDo(document(
+					"auth/auth-duplicate-nickName-check-fail",
+					preprocessRequest(prettyPrint()),
+					responseFields(
+						fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+						fieldWithPath("code").type(STRING).description("오류 코드"),
+						fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+						fieldWithPath("message").type(STRING).description("오류 메시지")
+					)
+				));
+		}
+
+		@DisplayName("닉네임이 유효한 형태가 아닌 경우")
+		@NullAndEmptySource
+		@ValueSource(strings = {"요#@$", "       송", "#$%^&", "yosong  !@#$%,,,", ",,,,,,", "~@#$T예,,,&^%#@#-987성"})
+		@ParameterizedTest
+		void failIfNickNameIsNotValid(String nickName) throws Exception {
+			// given
+			MemberNickNameCheckReq request = new MemberNickNameCheckReq(nickName);
+
+			// when -> then
+			mockMvc.perform(post(duplicateApi)
+					.with(user("user").roles("MEMBER"))
+					.with(csrf())
+					.contentType(MediaType.APPLICATION_JSON_VALUE)
+					.content(objectMapper.writeValueAsString(request))
+				)
+				.andExpect(status().isBadRequest())
+				.andDo(print())
+				.andDo(document(
+					"auth/auth-duplicate-nickName-check-fail",
+					preprocessRequest(prettyPrint()),
+					responseFields(
+						fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+						fieldWithPath("code").type(STRING).description("오류 코드"),
+						fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+						fieldWithPath("errors[0].field").type(STRING).description("오류가 발생한 필드"),
+						fieldWithPath("errors[1].value").type(STRING).description("오류를 발생시킨 값"),
+						fieldWithPath("errors[2].reason").type(STRING).description("오류의 원린"),
+						fieldWithPath("message").type(STRING).description("오류 메시지")
+					)
+				));
+		}
+	}
+
+	@Nested
 	@DisplayName("<로그인>")
 	class loginTest {
 
@@ -66,13 +170,13 @@ class AuthControllerTest {
 		@DisplayName("등록된 회원이라면 로그인 성공")
 		@Test
 		void loginSuccessIfAlreadyExistMember() throws Exception {
+			// given
 			OAuthUserInfoRes requiredUserInfoRes
 				= new OAuthUserInfoRes("MOCK_SERVER", 12345L, "TESTER");
 			MemberAuthRes authRes = new MemberAuthRes(12345L, "member",
 				"MOCK_ACCESS_TOKEN", "MOCK_REFRESH_TOKEN");
 			OAuthLoginRes oAuthLoginRes = OAuthLoginRes.from(authRes);
 
-			// given
 			when(oAuth2AuthorizationService.authorizeFromKakao(any(String.class)))
 				.thenReturn(requiredUserInfoRes);
 			when(authService.authenticate(requiredUserInfoRes))
@@ -115,12 +219,12 @@ class AuthControllerTest {
 		@DisplayName("등록된 회원이 아니라면 회원가입 요구")
 		@Test
 		void requestSignupMessageIfNotExistMember() throws Exception {
+			// given
 			OAuthUserInfoRes oAuthUserInfoRes
 				= new OAuthUserInfoRes("MOCK_SERVER", 12345L, "TESTER");
 			OAuthLoginRes oAuthLoginRes
 				= new OAuthLoginRes("딜라이트 서비스에 가입이 필요합니다.", oAuthUserInfoRes);
 
-			// given
 			when(oAuth2AuthorizationService.authorizeFromKakao(any(String.class)))
 				.thenReturn(oAuthUserInfoRes);
 			when(authService.authenticate(oAuthUserInfoRes))
