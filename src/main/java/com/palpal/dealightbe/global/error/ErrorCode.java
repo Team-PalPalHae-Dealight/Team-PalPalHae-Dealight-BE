@@ -20,6 +20,7 @@ public enum ErrorCode {
 
 	//멤버
 	NOT_FOUND_MEMBER("M001", "고객을 찾을 수 없습니다."),
+	DUPLICATED_NICK_NAME("M002", "이미 존재하는 닉네임입니다."),
 
 	//업체
 	INVALID_BUSINESS_TIME("ST001", "마감 시간은 오픈 시간보다 이전일 수 없습니다"),
