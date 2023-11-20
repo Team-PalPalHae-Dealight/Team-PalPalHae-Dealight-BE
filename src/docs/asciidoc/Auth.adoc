@@ -8,9 +8,8 @@ endif::[]
 :source-highlighter: highlightjs
 :toc: left
 :toclevels: 2
-:sectlinks:
 
-
+[[User-API]]
 == POST: 닉네임 중복 검사
 === 성공
 
