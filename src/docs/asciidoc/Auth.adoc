@@ -10,8 +10,8 @@ endif::[]
 :toclevels: 2
 :sectlinks:
 
-== POST: 닉네임 중복 검사
 
+== POST: 닉네임 중복 검사
 === 성공
 
 .Request
@@ -55,7 +55,6 @@ include::{snippets}/auth/auth-duplicate-nickName-check-fail-not-valid-form/respo
 include::{snippets}/auth/auth-duplicate-nickName-check-fail-not-valid-form/response-body.adoc[]
 
 == POST: 회원가입
-
 === 성공
 
 .Request
@@ -168,7 +167,6 @@ include::{snippets}/auth/auth-null-authorization-code-fail//response-fields.adoc
 include::{snippets}/auth/auth-null-authorization-code-fail//response-body.adoc[]
 
 === 실패: Authorization Code가 잘못된 경우
-
 .Request
 include::{snippets}/auth/auth-invalid-authorization-code/http-request.adoc[]
 .Request Parameters

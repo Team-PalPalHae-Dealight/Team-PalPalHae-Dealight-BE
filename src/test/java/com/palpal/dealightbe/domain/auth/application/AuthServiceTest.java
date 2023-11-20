@@ -3,9 +3,13 @@ package com.palpal.dealightbe.domain.auth.application;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +19,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -30,6 +36,7 @@ import com.palpal.dealightbe.domain.auth.application.dto.response.MemberAuthRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.OAuthLoginRes;
 import com.palpal.dealightbe.domain.auth.application.dto.response.OAuthUserInfoRes;
 import com.palpal.dealightbe.domain.auth.domain.Jwt;
+import com.palpal.dealightbe.domain.image.ImageService;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.member.domain.MemberRole;
@@ -38,10 +45,13 @@ import com.palpal.dealightbe.domain.member.domain.Role;
 import com.palpal.dealightbe.domain.member.domain.RoleRepository;
 import com.palpal.dealightbe.domain.member.domain.RoleType;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
+import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
 
+	@Mock
+	private ImageService imageService;
 	@Mock
 	private MemberRepository memberRepository;
 	@Mock
@@ -65,6 +75,7 @@ class AuthServiceTest {
 			.build();
 		MemberRole memberRole = new MemberRole(member, role);
 		member.updateMemberRoles(Collections.singletonList(memberRole));
+		member.updateImage("MOCK_IMAGE_URL");
 	}
 
 	@DisplayName("Dealight에 등록된 사용자일 경우 MemberAuthRes 반환")
@@ -97,9 +108,9 @@ class AuthServiceTest {
 			.isNotEmpty();
 	}
 
-	@DisplayName("Dealight에 등록된 사용자가 아닐 경우 JoinRequireRes를 반환")
+	@DisplayName("Dealight에 등록된 사용자가 아닐 경우 OAuthUserInfoRes를 반환")
 	@Test
-	void loginFailIfNotRegisteredMemberReturnJoinRequireRes() {
+	void loginFailIfNotRegisteredMemberReturnOAuthUserInfoRes() {
 		// given
 		Long mockProviderId = 12345L;
 		OAuthUserInfoRes oAuthUserInfoRes
@@ -200,8 +211,10 @@ class AuthServiceTest {
 		MemberAuthRes response = authService.signup(memberSignupReq);
 
 		// then
-		assertThat(response.accessToken()).isEqualTo("MOCK_ACCESS_TOKEN");
-		assertThat(response.refreshToken()).isEqualTo("MOCK_REFRESH_TOKEN");
+		assertThat(response.accessToken())
+			.isEqualTo("MOCK_ACCESS_TOKEN");
+		assertThat(response.refreshToken())
+			.isEqualTo("MOCK_REFRESH_TOKEN");
 	}
 
 	@DisplayName("이미 존재하는 회원인 경우 회원가입 실패")
@@ -223,7 +236,148 @@ class AuthServiceTest {
 			.isInstanceOf(BusinessException.class);
 	}
 
-	@DisplayName("닉네임 중복 검사 실패")
+	@DisplayName("회원탈퇴 성공")
+	@Test
+	void unregisterSuccess() {
+		// given
+		Long providerId = member.getProviderId();
+		when(memberRepository.findMemberByProviderId(providerId))
+			.thenReturn(Optional.of(member));
+		doNothing().when(imageService)
+			.delete(any());
+
+		// when
+		authService.unregister(providerId);
+
+		// then
+		verify(memberRepository, times(1))
+			.delete(member);
+	}
+
+	@DisplayName("기본 이미지라면 삭제하지 않고, 회원탈퇴 성공")
+	@Test
+	void unregisterSuccessIfMemberHaveDefaultImage() {
+		// given
+		Long providerId = member.getProviderId();
+		String memberImage = member.getImage();
+		member.updateImage("https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/image/member-default-image.png");
+		when(memberRepository.findMemberByProviderId(providerId))
+			.thenReturn(Optional.of(member));
+
+		// when
+		authService.unregister(providerId);
+
+		// then
+		verify(imageService, times(0))
+			.delete(memberImage);
+		verify(memberRepository, times(1))
+			.delete(member);
+	}
+
+	@DisplayName("회원정보 조회에 실패할 경우, 회원탈퇴 실패")
+	@Test
+	void unregisterFailIfNotFoundMember() {
+		// given
+		Long providerId = member.getProviderId();
+		when(memberRepository.findMemberByProviderId(providerId))
+			.thenReturn(Optional.empty());
+
+		// when ->then
+		assertThatThrownBy(() -> authService.unregister(providerId))
+			.isInstanceOf(EntityNotFoundException.class);
+		verify(memberRepository, times(0))
+			.delete(member);
+	}
+
+	@DisplayName("Token 재발급 성공: Access Token만 재발급")
+	@ValueSource(longs = {11, 12, 13, 14, 15, 16, 17, 18, 19, 20})
+	@ParameterizedTest
+	void reissueOnlyAccessTokenSuccess(long days) {
+		// given
+		Long providerId = member.getProviderId();
+		String mockRefreshToken = "MOCK_REFRESH_TOKEN";
+		LocalDateTime expiryDateAfter20DaysFromCurrentTime
+			= LocalDateTime.now().plusDays(days);
+		Instant instant = expiryDateAfter20DaysFromCurrentTime
+			.atZone(ZoneId.systemDefault()).toInstant();
+		Date date = Date.from(instant);
+
+		given(memberRepository.findMemberByProviderId(providerId))
+			.willReturn(Optional.of(member));
+		given(jwt.getExpiryDate(mockRefreshToken))
+			.willReturn(date);
+
+		// when
+		authService.reissueToken(providerId, mockRefreshToken);
+
+		// then
+		verify(jwt, times(1))
+			.createAccessToken(member);
+	}
+
+	@DisplayName("Access Token, Refresh Token 모두 재발급 성공")
+	@ValueSource(longs = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
+	@ParameterizedTest
+	void reissueAllTokenSuccess(long days) {
+		// given
+		Long providerId = member.getProviderId();
+		String mockRefreshToken = "MOCK_REFRESH_TOKEN";
+		LocalDateTime expiryDateAfter20DaysFromCurrentTime
+			= LocalDateTime.now().plusDays(days);
+		Instant instant = expiryDateAfter20DaysFromCurrentTime
+			.atZone(ZoneId.systemDefault()).toInstant();
+		Date date = Date.from(instant);
+
+		given(memberRepository.findMemberByProviderId(providerId))
+			.willReturn(Optional.of(member));
+		given(jwt.getExpiryDate(mockRefreshToken))
+			.willReturn(date);
+
+		// when
+		authService.reissueToken(providerId, mockRefreshToken);
+
+		// then
+		verify(jwt, times(1))
+			.createAccessToken(member);
+		verify(jwt, times(1))
+			.createRefreshToken(member);
+	}
+
+	@DisplayName("Member를 찾지 못하면 토큰 발급 실패")
+	@Test
+	void reissueFailIfMemberNotFound() {
+		// given
+		Long providerId = member.getProviderId();
+		String mockRefreshToken = "MOCK_REFRESH_TOKEN";
+
+		given(memberRepository.findMemberByProviderId(providerId))
+			.willReturn(Optional.empty());
+
+		// when -> then
+		assertThatThrownBy(() -> authService.reissueToken(providerId, mockRefreshToken))
+			.isInstanceOf(EntityNotFoundException.class);
+	}
+
+	@DisplayName("Jwt 객체에 문제가 발생하면 Access Token 발급에 실패")
+	@Test
+	void reissueFailIfJwtIsNotWorking() {
+		// given
+		Long providerId = member.getProviderId();
+		String mockRefreshToken = "MOCK_REFRESH_TOKEN";
+
+		given(memberRepository.findMemberByProviderId(providerId))
+			.willReturn(Optional.of(member));
+		doThrow(RuntimeException.class).when(jwt)
+			.createAccessToken(member);
+
+		// when -> then
+		assertThatThrownBy(() -> authService.reissueToken(providerId, mockRefreshToken))
+			.isInstanceOf(RuntimeException.class);
+		verify(memberRepository, times(1))
+			.findMemberByProviderId(providerId);
+	}
+  
+  @DisplayName("닉네임 중복 검사 실패")
 	@Test
 	void successNickNameDuplicateCheck() {
 		// given
@@ -234,5 +388,5 @@ class AuthServiceTest {
 		// when -> then
 		assertThatThrownBy(() -> authService.checkDuplicateNickName(request))
 			.isInstanceOf(BusinessException.class);
-	}
+  }
 }

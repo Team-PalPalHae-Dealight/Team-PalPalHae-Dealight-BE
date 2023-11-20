@@ -36,13 +36,6 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 	}
 
-	@ExceptionHandler(IllegalArgumentException.class)
-	public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
-		ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.UNABLE_TO_HANDLE_ERROR);
-
-		return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-
 	@ExceptionHandler(RequiredAuthenticationException.class)
 	public ResponseEntity<ErrorResponse> handleRequiredAuthenticationException(RequiredAuthenticationException e) {
 		// 인증을 필요로하지만 토큰이 헤더에 들어있지 않은 경우(토큰이 null인 경우)
