@@ -12,6 +12,7 @@ import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.image.ImageService;
 import com.palpal.dealightbe.domain.image.application.dto.request.ImageUploadReq;
 import com.palpal.dealightbe.domain.image.application.dto.response.ImageRes;
+import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
@@ -24,6 +25,7 @@ import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusRe
 import com.palpal.dealightbe.domain.store.application.dto.response.StoresInfoSliceRes;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
+import com.palpal.dealightbe.domain.store.domain.StoreStatus;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
