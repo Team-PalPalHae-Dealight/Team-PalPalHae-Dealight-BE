@@ -15,11 +15,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.palpal.dealightbe.config.JpaConfig;
 import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.address.domain.AddressRepository;
 import com.palpal.dealightbe.domain.member.domain.Member;
@@ -29,7 +31,7 @@ import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.domain.store.domain.StoreStatus;
 
-@ExtendWith(SpringExtension.class)
+@Import(JpaConfig.class)
 @DataJpaTest
 class ItemRepositoryTest {
 
