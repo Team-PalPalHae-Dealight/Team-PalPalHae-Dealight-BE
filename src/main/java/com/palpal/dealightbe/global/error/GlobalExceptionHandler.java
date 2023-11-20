@@ -7,6 +7,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.palpal.dealightbe.domain.auth.exception.InvalidRoleException;
 import com.palpal.dealightbe.domain.auth.exception.OAuth2AuthorizationException;
 import com.palpal.dealightbe.domain.auth.exception.RequiredAuthenticationException;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
@@ -56,6 +57,13 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(
 		MissingServletRequestParameterException e) {
 		// 쿼리 파라미터에 아무 값도 들어오지 않은 경우
+		ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.REQUIRE_QUERY_PARAM);
+
+		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler(InvalidRoleException.class)
+	public ResponseEntity<ErrorResponse> handleInvalidRoleException(InvalidRoleException e) {
 		ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.REQUIRE_QUERY_PARAM);
 
 		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
