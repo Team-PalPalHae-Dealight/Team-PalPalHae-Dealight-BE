@@ -32,11 +32,11 @@ public class NotificationService {
 	private final EmitterRepository emitterRepository;
 	private final NotificationRepository notificationRepository;
 
-	private static String getEmitterId(Long id, RoleType userType) {
+	private String getEmitterId(Long id, RoleType userType) {
 		return userType.getRole() + "_" + id + "_" + System.currentTimeMillis();
 	}
 
-	private static String getEventId(Long id, String userType) {
+	private String getEventId(Long id, String userType) {
 		return userType + "_" + id + "_" + System.currentTimeMillis();
 	}
 
