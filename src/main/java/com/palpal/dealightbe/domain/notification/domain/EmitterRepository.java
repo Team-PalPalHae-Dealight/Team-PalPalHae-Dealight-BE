@@ -1,5 +1,7 @@
 package com.palpal.dealightbe.domain.notification.domain;
 
+import static com.palpal.dealightbe.domain.notification.util.EventIdUtil.extractTimestampFromEventId;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -11,14 +13,14 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class EmitterRepository {
 
 	public final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
-	private final Map<String, String> eventCache = new ConcurrentHashMap<>();
+	private final Map<String, Notification> eventCache = new ConcurrentHashMap<>();
 
 	public SseEmitter save(String id, SseEmitter sseEmitter) {
 		emitters.put(id, sseEmitter);
 		return sseEmitter;
 	}
 
-	public void saveEventCache(String id, String event) {
+	public void saveEventCache(String id, Notification event) {
 		eventCache.put(id, event);
 	}
 
@@ -28,9 +30,10 @@ public class EmitterRepository {
 			.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
-	public Map<String, String> findAllEventCacheStartWithId(String id) {
+	public Map<String, Notification> findAllEventCacheAfterTimestamp(String prefix, long lastEventTimestamp) {
 		return eventCache.entrySet().stream()
-			.filter(entry -> entry.getKey().startsWith(id))
+			.filter(entry -> entry.getKey().startsWith(prefix))
+			.filter(entry -> extractTimestampFromEventId(entry.getKey()) > lastEventTimestamp)
 			.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
