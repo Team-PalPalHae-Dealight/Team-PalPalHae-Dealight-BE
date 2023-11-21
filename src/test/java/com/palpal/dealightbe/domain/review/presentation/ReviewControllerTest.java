@@ -5,6 +5,7 @@ import static com.palpal.dealightbe.global.error.ErrorCode.UNAUTHORIZED_REQUEST;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
@@ -162,9 +163,7 @@ class ReviewControllerTest {
 		@DisplayName("실패 - 완료된 주문에 대해서만 리뷰를 작성할 수 있다")
 		void create_fail_not_completed() throws Exception {
 			// given
-			ReviewCreateReq emptyReq = new ReviewCreateReq(List.of());
-
-			given(reviewService.create(anyLong(), any(ReviewCreateReq.class), anyLong()))
+			given(reviewService.create(anyLong(), eq(reviewCreateReq), anyLong()))
 				.willThrow(new BusinessException(ILLEGAL_REVIEW_REQUEST));
 
 			// when
@@ -174,14 +173,14 @@ class ReviewControllerTest {
 						.with(csrf().asHeader())
 						.with(user("username").roles("MEMBER"))
 						.header("Authorization", "Bearer {ACCESS_TOKEN}")
-						.content(objectMapper.writeValueAsString(emptyReq))
+						.content(objectMapper.writeValueAsString(reviewCreateReq))
 						.contentType(APPLICATION_JSON)
 						.param("id", "2")
 				)
 				.andDo(print())
 				.andExpect(status().is4xxClientError())
 				.andExpect(result -> {
-					assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException);
+					assertTrue(result.getResolvedException() instanceof BusinessException);
 				})
 				.andDo(document("review/review-create-fail-not-completed",
 					preprocessRequest(prettyPrint()),
@@ -193,9 +192,6 @@ class ReviewControllerTest {
 						fieldWithPath("timestamp").type(STRING).description("예외 발생 시간"),
 						fieldWithPath("code").type(STRING).description("오류 코드"),
 						fieldWithPath("errors").type(ARRAY).description("오류 목록"),
-						fieldWithPath("errors[].field").type(STRING).description("잘못 입력된 필드"),
-						fieldWithPath("errors[].value").type(STRING).description("입력된 값"),
-						fieldWithPath("errors[].reason").type(STRING).description("원인"),
 						fieldWithPath("message").type(STRING).description("오류 메시지")
 					)
 				));
