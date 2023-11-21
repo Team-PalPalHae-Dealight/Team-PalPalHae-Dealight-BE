@@ -129,8 +129,8 @@ class StoreControllerTest {
 					fieldWithPath("name").description("상호명"),
 					fieldWithPath("telephone").description("업체 전화번호"),
 					fieldWithPath("addressName").description("업체 주소"),
-					fieldWithPath("xCoordinate").description("X 좌표"),
-					fieldWithPath("yCoordinate").description("Y 좌표"),
+					fieldWithPath("xCoordinate").description("경도"),
+					fieldWithPath("yCoordinate").description("위도"),
 					fieldWithPath("openTime").description("오픈 시간"),
 					fieldWithPath("closeTime").description("마감 시간"),
 					fieldWithPath("dayOff").description("휴무일")
@@ -185,8 +185,110 @@ class StoreControllerTest {
 					fieldWithPath("name").description("상호명"),
 					fieldWithPath("telephone").description("업체 전화번호"),
 					fieldWithPath("addressName").description("업체 주소"),
-					fieldWithPath("xCoordinate").description("X 좌표"),
-					fieldWithPath("yCoordinate").description("Y 좌표"),
+					fieldWithPath("xCoordinate").description("경도"),
+					fieldWithPath("yCoordinate").description("위도"),
+					fieldWithPath("openTime").description("오픈 시간"),
+					fieldWithPath("closeTime").description("마감 시간"),
+					fieldWithPath("dayOff").description("휴무일")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("오류 코드"),
+					fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("업체 등록 실패 - 등록되지 않은 유저")
+	void registerStoreFailTest_notFoundMember() throws Exception {
+
+		//given
+		LocalTime openTime = LocalTime.of(23, 0);
+		LocalTime closeTime = LocalTime.of(9, 0);
+
+		StoreCreateReq storeCreateReq = new StoreCreateReq("888222111", "맛짱조개", "01066772291", "서울시 강남구", 67.89,
+			293.2323, openTime, closeTime, Set.of(DayOff.MON));
+
+		given(storeService.register(any(), any()))
+			.willThrow(new BusinessException(ErrorCode.NOT_FOUND_MEMBER));
+
+		//when -> then
+		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/stores")
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(storeCreateReq)))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("M001"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("고객을 찾을 수 없습니다."))
+			.andDo(print())
+			.andDo(document("store/store-register-fail-not-found-member",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				requestFields(
+					fieldWithPath("storeNumber").description("사업자 등록 번호"),
+					fieldWithPath("name").description("상호명"),
+					fieldWithPath("telephone").description("업체 전화번호"),
+					fieldWithPath("addressName").description("업체 주소"),
+					fieldWithPath("xCoordinate").description("경도"),
+					fieldWithPath("yCoordinate").description("위도"),
+					fieldWithPath("openTime").description("오픈 시간"),
+					fieldWithPath("closeTime").description("마감 시간"),
+					fieldWithPath("dayOff").description("휴무일")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("오류 코드"),
+					fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("업체 등록 실패 - 이미 업체를 보유한 고객")
+	void registerStoreFailTest_aleadyHasStore() throws Exception {
+
+		//given
+		LocalTime openTime = LocalTime.of(23, 0);
+		LocalTime closeTime = LocalTime.of(9, 0);
+
+		StoreCreateReq storeCreateReq = new StoreCreateReq("888222111", "맛짱조개", "01066772291", "서울시 강남구", 67.89,
+			293.2323, openTime, closeTime, Set.of(DayOff.MON));
+
+		given(storeService.register(any(), any()))
+			.willThrow(new BusinessException(ErrorCode.ALEADY_HAS_STORE));
+
+		//when -> then
+		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/stores")
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(storeCreateReq)))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("ST007"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("이미 업체를 보유하고 있습니다"))
+			.andDo(print())
+			.andDo(document("store/store-register-fail-aleady-has-store",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				requestFields(
+					fieldWithPath("storeNumber").description("사업자 등록 번호"),
+					fieldWithPath("name").description("상호명"),
+					fieldWithPath("telephone").description("업체 전화번호"),
+					fieldWithPath("addressName").description("업체 주소"),
+					fieldWithPath("xCoordinate").description("경도"),
+					fieldWithPath("yCoordinate").description("위도"),
 					fieldWithPath("openTime").description("오픈 시간"),
 					fieldWithPath("closeTime").description("마감 시간"),
 					fieldWithPath("dayOff").description("휴무일")
