@@ -573,7 +573,7 @@ class ItemControllerTest {
 				),
 				requestParameters(
 					List.of(
-						parameterWithName("last-id").description("페이지의 마지막 상품 ID"),
+						parameterWithName("last-id").description("이전 페이지 목록의 마지막 상품 ID"),
 						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
@@ -659,7 +659,7 @@ class ItemControllerTest {
 					List.of(parameterWithName("x-coordinate").description("경도"),
 						parameterWithName("y-coordinate").description("위도"),
 						parameterWithName("sort-by").description("정렬 기준"),
-						parameterWithName("last-id").description("페이지의 마지막 상품 ID"),
+						parameterWithName("last-id").description("이전 페이지 목록의 마지막 상품 ID"),
 						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
@@ -751,7 +751,7 @@ class ItemControllerTest {
 				),
 				requestParameters(
 					List.of(
-						parameterWithName("last-id").description("페이지의 마지막 상품 ID"),
+						parameterWithName("last-id").description("이전 페이지 목록의 마지막 상품 ID"),
 						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
