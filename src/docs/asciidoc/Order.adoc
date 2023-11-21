@@ -15,20 +15,11 @@ endif::[]
 :toclevels: 5
 :sectlinks:
 
-== 주문 관련 API
-
-=== 0. 예외 발생 예시
-
-include::{snippets}/order/order-create-fail-arrival-time/response-fields.adoc[]
-include::{snippets}/order/order-create-fail-arrival-time/response-body.adoc[]
-
-include::{snippets}/order/order-create-fail-store-id/response-body.adoc[]
-
----
+= 주문 관련 API
 
 == 1. 주문 생성
 
-/api/orders
+=== [POST] /api/orders
 
 include::{snippets}/order/order-create-success/http-request.adoc[]
 
@@ -74,7 +65,7 @@ include::{snippets}/order/order-create-fail-closed-store/response-fields.adoc[]
 
 == 2. 주문 상태 변경
 
-/api/orders/{orderId}
+=== [PATCH] /api/orders/{orderId}
 
 include::{snippets}/order/order-status-update-success/http-request.adoc[]
 
@@ -112,7 +103,7 @@ include::{snippets}/order/order-create-fail-invalid-status/response-fields.adoc[
 
 == 3. 주문 상세 내용 조회 (단건)
 
-/api/orders/{orderId}
+=== [GET] /api/orders/{orderId}
 
 include::{snippets}/order/order-find-by-id-success/http-request.adoc[]
 
@@ -144,7 +135,7 @@ include::{snippets}/order/order-create-fail-unauthorized/response-fields.adoc[]
 
 === 4. 주문 조회 (다건) - 업체
 
-/api/orders/stores?id={storeId}&status={status}&page={page}&size={size}
+=== [GET] /api/orders/stores?id={storeId}&status={status}&page={page}&size={size}
 
 include::{snippets}/order/order-find-by-store-id-success/http-request.adoc[]
 
@@ -177,10 +168,10 @@ include::{snippets}/order/order-find-by-store-fail-unauthorized/response-fields.
 
 === 5. 주문 조회 (다건) - 고객
 
-/api/orders?status={status}&page={page}&size={size}
+=== [GET] /api/orders?status={status}&page={page}&size={size}
 
 include::{snippets}/order/order-find-by-member-success/http-request.adoc[]
-정 ==== 요청
+
 
 - header
 include::{snippets}/order/order-find-by-member-success/request-headers.adoc[]
