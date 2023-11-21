@@ -13,6 +13,8 @@ plugins {
     id 'org.asciidoctor.jvm.convert' version '3.3.2'
     // queryDSL plugin
     id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+    // git info
+    id "com.gorylenko.gradle-git-properties" version "2.4.1"
 }
 
 group = 'com.palpal'
@@ -51,7 +53,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+    // monitoring tools: actuator, prometheus, grafana
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 
     implementation 'org.apache.commons:commons-lang3:3.12.0'
 
@@ -126,4 +131,8 @@ bootJar {
     from("${asciidoctor.outputDir}") {
         into 'static/docs'
     }
+}
+
+springBoot {
+    buildInfo()
 }
