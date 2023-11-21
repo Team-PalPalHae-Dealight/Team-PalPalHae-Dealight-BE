@@ -86,6 +86,8 @@ public class AuthController {
 	public ResponseEntity<MemberAuthRes> updateMemberRoleToStore(Long providerId) {
 		MemberAuthRes memberAuthRes = authService.updateMemberRoleToStore(providerId);
 
-		return ResponseEntity.ok(memberAuthRes);
+		return ResponseEntity
+			.status(HttpStatus.CREATED)
+			.body(memberAuthRes);
 	}
 }
