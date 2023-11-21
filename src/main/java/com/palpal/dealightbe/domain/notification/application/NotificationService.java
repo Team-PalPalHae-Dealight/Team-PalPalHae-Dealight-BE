@@ -1,5 +1,6 @@
 package com.palpal.dealightbe.domain.notification.application;
 
+import static com.palpal.dealightbe.domain.notification.util.EventIdUtil.extractTimestampFromEventId;
 import static com.palpal.dealightbe.global.error.ErrorCode.SSE_STREAM_ERROR;
 
 import java.io.IOException;
@@ -28,12 +29,15 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class NotificationService {
 	private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
-
 	private final EmitterRepository emitterRepository;
 	private final NotificationRepository notificationRepository;
 
 	private static String getEmitterId(Long id, RoleType userType) {
 		return userType.getRole() + "_" + id + "_" + System.currentTimeMillis();
+	}
+
+	private static String getEventId(Long id, String userType) {
+		return userType + "_" + id + "_" + System.currentTimeMillis();
 	}
 
 	public SseEmitter subscribe(Long id, RoleType userType, String lastEventId) {
