@@ -87,13 +87,15 @@ public class NotificationService {
 	}
 
 	private void sendNotification(Long id, Notification notification, String userType) {
-		// userType과 id를 기반으로 emitter를 찾고 이벤트 전송
 		String emitterKeyPrefix = userType + "_" + id;
 
 		Map<String, SseEmitter> emitters = emitterRepository.findAllStartWithById(emitterKeyPrefix);
-		emitters.forEach((key, emitter) -> {
-			emitterRepository.saveEventCache(key, notification);
-			sendEventToEmitter(emitter, key, NotificationRes.from(notification));
+
+		String eventId = getEventId(id, userType);
+		emitterRepository.saveEventCache(eventId, notification);
+
+		emitters.forEach((emitterId, emitter) -> {
+			sendEventToEmitter(emitter, emitterId, eventId, NotificationRes.from(notification));
 		});
 	}
 
