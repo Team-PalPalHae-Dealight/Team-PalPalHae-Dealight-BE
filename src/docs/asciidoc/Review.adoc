@@ -15,19 +15,11 @@ endif::[]
 :toclevels: 5
 :sectlinks:
 
-== 리뷰 관련 API
-
-=== 0. 예외 발생 예시
-
-include::{snippets}/review/review-create-fail-empty/response-fields.adoc[]
-include::{snippets}/review/review-create-fail-empty/response-body.adoc[]
-include::{snippets}/review/review-create-fail-empty/response-body.adoc[]
-
----
+= 리뷰 관련 API
 
 == 1. 리뷰 등록
 
-/api/reviews/orders?id={orderId}
+=== [POST] /api/reviews/orders?id={orderId}
 
 include::{snippets}/review/review-create-success/http-request.adoc[]
 
@@ -56,11 +48,15 @@ include::{snippets}/review/review-create-success/response-fields.adoc[]
 include::{snippets}/review/review-create-fail-not-completed/response-body.adoc[]
 include::{snippets}/review/review-create-fail-not-completed/response-fields.adoc[]
 
+- 리뷰를 입력하지 않은 경우
+include::{snippets}/review/review-create-fail-empty/response-fields.adoc[]
+include::{snippets}/review/review-create-fail-empty/response-body.adoc[]
+
 ---
 
 == 2. 리뷰 통계 조회 - 업체별
 
-/api/reviews/stores?id={storeId}
+=== [GET] /api/reviews/stores?id={storeId}
 
 include::{snippets}/review/review-find-by-store-id-success/http-request.adoc[]
 
@@ -92,9 +88,9 @@ include::{snippets}/review/review-find-by-store-fail-unauthorized/response-field
 
 ---
 
-== 3. 리뷰 조회 - 주문별
+== 3. 리뷰 조회 - 주문별(고객)
 
-/api/reviews/orders?id={orderId}
+=== [GET] /api/reviews/orders?id={orderId}
 
 include::{snippets}/review/review-find-by-order-id-success/http-request.adoc[]
 
@@ -127,13 +123,13 @@ include::{snippets}/review/review-find-by-order-fail-unauthorized/response-field
 
 ---
 
-=== 4. 리뷰 선택지 조회
+== 4. 리뷰 선택지 조회
 
-/api/reviews/contents
+=== [GET] /api/reviews/contents
 
 include::{snippets}/review/review-contents-success/http-request.adoc[]
 
-==== 요청
+=== 요청
 
 - header
 include::{snippets}/review/review-contents-success/request-headers.adoc[]
@@ -141,7 +137,7 @@ include::{snippets}/review/review-contents-success/request-headers.adoc[]
 - body
 include::{snippets}/review/review-contents-success//request-body.adoc[]
 
-==== 응답
+=== 응답
 
 include::{snippets}/review/review-contents-success/response-body.adoc[]
 include::{snippets}/review/review-contents-success/response-fields.adoc[]
