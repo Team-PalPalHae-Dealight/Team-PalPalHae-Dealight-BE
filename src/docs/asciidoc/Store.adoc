@@ -13,7 +13,7 @@ endif::[]
 [[User-API]]
 == Store API
 
-=== 업체 등록
+=== 업체 등록 - 성공
 
 ==== POST - /api/stores
 
@@ -31,6 +31,16 @@ include::{snippets}/store/store-register/response-fields.adoc[]
 include::{snippets}/store/store-register-fail-invalid-business-time/http-response.adoc[]
 
 include::{snippets}/store/store-register-fail-invalid-business-time/response-fields.adoc[]
+
+.Request Fail - 이미 업체를 보유한 고객
+include::{snippets}/store/store-register-fail-aleady-has-store/http-response.adoc[]
+
+include::{snippets}/store/store-register-fail-aleady-has-store/response-fields.adoc[]
+
+.Request Fail - 존재하지 않는 고객
+include::{snippets}/store/store-register-fail-not-found-member/http-response.adoc[]
+
+include::{snippets}/store/store-register-fail-not-found-member/response-fields.adoc[]
 
 === 업체 마이 페이지 조회
 

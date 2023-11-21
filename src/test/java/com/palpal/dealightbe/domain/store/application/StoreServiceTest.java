@@ -266,6 +266,25 @@ class StoreServiceTest {
 		});
 	}
 
+	@DisplayName("업체 등록 실패: 이미 등록된 업체가 있을 경우")
+	@Test
+	void registerStoreFailureDuplicatedStoreTest() {
+		// given
+		LocalTime openTime = LocalTime.of(9, 0);
+		LocalTime closeTime = LocalTime.of(23, 0);
+		StoreCreateReq storeCreateReq = new StoreCreateReq("888-222-111", "맛짱조개", "01066772291", "서울시 강남구", 67.89, 293.2323, openTime, closeTime, Set.of(DayOff.MON));
+
+		when(memberRepository.findMemberByProviderId(member.getProviderId()))
+			.thenReturn(Optional.of(member));
+
+		when(storeRepository.findByMemberProviderId(member.getProviderId()))
+			.thenReturn(Optional.of(store));
+
+
+		assertThrows(BusinessException.class,
+			() -> storeService.register(member.getProviderId(), storeCreateReq));
+	}
+
 	@Test
 	@DisplayName("업체 마이페이지 조회 성공")
 	void getStoreInfoSuccessTest() throws Exception {

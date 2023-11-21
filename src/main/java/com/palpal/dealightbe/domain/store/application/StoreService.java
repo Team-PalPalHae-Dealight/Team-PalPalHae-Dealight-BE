@@ -54,6 +54,8 @@ public class StoreService {
 				throw new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
 			});
 
+		checkDuplicatedStore(providerId);
+
 		Address address = addressService.register(req.addressName(), req.xCoordinate(), req.yCoordinate());
 
 		Store store = StoreCreateReq.toStore(req, address, member);
@@ -177,5 +179,13 @@ public class StoreService {
 		if (store.getStoreStatus() == StoreStatus.CLOSED) {
 			itemRepository.deleteAllByStoreId(store.getId());
 		}
+	}
+
+	private void checkDuplicatedStore(Long providerId) {
+		storeRepository.findByMemberProviderId(providerId)
+			.ifPresent(existingStore -> {
+				log.warn("GET:READ:DUPLICATED_STORE: {}", providerId);
+				throw new BusinessException(ErrorCode.ALREADY_HAS_STORE);
+			});
 	}
 }
