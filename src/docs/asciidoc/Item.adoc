@@ -119,7 +119,7 @@ include::{snippets}/item/item-find-by-id-fail-not-found-item/response-fields.ado
 
 === 상품 목록 조회(업체 시점)
 
-==== /api/items/stores?size={size}&page={page}
+==== /api/items/stores?last-id={lastId}&size={size}&page={page}
 
 .Request Success - 성공
 include::{snippets}/item/item-find-all-for-store/http-request.adoc[]
@@ -139,7 +139,7 @@ include::{snippets}/item/item-find-all-for-store/response-fields.adoc[]
 
 === 상품 목록 조회(고객 시점)
 
-==== /api/items/members?x-coordinate={xCoordinate}&y-coordinate={yCoordinate}&sort-by={sortBy}&size={size}&page={page}
+==== /api/items/members?x-coordinate={xCoordinate}&y-coordinate={yCoordinate}&sort-by={sortBy}&last-id={lastId}&size={size}&page={page}
 
 <sort-by(정렬 조건) 종류>
 
@@ -161,7 +161,7 @@ include::{snippets}/item/item-find-all-for-member/response-fields.adoc[]
 
 === 업체의 상품 목록 조회(고객 시점)
 
-==== /api/items/stores/{storeId}?size={size}&page={page}
+==== /api/items/stores/{storeId}?last-id={lastId}&size={size}&page={page}
 
 .Request Success - 성공
 include::{snippets}/item/item-find-all-by-store-id/http-request.adoc[]
