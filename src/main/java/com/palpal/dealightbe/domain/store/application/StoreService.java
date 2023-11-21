@@ -185,7 +185,7 @@ public class StoreService {
 		storeRepository.findByMemberProviderId(providerId)
 			.ifPresent(existingStore -> {
 				log.warn("GET:READ:DUPLICATED_STORE: {}", providerId);
-				throw new BusinessException(ErrorCode.ALEADY_HAS_STORE);
+				throw new BusinessException(ErrorCode.ALREADY_HAS_STORE);
 			});
 	}
 }

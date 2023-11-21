@@ -29,7 +29,7 @@ public enum ErrorCode {
 	NOT_MATCH_OWNER_AND_REQUESTER("ST004", "업체 소유자와 요청자가 일치하지 않습니다."),
 	NOT_FOUND_STATUS("ST005", "존재하지 않는 영업 상태 입니다."),
 	CLOSED_STORE("ST006", "영업이 종료된 업체입니다."),
-	ALEADY_HAS_STORE("ST007", "이미 업체를 보유하고 있습니다"),
+	ALREADY_HAS_STORE("ST007", "이미 업체를 보유하고 있습니다"),
 
 	//상품
 	INVALID_ITEM_DISCOUNT_PRICE("I001", "상품 할인가는 원가보다 클 수 없습니다."),

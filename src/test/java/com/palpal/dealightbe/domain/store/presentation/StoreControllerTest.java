@@ -263,7 +263,7 @@ class StoreControllerTest {
 			293.2323, openTime, closeTime, Set.of(DayOff.MON));
 
 		given(storeService.register(any(), any()))
-			.willThrow(new BusinessException(ErrorCode.ALEADY_HAS_STORE));
+			.willThrow(new BusinessException(ErrorCode.ALREADY_HAS_STORE));
 
 		//when -> then
 		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/stores")
