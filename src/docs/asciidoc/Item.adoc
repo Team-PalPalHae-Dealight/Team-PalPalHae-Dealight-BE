@@ -121,7 +121,7 @@ include::{snippets}/item/item-find-by-id-fail-not-found-item/response-fields.ado
 
 ==== /api/items/stores?last-id={lastId}&size={size}&page={page}
 
-- 첫 페이지 조회 시 last-id 값 : 0
+- 첫 페이지 조회 시 last-id는 쿼리스트링에 삽입하지 않음
 
 .Request Success - 성공
 include::{snippets}/item/item-find-all-for-store/http-request.adoc[]
@@ -143,7 +143,7 @@ include::{snippets}/item/item-find-all-for-store/response-fields.adoc[]
 
 ==== /api/items/members?x-coordinate={xCoordinate}&y-coordinate={yCoordinate}&sort-by={sortBy}&last-id={lastId}&size={size}&page={page}
 
-- 첫 페이지 조회 시 last-id 값 : 0
+- 첫 페이지 조회 시 last-id는 쿼리스트링에 삽입하지 않음
 
 <sort-by(정렬 조건) 종류>
 
@@ -167,7 +167,7 @@ include::{snippets}/item/item-find-all-for-member/response-fields.adoc[]
 
 ==== /api/items/stores/{storeId}?last-id={lastId}&size={size}&page={page}
 
-- 첫 페이지 조회 시 last-id 값 : 0
+- 첫 페이지 조회 시 last-id는 쿼리스트링에 삽입하지 않음
 
 .Request Success - 성공
 include::{snippets}/item/item-find-all-by-store-id/http-request.adoc[]
