@@ -760,7 +760,7 @@ class AuthControllerTest {
 					.with(user("user").roles("MEMBER"))
 				)
 				.andDo(print())
-				.andExpect(status().isOk())
+				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.userId").value(providerId))
 				.andExpect(jsonPath("$.role").value("store"))
 				.andExpect(jsonPath("$.accessToken").value(accessToken))

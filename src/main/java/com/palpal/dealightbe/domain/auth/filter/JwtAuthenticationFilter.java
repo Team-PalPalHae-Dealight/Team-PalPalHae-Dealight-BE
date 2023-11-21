@@ -38,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		FilterChain filterChain) throws ServletException, IOException {
 		if (SecurityContextHolder.getContext().getAuthentication() == null) {
 			String token = parseTokenFromHttpRequest(request);
-			log.info("JwtAuthenticationFilter에서 token({}) 검증을 시작합니다...", token);
+			log.debug("JwtAuthenticationFilter에서 token({}) 검증을 시작합니다...", token);
 			if (token != null) {
 				try {
 					jwt.validateToken(token);
@@ -70,25 +70,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 
 		// 인증 정보가 이미 있는 경우, 토큰이 null인 경우, 인증에 성공한 경우
-		log.info("인증 과정을 마쳤으므로 다음 필터로 진행합니다...");
+		log.debug("인증 과정을 마쳤으므로 다음 필터로 진행합니다...");
 		filterChain.doFilter(request, response);
 	}
 
 	private String parseTokenFromHttpRequest(HttpServletRequest request) {
-		log.info("요청 메시지로부터 Authorization 헤더 값을 가져옵니다...");
+		log.debug("요청 메시지로부터 Authorization 헤더 값을 가져옵니다...");
 		String jwtWithBearer = request.getHeader(HttpHeaders.AUTHORIZATION);
-		log.info("jwtWithBearer: {}", jwtWithBearer);
+		log.debug("jwtWithBearer: {}", jwtWithBearer);
 		boolean isValidToken = validateTokenFromRequest(jwtWithBearer);
-		log.info("isValidToken: {}", isValidToken);
+		log.debug("isValidToken: {}", isValidToken);
 		if (!isValidToken) {
-			log.warn("Authorization에 값이 존재하지 않습니다.");
+			log.debug("Authorization에 값이 존재하지 않습니다.");
 
 			return null;
 		}
 
-		log.info("Authorization({}) 값을 가져오는데 성공했습니다.", jwtWithBearer);
+		log.debug("Authorization({}) 값을 가져오는데 성공했습니다.", jwtWithBearer);
 		String jwt = jwtWithBearer.substring(7);
-		log.info("Jwt({})를 가져오는데 성공했습니다.", jwt);
+		log.debug("Jwt({})를 가져오는데 성공했습니다.", jwt);
 
 		return jwt;
 	}
@@ -126,7 +126,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private void writeToHttpServletResponse(HttpServletResponse response, int statusCode, String errorMessage) throws
 		IOException {
-		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		response.setStatus(statusCode);
 		response.setContentType("application/json;charset=UTF-8");
 		response.getWriter().write(errorMessage);
 		response.getWriter().flush();

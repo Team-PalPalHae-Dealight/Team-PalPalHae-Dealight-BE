@@ -3,6 +3,7 @@ spring:
     import:
       - classpath:application-oauth.yml
       - classpath:application-aws.yml
+      - classpath:application-actuator.yml
 
   datasource:
     url: "jdbc:h2:mem:spring_security;MODE=MYSQL;DB_CLOSE_DELAY=-1"
