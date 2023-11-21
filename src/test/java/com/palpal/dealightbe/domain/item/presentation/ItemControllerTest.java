@@ -523,6 +523,8 @@ class ItemControllerTest {
 			.store(store)
 			.build();
 
+		Long lastId = 0L;
+
 		int size = 5;
 		int page = 0;
 		PageRequest pageRequest = PageRequest.of(page, size);
@@ -542,6 +544,7 @@ class ItemControllerTest {
 		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/items/stores")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.param("last-id", String.valueOf(lastId))
 				.param("size", String.valueOf(size))
 				.param("page", String.valueOf(1)))
 			.andExpect(status().isOk())
@@ -570,6 +573,7 @@ class ItemControllerTest {
 				),
 				requestParameters(
 					List.of(
+						parameterWithName("last-id").description("페이지의 마지막 상품 ID"),
 						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
@@ -603,6 +607,8 @@ class ItemControllerTest {
 		double yCoordinate = 37.5912999;
 		String sortBy = "deadline";
 
+		Long lastId = 0L;
+
 		int size = 5;
 		int page = 0;
 		PageRequest pageRequest = PageRequest.of(page, size);
@@ -625,6 +631,7 @@ class ItemControllerTest {
 				.param("x-coordinate", String.valueOf(xCoordinate))
 				.param("y-coordinate", String.valueOf(yCoordinate))
 				.param("sort-by", sortBy)
+				.param("last-id", String.valueOf(lastId))
 				.param("size", String.valueOf(size))
 				.param("page", String.valueOf(1)))
 			.andExpect(status().isOk())
@@ -652,6 +659,7 @@ class ItemControllerTest {
 					List.of(parameterWithName("x-coordinate").description("경도"),
 						parameterWithName("y-coordinate").description("위도"),
 						parameterWithName("sort-by").description("정렬 기준"),
+						parameterWithName("last-id").description("페이지의 마지막 상품 ID"),
 						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
@@ -694,6 +702,8 @@ class ItemControllerTest {
 			.store(store)
 			.build();
 
+		Long lastId = 0L;
+
 		int size = 5;
 		int page = 0;
 		PageRequest pageRequest = PageRequest.of(page, size);
@@ -712,6 +722,7 @@ class ItemControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/items/stores/{storeId}", storeId)
 				.contentType(MediaType.APPLICATION_JSON)
+				.param("last-id", String.valueOf(lastId))
 				.param("size", String.valueOf(size))
 				.param("page", String.valueOf(1)))
 			.andExpect(status().isOk())
@@ -740,6 +751,7 @@ class ItemControllerTest {
 				),
 				requestParameters(
 					List.of(
+						parameterWithName("last-id").description("페이지의 마지막 상품 ID"),
 						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
