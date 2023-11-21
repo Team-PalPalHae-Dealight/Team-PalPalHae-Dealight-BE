@@ -50,11 +50,12 @@ public class NotificationService {
 		emitter.onTimeout(() -> emitterRepository.deleteById(emitterId));
 
 		emitterRepository.save(emitterId, emitter);
+		String eventId = getEventId(id, userType.getRole());
 
-		sendEventToEmitter(emitter, emitterId, "EventStream Created. [" + userType + "Id=" + id + "]");
+		sendEventToEmitter(emitter, emitterId, eventId, "EventStream Created. [" + userType + "Id=" + id + "]");
 
 		if (!lastEventId.isEmpty()) {
-			resendMissedEvents(id, userType.getRole(), lastEventId, emitter);
+			resendMissedEvents(id, userType.getRole(), emitterId, lastEventId, emitter);
 		}
 
 		return emitter;
