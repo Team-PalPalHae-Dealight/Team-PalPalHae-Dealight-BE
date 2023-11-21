@@ -61,11 +61,17 @@ public class NotificationService {
 		return emitter;
 	}
 
-	private void resendMissedEvents(Long id, String userType, String lastEventId, SseEmitter emitter) {
-		Map<String, Notification> events = emitterRepository.findAllEventCacheStartWithId(userType + "_" + id);
-		events.entrySet().stream()
-			.filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
-			.forEach(entry -> sendEventToEmitter(emitter, entry.getKey(), entry.getValue()));
+	private void resendMissedEvents(Long id, String userType, String emitterId, String lastEventId,
+		SseEmitter emitter) {
+
+		long lastEventTimestamp = extractTimestampFromEventId(lastEventId);
+		Map<String, Notification> events = emitterRepository.findAllEventCacheAfterTimestamp(userType + "_" + id,
+			lastEventTimestamp);
+		for (Map.Entry<String, Notification> eventEntry : events.entrySet()) {
+			String eventId = eventEntry.getKey();
+			Notification notification = eventEntry.getValue();
+			sendEventToEmitter(emitter, emitterId, eventId, NotificationRes.from(notification));
+		}
 	}
 
 	private void sendEventToEmitter(SseEmitter emitter, String emitterId, String eventId, Object data) {
