@@ -68,16 +68,17 @@ public class NotificationService {
 			.forEach(entry -> sendEventToEmitter(emitter, entry.getKey(), entry.getValue()));
 	}
 
-	private void sendEventToEmitter(SseEmitter emitter, String emitterId, Object data) {
+	private void sendEventToEmitter(SseEmitter emitter, String emitterId, String eventId, Object data) {
 
 		try {
 			if (data instanceof NotificationRes) {
-				// JSON 형태의 객체인 경우
-				emitter.send(SseEmitter.event().id(emitterId).name("orderNotification").data(data));
+				emitter.send(SseEmitter.event()
+					.id(eventId)
+					.name("orderNotification")
+					.data(data));
 			} else {
-				// 문자열인 경우
 				String jsonData = "{\"message\":\"" + data.toString() + "\"}";
-				emitter.send(SseEmitter.event().id(emitterId).name("orderNotification").data(jsonData));
+				emitter.send(SseEmitter.event().id(eventId).name("orderNotification").data(jsonData));
 			}
 		} catch (IOException exception) {
 			emitterRepository.deleteById(emitterId);
