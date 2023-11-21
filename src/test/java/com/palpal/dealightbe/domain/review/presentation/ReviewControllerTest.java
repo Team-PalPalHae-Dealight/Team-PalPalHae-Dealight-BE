@@ -163,7 +163,7 @@ class ReviewControllerTest {
 		@DisplayName("실패 - 완료된 주문에 대해서만 리뷰를 작성할 수 있다")
 		void create_fail_not_completed() throws Exception {
 			// given
-			given(reviewService.create(anyLong(), eq(reviewCreateReq), anyLong()))
+			given(reviewService.create(any(), eq(reviewCreateReq), any()))
 				.willThrow(new BusinessException(ILLEGAL_REVIEW_REQUEST));
 
 			// when
