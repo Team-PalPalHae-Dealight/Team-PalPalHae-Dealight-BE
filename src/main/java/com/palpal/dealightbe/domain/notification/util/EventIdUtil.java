@@ -1,9 +1,10 @@
 package com.palpal.dealightbe.domain.notification.util;
 
-public final class EventIdUtil {
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
-	private EventIdUtil() {
-	}
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class EventIdUtil {
 
 	public static long extractTimestampFromEventId(String eventId) {
 		String[] parts = eventId.split("_");
