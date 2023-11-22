@@ -31,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -93,12 +94,15 @@ class StoreControllerTest {
 		//given
 		LocalTime openTime = LocalTime.of(9, 0);
 		LocalTime closeTime = LocalTime.of(23, 0);
+		Set<String> dayOffs = Set.of(DayOff.MON).stream()
+			.map(DayOff::getName)
+			.collect(Collectors.toSet());
 
 		StoreCreateReq storeCreateReq = new StoreCreateReq("888222111", "맛짱조개", "01066772291", "서울시 강남구", 67.89,
 			293.2323, openTime, closeTime, Set.of(DayOff.MON));
 		AddressRes addressRes = new AddressRes("서울시 강남구", 67.89, 293.2323);
 		StoreCreateRes storeCreateRes = new StoreCreateRes(1L, "888222111", "맛짱조개", "01066772291", addressRes, openTime,
-			closeTime, Set.of(DayOff.MON), DEFAULT_PATH);
+			closeTime, dayOffs, DEFAULT_PATH);
 
 		given(storeService.register(any(), any()))
 			.willReturn(storeCreateRes);
@@ -306,12 +310,16 @@ class StoreControllerTest {
 	@DisplayName("업체 마이페이지 조회 성공")
 	void getInfoSuccessTest() throws Exception {
 
+		Set<String> dayOffs = Set.of(DayOff.MON, DayOff.TUE).stream()
+			.map(DayOff::getName)
+			.collect(Collectors.toSet());
+
 		//given
 		Long storeId = 1L;
 		LocalTime openTime = LocalTime.of(9, 0);
 		LocalTime closeTime = LocalTime.of(23, 0);
 		StoreInfoRes storeInfoRes = new StoreInfoRes("123123213", "피나치공", "02123456", "서울시 강남구", openTime, closeTime,
-			Set.of(DayOff.MON, DayOff.TUE), StoreStatus.OPENED, null);
+			dayOffs, StoreStatus.OPENED, null);
 
 		given(storeService.getInfo(any(), eq(storeId)))
 			.willReturn(storeInfoRes);
@@ -388,11 +396,14 @@ class StoreControllerTest {
 		Long storeId = 1L;
 		LocalTime openTime = LocalTime.of(19, 0);
 		LocalTime closeTime = LocalTime.of(22, 0);
+		Set<String> dayOffs = Set.of(DayOff.TUE).stream()
+			.map(DayOff::getName)
+			.collect(Collectors.toSet());
 
 		StoreUpdateReq updateReq = new StoreUpdateReq("888222111", "부산시", 777.777, 123.123234, openTime, closeTime,
 			Set.of(DayOff.TUE));
 		StoreInfoRes storeInfoRes = new StoreInfoRes("888222111", "맛짱조개", "01066772291", "부산시", openTime, closeTime,
-			Set.of(DayOff.TUE), StoreStatus.OPENED, null);
+			dayOffs, StoreStatus.OPENED, null);
 
 		given(storeService.updateInfo(any(), eq(storeId), eq(updateReq)))
 			.willReturn(storeInfoRes);
