@@ -143,4 +143,18 @@ public class NotificationService {
 			.content(content)
 			.build();
 	}
+
+	public void deleteAll(Long memberId) {
+		Member member = memberRepository.findMemberByProviderId(memberId)
+			.orElseThrow(() -> {
+				log.warn("PATCH:UPDATE:NOT_FOUND_MEMBER_BY_ID : {}", memberId);
+				return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
+			});
+
+		RoleType role = member.getMemberRoles().get(0).getRole().getType();
+		String id = getNotificationId(memberId, role);
+		emitterRepository.deleteAllStartWithId(id);
+		emitterRepository.deleteAllEventCacheStartWithId(id);
+	}
+
 }
