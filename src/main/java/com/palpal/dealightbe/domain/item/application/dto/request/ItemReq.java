@@ -23,10 +23,7 @@ public record ItemReq(
 	int originalPrice,
 
 	@Length(max = 300, message = "상품 설명은 300자 이하로 등록 가능합니다.")
-	String description,
-
-	@Length(max = 300, message = "상품 안내 사항은 300자 이하로 등록 가능합니다.")
-	String information
+	String description
 ) {
 
 	public static Item toItem(ItemReq itemReq, Store store, String image) {
@@ -37,7 +34,6 @@ public record ItemReq(
 			.discountPrice(itemReq.discountPrice)
 			.originalPrice(itemReq.originalPrice)
 			.description(itemReq.description)
-			.information(itemReq.information)
 			.image(image)
 			.store(store)
 			.build();

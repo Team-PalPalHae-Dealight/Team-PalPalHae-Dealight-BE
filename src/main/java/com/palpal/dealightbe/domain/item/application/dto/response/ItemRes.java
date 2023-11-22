@@ -14,12 +14,8 @@ public record ItemRes(
 	int discountPrice,
 	int originalPrice,
 	String description,
-	String information,
 	String image,
 	String storeName,
-
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
-	LocalTime storeOpenTime,
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
 	LocalTime storeCloseTime,
@@ -37,10 +33,8 @@ public record ItemRes(
 			item.getDiscountPrice(),
 			item.getOriginalPrice(),
 			item.getDescription(),
-			item.getInformation(),
 			item.getImage(),
 			item.getStore().getName(),
-			item.getStore().getOpenTime(),
 			item.getStore().getCloseTime(),
 			AddressRes.from(item.getStore().getAddress())
 		);

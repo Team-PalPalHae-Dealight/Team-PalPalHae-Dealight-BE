@@ -12,14 +12,12 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.palpal.dealightbe.config.JpaConfig;
 import com.palpal.dealightbe.domain.address.domain.Address;
@@ -92,7 +90,6 @@ class ItemRepositoryTest {
 			.discountPrice(3300)
 			.originalPrice(4800)
 			.description("기본 떡볶이 입니다.")
-			.information("통신사 할인 불가능 합니다.")
 			.image("https://fake-image.com/item1.png")
 			.store(store1)
 			.build();
@@ -115,7 +112,6 @@ class ItemRepositoryTest {
 			.discountPrice(3000)
 			.originalPrice(3300)
 			.description("치즈 떡볶이 입니다.")
-			.information("통신사 할인 불가능 합니다.")
 			.image("https://fake-image.com/item1.png")
 			.store(store2)
 			.build();
@@ -138,7 +134,6 @@ class ItemRepositoryTest {
 			.discountPrice(1000)
 			.originalPrice(2500)
 			.description("순대 입니다.")
-			.information("통신사 할인 불가능 합니다.")
 			.image("https://fake-image.com/item1.png")
 			.store(store3)
 			.build();
@@ -161,7 +156,6 @@ class ItemRepositoryTest {
 			.discountPrice(2010)
 			.originalPrice(4800)
 			.description("찹쌀 순대 입니다.")
-			.information("통신사 할인 불가능 합니다.")
 			.image("https://fake-image.com/item1.png")
 			.store(store4)
 			.build();
@@ -184,7 +178,6 @@ class ItemRepositoryTest {
 			.discountPrice(2400)
 			.originalPrice(4550)
 			.description("김밥 입니다.")
-			.information("통신사 할인 불가능 합니다.")
 			.image("https://fake-image.com/item1.png")
 			.store(store5)
 			.build();
@@ -207,7 +200,6 @@ class ItemRepositoryTest {
 			.discountPrice(3500)
 			.originalPrice(4900)
 			.description("김밥 입니다.")
-			.information("통신사 할인 불가능 합니다.")
 			.image("https://fake-image.com/item1.png")
 			.store(store6)
 			.build();

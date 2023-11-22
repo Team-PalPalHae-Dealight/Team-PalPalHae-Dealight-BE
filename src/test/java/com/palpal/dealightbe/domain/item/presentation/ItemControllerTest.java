@@ -121,7 +121,6 @@ class ItemControllerTest {
 			.discountPrice(3000)
 			.originalPrice(4500)
 			.description("기본 떡볶이 입니다.")
-			.information("통신사 할인 불가능 합니다.")
 			.image("https://fake-image.com/item1.png")
 			.store(store)
 			.build();
@@ -150,7 +149,6 @@ class ItemControllerTest {
 			.discountPrice(4000)
 			.originalPrice(4500)
 			.description("김밥 입니다.")
-			.information("통신사 할인 불가능 합니다.")
 			.image("https://fake-image.com/item2.png")
 			.store(store2)
 			.build();
@@ -163,8 +161,8 @@ class ItemControllerTest {
 		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
 
 		ItemReq itemReq = new ItemReq(item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(),
-			item.getDescription(), item.getInformation());
-		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), item.getStore().getName(), item.getStore().getOpenTime(), item.getStore().getCloseTime(), addressRes);
+			item.getDescription());
+		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getImage(), item.getStore().getName(), item.getStore().getCloseTime(), addressRes);
 
 		MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "file".getBytes());
 		MockMultipartFile request = new MockMultipartFile("itemReq", "itemReq",
@@ -189,10 +187,8 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.discountPrice").value(itemRes.discountPrice()))
 			.andExpect(jsonPath("$.originalPrice").value(itemRes.originalPrice()))
 			.andExpect(jsonPath("$.description").value(itemRes.description()))
-			.andExpect(jsonPath("$.information").value(itemRes.information()))
 			.andExpect(jsonPath("$.image").value(itemRes.image()))
 			.andExpect(jsonPath("$.storeName").value(itemRes.storeName()))
-			.andExpect(jsonPath("$.storeOpenTime").value(itemRes.storeOpenTime().toString()))
 			.andExpect(jsonPath("$.storeCloseTime").value(itemRes.storeCloseTime().toString()))
 			.andExpect(jsonPath("$.storeAddress.name").value(addressRes.name()))
 			.andExpect(jsonPath("$.storeAddress.xCoordinate").value(addressRes.xCoordinate()))
@@ -213,8 +209,7 @@ class ItemControllerTest {
 					fieldWithPath("stock").type(NUMBER).description("재고 수"),
 					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
-					fieldWithPath("description").type(STRING).description("상품 설명"),
-					fieldWithPath("information").type(STRING).description("상품 안내")
+					fieldWithPath("description").type(STRING).description("상품 설명")
 				),
 				responseFields(
 					fieldWithPath("itemId").type(NUMBER).description("상품 ID"),
@@ -224,10 +219,8 @@ class ItemControllerTest {
 					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
 					fieldWithPath("description").type(STRING).description("상세 설명"),
-					fieldWithPath("information").type(STRING).description("안내 사항"),
 					fieldWithPath("image").type(STRING).description("상품 이미지 경로"),
 					fieldWithPath("storeName").type(STRING).description("상호명"),
-					fieldWithPath("storeOpenTime").type(STRING).description("오픈 시간"),
 					fieldWithPath("storeCloseTime").type(STRING).description("마감 시간"),
 					fieldWithPath("storeAddress.name").type(STRING).description("업체 주소"),
 					fieldWithPath("storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
@@ -246,15 +239,14 @@ class ItemControllerTest {
 			.discountPrice(4000)
 			.originalPrice(4500)
 			.description("기본 떡볶이 입니다.")
-			.information("통신사 할인 불가능 합니다.")
 			.store(store)
 			.build();
 
 		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
 
 		ItemReq itemReq = new ItemReq(item2.getName(), item2.getStock(), item2.getDiscountPrice(),
-			item2.getOriginalPrice(), item2.getDescription(), item2.getInformation());
-		ItemRes itemRes = new ItemRes(1L, 1L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage(), item2.getStore().getName(), item2.getStore().getOpenTime(), item2.getStore().getCloseTime(), addressRes);
+			item2.getOriginalPrice(), item2.getDescription());
+		ItemRes itemRes = new ItemRes(1L, 1L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getImage(), item2.getStore().getName(), item2.getStore().getCloseTime(), addressRes);
 
 		MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "file".getBytes());
 		MockMultipartFile request = new MockMultipartFile("itemReq", "itemReq",
@@ -298,8 +290,7 @@ class ItemControllerTest {
 					fieldWithPath("stock").type(NUMBER).description("재고 수"),
 					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
-					fieldWithPath("description").type(STRING).description("상품 설명"),
-					fieldWithPath("information").type(STRING).description("상품 안내")
+					fieldWithPath("description").type(STRING).description("상품 설명")
 				),
 				responseFields(
 					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
@@ -317,7 +308,7 @@ class ItemControllerTest {
 	@Test
 	public void itemCreateFailureTest_invalidDiscountPrice() throws Exception {
 		//given
-		ItemReq itemReq = new ItemReq("떡볶이", 2, 4500, 4000, "기본 떡볶이 입니다.", "통신사 할인 불가능 합니다.");
+		ItemReq itemReq = new ItemReq("떡볶이", 2, 4500, 4000, "기본 떡볶이 입니다.");
 
 		MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "file".getBytes());
 		MockMultipartFile request = new MockMultipartFile("itemReq", "itemReq",
@@ -356,8 +347,7 @@ class ItemControllerTest {
 					fieldWithPath("stock").type(NUMBER).description("재고 수"),
 					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
-					fieldWithPath("description").type(STRING).description("상품 설명"),
-					fieldWithPath("information").type(STRING).description("상품 안내")
+					fieldWithPath("description").type(STRING).description("상품 설명")
 				),
 				responseFields(
 					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
@@ -372,7 +362,7 @@ class ItemControllerTest {
 	@Test
 	public void itemCreateFailureTest_duplicatedItemName() throws Exception {
 		//given
-		ItemReq itemReq = new ItemReq("떡볶이", 2, 4000, 4500, "기본 떡볶이 입니다.", "통신사 할인 불가능 합니다.");
+		ItemReq itemReq = new ItemReq("떡볶이", 2, 4000, 4500, "기본 떡볶이 입니다.");
 
 		MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "file".getBytes());
 		MockMultipartFile request = new MockMultipartFile("itemReq", "itemReq",
@@ -411,8 +401,7 @@ class ItemControllerTest {
 					fieldWithPath("stock").type(NUMBER).description("재고 수"),
 					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
-					fieldWithPath("description").type(STRING).description("상품 설명"),
-					fieldWithPath("information").type(STRING).description("상품 안내")
+					fieldWithPath("description").type(STRING).description("상품 설명")
 				),
 				responseFields(
 					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
@@ -431,7 +420,7 @@ class ItemControllerTest {
 
 		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
 
-		ItemRes itemRes = new ItemRes(itemId, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), item.getName(), item.getStore().getOpenTime(), item.getStore().getCloseTime(), addressRes);
+		ItemRes itemRes = new ItemRes(itemId, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getImage(), item.getName(), item.getStore().getCloseTime(), addressRes);
 
 		when(itemService.findById(any())).thenReturn(itemRes);
 
@@ -447,10 +436,8 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.discountPrice").value(itemRes.discountPrice()))
 			.andExpect(jsonPath("$.originalPrice").value(itemRes.originalPrice()))
 			.andExpect(jsonPath("$.description").value(itemRes.description()))
-			.andExpect(jsonPath("$.information").value(itemRes.information()))
 			.andExpect(jsonPath("$.image").value(itemRes.image()))
 			.andExpect(jsonPath("$.storeName").value(itemRes.storeName()))
-			.andExpect(jsonPath("$.storeOpenTime").value(itemRes.storeOpenTime().toString()))
 			.andExpect(jsonPath("$.storeCloseTime").value(itemRes.storeCloseTime().toString()))
 			.andExpect(jsonPath("$.storeAddress.name").value(addressRes.name()))
 			.andExpect(jsonPath("$.storeAddress.xCoordinate").value(addressRes.xCoordinate()))
@@ -468,10 +455,8 @@ class ItemControllerTest {
 					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
 					fieldWithPath("description").type(STRING).description("상세 설명"),
-					fieldWithPath("information").type(STRING).description("안내 사항"),
 					fieldWithPath("image").type(STRING).description("상품 이미지 경로"),
 					fieldWithPath("storeName").type(STRING).description("상호명"),
-					fieldWithPath("storeOpenTime").type(STRING).description("오픈 시간"),
 					fieldWithPath("storeCloseTime").type(STRING).description("마감 시간"),
 					fieldWithPath("storeAddress.name").type(STRING).description("업체 주소"),
 					fieldWithPath("storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
@@ -517,7 +502,6 @@ class ItemControllerTest {
 			.discountPrice(4000)
 			.originalPrice(4500)
 			.description("치즈 김밥 입니다.")
-			.information("통신사 할인 불가능 합니다.")
 			.image("https://fake-image.com/item3.png")
 			.store(store)
 			.build();
@@ -528,8 +512,8 @@ class ItemControllerTest {
 
 		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
 
-		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), item.getStore().getName(), item.getStore().getOpenTime(), item.getStore().getCloseTime(), addressRes);
-		ItemRes itemRes3 = new ItemRes(2L, 1L, item3.getName(), item3.getStock(), item3.getDiscountPrice(), item3.getOriginalPrice(), item3.getDescription(), item3.getInformation(), item3.getImage(), item3.getStore().getName(), item3.getStore().getOpenTime(), item3.getStore().getCloseTime(), addressRes);
+		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getImage(), item.getStore().getName(), item.getStore().getCloseTime(), addressRes);
+		ItemRes itemRes3 = new ItemRes(2L, 1L, item3.getName(), item3.getStock(), item3.getDiscountPrice(), item3.getOriginalPrice(), item3.getDescription(), item3.getImage(), item3.getStore().getName(), item3.getStore().getCloseTime(), addressRes);
 		List<ItemRes> itemResList = List.of(itemRes, itemRes3);
 		boolean hasNext = false;
 		ItemsRes itemsRes = new ItemsRes(itemResList, hasNext);
@@ -551,10 +535,8 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.items[0].discountPrice").value(itemRes.discountPrice()))
 			.andExpect(jsonPath("$.items[0].originalPrice").value(itemRes.originalPrice()))
 			.andExpect(jsonPath("$.items[0].description").value(itemRes.description()))
-			.andExpect(jsonPath("$.items[0].information").value(itemRes.information()))
 			.andExpect(jsonPath("$.items[0].image").value(itemRes.image()))
 			.andExpect(jsonPath("$.items[0].storeName").value(itemRes.storeName()))
-			.andExpect(jsonPath("$.items[0].storeOpenTime").value(itemRes.storeOpenTime().toString()))
 			.andExpect(jsonPath("$.items[0].storeCloseTime").value(itemRes.storeCloseTime().toString()))
 			.andExpect(jsonPath("$.items[0].storeAddress.name").value(addressRes.name()))
 			.andExpect(jsonPath("$.items[0].storeAddress.xCoordinate").value(addressRes.xCoordinate()))
@@ -581,10 +563,8 @@ class ItemControllerTest {
 					fieldWithPath("items[0].discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("items[0].originalPrice").type(NUMBER).description("원가"),
 					fieldWithPath("items[0].description").type(STRING).description("상세 설명"),
-					fieldWithPath("items[0].information").type(STRING).description("안내 사항"),
 					fieldWithPath("items[0].image").type(STRING).description("상품 이미지 경로"),
 					fieldWithPath("items[0].storeName").type(STRING).description("상호명"),
-					fieldWithPath("items[0].storeOpenTime").type(STRING).description("오픈 시간"),
 					fieldWithPath("items[0].storeCloseTime").type(STRING).description("마감 시간"),
 					fieldWithPath("items[0].storeAddress.name").type(STRING).description("업체 주소"),
 					fieldWithPath("items[0].storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
@@ -609,8 +589,8 @@ class ItemControllerTest {
 		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
 		AddressRes addressRes2 = new AddressRes(address2.getName(), address2.getXCoordinate(), address2.getYCoordinate());
 
-		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), item.getStore().getName(), item.getStore().getOpenTime(), item.getStore().getCloseTime(), addressRes);
-		ItemRes itemRes2 = new ItemRes(2L, 2L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getInformation(), item2.getImage(), item2.getStore().getName(), item2.getStore().getOpenTime(), item2.getStore().getCloseTime(), addressRes2);
+		ItemRes itemRes = new ItemRes(1L, 1L, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getImage(), item.getStore().getName(), item.getStore().getCloseTime(), addressRes);
+		ItemRes itemRes2 = new ItemRes(2L, 2L, item2.getName(), item2.getStock(), item2.getDiscountPrice(), item2.getOriginalPrice(), item2.getDescription(), item2.getImage(), item2.getStore().getName(), item2.getStore().getCloseTime(), addressRes2);
 		List<ItemRes> itemResList = List.of(itemRes, itemRes2);
 		boolean hasNext = false;
 		ItemsRes itemsRes = new ItemsRes(itemResList, hasNext);
@@ -634,10 +614,8 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.items[0].discountPrice").value(itemRes.discountPrice()))
 			.andExpect(jsonPath("$.items[0].originalPrice").value(itemRes.originalPrice()))
 			.andExpect(jsonPath("$.items[0].description").value(itemRes.description()))
-			.andExpect(jsonPath("$.items[0].information").value(itemRes.information()))
 			.andExpect(jsonPath("$.items[0].image").value(itemRes.image()))
 			.andExpect(jsonPath("$.items[0].storeName").value(itemRes.storeName()))
-			.andExpect(jsonPath("$.items[0].storeOpenTime").value(itemRes.storeOpenTime().toString()))
 			.andExpect(jsonPath("$.items[0].storeCloseTime").value(itemRes.storeCloseTime().toString()))
 			.andExpect(jsonPath("$.items[0].storeAddress.name").value(addressRes.name()))
 			.andExpect(jsonPath("$.items[0].storeAddress.xCoordinate").value(addressRes.xCoordinate()))
@@ -663,10 +641,8 @@ class ItemControllerTest {
 					fieldWithPath("items[0].discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("items[0].originalPrice").type(NUMBER).description("원가"),
 					fieldWithPath("items[0].description").type(STRING).description("상세 설명"),
-					fieldWithPath("items[0].information").type(STRING).description("안내 사항"),
 					fieldWithPath("items[0].image").type(STRING).description("상품 이미지 경로"),
 					fieldWithPath("items[0].storeName").type(STRING).description("상호명"),
-					fieldWithPath("items[0].storeOpenTime").type(STRING).description("오픈 시간"),
 					fieldWithPath("items[0].storeCloseTime").type(STRING).description("마감 시간"),
 					fieldWithPath("items[0].storeAddress.name").type(STRING).description("업체 주소"),
 					fieldWithPath("items[0].storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
@@ -688,7 +664,6 @@ class ItemControllerTest {
 			.discountPrice(4000)
 			.originalPrice(4500)
 			.description("치즈 김밥 입니다.")
-			.information("통신사 할인 불가능 합니다.")
 			.image("https://fake-image.com/item3.png")
 			.store(store)
 			.build();
@@ -699,8 +674,8 @@ class ItemControllerTest {
 
 		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
 
-		ItemRes itemRes = new ItemRes(1L, storeId, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation(), item.getImage(), item.getStore().getName(), item.getStore().getOpenTime(), item.getStore().getCloseTime(), addressRes);
-		ItemRes itemRes3 = new ItemRes(2L, storeId, item3.getName(), item3.getStock(), item3.getDiscountPrice(), item3.getOriginalPrice(), item3.getDescription(), item3.getInformation(), item3.getImage(), item3.getStore().getName(), item3.getStore().getOpenTime(), item3.getStore().getCloseTime(), addressRes);
+		ItemRes itemRes = new ItemRes(1L, storeId, item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getImage(), item.getStore().getName(), item.getStore().getCloseTime(), addressRes);
+		ItemRes itemRes3 = new ItemRes(2L, storeId, item3.getName(), item3.getStock(), item3.getDiscountPrice(), item3.getOriginalPrice(), item3.getDescription(), item3.getImage(), item3.getStore().getName(), item3.getStore().getCloseTime(), addressRes);
 		List<ItemRes> itemResList = List.of(itemRes, itemRes3);
 		boolean hasNext = false;
 		ItemsRes itemsRes = new ItemsRes(itemResList, hasNext);
@@ -721,10 +696,8 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.items[0].discountPrice").value(itemRes.discountPrice()))
 			.andExpect(jsonPath("$.items[0].originalPrice").value(itemRes.originalPrice()))
 			.andExpect(jsonPath("$.items[0].description").value(itemRes.description()))
-			.andExpect(jsonPath("$.items[0].information").value(itemRes.information()))
 			.andExpect(jsonPath("$.items[0].image").value(itemRes.image()))
 			.andExpect(jsonPath("$.items[0].storeName").value(itemRes.storeName()))
-			.andExpect(jsonPath("$.items[0].storeOpenTime").value(itemRes.storeOpenTime().toString()))
 			.andExpect(jsonPath("$.items[0].storeCloseTime").value(itemRes.storeCloseTime().toString()))
 			.andExpect(jsonPath("$.items[0].storeAddress.name").value(addressRes.name()))
 			.andExpect(jsonPath("$.items[0].storeAddress.xCoordinate").value(addressRes.xCoordinate()))
@@ -751,10 +724,8 @@ class ItemControllerTest {
 					fieldWithPath("items[0].discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("items[0].originalPrice").type(NUMBER).description("원가"),
 					fieldWithPath("items[0].description").type(STRING).description("상세 설명"),
-					fieldWithPath("items[0].information").type(STRING).description("안내 사항"),
 					fieldWithPath("items[0].image").type(STRING).description("상품 이미지 경로"),
 					fieldWithPath("items[0].storeName").type(STRING).description("상호명"),
-					fieldWithPath("items[0].storeOpenTime").type(STRING).description("오픈 시간"),
 					fieldWithPath("items[0].storeCloseTime").type(STRING).description("마감 시간"),
 					fieldWithPath("items[0].storeAddress.name").type(STRING).description("업체 주소"),
 					fieldWithPath("items[0].storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
@@ -773,9 +744,9 @@ class ItemControllerTest {
 		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
 		String imageUrl = "http://image-url.com/image.jpg";
 
-		ItemReq itemReq = new ItemReq("치즈 떡볶이", 4, 9900, 14000, "치즈 떡볶이 입니다.", "통신사 할인 가능 합니다.");
+		ItemReq itemReq = new ItemReq("치즈 떡볶이", 4, 9900, 14000, "치즈 떡볶이 입니다.");
 		ItemRes itemRes = new ItemRes(itemId, 1L, itemReq.itemName(), itemReq.stock(), itemReq.discountPrice(),
-			itemReq.originalPrice(), itemReq.description(), itemReq.information(), imageUrl, store.getName(), store.getOpenTime(), store.getCloseTime(), addressRes);
+			itemReq.originalPrice(), itemReq.description(), imageUrl, store.getName(), store.getCloseTime(), addressRes);
 
 		MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "file".getBytes());
 		MockMultipartFile request = new MockMultipartFile("itemReq", "itemReq",
@@ -808,10 +779,8 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.discountPrice").value(itemRes.discountPrice()))
 			.andExpect(jsonPath("$.originalPrice").value(itemRes.originalPrice()))
 			.andExpect(jsonPath("$.description").value(itemRes.description()))
-			.andExpect(jsonPath("$.information").value(itemRes.information()))
 			.andExpect(jsonPath("$.image").value(itemRes.image()))
 			.andExpect(jsonPath("$.storeName").value(itemRes.storeName()))
-			.andExpect(jsonPath("$.storeOpenTime").value(itemRes.storeOpenTime().toString()))
 			.andExpect(jsonPath("$.storeCloseTime").value(itemRes.storeCloseTime().toString()))
 			.andExpect(jsonPath("$.storeAddress.name").value(addressRes.name()))
 			.andExpect(jsonPath("$.storeAddress.xCoordinate").value(addressRes.xCoordinate()))
@@ -833,8 +802,7 @@ class ItemControllerTest {
 					fieldWithPath("stock").type(NUMBER).description("재고 수"),
 					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
-					fieldWithPath("description").type(STRING).description("상품 설명"),
-					fieldWithPath("information").type(STRING).description("상품 안내")
+					fieldWithPath("description").type(STRING).description("상품 설명")
 				),
 				responseFields(
 					fieldWithPath("itemId").type(NUMBER).description("상품 ID"),
@@ -844,10 +812,8 @@ class ItemControllerTest {
 					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
 					fieldWithPath("description").type(STRING).description("상세 설명"),
-					fieldWithPath("information").type(STRING).description("안내 사항"),
 					fieldWithPath("image").type(STRING).description("상품 이미지 경로"),
 					fieldWithPath("storeName").type(STRING).description("상호명"),
-					fieldWithPath("storeOpenTime").type(STRING).description("오픈 시간"),
 					fieldWithPath("storeCloseTime").type(STRING).description("마감 시간"),
 					fieldWithPath("storeAddress.name").type(STRING).description("업체 주소"),
 					fieldWithPath("storeAddress.xCoordinate").type(NUMBER).description("업체 주소 경도"),
@@ -869,7 +835,6 @@ class ItemControllerTest {
 			.discountPrice(9900)
 			.originalPrice(14500)
 			.description("치즈 떡볶이 입니다.")
-			.information("통신사 할인 가능 합니다.")
 			.image(imageUrl)
 			.store(store)
 			.build();
@@ -877,9 +842,9 @@ class ItemControllerTest {
 		AddressRes addressRes = new AddressRes(address.getName(), address.getXCoordinate(), address.getYCoordinate());
 
 		ItemReq itemReq = new ItemReq(item3.getName(), item3.getStock(), item3.getDiscountPrice(),
-			item3.getOriginalPrice(), item3.getDescription(), item3.getInformation());
+			item3.getOriginalPrice(), item3.getDescription());
 		ItemRes itemRes = new ItemRes(itemId, 1L, item3.getName(), item3.getStock(), item3.getDiscountPrice(),
-			item3.getOriginalPrice(), item3.getDescription(), item3.getInformation(), item3.getImage(), item3.getStore().getName(), item3.getStore().getOpenTime(), item3.getStore().getCloseTime(), addressRes);
+			item3.getOriginalPrice(), item3.getDescription(), item3.getImage(), item3.getStore().getName(), item3.getStore().getCloseTime(), addressRes);
 
 		MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "file".getBytes());
 		MockMultipartFile request = new MockMultipartFile("itemReq", "itemReq",
@@ -931,8 +896,7 @@ class ItemControllerTest {
 					fieldWithPath("stock").type(NUMBER).description("재고 수"),
 					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
-					fieldWithPath("description").type(STRING).description("상품 설명"),
-					fieldWithPath("information").type(STRING).description("상품 안내")
+					fieldWithPath("description").type(STRING).description("상품 설명")
 				),
 				responseFields(
 					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
@@ -950,7 +914,7 @@ class ItemControllerTest {
 	@Test
 	public void itemUpdateFailureTest_invalidDiscountPrice() throws Exception {
 		//given
-		ItemReq itemReq = new ItemReq("치즈 떡볶이", 4, 10000, 5000, "치즈 떡볶이 입니다.", "통신사 할인 가능 합니다.");
+		ItemReq itemReq = new ItemReq("치즈 떡볶이", 4, 10000, 5000, "치즈 떡볶이 입니다.");
 
 		Long itemId = 1L;
 
@@ -1000,8 +964,7 @@ class ItemControllerTest {
 					fieldWithPath("stock").type(NUMBER).description("재고 수"),
 					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
-					fieldWithPath("description").type(STRING).description("상품 설명"),
-					fieldWithPath("information").type(STRING).description("상품 안내")
+					fieldWithPath("description").type(STRING).description("상품 설명")
 				),
 				responseFields(
 					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
@@ -1025,13 +988,12 @@ class ItemControllerTest {
 			.discountPrice(9900)
 			.originalPrice(14500)
 			.description("치즈 떡볶이 입니다.")
-			.information("통신사 할인 가능 합니다.")
 			.image(imageUrl)
 			.store(store)
 			.build();
 
 		ItemReq itemReq = new ItemReq(item3.getName(), item3.getStock(), item3.getDiscountPrice(),
-			item3.getOriginalPrice(), item3.getDescription(), item3.getInformation());
+			item3.getOriginalPrice(), item3.getDescription());
 
 		MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "file".getBytes());
 		MockMultipartFile request = new MockMultipartFile("itemReq", "itemReq",
@@ -1079,8 +1041,7 @@ class ItemControllerTest {
 					fieldWithPath("stock").type(NUMBER).description("재고 수"),
 					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
-					fieldWithPath("description").type(STRING).description("상품 설명"),
-					fieldWithPath("information").type(STRING).description("상품 안내")
+					fieldWithPath("description").type(STRING).description("상품 설명")
 				),
 				responseFields(
 					fieldWithPath("timestamp").type(STRING).description("예외 시간"),

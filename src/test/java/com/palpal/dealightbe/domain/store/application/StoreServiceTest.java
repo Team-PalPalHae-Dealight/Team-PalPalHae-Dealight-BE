@@ -158,7 +158,6 @@ class StoreServiceTest {
 			.discountPrice(3000)
 			.originalPrice(4500)
 			.description("기본 떡볶이 입니다.")
-			.information("통신사 할인 불가능 합니다.")
 			.image("https://fake-image.com/item1.png")
 			.store(store)
 			.build();
@@ -169,7 +168,6 @@ class StoreServiceTest {
 			.discountPrice(4000)
 			.originalPrice(4500)
 			.description("기본 떡볶이 입니다.")
-			.information("통신사 할인 불가능 합니다.")
 			.image("https://fake-image.com/item1.png")
 			.store(store2)
 			.build();
@@ -180,7 +178,6 @@ class StoreServiceTest {
 			.discountPrice(100)
 			.originalPrice(4500)
 			.description("기본 순대 입니다.")
-			.information("통신사 할인 불가능 합니다.")
 			.image("https://fake-image.com/item1.png")
 			.store(store3)
 			.build();
