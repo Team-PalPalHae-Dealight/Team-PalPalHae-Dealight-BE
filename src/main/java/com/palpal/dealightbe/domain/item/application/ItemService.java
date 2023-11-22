@@ -1,11 +1,9 @@
 package com.palpal.dealightbe.domain.item.application;
 
-import static com.palpal.dealightbe.global.ListSortType.findSortType;
 import static com.palpal.dealightbe.global.error.ErrorCode.DUPLICATED_ITEM_NAME;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_STORE;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -20,7 +18,6 @@ import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
-import com.palpal.dealightbe.global.ListSortType;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
@@ -70,15 +67,7 @@ public class ItemService {
 
 	@Transactional(readOnly = true)
 	public ItemsRes findAllForMember(double xCoordinate, double yCoordinate, String sortBy, Pageable pageable) {
-		Slice<Item> items = Page.empty();
-
-		ListSortType sortType = findSortType(sortBy);
-
-		switch (sortType) {
-			case DEADLINE -> items = itemRepository.findAllByDeadline(xCoordinate, yCoordinate, pageable);
-			case DISCOUNT_RATE -> items = itemRepository.findAllByDiscountRate(xCoordinate, yCoordinate, pageable);
-			case DISTANCE -> items = itemRepository.findAllByDistance(xCoordinate, yCoordinate, pageable);
-		}
+		Slice<Item> items = itemRepository.findAllByOpenedStatusAndDistanceWithin3KmAndSortCondition(xCoordinate, yCoordinate, sortBy, pageable);
 
 		return ItemsRes.from(items);
 	}
