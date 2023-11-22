@@ -48,9 +48,6 @@ public class Item extends BaseEntity {
 	@Column(length = 300)
 	private String description;
 
-	@Column(length = 300)
-	private String information;
-
 	private String image;
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -58,8 +55,7 @@ public class Item extends BaseEntity {
 	private Store store;
 
 	@Builder
-	public Item(String name, int stock, int discountPrice, int originalPrice, String description, String information,
-				String image, Store store) {
+	public Item(String name, int stock, int discountPrice, int originalPrice, String description, String image, Store store) {
 		validateDiscountPrice(discountPrice, originalPrice);
 
 		this.name = name;
@@ -67,7 +63,6 @@ public class Item extends BaseEntity {
 		this.discountPrice = discountPrice;
 		this.originalPrice = originalPrice;
 		this.description = description;
-		this.information = information;
 		this.image = image;
 		this.store = store;
 	}
@@ -88,7 +83,6 @@ public class Item extends BaseEntity {
 		this.discountPrice = item.getDiscountPrice();
 		this.originalPrice = item.getOriginalPrice();
 		this.description = item.getDescription();
-		this.information = item.getInformation();
 		this.image = item.getImage();
 	}
 

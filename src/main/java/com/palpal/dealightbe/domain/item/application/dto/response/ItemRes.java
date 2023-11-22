@@ -14,7 +14,6 @@ public record ItemRes(
 	int discountPrice,
 	int originalPrice,
 	String description,
-	String information,
 	String image,
 	String storeName,
 
@@ -34,7 +33,6 @@ public record ItemRes(
 			item.getDiscountPrice(),
 			item.getOriginalPrice(),
 			item.getDescription(),
-			item.getInformation(),
 			item.getImage(),
 			item.getStore().getName(),
 			item.getStore().getCloseTime(),
