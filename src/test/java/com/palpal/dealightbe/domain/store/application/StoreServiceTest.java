@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -296,9 +297,13 @@ class StoreServiceTest {
 		StoreInfoRes infoRes = storeService.getInfo(member.getProviderId(), store.getId());
 
 		//then
+		Set<String> dayOffs = store.getDayOffs().stream()
+			.map(DayOff::getName)
+			.collect(Collectors.toSet());
+
 		assertThat(infoRes.storeNumber()).isEqualTo(store.getStoreNumber());
 		assertThat(infoRes.addressName()).isEqualTo(store.getAddress().getName());
-		assertThat(infoRes.dayOff()).isEqualTo(store.getDayOffs());
+		assertThat(infoRes.dayOff()).isEqualTo(dayOffs);
 		assertThat(infoRes.storeStatus()).isEqualTo(store.getStoreStatus());
 	}
 
@@ -344,9 +349,13 @@ class StoreServiceTest {
 		StoreInfoRes storeUpdatedInfoRes = storeService.updateInfo(member.getProviderId(), store.getId(), updateReq);
 
 		//then
+		Set<String> dayOffs = updateReq.dayOff().stream()
+			.map(DayOff::getName)
+			.collect(Collectors.toSet());
+
 		assertThat(storeUpdatedInfoRes.telephone()).isEqualTo(updateReq.telephone());
 		assertThat(storeUpdatedInfoRes.addressName()).isEqualTo(updateReq.addressName());
-		assertThat(storeUpdatedInfoRes.dayOff()).isEqualTo(updateReq.dayOff());
+		assertThat(storeUpdatedInfoRes.dayOff()).isEqualTo(dayOffs);
 		assertThat(store.getName()).isEqualTo("맛짱고기");
 		assertThat(store.getStoreNumber()).isEqualTo("8888");
 	}
