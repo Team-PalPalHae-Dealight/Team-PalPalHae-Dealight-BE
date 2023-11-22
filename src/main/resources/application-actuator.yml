@@ -6,7 +6,9 @@ server:
 management:
   info:
     env:
-      enabled: true
+      enabled: false
+    os:
+      enabled: false
     git:
       mode: full
 
@@ -15,11 +17,15 @@ management:
       show-details: always
 
   endpoints:
+    jmx:
+      exposure:
+        exclude: "*"
+
     web:
       base-path: "/admin/manage"
       exposure:
         include: "*"
-        exclude: "env"
+        exclude: "beans, env, heapdump, shutdown"
 
 info:
   app:
