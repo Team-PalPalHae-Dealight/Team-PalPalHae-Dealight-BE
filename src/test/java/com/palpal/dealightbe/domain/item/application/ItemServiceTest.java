@@ -269,7 +269,7 @@ class ItemServiceTest {
 		double xCoordinate = 127.0221068;
 		double yCoordinate = 37.5912999;
 
-		when(itemRepository.findAllByDeadline(anyDouble(), anyDouble(), eq(PageRequest.of(page, size)))).thenReturn(itemPage);
+		when(itemRepository.findAllByOpenedStatusAndDistanceWithin3KmAndSortCondition(anyDouble(), anyDouble(), eq("deadline"), eq(PageRequest.of(page, size)))).thenReturn(itemPage);
 
 		//when
 		ItemsRes itemsRes = itemService.findAllForMember(xCoordinate, yCoordinate, "deadline", pageRequest);
@@ -295,7 +295,7 @@ class ItemServiceTest {
 		double xCoordinate = 127.0221068;
 		double yCoordinate = 37.5912999;
 
-		when(itemRepository.findAllByDiscountRate(anyDouble(), anyDouble(), eq(PageRequest.of(page, size)))).thenReturn(itemPage);
+		when(itemRepository.findAllByOpenedStatusAndDistanceWithin3KmAndSortCondition(anyDouble(), anyDouble(), eq("discount-rate"), eq(PageRequest.of(page, size)))).thenReturn(itemPage);
 
 		//when
 		ItemsRes itemsRes = itemService.findAllForMember(xCoordinate, yCoordinate, "discount-rate", pageRequest);
@@ -321,7 +321,7 @@ class ItemServiceTest {
 		double xCoordinate = 127.0221068;
 		double yCoordinate = 37.5912999;
 
-		when(itemRepository.findAllByDistance(anyDouble(), anyDouble(), eq(PageRequest.of(page, size)))).thenReturn(itemPage);
+		when(itemRepository.findAllByOpenedStatusAndDistanceWithin3KmAndSortCondition(anyDouble(), anyDouble(), eq("distance"), eq(PageRequest.of(page, size)))).thenReturn(itemPage);
 
 		//when
 		ItemsRes itemsRes = itemService.findAllForMember(xCoordinate, yCoordinate, "distance", pageRequest);
