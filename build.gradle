@@ -156,16 +156,10 @@ jacocoTestReport {
         html.destination file("${buildDir}/jacoco/index.html")
     }
 
-    def Qdomains = []
-    for (qPattern in "**/QA".."**/QZ") {
-        Qdomains.add(qPattern + "*")
-    }
-
     afterEvaluate {
         classDirectories.setFrom(
                 files(classDirectories.files.collect {
-                    fileTree(dir: it, excludes: [
-                    ] + Qdomains)
+                    fileTree(dir: it, excludes: [])
                 })
         )
     }
@@ -174,11 +168,6 @@ jacocoTestReport {
 }
 
 jacocoTestCoverageVerification {
-    def Qdomains = []
-    for (qPattern in '*.QA'..'*.QZ') {
-        Qdomains.add(qPattern + '*')
-    }
-
     violationRules {
         rule {
             enabled = true
@@ -190,8 +179,7 @@ jacocoTestCoverageVerification {
                 minimum = 0
             }
 
-            excludes = [
-            ] + Qdomains
+            excludes = []
         }
     }
 }
