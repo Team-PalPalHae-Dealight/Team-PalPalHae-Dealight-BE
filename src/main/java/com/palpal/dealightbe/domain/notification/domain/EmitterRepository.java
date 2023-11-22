@@ -1,6 +1,6 @@
 package com.palpal.dealightbe.domain.notification.domain;
 
-import static com.palpal.dealightbe.domain.notification.util.EventIdUtil.extractTimestampFromEventId;
+import static com.palpal.dealightbe.domain.notification.util.NotificationUtil.extractTimestampFromEventId;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
