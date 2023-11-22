@@ -1,9 +1,14 @@
 package com.palpal.dealightbe.domain.notification.application;
 
-import static com.palpal.dealightbe.domain.notification.util.EventIdUtil.extractTimestampFromEventId;
+import static com.palpal.dealightbe.domain.notification.util.NotificationUtil.extractTimestampFromEventId;
+import static com.palpal.dealightbe.domain.notification.util.NotificationUtil.getEmitterId;
+import static com.palpal.dealightbe.domain.notification.util.NotificationUtil.getEventId;
+import static com.palpal.dealightbe.domain.notification.util.NotificationUtil.getNotificationId;
 import static com.palpal.dealightbe.global.error.ErrorCode.SSE_STREAM_ERROR;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
@@ -11,15 +16,19 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.palpal.dealightbe.domain.member.domain.Member;
+import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.member.domain.RoleType;
 import com.palpal.dealightbe.domain.notification.application.dto.response.NotificationRes;
+import com.palpal.dealightbe.domain.notification.application.dto.response.NotificationsRes;
 import com.palpal.dealightbe.domain.notification.domain.EmitterRepository;
 import com.palpal.dealightbe.domain.notification.domain.Notification;
 import com.palpal.dealightbe.domain.notification.domain.NotificationRepository;
 import com.palpal.dealightbe.domain.order.domain.Order;
 import com.palpal.dealightbe.domain.order.domain.OrderStatus;
 import com.palpal.dealightbe.domain.store.domain.Store;
+import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
+import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,14 +40,7 @@ public class NotificationService {
 	private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
 	private final EmitterRepository emitterRepository;
 	private final NotificationRepository notificationRepository;
-
-	private String getEmitterId(Long id, RoleType userType) {
-		return userType.getRole() + "_" + id + "_" + System.currentTimeMillis();
-	}
-
-	private String getEventId(Long id, String userType) {
-		return userType + "_" + id + "_" + System.currentTimeMillis();
-	}
+	private final MemberRepository memberRepository;
 
 	public SseEmitter subscribe(Long id, RoleType userType, String lastEventId) {
 
