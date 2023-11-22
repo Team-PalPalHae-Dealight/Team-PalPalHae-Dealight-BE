@@ -56,6 +56,16 @@ jobs:
           echo "${{ secrets.YML_DEV_AWS }}" > ./application-aws.yml
         shell: bash
 
+      # application-actuator.yml 생성
+      - name: Make application-actuator.yml
+        if: |
+          contains(github.ref, 'develop')
+        run: |
+          cd ./src/main/resources
+          touch ./application-actuator.yml
+          echo "${{ secrets.YML_DEV_ACTUATOR }}" > ./application-actuator.yml
+        shell: bash
+
       # Gradle에 실행 권한을 부여
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
