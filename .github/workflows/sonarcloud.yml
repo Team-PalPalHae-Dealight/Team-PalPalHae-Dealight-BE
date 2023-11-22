@@ -24,6 +24,23 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      # 서비스에 필요한 yml 파일 생성
+      # application-oauth.yml 생성
+      - name: Make application-oauth.yml
+        run: |
+          cd ./src/main/resources
+          touch ./application-oauth.yml
+          echo "${{ secrets.YML_DEV_OAUTH }}" > ./application-oauth.yml
+        shell: bash
+
+      # application-aws.yml 생성
+      - name: Make application-aws.yml
+        run: |
+          cd ./src/main/resources
+          touch ./application-aws.yml
+          echo "${{ secrets.YML_DEV_AWS }}" > ./application-aws.yml
+        shell: bash
+
       - name: Run gradle test
         uses: gradle/gradle-build-action@v2
         with:
@@ -43,23 +60,6 @@ jobs:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
-
-      # 서비스에 필요한 yml 파일 생성
-      # application-oauth.yml 생성
-      - name: Make application-oauth.yml
-        run: |
-          cd ./src/main/resources
-          touch ./application-oauth.yml
-          echo "${{ secrets.YML_DEV_OAUTH }}" > ./application-oauth.yml
-        shell: bash
-
-      # application-aws.yml 생성
-      - name: Make application-aws.yml
-        run: |
-          cd ./src/main/resources
-          touch ./application-aws.yml
-          echo "${{ secrets.YML_DEV_AWS }}" > ./application-aws.yml
-        shell: bash
 
       - name: Build and analyze
         uses: gradle/gradle-build-action@v2

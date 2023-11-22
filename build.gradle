@@ -156,10 +156,19 @@ jacocoTestReport {
         html.destination file("${buildDir}/jacoco/index.html")
     }
 
+    def Qdomains = []
+    for (qPattern in "**/QA".."**/QZ") {
+        Qdomains.add(qPattern + "*")
+    }
+
     afterEvaluate {
         classDirectories.setFrom(
                 files(classDirectories.files.collect {
-                    fileTree(dir: it, excludes: [])
+                    fileTree(dir: it, excludes: [
+                            '**/*Application*',
+                            '**/*Exception*',
+                            '**/dto/**'
+                    ] + Qdomains)
                 })
         )
     }
@@ -168,6 +177,11 @@ jacocoTestReport {
 }
 
 jacocoTestCoverageVerification {
+    def Qdomains = []
+    for (qPattern in '*.QA'..'*.QZ') {
+        Qdomains.add(qPattern + '*')
+    }
+
     violationRules {
         rule {
             enabled = true
@@ -179,11 +193,14 @@ jacocoTestCoverageVerification {
                 minimum = 0
             }
 
-            excludes = []
+            excludes = [
+                    '*.*Application',
+                    '*.*Exception',
+                    '*.dto.*'
+            ] + Qdomains
         }
     }
 }
-
 // sonar cloud 빌드 옵션
 sonar {
     properties {
