@@ -15,6 +15,10 @@ plugins {
     id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
     // git info
     id "com.gorylenko.gradle-git-properties" version "2.4.1"
+    // jacoco
+    id 'jacoco'
+    // sonar cloud
+    id 'org.sonarqube' version '4.4.1.3373'
 }
 
 group = 'com.palpal'
@@ -22,6 +26,10 @@ version = '0.0.1-SNAPSHOT'
 
 java {
     sourceCompatibility = '17'
+}
+
+jacoco {
+    toolVersion = "0.8.7"
 }
 
 configurations {
@@ -82,6 +90,35 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 }
 
+test {
+    outputs.dir snippetsDir
+    finalizedBy 'jacocoTestReport'
+}
+
+// asciidoctor 빌드 옵션
+tasks.named('test') {
+    outputs.dir snippetsDir
+    useJUnitPlatform()
+}
+
+tasks.named('asciidoctor') {
+    inputs.dir snippetsDir
+    dependsOn test
+}
+
+asciidoctor {
+    inputs.dir snippetsDir
+    configurations 'asciidoctorExt'
+    dependsOn test
+}
+
+bootJar {
+    dependsOn asciidoctor
+    from("${asciidoctor.outputDir}") {
+        into 'static/docs'
+    }
+}
+
 // queryDSL 빌드 옵션
 def querydslDir = "$buildDir/generated/querydsl"
 
@@ -102,37 +139,74 @@ compileQuerydsl {
     options.annotationProcessorPath = configurations.querydsl
 }
 
-tasks.named('test') {
-    outputs.dir snippetsDir
-    useJUnitPlatform()
-}
-
-tasks.named('asciidoctor') {
-    inputs.dir snippetsDir
-    dependsOn test
-}
-
-test {
-    outputs.dir snippetsDir
-}
-tasks.named('test') {
-    outputs.dir snippetsDir
-    useJUnitPlatform()
-}
-
-asciidoctor {
-    inputs.dir snippetsDir
-    configurations 'asciidoctorExt'
-    dependsOn test
-}
-
-bootJar {
-    dependsOn asciidoctor
-    from("${asciidoctor.outputDir}") {
-        into 'static/docs'
-    }
-}
-
+// prometheus 설정
 springBoot {
     buildInfo()
+}
+
+// jacoco 빌드 옵션
+jacocoTestReport {
+    reports {
+        xml.required = true
+        csv.required = true
+        html.required = true
+
+        xml.destination file("${buildDir}/jacoco/index.xml")
+        csv.destination file("${buildDir}/jacoco/index.csv")
+        html.destination file("${buildDir}/jacoco/index.html")
+    }
+
+    def Qdomains = []
+    for (qPattern in "**/QA".."**/QZ") {
+        Qdomains.add(qPattern + "*")
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(
+                files(classDirectories.files.collect {
+                    fileTree(dir: it, excludes: [
+                            '**/*Application*',
+                            '**/*Exception*',
+                            '**/dto/**'
+                    ] + Qdomains)
+                })
+        )
+    }
+
+    finalizedBy 'jacocoTestCoverageVerification'
+}
+
+jacocoTestCoverageVerification {
+    def Qdomains = []
+    for (qPattern in '*.QA'..'*.QZ') {
+        Qdomains.add(qPattern + '*')
+    }
+
+    violationRules {
+        rule {
+            enabled = true
+            element = 'CLASS'
+
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.5
+            }
+
+            excludes = [
+                    '*.*Application',
+                    '*.*Exception',
+                    '*.dto.*'
+            ] + Qdomains
+        }
+    }
+}
+// sonar cloud 빌드 옵션
+sonar {
+    properties {
+        property "sonar.projectKey", "Team-PalPalHae-Dealight_Team-PalPalHae-Dealight-BE"
+        property "sonar.organization", "dealight-be"
+        property "sonar.host.url", "https://sonarcloud.io"
+        property 'sonar.coverage.jacoco.xmlReportPaths', 'build/jacoco/index.xml'
+    }
 }

@@ -1,5 +1,5 @@
 # github repository actions 페이지에 나타날 이름
-name: CI/CD using Actions & S3 & Code Deploy & Docker
+name: CI/CD using Actions & S3 & Code Deploy & Docker & SonarCloud
 
 # event trigger
 # develop 브랜치에 push가 되었을 때 실행
@@ -54,6 +54,16 @@ jobs:
           cd ./src/main/resources
           touch ./application-aws.yml
           echo "${{ secrets.YML_DEV_AWS }}" > ./application-aws.yml
+        shell: bash
+
+      # application-actuator.yml 생성
+      - name: Make application-actuator.yml
+        if: |
+          contains(github.ref, 'develop')
+        run: |
+          cd ./src/main/resources
+          touch ./application-actuator.yml
+          echo "${{ secrets.YML_DEV_ACTUATOR }}" > ./application-actuator.yml
         shell: bash
 
       # Gradle에 실행 권한을 부여
