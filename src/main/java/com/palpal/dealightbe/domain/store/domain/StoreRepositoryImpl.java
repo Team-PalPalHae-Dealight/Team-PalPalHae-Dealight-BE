@@ -65,12 +65,10 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
 				orderSpecifiers = new OrderSpecifier[]{getDistanceWithin3Km(xCoordinate, yCoordinate).asc(), item.updatedAt.desc()};
 				break;
 			case DISCOUNT_RATE:
-				orderSpecifiers = new OrderSpecifier[]{getDistanceWithin3Km(xCoordinate, yCoordinate).asc(),
-					Expressions.numberTemplate(Double.class, DISCOUNT_RATE).desc(), item.updatedAt.desc()};
+				orderSpecifiers = new OrderSpecifier[]{Expressions.numberTemplate(Double.class, DISCOUNT_RATE).desc(), item.updatedAt.desc()};
 				break;
 			case DEADLINE:
-				orderSpecifiers = new OrderSpecifier[]{getDistanceWithin3Km(xCoordinate, yCoordinate).asc(),
-					Expressions.numberTemplate(Double.class, DEADLINE, store.closeTime).asc(), item.updatedAt.desc()};
+				orderSpecifiers = new OrderSpecifier[]{Expressions.numberTemplate(Double.class, DEADLINE, store.closeTime).asc(), item.updatedAt.desc()};
 				break;
 			default:
 				orderSpecifiers = new OrderSpecifier[]{getDistanceWithin3Km(xCoordinate, yCoordinate).asc(), item.updatedAt.desc()};
