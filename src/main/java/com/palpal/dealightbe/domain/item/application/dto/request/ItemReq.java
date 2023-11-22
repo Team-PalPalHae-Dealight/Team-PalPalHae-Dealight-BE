@@ -11,7 +11,7 @@ import com.palpal.dealightbe.domain.store.domain.Store;
 public record ItemReq(
 	@NotBlank(message = "상품 이름을 입력해주세요.")
 	@Length(min = 1, max = 50, message = "상품 이름은 1자 이상 50자 이하로 등록 가능합니다.")
-	String name,
+	String itemName,
 
 	@Min(value = 1, message = "상품 재고 수량은 1개 이상부터 등록 가능합니다.")
 	int stock,
@@ -32,7 +32,7 @@ public record ItemReq(
 	public static Item toItem(ItemReq itemReq, Store store, String image) {
 
 		return Item.builder()
-			.name(itemReq.name)
+			.name(itemReq.itemName)
 			.stock(itemReq.stock)
 			.discountPrice(itemReq.discountPrice)
 			.originalPrice(itemReq.originalPrice)
