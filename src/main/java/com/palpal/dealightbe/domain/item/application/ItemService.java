@@ -42,7 +42,7 @@ public class ItemService {
 	public ItemRes create(ItemReq itemReq, Long providerId, ImageUploadReq imageUploadReq) {
 		Store store = getStore(providerId);
 
-		checkDuplicatedItemName(itemReq.name(), store.getId());
+		checkDuplicatedItemName(itemReq.itemName(), store.getId());
 
 		String imageUrl = saveImage(imageUploadReq);
 
@@ -94,7 +94,7 @@ public class ItemService {
 		Store store = getStore(providerId);
 		Item item = getItem(itemId);
 
-		checkDuplicatedItemNameForUpdate(itemId, itemReq.name(), store.getId());
+		checkDuplicatedItemNameForUpdate(itemId, itemReq.itemName(), store.getId());
 
 		String image = item.getImage();
 		imageService.delete(image);
