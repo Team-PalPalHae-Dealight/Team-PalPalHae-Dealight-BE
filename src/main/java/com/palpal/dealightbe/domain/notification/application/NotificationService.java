@@ -157,4 +157,11 @@ public class NotificationService {
 		emitterRepository.deleteAllEventCacheStartWithId(id);
 	}
 
+	public NotificationsRes findAllByMemberId(Long memberId) {
+		List<Notification> responses = new ArrayList<>(
+			notificationRepository.findAllByMemberIdAndIsReadFalse(memberId));
+
+		return NotificationsRes.of(responses);
+	}
+
 }
