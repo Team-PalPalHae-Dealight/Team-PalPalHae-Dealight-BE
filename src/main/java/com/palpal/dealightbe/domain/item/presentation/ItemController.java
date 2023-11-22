@@ -51,7 +51,7 @@ public class ItemController {
 
 	@ProviderId
 	@GetMapping("/stores")
-	public ResponseEntity<ItemsRes> findAllForStore(Long providerId, @RequestParam(name = "last-id", required = false) Long lastId, @RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = DEFAULT_PAGE_SIZE) int size) {
+	public ResponseEntity<ItemsRes> findAllForStore(Long providerId, @RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = DEFAULT_PAGE_SIZE) int size) {
 		page = Math.max(page - 1, 0);
 		PageRequest pageable = PageRequest.of(page, size);
 
@@ -61,7 +61,7 @@ public class ItemController {
 	}
 
 	@GetMapping("/members")
-	public ResponseEntity<ItemsRes> findAllForMember(@RequestParam("x-coordinate") double xCoordinate, @RequestParam("y-coordinate") double yCoordinate, @RequestParam(value = "sort-by", required = false, defaultValue = "distance") String sortBy, @RequestParam(name = "last-id", required = false) Long lastId, @RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = DEFAULT_PAGE_SIZE) int size) {
+	public ResponseEntity<ItemsRes> findAllForMember(@RequestParam("x-coordinate") double xCoordinate, @RequestParam("y-coordinate") double yCoordinate, @RequestParam(value = "sort-by", required = false, defaultValue = "distance") String sortBy, @RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = DEFAULT_PAGE_SIZE) int size) {
 		page = Math.max(page - 1, 0);
 		PageRequest pageable = PageRequest.of(page, size);
 
@@ -71,7 +71,7 @@ public class ItemController {
 	}
 
 	@GetMapping("/stores/{storeId}")
-	public ResponseEntity<ItemsRes> findAllByStoreId(@PathVariable Long storeId, @RequestParam(name = "last-id", required = false) Long lastId, @RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = DEFAULT_PAGE_SIZE) int size) {
+	public ResponseEntity<ItemsRes> findAllByStoreId(@PathVariable Long storeId, @RequestParam(required = false, defaultValue = "0") int page, @RequestParam(required = false, defaultValue = DEFAULT_PAGE_SIZE) int size) {
 		page = Math.max(page - 1, 0);
 		PageRequest pageable = PageRequest.of(page, size);
 
