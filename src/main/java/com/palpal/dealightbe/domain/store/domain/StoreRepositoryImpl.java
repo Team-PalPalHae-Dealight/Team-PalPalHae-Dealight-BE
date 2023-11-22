@@ -33,7 +33,7 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
 
 	@Override
 	public Slice<Store> findByKeywordAndDistanceWithin3KmAndSortCondition(double xCoordinate, double yCoordinate, String keyword, String sortBy, Long cursor, Pageable pageable) {
-		BooleanExpression distancePredicate = getDistancePredicate(xCoordinate, yCoordinate);
+		BooleanExpression distancePredicate = getDistanceWithin3KmPredicate(xCoordinate, yCoordinate);
 
 		BooleanExpression keywordPredicate = getKeywordPredicate(keyword);
 
@@ -62,18 +62,16 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
 
 		switch (sortType) {
 			case DISTANCE:
-				orderSpecifiers = new OrderSpecifier[]{getDistanceWithin3Km(xCoordinate, yCoordinate).asc(), item.updatedAt.desc()};
+				orderSpecifiers = new OrderSpecifier[]{getDistanceByNear(xCoordinate, yCoordinate).asc(), item.updatedAt.desc()};
 				break;
 			case DISCOUNT_RATE:
-				orderSpecifiers = new OrderSpecifier[]{getDistanceWithin3Km(xCoordinate, yCoordinate).asc(),
-					Expressions.numberTemplate(Double.class, DISCOUNT_RATE).desc(), item.updatedAt.desc()};
+				orderSpecifiers = new OrderSpecifier[]{getBigDiscountRate().desc(), item.updatedAt.desc()};
 				break;
 			case DEADLINE:
-				orderSpecifiers = new OrderSpecifier[]{getDistanceWithin3Km(xCoordinate, yCoordinate).asc(),
-					Expressions.numberTemplate(Double.class, DEADLINE, store.closeTime).asc(), item.updatedAt.desc()};
+				orderSpecifiers = new OrderSpecifier[]{getDeadlineImminent().asc(), item.updatedAt.desc()};
 				break;
 			default:
-				orderSpecifiers = new OrderSpecifier[]{getDistanceWithin3Km(xCoordinate, yCoordinate).asc(), item.updatedAt.desc()};
+				orderSpecifiers = new OrderSpecifier[]{getDistanceByNear(xCoordinate, yCoordinate).asc(), item.updatedAt.desc()};
 				break;
 		}
 		return orderSpecifiers;
@@ -87,7 +85,7 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
 		return store.id.gt(storeId);
 	}
 
-	private BooleanTemplate getDistancePredicate(double xCoordinate, double yCoordinate) {
+	private BooleanTemplate getDistanceWithin3KmPredicate(double xCoordinate, double yCoordinate) {
 		return Expressions.booleanTemplate(HAVERSINE + " <= 3", yCoordinate, address, xCoordinate);
 	}
 
@@ -108,8 +106,15 @@ public class StoreRepositoryImpl implements StoreRepositoryCustom {
 		return new SliceImpl<>(resultList, pageable, hasNext);
 	}
 
-	private NumberTemplate<Double> getDistanceWithin3Km(double xCoordinate, double yCoordinate) {
-		return Expressions.numberTemplate(Double.class,
-			HAVERSINE, yCoordinate, address, xCoordinate);
+	private NumberTemplate<Double> getDeadlineImminent() {
+		return Expressions.numberTemplate(Double.class, DEADLINE, store.closeTime);
+	}
+
+	private static NumberTemplate<Double> getBigDiscountRate() {
+		return Expressions.numberTemplate(Double.class, DISCOUNT_RATE);
+	}
+
+	private NumberTemplate<Double> getDistanceByNear(double xCoordinate, double yCoordinate) {
+		return Expressions.numberTemplate(Double.class, HAVERSINE, yCoordinate, address, xCoordinate);
 	}
 }
