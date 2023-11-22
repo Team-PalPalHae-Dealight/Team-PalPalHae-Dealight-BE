@@ -21,7 +21,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
 	@Override
 	public Slice<Item> findAllByStoreIdOrderByUpdatedAtDesc(Long storeId, Pageable pageable) {
-		List<Item> items = queryFactory.select(item)
+		List<Item> result = queryFactory.select(item)
 			.from(item)
 			.where(item.store.id.eq(storeId))
 			.orderBy(item.updatedAt.desc())
@@ -29,12 +29,17 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 			.limit(pageable.getPageSize() + 1)
 			.fetch();
 
+		return checkLastPage(pageable, result);
+	}
+
+	private Slice<Item> checkLastPage(Pageable pageable, List<Item> results) {
 		boolean hasNext = false;
-		if (items.size() > pageable.getPageSize()) {
-			items.remove(pageable.getPageSize());
+
+		if (results.size() > pageable.getPageSize()) {
 			hasNext = true;
+			results.remove(pageable.getPageSize());
 		}
 
-		return new SliceImpl<>(items, pageable, hasNext);
+		return new SliceImpl<>(results, pageable, hasNext);
 	}
 }
