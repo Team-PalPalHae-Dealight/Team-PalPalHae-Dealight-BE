@@ -112,26 +112,18 @@ public class NotificationService {
 		// Notification 메시지 생성
 		String message = Notification.createMessage(orderStatus, order);
 
-		// Notification 저장
-		Notification notification = createNotification(member, store, order, message);
-		notificationRepository.save(notification);
-
 		// 알림 대상에 따라 SseEmitter에 이벤트 전송
 		switch (orderStatus) {
-			case RECEIVED ->
-				// member가 주문을 했으므로, store에게 알림을 보냄
-				sendNotification(store.getId(), notification, "store");
-			case CONFIRMED ->
-				// store가 주문을 확인했으므로, member에게 알림을 보냄
-				sendNotification(member.getId(), notification, "member");
-			case COMPLETED -> {
-				// 주문이 완료되었으므로, member와 store 모두에게 알림을 보냄
-				sendNotification(member.getId(), notification, "member");
+			case RECEIVED, CANCELED -> {
+				// Store용 Notification 객체 생성 및 저장
+				Notification notification = createNotification(null, store, order, message);
+				notificationRepository.save(notification);
 				sendNotification(store.getId(), notification, "store");
 			}
-			case CANCELED -> {
-				// 주문이 취소되었으므로, member와 store 모두에게 알림을 보냄
-				sendNotification(store.getId(), notification, "store");
+			case CONFIRMED, COMPLETED -> {
+				// Member용 Notification 객체 생성 및 저장
+				Notification notification = createNotification(member, null, order, message);
+				notificationRepository.save(notification);
 				sendNotification(member.getId(), notification, "member");
 			}
 		}
