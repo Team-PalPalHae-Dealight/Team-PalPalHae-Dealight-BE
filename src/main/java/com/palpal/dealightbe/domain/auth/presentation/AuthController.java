@@ -88,4 +88,11 @@ public class AuthController {
 
 		return ResponseEntity.ok(memberAuthRes);
 	}
+
+	@ProviderId
+	@PostMapping("/logout")
+	public ResponseEntity<Void> logout(Long providerId) {
+		authService.logout(providerId);
+		return ResponseEntity.noContent().build();
+	}
 }
