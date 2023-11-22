@@ -10,7 +10,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Github checkout
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -20,8 +21,17 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
 
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run gradle test
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: clean test
+
       - name: Cache SonarCloud packages
         uses: actions/cache@v3
+        if: always()
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
@@ -34,11 +44,40 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+      # 서비스에 필요한 yml 파일 생성
+      # application-oauth.yml 생성
+      - name: Make application-oauth.yml
+        run: |
+          cd ./src/main/resources
+          touch ./application-oauth.yml
+          echo "${{ secrets.YML_DEV_OAUTH }}" > ./application-oauth.yml
+        shell: bash
+
+      # application-aws.yml 생성
+      - name: Make application-aws.yml
+        run: |
+          cd ./src/main/resources
+          touch ./application-aws.yml
+          echo "${{ secrets.YML_DEV_AWS }}" > ./application-aws.yml
+        shell: bash
 
       - name: Build and analyze
-        run: ./gradlew build jacocoTestReport sonar --info
+        uses: gradle/gradle-build-action@v2
+        if: always()
+        with:
+          arguments: sonar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Write 'PR comment' on test results automatically
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: build/test-results/test/TEST-*.xml
+
+      - name: Write 'PR check' on failure test automatically
+        uses: mikepenz/action-junit-report@v3
+        if: failure()
+        with:
+          report_paths: build/test-results/test/TEST-*.xml
