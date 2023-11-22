@@ -17,6 +17,8 @@ plugins {
     id "com.gorylenko.gradle-git-properties" version "2.4.1"
     // jacoco
     id 'jacoco'
+    // sonar cloud
+    id 'org.sonarqube' version '4.4.1.3373'
 }
 
 group = 'com.palpal'
@@ -197,5 +199,15 @@ jacocoTestCoverageVerification {
                     '*.dto.*'
             ] + Qdomains
         }
+    }
+}
+
+// sonar cloud 빌드 옵션
+sonar {
+    properties {
+        property "sonar.projectKey", "Team-PalPalHae-Dealight_Team-PalPalHae-Dealight-BE"
+        property "sonar.organization", "dealight-be"
+        property "sonar.host.url", "https://sonarcloud.io"
+        property 'sonar.coverage.jacoco.xmlReportPaths', 'build/jacoco/index.xml'
     }
 }
