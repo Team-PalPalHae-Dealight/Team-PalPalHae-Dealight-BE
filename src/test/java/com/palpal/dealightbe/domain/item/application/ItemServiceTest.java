@@ -20,6 +20,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -252,9 +254,10 @@ class ItemServiceTest {
 		assertThat(itemsRes.items()).hasSize(items.size());
 	}
 
-	@DisplayName("상품 목록 조회(고객 시점) - 마감순 성공 테스트")
-	@Test
-	void itemFindAllForMemberSuccessSortByDeadlineTest() {
+	@ValueSource(strings = {"deadline", "discount-rate", "distance"})
+	@ParameterizedTest
+	@DisplayName("상품 목록 조회(고객 시점) 성공 테스트")
+	void itemFindAllForMemberSuccessTest(String sortBy) {
 		//given
 		int page = 0;
 		int size = 5;
@@ -269,62 +272,10 @@ class ItemServiceTest {
 		double xCoordinate = 127.0221068;
 		double yCoordinate = 37.5912999;
 
-		when(itemRepository.findAllByOpenedStatusAndDistanceWithin3KmAndSortCondition(anyDouble(), anyDouble(), eq("deadline"), eq(PageRequest.of(page, size)))).thenReturn(itemPage);
+		when(itemRepository.findAllByOpenedStatusAndDistanceWithin3KmAndSortCondition(anyDouble(), anyDouble(), eq(sortBy), eq(PageRequest.of(page, size)))).thenReturn(itemPage);
 
 		//when
-		ItemsRes itemsRes = itemService.findAllForMember(xCoordinate, yCoordinate, "deadline", pageRequest);
-
-		//then
-		assertThat(itemsRes.items()).hasSize(items.size());
-	}
-
-	@DisplayName("상품 목록 조회(고객 시점) - 할인율순 성공 테스트")
-	@Test
-	void itemFindAllForMemberSuccessSortByDiscountRateTest() {
-		//given
-		int page = 0;
-		int size = 5;
-		PageRequest pageRequest = PageRequest.of(page, size);
-
-		List<Item> items = new ArrayList<>();
-		items.add(item);
-		items.add(item2);
-
-		SliceImpl<Item> itemPage = new SliceImpl<>(items);
-
-		double xCoordinate = 127.0221068;
-		double yCoordinate = 37.5912999;
-
-		when(itemRepository.findAllByOpenedStatusAndDistanceWithin3KmAndSortCondition(anyDouble(), anyDouble(), eq("discount-rate"), eq(PageRequest.of(page, size)))).thenReturn(itemPage);
-
-		//when
-		ItemsRes itemsRes = itemService.findAllForMember(xCoordinate, yCoordinate, "discount-rate", pageRequest);
-
-		//then
-		assertThat(itemsRes.items()).hasSize(items.size());
-	}
-
-	@DisplayName("상품 목록 조회(고객 시점) - 거리순 성공 테스트")
-	@Test
-	void itemFindAllForMemberSuccessSortByDistanceTest() {
-		//given
-		int page = 0;
-		int size = 5;
-		PageRequest pageRequest = PageRequest.of(page, size);
-
-		List<Item> items = new ArrayList<>();
-		items.add(item);
-		items.add(item2);
-
-		SliceImpl<Item> itemPage = new SliceImpl<>(items);
-
-		double xCoordinate = 127.0221068;
-		double yCoordinate = 37.5912999;
-
-		when(itemRepository.findAllByOpenedStatusAndDistanceWithin3KmAndSortCondition(anyDouble(), anyDouble(), eq("distance"), eq(PageRequest.of(page, size)))).thenReturn(itemPage);
-
-		//when
-		ItemsRes itemsRes = itemService.findAllForMember(xCoordinate, yCoordinate, "distance", pageRequest);
+		ItemsRes itemsRes = itemService.findAllForMember(xCoordinate, yCoordinate, sortBy, pageRequest);
 
 		//then
 		assertThat(itemsRes.items()).hasSize(items.size());
