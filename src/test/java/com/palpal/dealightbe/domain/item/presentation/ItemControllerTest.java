@@ -51,7 +51,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 
@@ -210,7 +209,7 @@ class ItemControllerTest {
 					partWithName("itemReq").description("상품 등록 내용")
 				),
 				requestPartFields("itemReq",
-					fieldWithPath("name").type(STRING).description("상품 이름"),
+					fieldWithPath("itemName").type(STRING).description("상품 이름"),
 					fieldWithPath("stock").type(NUMBER).description("재고 수"),
 					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
@@ -276,10 +275,10 @@ class ItemControllerTest {
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
 			.andExpect(jsonPath("$.code").value("C001"))
-			.andExpect(jsonPath("$.errors[0].field").value("name"))
+			.andExpect(jsonPath("$.errors[0].field").value("itemName"))
 			.andExpect(jsonPath("$.errors[0].value").value(""))
 			.andExpect(jsonPath("$.errors[0].reason").isNotEmpty())
-			.andExpect(jsonPath("$.errors[1].field").value("name"))
+			.andExpect(jsonPath("$.errors[1].field").value("itemName"))
 			.andExpect(jsonPath("$.errors[1].value").value(""))
 			.andExpect(jsonPath("$.errors[1].reason").isNotEmpty())
 			.andExpect(jsonPath("$.message").value("잘못된 값을 입력하셨습니다."))
@@ -295,7 +294,7 @@ class ItemControllerTest {
 					partWithName("itemReq").description("상품 등록 내용")
 				),
 				requestPartFields("itemReq",
-					fieldWithPath("name").type(STRING).description("상품 이름"),
+					fieldWithPath("itemName").type(STRING).description("상품 이름"),
 					fieldWithPath("stock").type(NUMBER).description("재고 수"),
 					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
@@ -353,7 +352,7 @@ class ItemControllerTest {
 					partWithName("itemReq").description("상품 등록 내용")
 				),
 				requestPartFields("itemReq",
-					fieldWithPath("name").type(STRING).description("상품 이름"),
+					fieldWithPath("itemName").type(STRING).description("상품 이름"),
 					fieldWithPath("stock").type(NUMBER).description("재고 수"),
 					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
@@ -408,7 +407,7 @@ class ItemControllerTest {
 					partWithName("itemReq").description("상품 등록 내용")
 				),
 				requestPartFields("itemReq",
-					fieldWithPath("name").type(STRING).description("상품 이름"),
+					fieldWithPath("itemName").type(STRING).description("상품 이름"),
 					fieldWithPath("stock").type(NUMBER).description("재고 수"),
 					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
@@ -523,8 +522,6 @@ class ItemControllerTest {
 			.store(store)
 			.build();
 
-		Long lastId = 0L;
-
 		int size = 5;
 		int page = 0;
 		PageRequest pageRequest = PageRequest.of(page, size);
@@ -544,7 +541,6 @@ class ItemControllerTest {
 		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/items/stores")
 				.contentType(MediaType.APPLICATION_JSON)
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
-				.param("last-id", String.valueOf(lastId))
 				.param("size", String.valueOf(size))
 				.param("page", String.valueOf(1)))
 			.andExpect(status().isOk())
@@ -573,7 +569,6 @@ class ItemControllerTest {
 				),
 				requestParameters(
 					List.of(
-						parameterWithName("last-id").description("이전 페이지 목록의 마지막 상품 ID"),
 						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
@@ -607,8 +602,6 @@ class ItemControllerTest {
 		double yCoordinate = 37.5912999;
 		String sortBy = "deadline";
 
-		Long lastId = 0L;
-
 		int size = 5;
 		int page = 0;
 		PageRequest pageRequest = PageRequest.of(page, size);
@@ -631,7 +624,6 @@ class ItemControllerTest {
 				.param("x-coordinate", String.valueOf(xCoordinate))
 				.param("y-coordinate", String.valueOf(yCoordinate))
 				.param("sort-by", sortBy)
-				.param("last-id", String.valueOf(lastId))
 				.param("size", String.valueOf(size))
 				.param("page", String.valueOf(1)))
 			.andExpect(status().isOk())
@@ -659,7 +651,6 @@ class ItemControllerTest {
 					List.of(parameterWithName("x-coordinate").description("경도"),
 						parameterWithName("y-coordinate").description("위도"),
 						parameterWithName("sort-by").description("정렬 기준"),
-						parameterWithName("last-id").description("이전 페이지 목록의 마지막 상품 ID"),
 						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
@@ -702,8 +693,6 @@ class ItemControllerTest {
 			.store(store)
 			.build();
 
-		Long lastId = 0L;
-
 		int size = 5;
 		int page = 0;
 		PageRequest pageRequest = PageRequest.of(page, size);
@@ -722,7 +711,6 @@ class ItemControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/items/stores/{storeId}", storeId)
 				.contentType(MediaType.APPLICATION_JSON)
-				.param("last-id", String.valueOf(lastId))
 				.param("size", String.valueOf(size))
 				.param("page", String.valueOf(1)))
 			.andExpect(status().isOk())
@@ -751,7 +739,6 @@ class ItemControllerTest {
 				),
 				requestParameters(
 					List.of(
-						parameterWithName("last-id").description("이전 페이지 목록의 마지막 상품 ID"),
 						parameterWithName("size").description("한 페이지 당 상품 목록 개수"),
 						parameterWithName("page").description("페이지 번호")
 					)),
@@ -787,7 +774,7 @@ class ItemControllerTest {
 		String imageUrl = "http://image-url.com/image.jpg";
 
 		ItemReq itemReq = new ItemReq("치즈 떡볶이", 4, 9900, 14000, "치즈 떡볶이 입니다.", "통신사 할인 가능 합니다.");
-		ItemRes itemRes = new ItemRes(itemId, 1L, itemReq.name(), itemReq.stock(), itemReq.discountPrice(),
+		ItemRes itemRes = new ItemRes(itemId, 1L, itemReq.itemName(), itemReq.stock(), itemReq.discountPrice(),
 			itemReq.originalPrice(), itemReq.description(), itemReq.information(), imageUrl, store.getName(), store.getOpenTime(), store.getCloseTime(), addressRes);
 
 		MockMultipartFile file = new MockMultipartFile("image", "test.jpg", "image/jpeg", "file".getBytes());
@@ -842,7 +829,7 @@ class ItemControllerTest {
 					partWithName("itemReq").description("상품 등록 내용")
 				),
 				requestPartFields("itemReq",
-					fieldWithPath("name").type(STRING).description("상품 이름"),
+					fieldWithPath("itemName").type(STRING).description("상품 이름"),
 					fieldWithPath("stock").type(NUMBER).description("재고 수"),
 					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
@@ -920,10 +907,10 @@ class ItemControllerTest {
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
 			.andExpect(jsonPath("$.code").value("C001"))
-			.andExpect(jsonPath("$.errors[0].field").value("name"))
+			.andExpect(jsonPath("$.errors[0].field").value("itemName"))
 			.andExpect(jsonPath("$.errors[0].value").value(""))
 			.andExpect(jsonPath("$.errors[0].reason").isNotEmpty())
-			.andExpect(jsonPath("$.errors[1].field").value("name"))
+			.andExpect(jsonPath("$.errors[1].field").value("itemName"))
 			.andExpect(jsonPath("$.errors[1].value").value(""))
 			.andExpect(jsonPath("$.errors[1].reason").isNotEmpty())
 			.andExpect(jsonPath("$.message").value("잘못된 값을 입력하셨습니다."))
@@ -940,7 +927,7 @@ class ItemControllerTest {
 					partWithName("itemReq").description("상품 등록 내용")
 				),
 				requestPartFields("itemReq",
-					fieldWithPath("name").type(STRING).description("상품 이름"),
+					fieldWithPath("itemName").type(STRING).description("상품 이름"),
 					fieldWithPath("stock").type(NUMBER).description("재고 수"),
 					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
@@ -1009,7 +996,7 @@ class ItemControllerTest {
 					partWithName("itemReq").description("상품 등록 내용")
 				),
 				requestPartFields("itemReq",
-					fieldWithPath("name").type(STRING).description("상품 이름"),
+					fieldWithPath("itemName").type(STRING).description("상품 이름"),
 					fieldWithPath("stock").type(NUMBER).description("재고 수"),
 					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("originalPrice").type(NUMBER).description("원가"),
@@ -1088,7 +1075,7 @@ class ItemControllerTest {
 					partWithName("itemReq").description("상품 등록 내용")
 				),
 				requestPartFields("itemReq",
-					fieldWithPath("name").type(STRING).description("상품 이름"),
+					fieldWithPath("itemName").type(STRING).description("상품 이름"),
 					fieldWithPath("stock").type(NUMBER).description("재고 수"),
 					fieldWithPath("discountPrice").type(NUMBER).description("할인가"),
 					fieldWithPath("originalPrice").type(NUMBER).description("원가"),

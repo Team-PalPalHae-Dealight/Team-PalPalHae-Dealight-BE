@@ -391,7 +391,7 @@ class ItemServiceTest {
 		ItemRes itemRes = itemService.update(itemId, itemReq, providerId, imageUploadReq);
 
 		//then
-		assertThat(itemRes.itemName()).isEqualTo(itemReq.name());
+		assertThat(itemRes.itemName()).isEqualTo(itemReq.itemName());
 		assertThat(itemRes.stock()).isEqualTo(itemReq.stock());
 		assertThat(itemRes.discountPrice()).isEqualTo(itemReq.discountPrice());
 		assertThat(itemRes.originalPrice()).isEqualTo(itemReq.originalPrice());
