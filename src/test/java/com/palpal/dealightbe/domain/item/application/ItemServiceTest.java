@@ -87,7 +87,6 @@ class ItemServiceTest {
 			.discountPrice(3000)
 			.originalPrice(4500)
 			.description("기본 떡볶이 입니다.")
-			.information("통신사 할인 불가능 합니다.")
 			.image("https://fake-image.com/item1.png")
 			.store(store)
 			.build();
@@ -113,7 +112,6 @@ class ItemServiceTest {
 			.discountPrice(4000)
 			.originalPrice(4500)
 			.description("김밥 입니다.")
-			.information("통신사 할인 불가능 합니다.")
 			.image("https://fake-image.com/item2.png")
 			.store(store2)
 			.build();
@@ -123,7 +121,7 @@ class ItemServiceTest {
 	@Test
 	void itemCreateSuccessTest() {
 		//given
-		ItemReq itemReq = new ItemReq(item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation());
+		ItemReq itemReq = new ItemReq(item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription());
 		Long providerId = 1L;
 
 		MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "Spring Framework".getBytes());
@@ -144,7 +142,6 @@ class ItemServiceTest {
 		assertThat(itemRes.discountPrice()).isEqualTo(item.getDiscountPrice());
 		assertThat(itemRes.originalPrice()).isEqualTo(item.getOriginalPrice());
 		assertThat(itemRes.description()).isEqualTo(item.getDescription());
-		assertThat(itemRes.information()).isEqualTo(item.getInformation());
 		assertThat(itemRes.image()).isEqualTo(item.getImage());
 	}
 
@@ -152,7 +149,7 @@ class ItemServiceTest {
 	@Test
 	void itemCreateFailureTest_storeNotFound() {
 		//given
-		ItemReq itemReq = new ItemReq(item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription(), item.getInformation());
+		ItemReq itemReq = new ItemReq(item.getName(), item.getStock(), item.getDiscountPrice(), item.getOriginalPrice(), item.getDescription());
 		Long providerId = 1L;
 
 		MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "Spring Framework".getBytes());
@@ -171,7 +168,7 @@ class ItemServiceTest {
 	@Test
 	void itemCreateFailureTest_invalidDiscountPrice() {
 		//given
-		ItemReq itemReq = new ItemReq(item.getName(), item.getStock(), 4500, 4000, item.getDescription(), item.getInformation());
+		ItemReq itemReq = new ItemReq(item.getName(), item.getStock(), 4500, 4000, item.getDescription());
 		Long providerId = 1L;
 
 		MockMultipartFile file = new MockMultipartFile("file", "test.jpg", "image/jpeg", "Spring Framework".getBytes());
@@ -203,7 +200,6 @@ class ItemServiceTest {
 		assertThat(itemRes.discountPrice()).isEqualTo(item.getDiscountPrice());
 		assertThat(itemRes.originalPrice()).isEqualTo(item.getOriginalPrice());
 		assertThat(itemRes.description()).isEqualTo(item.getDescription());
-		assertThat(itemRes.information()).isEqualTo(item.getInformation());
 	}
 
 	@DisplayName("상품 상세 정보 조회(단건) 실패 테스트 - 상품이 존재하지 않는 경우")
@@ -230,7 +226,6 @@ class ItemServiceTest {
 			.discountPrice(4000)
 			.originalPrice(4500)
 			.description("치즈 김밥 입니다.")
-			.information("통신사 할인 불가능 합니다.")
 			.image("https://fake-image.com/item2.png")
 			.store(store)
 			.build();
@@ -345,7 +340,6 @@ class ItemServiceTest {
 			.discountPrice(4000)
 			.originalPrice(4500)
 			.description("치즈 김밥 입니다.")
-			.information("통신사 할인 불가능 합니다.")
 			.image("https://fake-image.com/item2.png")
 			.store(store)
 			.build();
@@ -375,7 +369,7 @@ class ItemServiceTest {
 	@Test
 	void itemUpdateSuccessTest() {
 		//given
-		ItemReq itemReq = new ItemReq("수정이름", 1, 3000, 3500, "상세 내용 수정", "안내 사항 수정");
+		ItemReq itemReq = new ItemReq("수정이름", 1, 3000, 3500, "상세 내용 수정");
 		Long providerId = 1L;
 		Long itemId = 1L;
 
@@ -396,7 +390,6 @@ class ItemServiceTest {
 		assertThat(itemRes.discountPrice()).isEqualTo(itemReq.discountPrice());
 		assertThat(itemRes.originalPrice()).isEqualTo(itemReq.originalPrice());
 		assertThat(itemRes.description()).isEqualTo(itemReq.description());
-		assertThat(itemRes.information()).isEqualTo(itemReq.information());
 		assertThat(itemRes.image()).isEqualTo(imageUrl);
 	}
 
@@ -404,7 +397,7 @@ class ItemServiceTest {
 	@Test
 	void itemUpdateFailureTest_invalidDiscountPrice() {
 		//given
-		ItemReq itemReq = new ItemReq("수정이름", 1, 4000, 3500, "상세 내용 수정", "안내 사항 수정");
+		ItemReq itemReq = new ItemReq("수정이름", 1, 4000, 3500, "상세 내용 수정");
 		Long providerId = 1L;
 		Long itemId = 1L;
 

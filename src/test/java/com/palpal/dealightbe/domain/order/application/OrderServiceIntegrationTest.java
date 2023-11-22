@@ -239,7 +239,6 @@ public class OrderServiceIntegrationTest {
 			.originalPrice(4500)
 			.discountPrice(4000)
 			.description("기본 떡볶이 입니다.")
-			.information("통신사 할인 불가능 합니다.")
 			.store(store)
 			.build();
 
