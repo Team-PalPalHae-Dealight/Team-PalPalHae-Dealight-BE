@@ -22,9 +22,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
-	private final static String HAVERSINE = "(6371 * ACOS(COS(RADIANS({0})) * COS(RADIANS({1}.yCoordinate)) * COS(RADIANS({1}.xCoordinate) - RADIANS({2})) + SIN(RADIANS({0})) * SIN(RADIANS({1}.yCoordinate))))";
-	private final static String DEADLINE = "CASE WHEN {0} < CURTIME() THEN (24 * 60 * 60 + (HOUR({0}) * 3600 + MINUTE({0}) * 60 + SECOND({0}))) ELSE (HOUR({0}) * 3600 + MINUTE({0}) * 60 + SECOND({0})) END";
-	private final static String DISCOUNT_RATE = "(item.originalPrice - item.discountPrice) * 1.0 / item.originalPrice";
+	private static final String HAVERSINE = "(6371 * ACOS(COS(RADIANS({0})) * COS(RADIANS({1}.yCoordinate)) * COS(RADIANS({1}.xCoordinate) - RADIANS({2})) + SIN(RADIANS({0})) * SIN(RADIANS({1}.yCoordinate))))";
+	private static final String DEADLINE = "CASE WHEN {0} < CURTIME() THEN (24 * 60 * 60 + (HOUR({0}) * 3600 + MINUTE({0}) * 60 + SECOND({0}))) ELSE (HOUR({0}) * 3600 + MINUTE({0}) * 60 + SECOND({0})) END";
+	private static final String DISCOUNT_RATE = "(item.originalPrice - item.discountPrice) * 1.0 / item.originalPrice";
 
 	private final JPAQueryFactory queryFactory;
 	private QItem item = QItem.item;
