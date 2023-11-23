@@ -118,6 +118,23 @@ include::{snippets}/cart/cart-add-item-item-not-found/response-fields.adoc[]
 
 ---
 
+.Request Fail - 장바구니의 최소, 최대 수량 조건에 맞지 않는 경우
+include::{snippets}/cart/cart-add-item-invalid-cart-quantity/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-add-item-invalid-cart-quantity/request-headers.adoc[]
+
+.request parameter
+include::{snippets}/cart/cart-add-item-invalid-cart-quantity/request-parameters.adoc[]
+
+.Response Fail - 장바구니의 최소, 최대 수량 조건에 맞지 않는 경우
+include::{snippets}/cart/cart-add-item-invalid-cart-quantity/http-response.adoc[]
+
+.response fields
+include::{snippets}/cart/cart-add-item-invalid-cart-quantity/response-fields.adoc[]
+
+---
+
 === 장바구니 조회
 
 ==== /api/carts
