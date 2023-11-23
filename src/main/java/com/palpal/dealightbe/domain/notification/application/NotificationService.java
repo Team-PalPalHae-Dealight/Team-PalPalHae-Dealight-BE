@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -38,6 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class NotificationService {
 	private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
+	private static final String DEFAULT_SCHEDULING_TIME = "0 0 2 ? * TUE";  //매주 화요일 새벽 2시에 진행
 	private final EmitterRepository emitterRepository;
 	private final NotificationRepository notificationRepository;
 	private final MemberRepository memberRepository;
@@ -61,6 +63,12 @@ public class NotificationService {
 		}
 
 		return emitter;
+	}
+
+	@Transactional
+	@Scheduled(cron = DEFAULT_SCHEDULING_TIME)
+	public void cleanupReadNotifications() {
+		notificationRepository.deleteReadNotifications();
 	}
 
 	private void resendMissedEvents(Long id, String userType, String emitterId, String lastEventId,
