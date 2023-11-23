@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalTime;
@@ -156,6 +157,37 @@ class ReviewServiceIntegrationTest {
 					BusinessException.class,
 					() ->
 						reviewService.create(orderId, reviewCreateReq, memberProviderId)
+				);
+			}
+
+			@DisplayName("이미 리뷰가 작성된 주문에 대해서 추가로 리뷰를 작성할 수 없다.")
+			@Test
+			void createTest_fail_already_exists() {
+				// given
+				Member member = createMember();
+				Store store = createStore();
+				Order order = createOrder(member, store);
+
+				long orderId = order.getId();
+
+				ReviewCreateReq reviewCreateReq = new ReviewCreateReq(
+					List.of(ReviewContent.Q1.getMessage(), ReviewContent.Q2.getMessage())
+				);
+				long memberProviderId = member.getProviderId();
+
+				order.changeStatus(store.getMember(), "CONFIRMED");
+				order.changeStatus(store.getMember(), "COMPLETED");
+
+				// when
+				// then
+
+				assertDoesNotThrow(() -> reviewService.create(orderId, reviewCreateReq, memberProviderId));
+
+				assertThrows(
+					BusinessException.class,
+					() -> {
+						reviewService.create(orderId, reviewCreateReq, memberProviderId);
+					}
 				);
 			}
 		}

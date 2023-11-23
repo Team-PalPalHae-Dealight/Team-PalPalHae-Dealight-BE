@@ -3,7 +3,9 @@ package com.palpal.dealightbe.domain.order.domain;
 import static com.palpal.dealightbe.domain.order.domain.OrderStatus.CANCELED;
 import static com.palpal.dealightbe.domain.order.domain.OrderStatus.COMPLETED;
 import static com.palpal.dealightbe.domain.order.domain.OrderStatus.RECEIVED;
+import static com.palpal.dealightbe.global.error.ErrorCode.ALREADY_EXIST_REVIEW;
 import static com.palpal.dealightbe.global.error.ErrorCode.EXCEEDED_ORDER_ITEMS;
+import static com.palpal.dealightbe.global.error.ErrorCode.ILLEGAL_REVIEW_REQUEST;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ARRIVAL_TIME;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_DEMAND_LENGTH;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ORDER_STATUS;
@@ -60,15 +62,15 @@ public class Order extends BaseEntity {
 	@JoinColumn(name = "store_id")
 	private Store store;
 
-	private LocalTime arrivalTime;
-
-	private String demand;
+	@OneToMany(mappedBy = "order")
+	private List<OrderItem> orderItems = new ArrayList<>();
 
 	@Enumerated(EnumType.STRING)
 	private OrderStatus orderStatus = RECEIVED;
 
-	@OneToMany(mappedBy = "order")
-	private List<OrderItem> orderItems = new ArrayList<>();
+	private LocalTime arrivalTime;
+
+	private String demand;
 
 	private int totalPrice;
 
@@ -184,8 +186,18 @@ public class Order extends BaseEntity {
 		return orderStatus == COMPLETED;
 	}
 
-	public void changeReviewStatus() {
+	public void createReviews() {
+		if (!isCompleted()) {
+			log.warn("POST:WRITER:CANNOT_WRITER_REVIEW : ORDER_STATUS {}", orderStatus);
+			throw new BusinessException(ILLEGAL_REVIEW_REQUEST);
+		}
+
+		if (reviewContains) {
+			throw new BusinessException(ALREADY_EXIST_REVIEW);
+		}
+
 		reviewContains = true;
+
 	}
 
 	private void validateDemand(String demand) {

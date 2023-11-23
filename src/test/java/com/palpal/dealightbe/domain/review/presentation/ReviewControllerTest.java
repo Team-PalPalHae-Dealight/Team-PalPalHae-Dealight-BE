@@ -1,5 +1,6 @@
 package com.palpal.dealightbe.domain.review.presentation;
 
+import static com.palpal.dealightbe.global.error.ErrorCode.ALREADY_EXIST_REVIEW;
 import static com.palpal.dealightbe.global.error.ErrorCode.ILLEGAL_REVIEW_REQUEST;
 import static com.palpal.dealightbe.global.error.ErrorCode.UNAUTHORIZED_REQUEST;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -197,111 +198,31 @@ class ReviewControllerTest {
 					)
 				));
 		}
-	}
-
-	@Nested
-	@DisplayName("<업체별 리뷰 조회>")
-	class findByStoreIdTest {
-		String findByStoreIdPath = "/api/reviews/stores";
-
-		Long storeId = 1L;
-
-		StoreReviewsRes storeReviewsRes = new StoreReviewsRes(storeId,
-			List.of(new StoreReviewRes("사장님이 친절해요", 2), new StoreReviewRes("가격이 저렴해요", 4)));
 
 		@Test
-		@DisplayName("성공 - 고객이 업체별 리뷰 통계를 확인한다.")
-		void findByStoreId_success() throws Exception {
+		@DisplayName("실패 - 이미 리뷰가 작성된 주문에 대해 추가로 작성할 수 없다.")
+		void create_fail_already_exists() throws Exception {
 			// given
-			given(reviewService.findByStoreId(anyLong()))
-				.willReturn(storeReviewsRes);
+			given(reviewService.create(eq(1L), any(ReviewCreateReq.class), any()))
+				.willThrow(new BusinessException(ALREADY_EXIST_REVIEW));
 
 			// when
 			// then
 			mockMvc.perform(
-					get(findByStoreIdPath + "/{id}", "1")
-						.with(user("tester"))
-				)
-				.andDo(print())
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.storeId").value(storeId))
-				.andExpect(jsonPath("$.reviews[0].content").value(storeReviewsRes.reviews().get(0).content()))
-				.andExpect(jsonPath("$.reviews[0].count").value(storeReviewsRes.reviews().get(0).count()))
-				.andExpect(jsonPath("$.reviews[1].content").value(storeReviewsRes.reviews().get(1).content()))
-				.andExpect(jsonPath("$.reviews[1].count").value(storeReviewsRes.reviews().get(1).count()))
-				.andDo(document("review/review-find-by-store-id-success",
-						preprocessRequest(prettyPrint()),
-						preprocessResponse(prettyPrint()),
-						pathParameters(
-							parameterWithName("id").description("업체 아이디")
-						),
-						responseFields(
-							fieldWithPath("storeId").type(JsonFieldType.NUMBER).description("업체 아이디"),
-							fieldWithPath("reviews[]").type(JsonFieldType.ARRAY).description("각 리뷰별 메시지와 개수"),
-							fieldWithPath("reviews[].content").type(JsonFieldType.STRING).description("리뷰 메시지"),
-							fieldWithPath("reviews[].count").type(JsonFieldType.NUMBER).description("개수")
-						)
-					)
-				);
-		}
-
-		@Test
-		@DisplayName("성공 - 업체가 본인의 리뷰 통계를 조회한다.")
-		void findByStoreOwnerProviderId_success() throws Exception {
-			// given
-			given(reviewService.findByStoreOwnerProviderId(any()))
-				.willReturn(storeReviewsRes);
-
-			// when
-			// then
-			mockMvc.perform(
-					get(findByStoreIdPath)
-						.with(user("username").roles("STORE"))
+					post(createApiPath)
+						.with(csrf().asHeader())
+						.with(user("username").roles("MEMBER"))
 						.header("Authorization", "Bearer {ACCESS_TOKEN}")
-				)
-				.andDo(print())
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.storeId").value(storeId))
-				.andExpect(jsonPath("$.reviews[0].content").value(storeReviewsRes.reviews().get(0).content()))
-				.andExpect(jsonPath("$.reviews[0].count").value(storeReviewsRes.reviews().get(0).count()))
-				.andExpect(jsonPath("$.reviews[1].content").value(storeReviewsRes.reviews().get(1).content()))
-				.andExpect(jsonPath("$.reviews[1].count").value(storeReviewsRes.reviews().get(1).count()))
-				.andDo(document("review/review-find-by-token-success",
-					preprocessRequest(prettyPrint()),
-					preprocessResponse(prettyPrint()),
-					requestHeaders(
-						headerWithName("Authorization").description("Access Token")
-					),
-					responseFields(
-						fieldWithPath("storeId").type(JsonFieldType.NUMBER).description("업체 아이디"),
-						fieldWithPath("reviews[]").type(JsonFieldType.ARRAY).description("각 리뷰별 메시지와 개수"),
-						fieldWithPath("reviews[].content").type(JsonFieldType.STRING).description("리뷰 메시지"),
-						fieldWithPath("reviews[].count").type(JsonFieldType.NUMBER).description("개수")
-						)
-					)
-				);
-		}
-
-		@Test
-		@DisplayName("실패 - 업체 당사자만 리뷰를 조회할 수 있다")
-		void findByStoreId_fail_unauthorized() throws Exception {
-			// given
-			given(reviewService.findByStoreOwnerProviderId(any()))
-				.willThrow(new BusinessException(UNAUTHORIZED_REQUEST));
-
-			// when
-			// then
-			mockMvc.perform(
-					get(findByStoreIdPath)
-						.with(user("username").roles("STORE"))
-						.header("Authorization", "Bearer {ACCESS_TOKEN}")
+						.content(objectMapper.writeValueAsString(reviewCreateReq))
+						.contentType(APPLICATION_JSON)
+						.param("id", String.valueOf(1L))
 				)
 				.andDo(print())
 				.andExpect(status().is4xxClientError())
 				.andExpect(result -> {
 					assertTrue(result.getResolvedException() instanceof BusinessException);
 				})
-				.andDo(document("review/review-find-by-token-fail-unauthorized",
+				.andDo(document("review/review-create-fail-already-exists",
 					preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
 					requestHeaders(
@@ -315,114 +236,232 @@ class ReviewControllerTest {
 					)
 				));
 		}
-	}
 
-	@Nested
-	@DisplayName("<주문별 리뷰 조회>")
-	class findByOrderIdTest {
-		String findByOrderIdPath = "/api/reviews/orders";
+		@Nested
+		@DisplayName("<업체별 리뷰 조회>")
+		class findByStoreIdTest {
+			String findByStoreIdPath = "/api/reviews/stores";
 
-		ReviewRes reviewRes = new ReviewRes(List.of("사장님이 친절해요", "가격이 저렴해요"));
+			Long storeId = 1L;
 
-		@Test
-		@DisplayName("성공 - 주문에 작성된 리뷰를 조회한다.")
-		void findByOrderId_success() throws Exception {
-			// given
-			given(reviewService.findByOrderId(anyLong(), any()))
-				.willReturn(reviewRes);
+			StoreReviewsRes storeReviewsRes = new StoreReviewsRes(storeId,
+				List.of(new StoreReviewRes("사장님이 친절해요", 2), new StoreReviewRes("가격이 저렴해요", 4)));
 
-			// when
-			// then
-			mockMvc.perform(
-					get(findByOrderIdPath)
-						.with(csrf().asHeader())
-						.with(user("username").roles("MEMBER"))
-						.header("Authorization", "Bearer {ACCESS_TOKEN}")
-						.contentType(APPLICATION_JSON)
-						.param("id", "1")
-				)
-				.andDo(print())
-				.andExpect(status().isOk())
+			@Test
+			@DisplayName("성공 - 고객이 업체별 리뷰 통계를 확인한다.")
+			void findByStoreId_success() throws Exception {
+				// given
+				given(reviewService.findByStoreId(anyLong()))
+					.willReturn(storeReviewsRes);
 
-				.andExpect(jsonPath("$.messages[0]").value(reviewRes.messages().get(0)))
-				.andExpect(jsonPath("$.messages[1]").value(reviewRes.messages().get(1)))
-				.andDo(document("review/review-find-by-order-id-success",
+				// when
+				// then
+				mockMvc.perform(
+						get(findByStoreIdPath + "/{id}", "1")
+							.with(user("tester"))
+					)
+					.andDo(print())
+					.andExpect(status().isOk())
+					.andExpect(jsonPath("$.storeId").value(storeId))
+					.andExpect(jsonPath("$.reviews[0].content").value(storeReviewsRes.reviews().get(0).content()))
+					.andExpect(jsonPath("$.reviews[0].count").value(storeReviewsRes.reviews().get(0).count()))
+					.andExpect(jsonPath("$.reviews[1].content").value(storeReviewsRes.reviews().get(1).content()))
+					.andExpect(jsonPath("$.reviews[1].count").value(storeReviewsRes.reviews().get(1).count()))
+					.andDo(document("review/review-find-by-store-id-success",
+							preprocessRequest(prettyPrint()),
+							preprocessResponse(prettyPrint()),
+							pathParameters(
+								parameterWithName("id").description("업체 아이디")
+							),
+							responseFields(
+								fieldWithPath("storeId").type(JsonFieldType.NUMBER).description("업체 아이디"),
+								fieldWithPath("reviews[]").type(JsonFieldType.ARRAY).description("각 리뷰별 메시지와 개수"),
+								fieldWithPath("reviews[].content").type(JsonFieldType.STRING).description("리뷰 메시지"),
+								fieldWithPath("reviews[].count").type(JsonFieldType.NUMBER).description("개수")
+							)
+						)
+					);
+			}
+
+			@Test
+			@DisplayName("성공 - 업체가 본인의 리뷰 통계를 조회한다.")
+			void findByStoreOwnerProviderId_success() throws Exception {
+				// given
+				given(reviewService.findByStoreOwnerProviderId(any()))
+					.willReturn(storeReviewsRes);
+
+				// when
+				// then
+				mockMvc.perform(
+						get(findByStoreIdPath)
+							.with(user("username").roles("STORE"))
+							.header("Authorization", "Bearer {ACCESS_TOKEN}")
+					)
+					.andDo(print())
+					.andExpect(status().isOk())
+					.andExpect(jsonPath("$.storeId").value(storeId))
+					.andExpect(jsonPath("$.reviews[0].content").value(storeReviewsRes.reviews().get(0).content()))
+					.andExpect(jsonPath("$.reviews[0].count").value(storeReviewsRes.reviews().get(0).count()))
+					.andExpect(jsonPath("$.reviews[1].content").value(storeReviewsRes.reviews().get(1).content()))
+					.andExpect(jsonPath("$.reviews[1].count").value(storeReviewsRes.reviews().get(1).count()))
+					.andDo(document("review/review-find-by-token-success",
+							preprocessRequest(prettyPrint()),
+							preprocessResponse(prettyPrint()),
+							requestHeaders(
+								headerWithName("Authorization").description("Access Token")
+							),
+							responseFields(
+								fieldWithPath("storeId").type(JsonFieldType.NUMBER).description("업체 아이디"),
+								fieldWithPath("reviews[]").type(JsonFieldType.ARRAY).description("각 리뷰별 메시지와 개수"),
+								fieldWithPath("reviews[].content").type(JsonFieldType.STRING).description("리뷰 메시지"),
+								fieldWithPath("reviews[].count").type(JsonFieldType.NUMBER).description("개수")
+							)
+						)
+					);
+			}
+
+			@Test
+			@DisplayName("실패 - 업체 당사자만 리뷰를 조회할 수 있다")
+			void findByStoreId_fail_unauthorized() throws Exception {
+				// given
+				given(reviewService.findByStoreOwnerProviderId(any()))
+					.willThrow(new BusinessException(UNAUTHORIZED_REQUEST));
+
+				// when
+				// then
+				mockMvc.perform(
+						get(findByStoreIdPath)
+							.with(user("username").roles("STORE"))
+							.header("Authorization", "Bearer {ACCESS_TOKEN}")
+					)
+					.andDo(print())
+					.andExpect(status().is4xxClientError())
+					.andExpect(result -> {
+						assertTrue(result.getResolvedException() instanceof BusinessException);
+					})
+					.andDo(document("review/review-find-by-token-fail-unauthorized",
 						preprocessRequest(prettyPrint()),
 						preprocessResponse(prettyPrint()),
 						requestHeaders(
 							headerWithName("Authorization").description("Access Token")
 						),
-						requestParameters(
-							parameterWithName("id").description("주문 아이디")
+						responseFields(
+							fieldWithPath("timestamp").type(STRING).description("예외 발생 시간"),
+							fieldWithPath("code").type(STRING).description("오류 코드"),
+							fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+							fieldWithPath("message").type(STRING).description("오류 메시지")
+						)
+					));
+			}
+		}
+
+		@Nested
+		@DisplayName("<주문별 리뷰 조회>")
+		class findByOrderIdTest {
+			String findByOrderIdPath = "/api/reviews/orders";
+
+			ReviewRes reviewRes = new ReviewRes(List.of("사장님이 친절해요", "가격이 저렴해요"));
+
+			@Test
+			@DisplayName("성공 - 주문에 작성된 리뷰를 조회한다.")
+			void findByOrderId_success() throws Exception {
+				// given
+				given(reviewService.findByOrderId(anyLong(), any()))
+					.willReturn(reviewRes);
+
+				// when
+				// then
+				mockMvc.perform(
+						get(findByOrderIdPath)
+							.with(csrf().asHeader())
+							.with(user("username").roles("MEMBER"))
+							.header("Authorization", "Bearer {ACCESS_TOKEN}")
+							.contentType(APPLICATION_JSON)
+							.param("id", "1")
+					)
+					.andDo(print())
+					.andExpect(status().isOk())
+
+					.andExpect(jsonPath("$.messages[0]").value(reviewRes.messages().get(0)))
+					.andExpect(jsonPath("$.messages[1]").value(reviewRes.messages().get(1)))
+					.andDo(document("review/review-find-by-order-id-success",
+							preprocessRequest(prettyPrint()),
+							preprocessResponse(prettyPrint()),
+							requestHeaders(
+								headerWithName("Authorization").description("Access Token")
+							),
+							requestParameters(
+								parameterWithName("id").description("주문 아이디")
+							),
+							responseFields(
+								fieldWithPath("messages[]").type(JsonFieldType.ARRAY).description("해당 주문에 작성된 리뷰 메시지")
+							)
+						)
+					);
+			}
+
+			@Test
+			@DisplayName("실패 - 주문한 고객만 리뷰를 조회할 수 있습니다.")
+			void findByOrderId_fail_unauthorized() throws Exception {
+				// given
+				given(reviewService.findByOrderId(anyLong(), any()))
+					.willThrow(new BusinessException(UNAUTHORIZED_REQUEST));
+
+				// when
+				// then
+				mockMvc.perform(
+						get(findByOrderIdPath)
+							.with(csrf().asHeader())
+							.with(user("username").roles("MEMBER"))
+							.header("Authorization", "Bearer {ACCESS_TOKEN}")
+							.contentType(APPLICATION_JSON)
+							.param("id", "1")
+					)
+					.andDo(print())
+					.andExpect(status().is4xxClientError())
+					.andExpect(result -> {
+						assertTrue(result.getResolvedException() instanceof BusinessException);
+					})
+					.andDo(document("review/review-find-by-order-fail-unauthorized",
+						preprocessRequest(prettyPrint()),
+						preprocessResponse(prettyPrint()),
+						requestHeaders(
+							headerWithName("Authorization").description("Access Token")
 						),
 						responseFields(
-							fieldWithPath("messages[]").type(JsonFieldType.ARRAY).description("해당 주문에 작성된 리뷰 메시지")
+							fieldWithPath("timestamp").type(STRING).description("예외 발생 시간"),
+							fieldWithPath("code").type(STRING).description("오류 코드"),
+							fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+							fieldWithPath("message").type(STRING).description("오류 메시지")
 						)
-					)
-				);
+					));
+			}
+
 		}
 
 		@Test
-		@DisplayName("실패 - 주문한 고객만 리뷰를 조회할 수 있습니다.")
-		void findByOrderId_fail_unauthorized() throws Exception {
-			// given
-			given(reviewService.findByOrderId(anyLong(), any()))
-				.willThrow(new BusinessException(UNAUTHORIZED_REQUEST));
+		@DisplayName("<리뷰 선택지 항목 조회>")
+		void getReviewContentsTest() throws Exception {
+			String path = "/api/reviews/contents";
 
-			// when
-			// then
-			mockMvc.perform(
-					get(findByOrderIdPath)
-						.with(csrf().asHeader())
-						.with(user("username").roles("MEMBER"))
-						.header("Authorization", "Bearer {ACCESS_TOKEN}")
-						.contentType(APPLICATION_JSON)
-						.param("id", "1")
+			mockMvc.perform(get(path)
+					.with(csrf().asHeader())
+					.with(user("username").roles("MEMBER"))
+					.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				)
-				.andDo(print())
-				.andExpect(status().is4xxClientError())
-				.andExpect(result -> {
-					assertTrue(result.getResolvedException() instanceof BusinessException);
-				})
-				.andDo(document("review/review-find-by-order-fail-unauthorized",
-					preprocessRequest(prettyPrint()),
-					preprocessResponse(prettyPrint()),
-					requestHeaders(
-						headerWithName("Authorization").description("Access Token")
-					),
-					responseFields(
-						fieldWithPath("timestamp").type(STRING).description("예외 발생 시간"),
-						fieldWithPath("code").type(STRING).description("오류 코드"),
-						fieldWithPath("errors").type(ARRAY).description("오류 목록"),
-						fieldWithPath("message").type(STRING).description("오류 메시지")
+				.andDo(document("review/review-contents-success",
+						preprocessRequest(prettyPrint()),
+						preprocessResponse(prettyPrint()),
+						requestHeaders(
+							headerWithName("Authorization").description("Access Token")
+						),
+						responseFields(
+							fieldWithPath("contents[]").type(JsonFieldType.ARRAY).description("사용자에게 주어지는 선택 가능 항목들")
+						)
 					)
-				));
+				)
+				.andExpect(status().isOk())
+			;
 		}
-
-	}
-
-	@Test
-	@DisplayName("<리뷰 선택지 항목 조회>")
-	void getReviewContentsTest() throws Exception {
-		String path = "/api/reviews/contents";
-
-		mockMvc.perform(get(path)
-				.with(csrf().asHeader())
-				.with(user("username").roles("MEMBER"))
-				.header("Authorization", "Bearer {ACCESS_TOKEN}")
-			)
-			.andDo(document("review/review-contents-success",
-					preprocessRequest(prettyPrint()),
-					preprocessResponse(prettyPrint()),
-					requestHeaders(
-						headerWithName("Authorization").description("Access Token")
-					),
-					responseFields(
-						fieldWithPath("contents[]").type(JsonFieldType.ARRAY).description("사용자에게 주어지는 선택 가능 항목들")
-					)
-				)
-			)
-			.andExpect(status().isOk())
-		;
 	}
 }
