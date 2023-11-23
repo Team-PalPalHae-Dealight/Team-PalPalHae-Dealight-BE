@@ -1,6 +1,5 @@
 package com.palpal.dealightbe.domain.review.application;
 
-import static com.palpal.dealightbe.global.error.ErrorCode.ILLEGAL_REVIEW_REQUEST;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ORDER;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_STORE;
 import static com.palpal.dealightbe.global.error.ErrorCode.UNAUTHORIZED_REQUEST;
@@ -42,15 +41,9 @@ public class ReviewService {
 
 		checkMemberAuthority(memberProviderId, order);
 
-		if (!order.isCompleted()) {
-			log.warn("POST:WRITER:CANNOT_WRITER_REVIEW : ORDER_STATUS {}", order.getOrderStatus());
-			throw new BusinessException(ILLEGAL_REVIEW_REQUEST);
-		}
-
 		List<Review> reviews = ReviewCreateReq.toReviews(request, order);
 		reviewRepository.saveAll(reviews);
-
-		order.changeReviewStatus();
+		order.createReviews();
 
 		return ReviewCreateRes.from(reviews);
 	}
