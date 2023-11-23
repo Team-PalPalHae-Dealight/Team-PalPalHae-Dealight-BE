@@ -47,10 +47,11 @@ public class CartService {
 		validateOwnStoreItem(providerId, item);
 
 		List<Cart> carts = cartRepository.findAllByMemberProviderId(providerId);
+		List<Cart> upToDateCarts = upToDateCarts(carts);
 
-		validateAnotherStoreItemExistence(carts, item.getStore().getId(), cartAdditionType);
+		validateAnotherStoreItemExistence(upToDateCarts, item.getStore().getId(), cartAdditionType);
 
-		return addItem(providerId, itemId, carts, cartAdditionType);
+		return addItem(providerId, itemId, upToDateCarts, cartAdditionType);
 	}
 
 	public CartsRes findAllByProviderId(Long providerId) {
