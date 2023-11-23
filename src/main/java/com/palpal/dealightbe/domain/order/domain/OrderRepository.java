@@ -11,7 +11,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 		value =
 			"""
 				select
-					orders.id as order_id,
+					orders.id as id,
 					orders.member_id as member_id,
 					stores.id as store_id,
 					orders.arrival_time as arrival_time,
@@ -21,7 +21,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 					stores.name as store_name,
 					orders.created_at as order_created_at,
 					orders.created_at as created_at,
-					orders.updated_at as updated_at
+					orders.updated_at as updated_at,
+					orders.review_contains as review_contains
 
 				from
 					orders left outer join members on orders.member_id = members.id
@@ -52,7 +53,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 		value =
 			"""
 				select
-					orders.id as order_id,
+					orders.id as id,
 					orders.member_id as member_id,
 					stores.id as store_id,
 					orders.arrival_time as arrival_time,
@@ -63,7 +64,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 					orders.created_at as order_created_at,
 					orders.created_at as created_at,
 					orders.updated_at as updated_at,
-					members.provider_id as member_provider_id
+					members.provider_id as member_provider_id,
+					orders.review_contains as review_contains
 				from
 					orders left outer join members on orders.member_id = members.id
 					left outer join stores on orders.store_id = stores.id
