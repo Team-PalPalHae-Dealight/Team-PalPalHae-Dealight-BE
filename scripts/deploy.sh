@@ -14,6 +14,10 @@ echo "모든 .html 파일을 $target_dir로 옮겼습니다."
 sudo aa-remove-unknown
 DOCKER_APP_NAME=dealight
 
+# docker-compose.infra를 실행하여 꺼진 컨테이너가 있으면 다시 실행
+echo "docker-compose.infra를 실행합니다..."
+sudo docker compose -f docker-compose.infra.yml up -d
+
 # 실행중인 blue가 있는지
 EXIST_BLUE=$(docker ps | grep ${DOCKER_APP_NAME}-blue-container)
 

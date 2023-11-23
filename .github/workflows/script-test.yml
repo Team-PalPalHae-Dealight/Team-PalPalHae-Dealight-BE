@@ -1,11 +1,9 @@
 # github repository actions 페이지에 나타날 이름
-name: CI/CD using Actions & S3 & Code Deploy & Docker & SonarCloud
+name: feature/#192 CI/CD TEST
 
-# event trigger
-# develop 브랜치에 push가 되었을 때 실행
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "feature/#192" ]
 
 permissions:
   contents: read
@@ -39,7 +37,7 @@ jobs:
       # application-oauth.yml 생성
       - name: Make application-oauth.yml
         if: |
-          contains(github.ref, 'develop')
+          contains(github.ref, 'feature/#192')
         run: |
           cd ./src/main/resources
           touch ./application-oauth.yml
@@ -49,7 +47,7 @@ jobs:
       # application-aws.yml 생성
       - name: Make application-aws.yml
         if: |
-          contains(github.ref, 'develop')
+          contains(github.ref, 'feature/#192')
         run: |
           cd ./src/main/resources
           touch ./application-aws.yml
@@ -59,7 +57,7 @@ jobs:
       # application-actuator.yml 생성
       - name: Make application-actuator.yml
         if: |
-          contains(github.ref, 'develop')
+          contains(github.ref, 'feature/#192')
         run: |
           cd ./src/main/resources
           touch ./application-actuator.yml
@@ -69,7 +67,7 @@ jobs:
       # application-rds.yml 생성
       - name: Make application-rds.yml
         if: |
-          contains(github.ref, 'develop')
+          contains(github.ref, 'feature/#192')
         run: |
           cd ./src/main/resources
           touch ./application-rds.yml
@@ -78,7 +76,7 @@ jobs:
 
       - name: Make Test application.yml
         if: |
-          contains(github.ref, 'develop')
+          contains(github.ref, 'feature/#192')
         run: |
           cd ./src/test/resources
           touch ./application.yml

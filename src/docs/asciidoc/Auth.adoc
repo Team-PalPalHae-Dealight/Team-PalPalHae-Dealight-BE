@@ -1,7 +1,3 @@
-ifndef::snippets[]
-:snippets: ../../../build/generated-snippets
-endif::[]
-
 = REST Docs Auth API
 :doctype: book
 :icons: font
