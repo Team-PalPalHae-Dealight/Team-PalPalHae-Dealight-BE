@@ -54,9 +54,11 @@ include::{snippets}/review/review-create-fail-empty/response-body.adoc[]
 
 ---
 
-== 2. 리뷰 통계 조회 - 업체별
+== 2. 업체별 리뷰 통계 조회
 
-=== [GET] /api/reviews/stores?id={storeId}
+== 2-1. 업체용
+
+=== [GET] /api/reviews/stores
 
 include::{snippets}/review/review-find-by-store-id-success/http-request.adoc[]
 
@@ -65,13 +67,33 @@ include::{snippets}/review/review-find-by-store-id-success/http-request.adoc[]
 ==== 요청
 
 - header
-include::{snippets}/review/review-find-by-store-id-success/request-headers.adoc[]
+include::{snippets}/review/review-find-by-token-success/request-headers.adoc[]
 
-- request parameters
-include::{snippets}/review/review-find-by-store-id-success/request-parameters.adoc[]
+==== 응답
 
-- body
-include::{snippets}/review/review-find-by-store-id-success/request-body.adoc[]
+include::{snippets}/review/review-find-by-token-success/response-body.adoc[]
+include::{snippets}/review/review-find-by-token-success/response-fields.adoc[]
+
+=== 실패
+
+- 업체 당사자가 아닌 다른 사람이 리뷰를 조회한 경우
+include::{snippets}/review/review-find-by-token-fail-unauthorized/response-body.adoc[]
+include::{snippets}/review/review-find-by-token-fail-unauthorized/response-fields.adoc[]
+
+== 2-2. 고객용
+
+=== [GET] /api/reviews/stores/{storeId}
+
+include::{snippets}/review/review-find-by-store-id-success/http-request.adoc[]
+
+=== 성공
+
+==== 요청
+
+- header, request parameters, body : 없음
+
+- path parameter
+include::{snippets}/review/review-find-by-store-id-success/path-parameters.adoc[]
 
 ==== 응답
 
@@ -81,10 +103,8 @@ include::{snippets}/review/review-find-by-store-id-success/response-fields.adoc[
 === 실패
 
 - 업체 당사자가 아닌 다른 사람이 리뷰를 조회한 경우
-include::{snippets}/review/review-find-by-store-fail-unauthorized/response-body.adoc[]
-include::{snippets}/review/review-find-by-store-fail-unauthorized/response-fields.adoc[]
-
-
+include::{snippets}/review/review-find-by-token-fail-unauthorized/response-body.adoc[]
+include::{snippets}/review/review-find-by-token-fail-unauthorized/response-fields.adoc[]
 
 ---
 
