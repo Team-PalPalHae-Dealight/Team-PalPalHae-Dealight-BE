@@ -133,7 +133,7 @@ include::{snippets}/order/order-create-fail-unauthorized/response-fields.adoc[]
 
 ---
 
-=== 4. 주문 조회 (다건) - 업체
+== 4. 주문 조회 (다건) - 업체
 
 === [GET] /api/orders/stores?id={storeId}&status={status}&page={page}&size={size}
 
@@ -166,7 +166,7 @@ include::{snippets}/order/order-find-by-store-fail-unauthorized/response-fields.
 
 ---
 
-=== 5. 주문 조회 (다건) - 고객
+== 5. 주문 조회 (다건) - 고객
 
 === [GET] /api/orders?status={status}&page={page}&size={size}
 
