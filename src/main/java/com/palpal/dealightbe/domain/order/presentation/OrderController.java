@@ -2,14 +2,10 @@ package com.palpal.dealightbe.domain.order.presentation;
 
 import java.net.URI;
 
-import javax.persistence.OptimisticLockException;
-
-import org.hibernate.StaleObjectStateException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -47,16 +43,8 @@ public class OrderController {
 		@Validated @RequestBody OrderCreateReq request,
 		Long providerId
 	) {
-		OrderRes orderRes;
 
-		while (true) {
-			try {
-				orderRes = orderService.create(request, providerId);
-				break;
-			} catch (OptimisticLockException | StaleObjectStateException |
-					 ObjectOptimisticLockingFailureException ignored) {
-			}
-		}
+		OrderRes orderRes = orderService.create(request, providerId);
 
 		URI uri = ServletUriComponentsBuilder
 			.fromCurrentRequest()
