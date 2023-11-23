@@ -49,8 +49,13 @@ include::{snippets}/review/review-create-fail-not-completed/response-body.adoc[]
 include::{snippets}/review/review-create-fail-not-completed/response-fields.adoc[]
 
 - 리뷰를 입력하지 않은 경우
-include::{snippets}/review/review-create-fail-empty/response-fields.adoc[]
 include::{snippets}/review/review-create-fail-empty/response-body.adoc[]
+include::{snippets}/review/review-create-fail-empty/response-fields.adoc[]
+
+- 이미 해당 주문에 대한 리뷰가 작성 완료된 경우
+include::{snippets}/review/review-create-fail-already-exists/response-body.adoc[]
+include::{snippets}/review/review-create-fail-already-exists/response-fields.adoc[]
+
 
 ---
 
