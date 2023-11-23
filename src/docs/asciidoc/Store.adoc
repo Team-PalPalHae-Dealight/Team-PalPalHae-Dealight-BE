@@ -1,14 +1,9 @@
-ifndef::snippets[]
-:snippets: ../../../build/generated-snippets
-endif::[]
-
 = REST Docs 업체 API
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs
 :toc: left
 :toclevels: 2
-:sectlinks:
 
 [[User-API]]
 == Store API
@@ -26,6 +21,8 @@ include::{snippets}/store/store-register/request-fields.adoc[]
 include::{snippets}/store/store-register/http-response.adoc[]
 
 include::{snippets}/store/store-register/response-fields.adoc[]
+
+=== 업체 등록 - 실패
 
 .Request Fail - 잘못된 영업 시간
 include::{snippets}/store/store-register-fail-invalid-business-time/http-response.adoc[]
