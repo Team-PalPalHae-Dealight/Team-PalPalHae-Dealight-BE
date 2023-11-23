@@ -213,6 +213,7 @@ class ItemRepositoryTest {
 		//given
 		double standardXCoordinate = 127.0221068;
 		double standardYCoordinate = 37.5912999;
+		String sortBy = "deadline";
 
 		Pageable pageable = PageRequest.of(0, 5);
 
@@ -221,7 +222,7 @@ class ItemRepositoryTest {
 		List<Item> expected = sortByStoreCloseTime(items);
 
 		//when
-		Slice<Item> sliceResult = itemRepository.findAllByDeadline(standardXCoordinate, standardYCoordinate, pageable);
+		Slice<Item> sliceResult = itemRepository.findAllByOpenedStatusAndDistanceWithin3KmAndSortCondition(standardXCoordinate, standardYCoordinate, sortBy, pageable);
 		List<Item> result = sliceResult.stream().toList();
 
 		//then
@@ -235,13 +236,14 @@ class ItemRepositoryTest {
 		//given
 		double standardXCoordinate = 127.0221068;
 		double standardYCoordinate = 37.5912999;
+		String sortBy = "discount-rate";
 
 		Pageable pageable = PageRequest.of(0, 5);
 
 		List<Item> expected = List.of(item3, item4, item5, item1);
 
 		//when
-		Slice<Item> result = itemRepository.findAllByDiscountRate(standardXCoordinate, standardYCoordinate, pageable);
+		Slice<Item> result = itemRepository.findAllByOpenedStatusAndDistanceWithin3KmAndSortCondition(standardXCoordinate, standardYCoordinate, sortBy, pageable);
 		List<Item> items = result.stream().toList();
 
 		//then
@@ -255,13 +257,14 @@ class ItemRepositoryTest {
 		//given
 		double standardXCoordinate = 127.0221068;
 		double standardYCoordinate = 37.5912999;
+		String sortBy = "distance";
 
 		Pageable pageable = PageRequest.of(0, 5);
 
 		List<Item> expected = List.of(item1, item3, item5, item4);
 
 		//when
-		Slice<Item> result = itemRepository.findAllByDistance(standardXCoordinate, standardYCoordinate, pageable);
+		Slice<Item> result = itemRepository.findAllByOpenedStatusAndDistanceWithin3KmAndSortCondition(standardXCoordinate, standardYCoordinate, sortBy, pageable);
 		List<Item> items = result.stream().toList();
 
 		//then

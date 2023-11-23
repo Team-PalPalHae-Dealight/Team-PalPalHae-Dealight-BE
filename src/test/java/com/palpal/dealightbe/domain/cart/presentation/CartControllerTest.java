@@ -572,7 +572,7 @@ class CartControllerTest {
 			));
 	}
 
-	@DisplayName("장바구니 수정 실패 테스트 - 장바구니의 상품이 존재하지 않는 경우")
+	@DisplayName("장바구니 수정 실패 테스트 - 장바구니에 상품이 존재하지 않는 경우")
 	@Test
 	void updateFailureTest_notFoundCartItem() throws Exception {
 		//given
@@ -643,7 +643,7 @@ class CartControllerTest {
 			));
 	}
 
-	@DisplayName("장바구니 요소 삭제 실패 테스트 - 장바구니의 상품이 존재하지 않는 경우")
+	@DisplayName("장바구니 요소 삭제 실패 테스트 - 장바구니에 상품이 존재하지 않는 경우")
 	@Test
 	void deleteOneFailureTest_notFoundCartItem() throws Exception {
 		//given
