@@ -113,19 +113,19 @@ public class NotificationService {
 		String message = Notification.createMessage(orderStatus, order);
 
 		// 알림 대상에 따라 SseEmitter에 이벤트 전송
-		switch (orderStatus) {
-			case RECEIVED, CANCELED -> {
-				// Store용 Notification 객체 생성 및 저장
-				Notification notification = createNotification(null, store, order, message);
-				notificationRepository.save(notification);
-				sendNotification(store.getId(), notification, "store");
-			}
-			case CONFIRMED, COMPLETED -> {
-				// Member용 Notification 객체 생성 및 저장
-				Notification notification = createNotification(member, null, order, message);
-				notificationRepository.save(notification);
-				sendNotification(member.getId(), notification, "member");
-			}
+		if (orderStatus == OrderStatus.RECEIVED || orderStatus == OrderStatus.CANCELED) {
+			// Store용 Notification 객체 생성 및 저장
+			Notification notification = createNotification(null, store, order, message);
+			notificationRepository.save(notification);
+			sendNotification(store.getId(), notification, "store");
+			return;
+		}
+
+		if (orderStatus == OrderStatus.CONFIRMED || orderStatus == OrderStatus.COMPLETED) {
+			// Member용 Notification 객체 생성 및 저장
+			Notification notification = createNotification(member, null, order, message);
+			notificationRepository.save(notification);
+			sendNotification(member.getId(), notification, "member");
 		}
 	}
 
