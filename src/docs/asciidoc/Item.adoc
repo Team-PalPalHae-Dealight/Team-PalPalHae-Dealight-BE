@@ -117,7 +117,7 @@ include::{snippets}/item/item-find-by-id-fail-not-found-item/response-fields.ado
 
 ---
 
-=== 상품 목록 조회(업체 시점)
+=== 업체의 상품 목록 조회(업체 시점)
 
 ==== /api/items/stores?size={size}&page={page}
 
@@ -137,7 +137,7 @@ include::{snippets}/item/item-find-all-for-store/response-fields.adoc[]
 
 ---
 
-=== 상품 목록 조회(고객 시점)
+=== 조건 별 상품 목록 조회(고객 시점)
 
 ==== /api/items/members?x-coordinate={xCoordinate}&y-coordinate={yCoordinate}&sort-by={sortBy}&size={size}&page={page}
 
@@ -159,7 +159,7 @@ include::{snippets}/item/item-find-all-for-member/response-fields.adoc[]
 
 ---
 
-=== 업체의 상품 목록 조회(고객 시점)
+=== 특정 업체의 상품 목록 조회(고객 시점)
 
 ==== /api/items/stores/{storeId}?size={size}&page={page}
 
