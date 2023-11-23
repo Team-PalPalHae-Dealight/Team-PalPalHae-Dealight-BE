@@ -66,14 +66,25 @@ public class StoreService {
 	}
 
 	@Transactional(readOnly = true)
-	public StoreInfoRes getInfo(Long providerId, Long storeId) {
-		Store store = validateMemberAndStoreOwner(providerId, storeId);
+	public StoreInfoRes getInfo(Long providerId) {
+		Store store = getStoreByProviderId(providerId);
+
+		return StoreInfoRes.from(store);
+	}
+
+	@Transactional(readOnly = true)
+	public StoreInfoRes getDetails(Long storeId) {
+		Store store = storeRepository.findById(storeId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_STORE_BY_ID : {}", storeId);
+				throw new EntityNotFoundException(ErrorCode.NOT_FOUND_STORE);
+			});
 
 		return StoreInfoRes.from(store);
 	}
 
 	public StoreInfoRes updateInfo(Long providerId, Long storeId, StoreUpdateReq request) {
-		Store store = validateMemberAndStoreOwner(providerId, storeId);
+		Store store = validateMemberAndStoreOwnerByProviderIdAndStoreId(providerId, storeId);
 
 		Store updateStore = StoreUpdateReq.toStore(request);
 		store.updateInfo(updateStore);
@@ -82,7 +93,7 @@ public class StoreService {
 	}
 
 	public StoreStatusRes updateStatus(Long providerId, Long storeId, StoreStatusReq storeStatus) {
-		Store store = validateMemberAndStoreOwner(providerId, storeId);
+		Store store = validateMemberAndStoreOwnerByProviderIdAndStoreId(providerId, storeId);
 
 		store.updateStatus(storeStatus.storeStatus());
 
@@ -93,13 +104,13 @@ public class StoreService {
 
 	@Transactional(readOnly = true)
 	public StoreStatusRes getStatus(Long providerId, Long storeId) {
-		Store store = validateMemberAndStoreOwner(providerId, storeId);
+		Store store = validateMemberAndStoreOwnerByProviderIdAndStoreId(providerId, storeId);
 
 		return StoreStatusRes.from(store);
 	}
 
 	public ImageRes uploadImage(Long providerId, Long storeId, ImageUploadReq request) {
-		Store store = validateMemberAndStoreOwner(providerId, storeId);
+		Store store = validateMemberAndStoreOwnerByProviderIdAndStoreId(providerId, storeId);
 
 		String imageUrl = imageService.store(request.file());
 
@@ -109,7 +120,7 @@ public class StoreService {
 	}
 
 	public ImageRes updateImage(Long providerId, Long storeId, ImageUploadReq req) {
-		Store store = validateMemberAndStoreOwner(providerId, storeId);
+		Store store = validateMemberAndStoreOwnerByProviderIdAndStoreId(providerId, storeId);
 
 		String image = store.getImage();
 		imageService.delete(image);
@@ -121,7 +132,7 @@ public class StoreService {
 	}
 
 	public void deleteImage(Long providerId, Long storeId) {
-		Store store = validateMemberAndStoreOwner(providerId, storeId);
+		Store store = validateMemberAndStoreOwnerByProviderIdAndStoreId(providerId, storeId);
 
 		String image = store.getImage();
 		if (Objects.equals(image, DEFAULT_PATH)) {
@@ -135,6 +146,19 @@ public class StoreService {
 
 	@Transactional(readOnly = true)
 	public StoreByMemberRes findByProviderId(Long providerId) {
+		Store store = getStoreByProviderId(providerId);
+
+		return StoreByMemberRes.from(store);
+	}
+
+	@Transactional(readOnly = true)
+	public StoresInfoSliceRes search(double xCoordinate, double yCoordinate, String keyword, String sortBy, Long cursor, Pageable pageable) {
+		Slice<Store> stores = storeRepository.findByKeywordAndDistanceWithin3KmAndSortCondition(xCoordinate, yCoordinate, keyword, sortBy, cursor, pageable);
+
+		return StoresInfoSliceRes.from(stores);
+	}
+
+	private Store getStoreByProviderId(Long providerId) {
 		Member member = memberRepository.findMemberByProviderId(providerId)
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_PROVIDER_ID : {}", providerId);
@@ -147,17 +171,12 @@ public class StoreService {
 				throw new EntityNotFoundException(ErrorCode.NOT_FOUND_STORE);
 			});
 
-		return StoreByMemberRes.from(store);
+		store.isSameOwnerAndTheRequester(member, store);
+
+		return store;
 	}
 
-	@Transactional(readOnly = true)
-	public StoresInfoSliceRes search(double xCoordinate, double yCoordinate, String keyword, String sortBy, Long cursor, Pageable pageable) {
-		Slice<Store> stores = storeRepository.findByKeywordAndDistanceWithin3KmAndSortCondition(xCoordinate, yCoordinate, keyword, sortBy, cursor, pageable);
-
-		return StoresInfoSliceRes.from(stores);
-	}
-
-	private Store validateMemberAndStoreOwner(Long providerId, Long storeId) {
+	private Store validateMemberAndStoreOwnerByProviderIdAndStoreId(Long providerId, Long storeId) {
 		Member member = memberRepository.findMemberByProviderId(providerId)
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_PROVIDER_ID : {}", providerId);
