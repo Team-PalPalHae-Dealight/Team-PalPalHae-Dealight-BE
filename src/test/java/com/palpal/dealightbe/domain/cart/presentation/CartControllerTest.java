@@ -412,6 +412,47 @@ class CartControllerTest {
 			));
 	}
 
+	@DisplayName("장바구니 담기 실패 테스트 - 장바구니의 최소, 최대 수량 조건에 맞지 않는 경우")
+	@Test
+	void addItemFailureTest_invalidCartQuantity() throws Exception {
+		//given
+		Long itemId = 1L;
+
+		doThrow(new BusinessException(INVALID_CART_QUANTITY)).when(
+			cartService).addItem(any(), any(), any());
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.param("id", String.valueOf(itemId))
+				.param("type", "check"))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("CT002"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("상품 당 최소 1개에서 최대 재고 수량까지만 장바구니에 담을 수 있습니다."))
+			.andDo(print())
+			.andDo(document("cart/cart-add-item-invalid-cart-quantity",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				requestParameters(
+					parameterWithName("id").description("상품 ID"),
+					parameterWithName("type").description("장바구니 담기 타입")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("예외 코드"),
+					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
 	@DisplayName("장바구니 조회 성공 테스트")
 	@Test
 	void findAllByProviderIdSuccessTest() throws Exception {
