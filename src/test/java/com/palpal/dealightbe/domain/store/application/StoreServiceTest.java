@@ -290,11 +290,11 @@ class StoreServiceTest {
 		//given
 		when(memberRepository.findMemberByProviderId(member.getProviderId()))
 			.thenReturn(Optional.of(member));
-		when(storeRepository.findById(store.getId()))
+		when(storeRepository.findByMemberProviderId(member.getProviderId()))
 			.thenReturn(Optional.of(store));
 
 		//when
-		StoreInfoRes infoRes = storeService.getInfo(member.getProviderId(), store.getId());
+		StoreInfoRes infoRes = storeService.getInfo(member.getProviderId());
 
 		//then
 		Set<String> dayOffs = store.getDayOffs().stream()
@@ -322,12 +322,12 @@ class StoreServiceTest {
 
 		when(memberRepository.findMemberByProviderId(invalidMember.getProviderId()))
 			.thenReturn(Optional.of(invalidMember));
-		when(storeRepository.findById(store.getId()))
+		when(storeRepository.findByMemberProviderId(invalidMember.getProviderId()))
 			.thenReturn(Optional.of(store));
 
 		//when -> then
 		assertThrows(BusinessException.class, () -> {
-			storeService.getInfo(invalidMember.getProviderId(), store.getId());
+			storeService.getInfo(invalidMember.getProviderId());
 		});
 	}
 
