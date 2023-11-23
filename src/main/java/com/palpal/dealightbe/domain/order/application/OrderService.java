@@ -63,6 +63,8 @@ public class OrderService {
 		order.addOrderItems(orderItems);
 		orderItemRepository.saveAll(orderItems);
 
+		// notificationService.send(member, store, order, OrderStatus.RECEIVED);
+
 		return OrderRes.from(order);
 	}
 
