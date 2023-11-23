@@ -5,7 +5,6 @@ import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_QUANTITY
 import static com.palpal.dealightbe.global.error.ErrorCode.STORE_HAS_NO_ITEM;
 
 import javax.persistence.Column;
-
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -73,6 +72,10 @@ public class Item extends BaseEntity {
 		}
 
 		this.stock -= quantity;
+	}
+
+	public void addStock(int quantity) {
+		stock += quantity;
 	}
 
 	public void update(Item item) {

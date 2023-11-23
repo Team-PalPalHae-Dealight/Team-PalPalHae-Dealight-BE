@@ -1,5 +1,6 @@
 package com.palpal.dealightbe.domain.order.application;
 
+import static com.palpal.dealightbe.domain.order.domain.OrderStatus.CANCELED;
 import static com.palpal.dealightbe.domain.order.domain.OrderStatus.RECEIVED;
 import static com.palpal.dealightbe.domain.store.domain.StoreStatus.OPENED;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -24,6 +25,7 @@ import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderCreateReq;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderProductReq;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderProductsReq;
+import com.palpal.dealightbe.domain.order.application.dto.request.OrderStatusUpdateReq;
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderRes;
 import com.palpal.dealightbe.domain.order.domain.Order;
 import com.palpal.dealightbe.domain.order.domain.OrderItem;
@@ -200,6 +202,48 @@ public class OrderServiceIntegrationTest {
 				assertThrows(BusinessException.class,
 					() -> orderService.create(orderCreateReq, memberProviderId)
 				);
+			}
+		}
+	}
+
+	@Nested
+	@DisplayName("주문 상태 변경")
+	class updateStatusTest {
+		@Nested
+		@DisplayName("성공")
+		class Success {
+			@DisplayName("고객이 주문한 상품을 취소하면 재고가 다시 늘어난다.")
+			@Test
+			void cancel_order() {
+				// given
+				Store store = createStore();
+				Item item = createItem(store);
+				Member member = createMember();
+
+				store.updateStatus(OPENED);
+				int stock = item.getStock();
+				int quantity = 2;
+
+				OrderCreateReq orderCreateReq = new OrderCreateReq(
+					new OrderProductsReq(
+						List.of(new OrderProductReq(item.getId(), quantity))
+					),
+					store.getId(), "도착할 때까지 상품 냉장고에 보관 부탁드려요",
+					LocalTime.of(12, 30), item.getDiscountPrice() * 2
+				);
+
+				// when
+				// then
+				OrderRes orderRes = orderService.create(orderCreateReq, member.getProviderId());
+				long orderId = orderRes.orderId();
+				Order order = orderRepository.findById(orderId).get();
+
+				assertThat(item.getStock(), is(stock - 2));
+
+				orderService.updateStatus(orderId, new OrderStatusUpdateReq("CANCELED"), member.getProviderId());
+				assertThat(order.getOrderStatus(), is(CANCELED));
+
+				assertThat(item.getStock(), is(stock));
 			}
 		}
 	}
