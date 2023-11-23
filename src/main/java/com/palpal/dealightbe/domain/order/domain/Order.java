@@ -184,6 +184,10 @@ public class Order extends BaseEntity {
 		return orderStatus == COMPLETED;
 	}
 
+	public void changeReviewStatus() {
+		reviewContains = true;
+	}
+
 	private void validateDemand(String demand) {
 		if (demand.length() > MAX_DEMAND_LENGTH) {
 			log.warn("POST:WRITE:TOO_LONG_DEMAND:LENGTH {}", demand.length());
@@ -221,9 +225,5 @@ public class Order extends BaseEntity {
 			log.warn("PATCH:UPDATE:STORE:CANNOT_CHANGE_STATUS:{} -> {}", originalStatus, changedStatus);
 			throw new BusinessException(INVALID_ORDER_STATUS);
 		}
-	}
-
-	public void changeReviewStatus() {
-		reviewContains = true;
 	}
 }
