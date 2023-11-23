@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -158,7 +159,6 @@ class StoreServiceTest {
 			.discountPrice(3000)
 			.originalPrice(4500)
 			.description("기본 떡볶이 입니다.")
-			.information("통신사 할인 불가능 합니다.")
 			.image("https://fake-image.com/item1.png")
 			.store(store)
 			.build();
@@ -169,7 +169,6 @@ class StoreServiceTest {
 			.discountPrice(4000)
 			.originalPrice(4500)
 			.description("기본 떡볶이 입니다.")
-			.information("통신사 할인 불가능 합니다.")
 			.image("https://fake-image.com/item1.png")
 			.store(store2)
 			.build();
@@ -180,7 +179,6 @@ class StoreServiceTest {
 			.discountPrice(100)
 			.originalPrice(4500)
 			.description("기본 순대 입니다.")
-			.information("통신사 할인 불가능 합니다.")
 			.image("https://fake-image.com/item1.png")
 			.store(store3)
 			.build();
@@ -299,9 +297,13 @@ class StoreServiceTest {
 		StoreInfoRes infoRes = storeService.getInfo(member.getProviderId(), store.getId());
 
 		//then
+		Set<String> dayOffs = store.getDayOffs().stream()
+			.map(DayOff::getName)
+			.collect(Collectors.toSet());
+
 		assertThat(infoRes.storeNumber()).isEqualTo(store.getStoreNumber());
 		assertThat(infoRes.addressName()).isEqualTo(store.getAddress().getName());
-		assertThat(infoRes.dayOff()).isEqualTo(store.getDayOffs());
+		assertThat(infoRes.dayOff()).isEqualTo(dayOffs);
 		assertThat(infoRes.storeStatus()).isEqualTo(store.getStoreStatus());
 	}
 
@@ -347,9 +349,13 @@ class StoreServiceTest {
 		StoreInfoRes storeUpdatedInfoRes = storeService.updateInfo(member.getProviderId(), store.getId(), updateReq);
 
 		//then
+		Set<String> dayOffs = updateReq.dayOff().stream()
+			.map(DayOff::getName)
+			.collect(Collectors.toSet());
+
 		assertThat(storeUpdatedInfoRes.telephone()).isEqualTo(updateReq.telephone());
 		assertThat(storeUpdatedInfoRes.addressName()).isEqualTo(updateReq.addressName());
-		assertThat(storeUpdatedInfoRes.dayOff()).isEqualTo(updateReq.dayOff());
+		assertThat(storeUpdatedInfoRes.dayOff()).isEqualTo(dayOffs);
 		assertThat(store.getName()).isEqualTo("맛짱고기");
 		assertThat(store.getStoreNumber()).isEqualTo("8888");
 	}

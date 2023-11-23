@@ -81,7 +81,7 @@ public class Member extends BaseEntity {
 		}
 		this.nickName = member.getNickName();
 		this.phoneNumber = member.getPhoneNumber();
-		updateAddress(member.getAddress());
+		this.address = member.getAddress();
 	}
 
 	public void updateAddress(Address address) {

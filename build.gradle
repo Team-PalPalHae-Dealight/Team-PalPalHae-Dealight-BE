@@ -13,6 +13,12 @@ plugins {
     id 'org.asciidoctor.jvm.convert' version '3.3.2'
     // queryDSL plugin
     id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+    // git info
+    id "com.gorylenko.gradle-git-properties" version "2.4.1"
+    // jacoco
+    id 'jacoco'
+    // sonar cloud
+    id 'org.sonarqube' version '4.4.1.3373'
 }
 
 group = 'com.palpal'
@@ -20,6 +26,10 @@ version = '0.0.1-SNAPSHOT'
 
 java {
     sourceCompatibility = '17'
+}
+
+jacoco {
+    toolVersion = "0.8.7"
 }
 
 configurations {
@@ -51,7 +61,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+    // monitoring tools: actuator, prometheus, grafana
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 
     implementation 'org.apache.commons:commons-lang3:3.12.0'
 
@@ -77,6 +90,35 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 }
 
+test {
+    outputs.dir snippetsDir
+    finalizedBy 'jacocoTestReport'
+}
+
+// asciidoctor 빌드 옵션
+tasks.named('test') {
+    outputs.dir snippetsDir
+    useJUnitPlatform()
+}
+
+tasks.named('asciidoctor') {
+    inputs.dir snippetsDir
+    dependsOn test
+}
+
+asciidoctor {
+    inputs.dir snippetsDir
+    configurations 'asciidoctorExt'
+    dependsOn test
+}
+
+bootJar {
+    dependsOn asciidoctor
+    from("${asciidoctor.outputDir}") {
+        into 'static/docs'
+    }
+}
+
 // queryDSL 빌드 옵션
 def querydslDir = "$buildDir/generated/querydsl"
 
@@ -97,33 +139,74 @@ compileQuerydsl {
     options.annotationProcessorPath = configurations.querydsl
 }
 
-tasks.named('test') {
-    outputs.dir snippetsDir
-    useJUnitPlatform()
+// prometheus 설정
+springBoot {
+    buildInfo()
 }
 
-tasks.named('asciidoctor') {
-    inputs.dir snippetsDir
-    dependsOn test
+// jacoco 빌드 옵션
+jacocoTestReport {
+    reports {
+        xml.required = true
+        csv.required = true
+        html.required = true
+
+        xml.destination file("${buildDir}/jacoco/index.xml")
+        csv.destination file("${buildDir}/jacoco/index.csv")
+        html.destination file("${buildDir}/jacoco/index.html")
+    }
+
+    def Qdomains = []
+    for (qPattern in "**/QA".."**/QZ") {
+        Qdomains.add(qPattern + "*")
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(
+                files(classDirectories.files.collect {
+                    fileTree(dir: it, excludes: [
+                            '**/*Application*',
+                            '**/*Exception*',
+                            '**/dto/**'
+                    ] + Qdomains)
+                })
+        )
+    }
+
+    finalizedBy 'jacocoTestCoverageVerification'
 }
 
-test {
-    outputs.dir snippetsDir
-}
-tasks.named('test') {
-    outputs.dir snippetsDir
-    useJUnitPlatform()
-}
+jacocoTestCoverageVerification {
+    def Qdomains = []
+    for (qPattern in '*.QA'..'*.QZ') {
+        Qdomains.add(qPattern + '*')
+    }
 
-asciidoctor {
-    inputs.dir snippetsDir
-    configurations 'asciidoctorExt'
-    dependsOn test
-}
+    violationRules {
+        rule {
+            enabled = true
+            element = 'CLASS'
 
-bootJar {
-    dependsOn asciidoctor
-    from("${asciidoctor.outputDir}") {
-        into 'static/docs'
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.0
+            }
+
+            excludes = [
+                    '*.*Application',
+                    '*.*Exception',
+                    '*.dto.*'
+            ] + Qdomains
+        }
+    }
+}
+// sonar cloud 빌드 옵션
+sonar {
+    properties {
+        property "sonar.projectKey", "Team-PalPalHae-Dealight_Team-PalPalHae-Dealight-BE"
+        property "sonar.organization", "dealight-be"
+        property "sonar.host.url", "https://sonarcloud.io"
+        property 'sonar.coverage.jacoco.xmlReportPaths', 'build/jacoco/index.xml'
     }
 }
