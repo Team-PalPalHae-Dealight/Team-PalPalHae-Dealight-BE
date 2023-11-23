@@ -50,6 +50,8 @@ public class ReviewService {
 		List<Review> reviews = ReviewCreateReq.toReviews(request, order);
 		reviewRepository.saveAll(reviews);
 
+		order.changeReviewStatus();
+
 		return ReviewCreateRes.from(reviews);
 	}
 

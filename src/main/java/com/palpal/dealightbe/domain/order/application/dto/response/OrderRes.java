@@ -16,12 +16,14 @@ public record OrderRes(
 	OrderProductsRes orderProductsRes,
 	int totalPrice,
 	LocalDateTime createdAt,
-	String status
+	String status,
+
+	boolean reviewContains
 ) {
 	public static OrderRes from(Order order) {
 		return new OrderRes(order.getId(), order.getStore().getId(), order.getMember().getId(),
 			order.getMember().getNickName(), order.getStore().getName(),
 			order.getDemand(), order.getArrivalTime(), OrderProductsRes.from(order), order.getTotalPrice(),
-			order.getCreatedAt(), order.getOrderStatus().getText());
+			order.getCreatedAt(), order.getOrderStatus().getText(), order.isReviewContains());
 	}
 }

@@ -5,6 +5,7 @@ import static com.palpal.dealightbe.global.error.ErrorCode.CLOSED_STORE;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ORDER_STATUS;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_STORE;
 import static com.palpal.dealightbe.global.error.ErrorCode.UNAUTHORIZED_REQUEST;
+import static java.lang.Boolean.FALSE;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -21,6 +22,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -49,7 +51,6 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
@@ -103,7 +104,8 @@ public class OrderControllerTest {
 
 		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "member nickName", "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요",
 			LocalTime.of(12, 30),
-			productsRes, 30000, createdAt, RECEIVED.getText());
+			productsRes, 30000, createdAt, RECEIVED.getText(),
+			false);
 
 		@Test
 		@DisplayName("성공 - 신규 주문을 등록한다")
@@ -142,6 +144,7 @@ public class OrderControllerTest {
 				.andExpect(jsonPath("$.orderProductsRes.orderProducts[0].image").value(productRes.image()))
 				.andExpect(jsonPath("$.totalPrice").value(orderCreateReq.totalPrice()))
 				.andExpect(jsonPath("$.status").value(RECEIVED.getText()))
+				.andExpect(jsonPath("$.reviewContains").value(FALSE))
 				.andDo(document("order/order-create-success", preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
 					requestHeaders(
@@ -186,7 +189,9 @@ public class OrderControllerTest {
 
 						fieldWithPath("totalPrice").type(NUMBER).description("총 금액"),
 						fieldWithPath("createdAt").type(STRING).description("주문 완료 일자 및 시간"),
-						fieldWithPath("status").type(STRING).description("현재 주문 상태"))));
+						fieldWithPath("status").type(STRING).description("현재 주문 상태"),
+						fieldWithPath("reviewContains").type(BOOLEAN).description("리뷰 작성 여부")))
+				);
 		}
 
 		@Test
@@ -569,7 +574,7 @@ public class OrderControllerTest {
 
 		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "member nickName", "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요",
 			LocalTime.of(12, 30),
-			productsRes, 10000, createdAt, RECEIVED.getText());
+			productsRes, 10000, createdAt, RECEIVED.getText(), false);
 
 		OrderProductRes productRes = productsRes.orderProducts().get(0);
 
@@ -606,6 +611,7 @@ public class OrderControllerTest {
 				.andExpect(
 					jsonPath("$.orderProductsRes.orderProducts[0].originalPrice").value(productRes.originalPrice()))
 				.andExpect(jsonPath("$.orderProductsRes.orderProducts[0].image").value(productRes.image()))
+				.andExpect(jsonPath("$.reviewContains").value(FALSE))
 				.andExpect(jsonPath("$.totalPrice").value(orderCreateReq.totalPrice()))
 				.andExpect(jsonPath("$.status").value(RECEIVED.getText()))
 				.andDo(document("order/order-find-by-id-success", preprocessRequest(prettyPrint()),
@@ -642,7 +648,9 @@ public class OrderControllerTest {
 
 						fieldWithPath("totalPrice").type(NUMBER).description("총 금액"),
 						fieldWithPath("createdAt").type(STRING).description("주문 완료 일자 및 시간"),
-						fieldWithPath("status").type(STRING).description("현재 주문 상태"))));
+						fieldWithPath("status").type(STRING).description("현재 주문 상태"),
+						fieldWithPath("reviewContains").type(BOOLEAN).description("리뷰 작성 여부")))
+				);
 		}
 
 		@Test
@@ -697,7 +705,7 @@ public class OrderControllerTest {
 
 		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "member nickName", "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요",
 			LocalTime.of(12, 30),
-			productsRes, 10000, createdAt, RECEIVED.getText());
+			productsRes, 10000, createdAt, RECEIVED.getText(), false);
 
 		OrdersRes ordersRes = new OrdersRes(List.of(orderRes), false);
 
@@ -734,6 +742,7 @@ public class OrderControllerTest {
 				.andExpect(jsonPath("$.orders[0].orderProductsRes.orderProducts[0].image").value(productRes.image()))
 				.andExpect(jsonPath("$.orders[0].totalPrice").value(orderRes.totalPrice()))
 				.andExpect(jsonPath("$.orders[0].status").value(RECEIVED.getText()))
+				.andExpect(jsonPath("$.orders[0].reviewContains").value(false))
 				.andExpect(jsonPath("$.hasNext").value(false))
 				.andDo(
 					document("order/order-find-by-store-id-success",
@@ -780,7 +789,8 @@ public class OrderControllerTest {
 							fieldWithPath("orders[].totalPrice").type(NUMBER).description("총 금액"),
 							fieldWithPath("orders[].createdAt").type(STRING).description("주문 완료 일자 및 시간"),
 							fieldWithPath("orders[].status").type(STRING).description("현재 주문 상태"),
-							fieldWithPath("hasNext").type(JsonFieldType.BOOLEAN).description("다음 데이터 존재 여부")))
+							fieldWithPath("orders[].reviewContains").type(BOOLEAN).description("리뷰 작성 여부"),
+							fieldWithPath("hasNext").type(BOOLEAN).description("다음 데이터 존재 여부")))
 				);
 		}
 
@@ -837,7 +847,7 @@ public class OrderControllerTest {
 
 		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "member nickName", "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요",
 			LocalTime.of(12, 30),
-			productsRes, 10000, createdAt, RECEIVED.getText());
+			productsRes, 10000, createdAt, RECEIVED.getText(), false);
 
 		OrdersRes ordersRes = new OrdersRes(List.of(orderRes), false);
 
@@ -873,6 +883,7 @@ public class OrderControllerTest {
 				.andExpect(jsonPath("$.orders[0].orderProductsRes.orderProducts[0].image").value(productRes.image()))
 				.andExpect(jsonPath("$.orders[0].totalPrice").value(orderRes.totalPrice()))
 				.andExpect(jsonPath("$.orders[0].status").value(RECEIVED.getText()))
+				.andExpect(jsonPath("$.orders[0].reviewContains").value(FALSE))
 				.andExpect(jsonPath("$.hasNext").value(false))
 				.andDo(
 					document("order/order-find-by-member-success",
@@ -918,7 +929,8 @@ public class OrderControllerTest {
 							fieldWithPath("orders[].totalPrice").type(NUMBER).description("총 금액"),
 							fieldWithPath("orders[].createdAt").type(STRING).description("주문 완료 일자 및 시간"),
 							fieldWithPath("orders[].status").type(STRING).description("현재 주문 상태"),
-							fieldWithPath("hasNext").type(JsonFieldType.BOOLEAN).description("다음 데이터 존재 여부")))
+							fieldWithPath("orders[].reviewContains").type(BOOLEAN).description("리뷰 작성 여부"),
+							fieldWithPath("hasNext").type(BOOLEAN).description("다음 데이터 존재 여부")))
 				);
 		}
 	}

@@ -72,6 +72,8 @@ public class Order extends BaseEntity {
 
 	private int totalPrice;
 
+	private boolean reviewContains;
+
 	private static final int MAX_DEMAND_LENGTH = 100;
 
 	private static final int MAX_ORDER_ITEMS = 5;
@@ -99,6 +101,7 @@ public class Order extends BaseEntity {
 		this.arrivalTime = arrivalTime;
 		this.demand = demand;
 		this.totalPrice = totalPrice;
+		this.reviewContains = false;
 	}
 
 	public void addOrderItems(List<OrderItem> orderItems) {
@@ -218,5 +221,9 @@ public class Order extends BaseEntity {
 			log.warn("PATCH:UPDATE:STORE:CANNOT_CHANGE_STATUS:{} -> {}", originalStatus, changedStatus);
 			throw new BusinessException(INVALID_ORDER_STATUS);
 		}
+	}
+
+	public void changeReviewStatus() {
+		reviewContains = true;
 	}
 }
