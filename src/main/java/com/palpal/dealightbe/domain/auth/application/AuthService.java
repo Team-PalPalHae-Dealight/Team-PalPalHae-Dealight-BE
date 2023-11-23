@@ -26,6 +26,7 @@ import com.palpal.dealightbe.domain.member.domain.MemberRoleRepository;
 import com.palpal.dealightbe.domain.member.domain.Role;
 import com.palpal.dealightbe.domain.member.domain.RoleRepository;
 import com.palpal.dealightbe.domain.member.domain.RoleType;
+import com.palpal.dealightbe.domain.notification.application.NotificationService;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
@@ -42,6 +43,7 @@ public class AuthService {
 	private static final String MEMBER_DEFAULT_IMAGE_PATH = "https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/image/member-default-image.png";
 	private final MemberRepository memberRepository;
 	private final RoleRepository roleRepository;
+	private final NotificationService notificationService;
 	private final MemberRoleRepository memberRoleRepository;
 	private final ImageService imageService;
 	private final Jwt jwt;
@@ -258,5 +260,10 @@ public class AuthService {
 				log.warn("READ:NOT_FOUND_MEMBER_BY_PROVIDER_ID : {}", providerId);
 				return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
 			});
+	}
+
+	public void logout(Long providerId) {
+		log.info("사용자(ProviderId:{})의 로그아웃을 진행합니다...", providerId);
+		notificationService.deleteAll(providerId);
 	}
 }
