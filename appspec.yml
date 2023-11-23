@@ -9,6 +9,8 @@ permissions:
   - object: /
 
 hooks:
+
+
   ApplicationStart:
     - location: deploy.sh
       timeout: 60

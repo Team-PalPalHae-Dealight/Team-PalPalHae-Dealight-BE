@@ -1,6 +1,6 @@
 on:
   push:
-    branches: [ "develop", "feature/#192" ]
+    branches: [ "develop"]
   pull_request:
     types: [ opened, synchronize, reopened ]
 

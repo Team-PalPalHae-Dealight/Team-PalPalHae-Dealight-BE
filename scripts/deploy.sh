@@ -8,13 +8,12 @@ target_dir="/home/ubuntu/docs"
 sudo find "$source_dir" -name "*.html" -exec mv {} "$target_dir" \;
 echo "모든 .html 파일을 $target_dir로 옮겼습니다."
 
-# docker-compose.infra를 실행하여 꺼진 컨테이너가 있으면 다시 실행
-echo "docker-compose.infra를 실행합니다..."
-sudo docker compose -f docker-compose.infra.yml up -d
-
 # Blue-Green 배포 실행
 # ubuntu 프로세스 매니저 버그 해결을 위해 추가
 sudo aa-remove-unknown
+
+# docker-compose.infra를 실행하여 꺼진 컨테이너가 있으면 다시 실행
+source infra.sh
 
 # 실행중인 blue가 있는지
 DOCKER_APP_NAME=dealight
