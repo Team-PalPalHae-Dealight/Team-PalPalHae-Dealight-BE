@@ -56,7 +56,7 @@ include::{snippets}/review/review-create-fail-empty/response-body.adoc[]
 
 == 2. 업체별 리뷰 통계 조회
 
-== 2-1. 업체용
+== 2-1. 업체용(토큰 O)
 
 === [GET] /api/reviews/stores
 
@@ -80,7 +80,7 @@ include::{snippets}/review/review-find-by-token-success/response-fields.adoc[]
 include::{snippets}/review/review-find-by-token-fail-unauthorized/response-body.adoc[]
 include::{snippets}/review/review-find-by-token-fail-unauthorized/response-fields.adoc[]
 
-== 2-2. 고객용
+== 2-2. 고객용(토큰 X)
 
 === [GET] /api/reviews/stores/{storeId}
 

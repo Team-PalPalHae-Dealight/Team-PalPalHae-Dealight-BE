@@ -94,8 +94,7 @@ include::{snippets}/order/order-status-update-success/response-fields.adoc[]
 include::{snippets}/order/order-create-fail-status/response-body.adoc[]
 include::{snippets}/order/order-create-fail-status/response-fields.adoc[]
 
-- 유효하지 않은 순서로 상태 변경을 요청하는 경우 (ex.
-주문 확인 -> 주문 완료)
+- 유효하지 않은 순서로 상태 변경을 요청하는 경우 (ex.주문 확인 -> 주문 완료)
 include::{snippets}/order/order-create-fail-invalid-status/response-body.adoc[]
 include::{snippets}/order/order-create-fail-invalid-status/response-fields.adoc[]
 
