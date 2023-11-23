@@ -57,7 +57,6 @@ public class CartService {
 		List<Cart> carts = cartRepository.findAllByMemberProviderId(providerId);
 
 		List<Cart> updatedCarts = updateCarts(carts);
-
 		List<Cart> unexpiredCarts = getUnexpiredCarts(updatedCarts);
 
 		return CartsRes.from(unexpiredCarts);
@@ -66,9 +65,8 @@ public class CartService {
 	public CartsRes update(Long providerId, CartsReq cartsReq) {
 		List<Cart> carts = getCarts(cartsReq, providerId);
 
-		List<Cart> updatedCarts = IntStream.range(0, carts.size())
-			.mapToObj(index -> updateCartQuantity(cartsReq, carts, index))
-			.toList();
+		List<Cart> renewedCarts = upToDateCarts(carts);
+		List<Cart> updatedCarts = updateCartsQuantity(renewedCarts, cartsReq);
 
 		return CartsRes.from(updatedCarts);
 	}
@@ -83,6 +81,18 @@ public class CartService {
 		List<Cart> carts = cartRepository.findAllByMemberProviderId(providerId);
 
 		cartRepository.deleteAll(carts);
+	}
+
+	private List<Cart> upToDateCarts(List<Cart> carts) {
+		List<Cart> updatedCarts = updateCarts(carts);
+		return getUnexpiredCarts(updatedCarts);
+	}
+
+	private List<Cart> updateCartsQuantity(List<Cart> carts, CartsReq cartsReq) {
+
+		return IntStream.range(0, carts.size())
+			.mapToObj(index -> updateCartQuantity(cartsReq, carts, index))
+			.toList();
 	}
 
 	private Cart updateCartQuantity(CartsReq cartsReq, List<Cart> carts, int index) {
