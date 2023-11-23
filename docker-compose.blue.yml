@@ -9,6 +9,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
+    volumes:
+      - /home/ubuntu/volumes/logs/config:/logs
     environment:
       TZ: "Asia/Seoul"
     networks:
