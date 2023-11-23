@@ -22,6 +22,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -203,31 +204,26 @@ class ReviewControllerTest {
 	class findByStoreIdTest {
 		String findByStoreIdPath = "/api/reviews/stores";
 
-		long storeId = 1L;
+		Long storeId = 1L;
 
 		StoreReviewsRes storeReviewsRes = new StoreReviewsRes(storeId,
 			List.of(new StoreReviewRes("사장님이 친절해요", 2), new StoreReviewRes("가격이 저렴해요", 4)));
 
 		@Test
-		@DisplayName("성공 - 업체별 리뷰 통계를 조회한다.")
+		@DisplayName("성공 - 고객이 업체별 리뷰 통계를 확인한다.")
 		void findByStoreId_success() throws Exception {
 			// given
-			given(reviewService.findByStoreId(anyLong(), any()))
+			given(reviewService.findByStoreId(anyLong()))
 				.willReturn(storeReviewsRes);
 
 			// when
 			// then
 			mockMvc.perform(
-					get(findByStoreIdPath)
-						.with(csrf().asHeader())
-						.with(user("username").roles("MEMBER"))
-						.header("Authorization", "Bearer {ACCESS_TOKEN}")
-						.contentType(APPLICATION_JSON)
-						.param("id", "1")
+					get(findByStoreIdPath + "/{id}", "1")
+						.with(user("tester"))
 				)
 				.andDo(print())
 				.andExpect(status().isOk())
-
 				.andExpect(jsonPath("$.storeId").value(storeId))
 				.andExpect(jsonPath("$.reviews[0].content").value(storeReviewsRes.reviews().get(0).content()))
 				.andExpect(jsonPath("$.reviews[0].count").value(storeReviewsRes.reviews().get(0).count()))
@@ -236,10 +232,7 @@ class ReviewControllerTest {
 				.andDo(document("review/review-find-by-store-id-success",
 						preprocessRequest(prettyPrint()),
 						preprocessResponse(prettyPrint()),
-						requestHeaders(
-							headerWithName("Authorization").description("Access Token")
-						),
-						requestParameters(
+						pathParameters(
 							parameterWithName("id").description("업체 아이디")
 						),
 						responseFields(
@@ -253,31 +246,62 @@ class ReviewControllerTest {
 		}
 
 		@Test
+		@DisplayName("성공 - 업체가 본인의 리뷰 통계를 조회한다.")
+		void findByStoreOwnerProviderId_success() throws Exception {
+			// given
+			given(reviewService.findByStoreOwnerProviderId(any()))
+				.willReturn(storeReviewsRes);
+
+			// when
+			// then
+			mockMvc.perform(
+					get(findByStoreIdPath)
+						.with(user("username").roles("STORE"))
+						.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				)
+				.andDo(print())
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.storeId").value(storeId))
+				.andExpect(jsonPath("$.reviews[0].content").value(storeReviewsRes.reviews().get(0).content()))
+				.andExpect(jsonPath("$.reviews[0].count").value(storeReviewsRes.reviews().get(0).count()))
+				.andExpect(jsonPath("$.reviews[1].content").value(storeReviewsRes.reviews().get(1).content()))
+				.andExpect(jsonPath("$.reviews[1].count").value(storeReviewsRes.reviews().get(1).count()))
+				.andDo(document("review/review-find-by-token-success",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestHeaders(
+						headerWithName("Authorization").description("Access Token")
+					),
+					responseFields(
+						fieldWithPath("storeId").type(JsonFieldType.NUMBER).description("업체 아이디"),
+						fieldWithPath("reviews[]").type(JsonFieldType.ARRAY).description("각 리뷰별 메시지와 개수"),
+						fieldWithPath("reviews[].content").type(JsonFieldType.STRING).description("리뷰 메시지"),
+						fieldWithPath("reviews[].count").type(JsonFieldType.NUMBER).description("개수")
+						)
+					)
+				);
+		}
+
+		@Test
 		@DisplayName("실패 - 업체 당사자만 리뷰를 조회할 수 있다")
 		void findByStoreId_fail_unauthorized() throws Exception {
 			// given
-			ReviewCreateReq emptyReq = new ReviewCreateReq(List.of());
-
-			given(reviewService.findByStoreId(any(), any()))
+			given(reviewService.findByStoreOwnerProviderId(any()))
 				.willThrow(new BusinessException(UNAUTHORIZED_REQUEST));
 
 			// when
 			// then
 			mockMvc.perform(
-					get(findByStoreIdPath, 1)
-						.with(csrf().asHeader())
-						.with(user("username").roles("MEMBER"))
+					get(findByStoreIdPath)
+						.with(user("username").roles("STORE"))
 						.header("Authorization", "Bearer {ACCESS_TOKEN}")
-						.content(objectMapper.writeValueAsString(emptyReq))
-						.contentType(APPLICATION_JSON)
-						.param("id", "2")
 				)
 				.andDo(print())
 				.andExpect(status().is4xxClientError())
 				.andExpect(result -> {
 					assertTrue(result.getResolvedException() instanceof BusinessException);
 				})
-				.andDo(document("review/review-find-by-store-fail-unauthorized",
+				.andDo(document("review/review-find-by-token-fail-unauthorized",
 					preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
 					requestHeaders(

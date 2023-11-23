@@ -56,8 +56,15 @@ public class ReviewService {
 	}
 
 	@Transactional(readOnly = true)
-	public StoreReviewsRes findByStoreId(Long id, Long providerId) {
-		Store store = getStore(id);
+	public StoreReviewsRes findByStoreId(Long id) {
+		List<ReviewStatistics> reviews = reviewRepository.selectStatisticsByStoreId(id);
+
+		return StoreReviewsRes.of(id, reviews);
+	}
+
+	@Transactional(readOnly = true)
+	public StoreReviewsRes findByStoreOwnerProviderId(Long providerId) {
+		Store store = getStoreByProviderId(providerId);
 
 		if (!store.isSameOwnerAndTheRequester(providerId)) {
 			log.warn("GET:READ:NOT A STORE OWNER : STORE OWNER {}, REQUESTER {}",
@@ -65,9 +72,9 @@ public class ReviewService {
 			throw new BusinessException(UNAUTHORIZED_REQUEST);
 		}
 
-		List<ReviewStatistics> reviews = reviewRepository.selectStatisticsByStoreId(id);
+		List<ReviewStatistics> reviews = reviewRepository.selectStatisticsByStoreId(providerId);
 
-		return StoreReviewsRes.of(id, reviews);
+		return StoreReviewsRes.of(store.getId(), reviews);
 	}
 
 	@Transactional(readOnly = true)
@@ -88,10 +95,10 @@ public class ReviewService {
 			});
 	}
 
-	private Store getStore(Long storeId) {
-		return storeRepository.findById(storeId)
+	private Store getStoreByProviderId(Long providerId) {
+		return storeRepository.findById(providerId)
 			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_STORE_BY_ID : {}", storeId);
+				log.warn("GET:READ:NOT_FOUND_STORE_BY_ID : {}", providerId);
 				return new EntityNotFoundException(NOT_FOUND_STORE);
 			});
 	}

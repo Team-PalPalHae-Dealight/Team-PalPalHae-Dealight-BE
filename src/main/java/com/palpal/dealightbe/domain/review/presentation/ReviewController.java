@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,14 +44,23 @@ public class ReviewController {
 		return ResponseEntity.ok(reviewCreateRes);
 	}
 
-	@GetMapping("/stores")
-	@ProviderId
+	@GetMapping("/stores/{id}")
 	public ResponseEntity<StoreReviewsRes> findByStoreId(
-		Long providerId,
-		@RequestParam Long id
+		@PathVariable Long id
 	) {
 
-		StoreReviewsRes storeReviewsRes = reviewService.findByStoreId(id, providerId);
+		StoreReviewsRes storeReviewsRes = reviewService.findByStoreId(id);
+
+		return ResponseEntity.ok(storeReviewsRes);
+	}
+
+	@GetMapping("/stores")
+	@ProviderId
+	public ResponseEntity<StoreReviewsRes> findByStoreOwnerProviderId(
+		Long providerId
+	) {
+
+		StoreReviewsRes storeReviewsRes = reviewService.findByStoreOwnerProviderId(providerId);
 
 		return ResponseEntity.ok(storeReviewsRes);
 	}

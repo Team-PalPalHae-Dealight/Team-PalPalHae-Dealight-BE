@@ -6,8 +6,8 @@ public record StoreReviewsRes(
 	Long storeId,
 	List<StoreReviewRes> reviews
 ) {
-	public static StoreReviewsRes of(long id, List<ReviewStatistics> reviews) {
-		return new StoreReviewsRes(id,
+	public static StoreReviewsRes of(long storeId, List<ReviewStatistics> reviews) {
+		return new StoreReviewsRes(storeId,
 			reviews.stream()
 				.map(r -> new StoreReviewRes(r.getContent(), r.getCount()))
 				.toList());
