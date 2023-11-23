@@ -257,7 +257,7 @@ class StoreControllerTest {
 
 	@Test
 	@DisplayName("업체 등록 실패 - 이미 업체를 보유한 고객")
-	void registerStoreFailTest_aleadyHasStore() throws Exception {
+	void registerStoreFailTest_alreadyHasStore() throws Exception {
 
 		//given
 		LocalTime openTime = LocalTime.of(23, 0);
@@ -315,18 +315,17 @@ class StoreControllerTest {
 			.collect(Collectors.toSet());
 
 		//given
-		Long storeId = 1L;
 		LocalTime openTime = LocalTime.of(9, 0);
 		LocalTime closeTime = LocalTime.of(23, 0);
 		StoreInfoRes storeInfoRes = new StoreInfoRes("123123213", "피나치공", "02123456", "서울시 강남구", openTime, closeTime,
 			dayOffs, StoreStatus.OPENED, null);
 
-		given(storeService.getInfo(any(), eq(storeId)))
+		given(storeService.getInfo(any()))
 			.willReturn(storeInfoRes);
 
 		//when -> then
 		mockMvc.perform(
-				RestDocumentationRequestBuilders.get("/api/stores/profiles/{storeId}", storeId)
+				RestDocumentationRequestBuilders.get("/api/stores/profiles")
 					.header("Authorization", "Bearer {ACCESS_TOKEN}")
 					.contentType(APPLICATION_JSON))
 			.andExpect(status().isOk())
@@ -337,6 +336,46 @@ class StoreControllerTest {
 				requestHeaders(
 					headerWithName("Authorization").description("Access Token")
 				),
+				responseFields(
+					fieldWithPath("storeNumber").description("사업자 등록 번호"),
+					fieldWithPath("name").description("상호명"),
+					fieldWithPath("telephone").description("업체 전화번호"),
+					fieldWithPath("addressName").description("업체 주소"),
+					fieldWithPath("openTime").description("오픈 시간"),
+					fieldWithPath("closeTime").description("마감 시간"),
+					fieldWithPath("dayOff").description("휴무일"),
+					fieldWithPath("storeStatus").description("영업 유무"),
+					fieldWithPath("image").description("이미지 주소")
+				)
+			));
+	}
+
+	@Test
+	@DisplayName("업체 상세페이지 조회 성공")
+	void getDetailsSuccessTest() throws Exception {
+
+		//given
+		Set<String> dayOffs = Set.of(DayOff.MON, DayOff.TUE).stream()
+			.map(DayOff::getName)
+			.collect(Collectors.toSet());
+		Long storeId = 1L;
+		LocalTime openTime = LocalTime.of(9, 0);
+		LocalTime closeTime = LocalTime.of(23, 0);
+		StoreInfoRes storeInfoRes = new StoreInfoRes("123123213", "피나치공", "02123456", "서울시 강남구", openTime, closeTime,
+			dayOffs, StoreStatus.OPENED, null);
+
+		given(storeService.getDetails(any()))
+			.willReturn(storeInfoRes);
+
+		//when -> then
+		mockMvc.perform(
+				RestDocumentationRequestBuilders.get("/api/stores/profiles/{storeId}", storeId)
+					.contentType(APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andDo(print())
+			.andDo(document("store/store-get-details",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
 				pathParameters(
 					parameterWithName("storeId").description("업체 ID")
 				),
@@ -360,12 +399,12 @@ class StoreControllerTest {
 
 		//given
 		Long storeId = 1L;
-		given(storeService.getInfo(any(), eq(storeId)))
+		given(storeService.getInfo(any()))
 			.willThrow(new BusinessException(ErrorCode.NOT_MATCH_OWNER_AND_REQUESTER));
 
 		//when -> then
 		mockMvc.perform(
-				RestDocumentationRequestBuilders.get("/api/stores/profiles/{storeId}", storeId)
+				RestDocumentationRequestBuilders.get("/api/stores/profiles/")
 					.header("Authorization", "Bearer {ACCESS_TOKEN}")
 					.contentType(APPLICATION_JSON))
 			.andExpect(status().isBadRequest())
@@ -375,9 +414,6 @@ class StoreControllerTest {
 				preprocessResponse(prettyPrint()),
 				requestHeaders(
 					headerWithName("Authorization").description("Access Token")
-				),
-				pathParameters(
-					parameterWithName("storeId").description("업체 ID")
 				),
 				responseFields(
 					fieldWithPath("timestamp").type(STRING).description("예외 시간"),

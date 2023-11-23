@@ -46,11 +46,18 @@ public class StoreController {
 	}
 
 	@ProviderId
-	@GetMapping("/profiles/{storeId}")
-	public ResponseEntity<StoreInfoRes> getInfo(Long providerId, @PathVariable Long storeId) {
-		StoreInfoRes infoRes = storeService.getInfo(providerId, storeId);
+	@GetMapping("/profiles")
+	public ResponseEntity<StoreInfoRes> getInfo(Long providerId) {
+		StoreInfoRes infoRes = storeService.getInfo(providerId);
 
 		return ResponseEntity.ok(infoRes);
+	}
+
+	@GetMapping("/profiles/{storeId}")
+	public ResponseEntity<StoreInfoRes> getDetails(@PathVariable Long storeId) {
+		StoreInfoRes detailsRes = storeService.getDetails(storeId);
+
+		return ResponseEntity.ok(detailsRes);
 	}
 
 	@ProviderId

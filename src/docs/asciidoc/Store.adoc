@@ -42,13 +42,12 @@ include::{snippets}/store/store-register-fail-not-found-member/http-response.ado
 
 include::{snippets}/store/store-register-fail-not-found-member/response-fields.adoc[]
 
-=== 업체 마이 페이지 조회
+=== 업체 마이 페이지 조회 - 업체 사용
 
-==== GET - /api/stores/profiles/{storeId}
+==== GET - /api/stores/profiles
 
 .Request
 include::{snippets}/store/store-get-info/http-request.adoc[]
-include::{snippets}/store/store-get-info/path-parameters.adoc[]
 
 .Response
 include::{snippets}/store/store-get-info/http-response.adoc[]
@@ -65,6 +64,18 @@ include::{snippets}/store/store-update-info/path-parameters.adoc[]
 .Response
 include::{snippets}/store/store-update-info/http-response.adoc[]
 include::{snippets}/store/store-update-info/response-fields.adoc[]
+
+=== 업체 상세 페이지 조회 - 고객 사용
+
+==== GET - /api/stores/profiles/{storeId}
+
+.Request
+include::{snippets}/store/store-get-details/http-request.adoc[]
+include::{snippets}/store/store-get-details/path-parameters.adoc[]
+
+.Response
+include::{snippets}/store/store-get-info/http-response.adoc[]
+include::{snippets}/store/store-get-info/response-fields.adoc[]
 
 === 업체 영업 상태 조회
 
