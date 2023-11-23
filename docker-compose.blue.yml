@@ -10,7 +10,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - /home/ubuntu/volumes/logs/config:/logs
+      - /home/ubuntu/volumes/logs:/logs
     environment:
       TZ: "Asia/Seoul"
     networks:
