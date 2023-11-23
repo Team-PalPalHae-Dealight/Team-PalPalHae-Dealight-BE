@@ -141,7 +141,7 @@ public class NotificationService {
 	public void deleteAll(Long memberId) {
 		Member member = memberRepository.findMemberByProviderId(memberId)
 			.orElseThrow(() -> {
-				log.warn("PATCH:UPDATE:NOT_FOUND_MEMBER_BY_ID : {}", memberId);
+				log.warn("DELETE:DELETE:NOT_FOUND_MEMBER_BY_ID : {}", memberId);
 				return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
 			});
 
@@ -162,7 +162,7 @@ public class NotificationService {
 	public void readNotification(Long id) {
 		Notification notification = notificationRepository.findById(id)
 			.orElseThrow(() -> {
-				log.warn("PATCH:UPDATE:NOT_FOUND_NOTIFICATION_BY_ID : {}", id);
+				log.warn("GET:READ:NOT_FOUND_NOTIFICATION_BY_ID : {}", id);
 				return new EntityNotFoundException(ErrorCode.NOT_FOUND_NOTIFICATION);
 			});
 
