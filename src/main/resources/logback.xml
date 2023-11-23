@@ -1,14 +1,18 @@
-<configuration>
-    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+<?xml version="1.0" encoding="UTF-8" ?>
 
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%clr(%d{HH:mm:ss.SSS}){magenta} %clr([%thread]){blue} %clr(%-5level){} %clr(%F, method:%M, %L line){cyan} : %m%n
-            </pattern>
-        </encoder>
-    </appender>
+<configuration scan="true">
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <timestamp key="BY_DATE" datePattern="yyyy-MM-dd"/>
 
-    <root level="info">
-        <appender-ref ref="STDOUT"/>
+    <include resource="console-appender.xml"/>
+    <include resource="info-appender.xml"/>
+    <include resource="warn-appender.xml"/>
+    <include resource="error-appender.xml"/>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE-INFO"/>
+        <appender-ref ref="FILE-ERROR"/>
+        <appender-ref ref="FILE-WARN"/>
     </root>
 </configuration>

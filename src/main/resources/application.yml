@@ -19,10 +19,10 @@ spring:
     database: h2
     open-in-view: false
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
       naming:
         implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
