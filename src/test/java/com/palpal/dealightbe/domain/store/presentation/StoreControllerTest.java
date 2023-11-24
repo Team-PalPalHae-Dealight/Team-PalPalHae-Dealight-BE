@@ -663,7 +663,7 @@ class StoreControllerTest {
 			.willReturn(storeByMemberRes);
 
 		//when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/stores/confirm")
+		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/stores/CONFIRMED")
 				.header("Authorization", "Bearer {ACCESS_TOKEN}"))
 			.andExpect(status().isOk())
 			.andDo(print())
@@ -690,7 +690,7 @@ class StoreControllerTest {
 
 		//when -> then
 		mockMvc.perform(
-				RestDocumentationRequestBuilders.get("/api/stores/confirm")
+				RestDocumentationRequestBuilders.get("/api/stores/CONFIRMED")
 					.header("Authorization", "Bearer {ACCESS_TOKEN}"))
 			.andExpect(status().isNotFound())
 			.andDo(print())

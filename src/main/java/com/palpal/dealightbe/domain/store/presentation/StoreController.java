@@ -113,7 +113,7 @@ public class StoreController {
 	}
 
 	@ProviderId
-	@GetMapping("/confirm")
+	@GetMapping("/CONFIRMED")
 	public ResponseEntity<StoreByMemberRes> findByProviderId(Long providerId) {
 		StoreByMemberRes storeByMemberRes = storeService.findByProviderId(providerId);
 

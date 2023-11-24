@@ -8,8 +8,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum OrderStatus {
-	RECEIVED("주문 확인", "새 주문이 도착했습니다: %d"),
-	CONFIRMED("주문 접수", "주문이 수락되었습니다: %d"),
+	CONFIRMED("주문 확인", "새 주문이 도착했습니다: %d"),
+	RECEIVED("주문 접수", "주문이 수락되었습니다: %d"),
 	COMPLETED("주문 완료", "주문이 완료되었습니다: %d"),
 	CANCELED("주문 취소", "주문이 취소되었습니다: %d");
 

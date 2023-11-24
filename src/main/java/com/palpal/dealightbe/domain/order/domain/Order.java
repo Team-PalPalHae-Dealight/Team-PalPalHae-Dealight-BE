@@ -2,7 +2,7 @@ package com.palpal.dealightbe.domain.order.domain;
 
 import static com.palpal.dealightbe.domain.order.domain.OrderStatus.CANCELED;
 import static com.palpal.dealightbe.domain.order.domain.OrderStatus.COMPLETED;
-import static com.palpal.dealightbe.domain.order.domain.OrderStatus.RECEIVED;
+import static com.palpal.dealightbe.domain.order.domain.OrderStatus.CONFIRMED;
 import static com.palpal.dealightbe.global.error.ErrorCode.ALREADY_EXIST_REVIEW;
 import static com.palpal.dealightbe.global.error.ErrorCode.EXCEEDED_ORDER_ITEMS;
 import static com.palpal.dealightbe.global.error.ErrorCode.ILLEGAL_REVIEW_REQUEST;
@@ -66,7 +66,7 @@ public class Order extends BaseEntity {
 	private List<OrderItem> orderItems = new ArrayList<>();
 
 	@Enumerated(EnumType.STRING)
-	private OrderStatus orderStatus = RECEIVED;
+	private OrderStatus orderStatus = CONFIRMED;
 
 	private LocalTime arrivalTime;
 
@@ -83,15 +83,15 @@ public class Order extends BaseEntity {
 	private static final Set<OrderStatus> UNCHANGEABLE_STATUS = Set.of(COMPLETED, CANCELED);
 
 	private static final Set<Pair<String, String>> orderStatusSequenceOfMember = Set.of(
-		Pair.of("RECEIVED", "CANCELED"),
-		Pair.of("CONFIRMED", "CANCELED")
+		Pair.of("CONFIRMED", "CANCELED"),
+		Pair.of("RECEIVED", "CANCELED")
 	);
 
 	private static final Set<Pair<String, String>> orderStatusSequenceOfStore = Set.of(
-		Pair.of("RECEIVED", "CONFIRMED"),
-		Pair.of("RECEIVED", "CANCELED"),
-		Pair.of("CONFIRMED", "COMPLETED"),
-		Pair.of("CONFIRMED", "CANCELED")
+		Pair.of("CONFIRMED", "RECEIVED"),
+		Pair.of("CONFIRMED", "CANCELED"),
+		Pair.of("RECEIVED", "COMPLETED"),
+		Pair.of("RECEIVED", "CANCELED")
 	);
 
 	@Builder

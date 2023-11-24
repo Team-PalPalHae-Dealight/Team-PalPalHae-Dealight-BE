@@ -65,7 +65,7 @@ public class ReviewService {
 			throw new BusinessException(UNAUTHORIZED_REQUEST);
 		}
 
-		List<ReviewStatistics> reviews = reviewRepository.selectStatisticsByStoreId(providerId);
+		List<ReviewStatistics> reviews = reviewRepository.selectStatisticsByStoreId(store.getId());
 
 		return StoreReviewsRes.of(store.getId(), reviews);
 	}
