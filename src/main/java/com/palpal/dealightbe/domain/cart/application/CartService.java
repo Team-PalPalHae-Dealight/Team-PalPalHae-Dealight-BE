@@ -5,6 +5,7 @@ import static com.palpal.dealightbe.global.error.ErrorCode.EXCEEDED_CART_ITEM_SI
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ATTEMPT_TO_ADD_OWN_STORE_ITEM_TO_CART;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_CART_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
+import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_STORE;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,8 @@ import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.store.domain.Store;
+import com.palpal.dealightbe.domain.store.domain.StoreRepository;
+import com.palpal.dealightbe.domain.store.domain.StoreStatus;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
@@ -40,6 +43,7 @@ public class CartService {
 
 	private final CartRepository cartRepository;
 	private final ItemRepository itemRepository;
+	private final StoreRepository storeRepository;
 
 	public CartRes addItem(Long providerId, Long itemId, CartAdditionType cartAdditionType) {
 		Item item = getItem(itemId);
@@ -84,8 +88,8 @@ public class CartService {
 	}
 
 	private List<Cart> upToDateCarts(List<Cart> carts) {
-		List<Cart> updatedCarts = updateCarts(carts);
-		return getUnexpiredCarts(updatedCarts);
+		List<Cart> unexpiredCarts = getUnexpiredCarts(carts);
+		return updateCarts(unexpiredCarts);
 	}
 
 	private List<Cart> updateCartsQuantity(List<Cart> carts, CartsReq cartsReq) {
@@ -133,9 +137,16 @@ public class CartService {
 	}
 
 	private void deleteExpiredCart(Cart cart) {
-		if (cart.isExpired()) {
+		Store store = getStore(cart.getStoreId());
+
+		if (isStoreClosed(store) || cart.isExpired()) {
 			cartRepository.delete(cart);
 		}
+	}
+
+	private boolean isStoreClosed(Store store) {
+
+		return store.getStoreStatus().equals(StoreStatus.CLOSED);
 	}
 
 	private void validateOwnStoreItem(Long providerId, Item item) {
@@ -223,6 +234,14 @@ public class CartService {
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_CART_BY_ITEM_ID_AND_PROVIDER_ID : itemId = {}, providerId = {}", itemId, providerId);
 				return new EntityNotFoundException(NOT_FOUND_CART_ITEM);
+			});
+	}
+
+	private Store getStore(Long storeId) {
+		return storeRepository.findById(storeId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_STORE_BY_ID : {}", storeId);
+				return new EntityNotFoundException(NOT_FOUND_STORE);
 			});
 	}
 
