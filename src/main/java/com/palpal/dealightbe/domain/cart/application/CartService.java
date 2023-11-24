@@ -57,10 +57,9 @@ public class CartService {
 	public CartsRes findAllByProviderId(Long providerId) {
 		List<Cart> carts = cartRepository.findAllByMemberProviderId(providerId);
 
-		List<Cart> updatedCarts = updateCarts(carts);
-		List<Cart> unexpiredCarts = getUnexpiredCarts(updatedCarts);
+		List<Cart> updatedCarts = upToDateCarts(carts);
 
-		return CartsRes.from(unexpiredCarts);
+		return CartsRes.from(updatedCarts);
 	}
 
 	public CartsRes update(Long providerId, CartsReq cartsReq) {
