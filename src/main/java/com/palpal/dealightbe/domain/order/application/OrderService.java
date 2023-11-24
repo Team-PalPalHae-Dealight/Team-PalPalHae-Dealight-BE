@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
+import com.palpal.dealightbe.domain.item.infrastructure.ItemRedisRepository;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderCreateReq;
@@ -49,6 +50,7 @@ public class OrderService {
 	private final StoreRepository storeRepository;
 	private final ItemRepository itemRepository;
 	private final OrderItemRepository orderItemRepository;
+	private final ItemRedisRepository itemRedisRepository;
 	// private final NotificationService notificationService;
 
 	public OrderRes create(OrderCreateReq orderCreateReq, Long memberProviderId) {
@@ -172,8 +174,18 @@ public class OrderService {
 				return new EntityNotFoundException(NOT_FOUND_ITEM);
 			});
 
+		long id = item.getId();
+
+		Boolean lockAcquired = itemRedisRepository.lock(id);
+
+		while (lockAcquired == null || !lockAcquired) {
+			lockAcquired = itemRedisRepository.lock(id);
+		}
+
 		int quantity = request.quantity();
 		item.deductStock(quantity);
+
+		itemRedisRepository.unlock(id);
 
 		return OrderItem.builder()
 			.item(item)
