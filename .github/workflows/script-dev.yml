@@ -76,6 +76,7 @@ jobs:
           echo "${{ secrets.YML_DEV_RDS }}" > ./application-rds.yml
         shell: bash
 
+      # 테스트를 위한 application.yml 생성
       - name: Make Test application.yml
         if: |
           contains(github.ref, 'develop')

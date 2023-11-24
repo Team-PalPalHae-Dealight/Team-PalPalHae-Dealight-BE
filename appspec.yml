@@ -9,8 +9,22 @@ permissions:
   - object: /
 
 hooks:
+  StartInfraSystem:
+    - location: infra.sh
+      timeout: 60
+      runas: root
 
+  BeforeDeploy:
+    - location: beforeDeploy.sh
+      timeout: 60
+      runas: root
 
-  ApplicationStart:
+  DeployService:
     - location: deploy.sh
       timeout: 60
+      runas: root
+
+  AfterDeploy:
+    - location: after.sh
+      timeout: 60
+      runas: root
