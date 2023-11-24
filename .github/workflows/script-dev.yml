@@ -81,6 +81,7 @@ jobs:
         if: |
           contains(github.ref, 'develop')
         run: |
+          mkdir ./src/test/resources
           cd ./src/test/resources
           touch ./application.yml
           echo "${{ secrets.YML_TEST }}" > ./application.yml
