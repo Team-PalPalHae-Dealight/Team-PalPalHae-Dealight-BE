@@ -31,8 +31,8 @@ public class Address extends BaseEntity {
 
 	public Address() {
 		this("프로그래머스 강남",
-			37.4974495848055,
-			127.028422526103);
+			127.028422526103,
+			37.4974495848055);
 	}
 
 	@Builder
