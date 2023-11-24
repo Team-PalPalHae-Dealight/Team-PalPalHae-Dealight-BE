@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.palpal.dealightbe.domain.address.application.dto.request.AddressReq;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
+import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.image.ImageService;
 import com.palpal.dealightbe.domain.image.application.dto.request.ImageUploadReq;
 import com.palpal.dealightbe.domain.image.application.dto.response.ImageRes;
@@ -47,9 +48,9 @@ public class MemberService {
 	public MemberUpdateRes updateMemberProfile(Long memberId, MemberUpdateReq request) {
 		Member member = memberRepository.findMemberByProviderId(memberId)
 			.orElseThrow(() -> {
-			log.warn("PATCH:UPDATE:NOT_FOUND_MEMBER_BY_ID : {}", memberId);
-			return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
-		});
+				log.warn("PATCH:UPDATE:NOT_FOUND_MEMBER_BY_ID : {}", memberId);
+				return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
+			});
 
 		Member memberFromRequest = MemberUpdateReq.toMember(request);
 		member.updateInfo(memberFromRequest);
@@ -60,13 +61,12 @@ public class MemberService {
 	public AddressRes updateMemberAddress(Long memberId, AddressReq request) {
 		Member member = memberRepository.findMemberByProviderId(memberId)
 			.orElseThrow(() -> {
-			log.warn("PATCH:UPDATE:NOT_FOUND_MEMBER_BY_ID : {}", memberId);
-			return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
-		});
+				log.warn("PATCH:UPDATE:NOT_FOUND_MEMBER_BY_ID : {}", memberId);
+				return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
+			});
 
-		member.getAddress().updateInfo(
-			AddressReq.toAddress(request)
-		);
+		Address addressForUpdate = AddressReq.toAddress(request);
+		member.updateAddress(addressForUpdate);
 
 		return AddressRes.from(member.getAddress());
 	}
