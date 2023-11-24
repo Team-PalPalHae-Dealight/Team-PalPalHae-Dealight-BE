@@ -1,0 +1,58 @@
+version: "3"
+
+networks:
+  dealight-network:
+    external: true
+
+services:
+  prometheus:
+    container_name: dealight-prometheus
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - /home/ubuntu/volumes/prometheus/config:/etc/prometheus
+      - /home/ubuntu/volumes/prometheus/prometheus-volumes:/prometheus
+    command: # web.enalbe-lifecycle은 api 재시작없이 설정파일들을 reload 할 수 있게 해줌
+      - '--web.enable-lifecycle'
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    restart: always
+    networks:
+      - dealight-network
+
+  redis:
+    container_name: dealight-cart-redis
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - dealight-network
+
+  loki:
+    container_name: dealight-loki
+    image: grafana/loki:2.9.2
+    ports:
+      - "3100:3100"
+    volumes:
+      - /home/ubuntu/volumes/loki/config:/etc/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - dealight-network
+
+  promtail:
+    container_name: dealight-promtail
+    image: grafana/promtail:2.9.2
+    volumes:
+      - /home/ubuntu/volumes/logs:/var/log
+      - /home/ubuntu/volumes/promtail/config.yml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - dealight-network
+
+  grafana:
+    container_name: dealight-grafana
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    networks:
+      - dealight-network

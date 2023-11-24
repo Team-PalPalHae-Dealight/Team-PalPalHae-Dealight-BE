@@ -1,6 +1,6 @@
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "develop"]
   pull_request:
     types: [ opened, synchronize, reopened ]
 
@@ -59,6 +59,7 @@ jobs:
 
       - name: Make Test application.yml
         run: |
+          mkdir ./src/test/resources
           cd ./src/test/resources
           touch ./application.yml
           echo "${{ secrets.YML_TEST }}" > ./application.yml
