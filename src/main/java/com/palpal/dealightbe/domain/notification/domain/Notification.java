@@ -9,6 +9,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.order.domain.Order;
 import com.palpal.dealightbe.domain.order.domain.OrderStatus;
@@ -32,10 +35,12 @@ public class Notification extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Member member;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "store_id")
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Store store;
 
 	@ManyToOne(fetch = FetchType.LAZY)
