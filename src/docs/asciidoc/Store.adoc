@@ -135,7 +135,7 @@ include::{snippets}/store/store-delete-image/http-response.adoc[]
 
 .Request Fail
 include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/http-request.adoc[]
-include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/path-parameters.adoc[]
+
 .Response
 include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/http-response.adoc[]
 include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/response-fields.adoc[]
