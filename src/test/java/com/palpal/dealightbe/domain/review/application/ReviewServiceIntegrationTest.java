@@ -120,7 +120,7 @@ class ReviewServiceIntegrationTest {
 				);
 				long memberProviderId = member.getProviderId();
 
-				order.changeStatus(store.getMember(), "CONFIRMED");
+				order.changeStatus(store.getMember(), "RECEIVED");
 				order.changeStatus(store.getMember(), "COMPLETED");
 
 				// when
