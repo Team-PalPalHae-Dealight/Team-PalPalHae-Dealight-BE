@@ -69,6 +69,9 @@ public class NotificationService {
 	@Scheduled(cron = DEFAULT_SCHEDULING_TIME)
 	public void cleanupReadNotifications() {
 		notificationRepository.deleteReadNotifications();
+
+		log.info("RUN:CLEANUP_READ_NOTIFICATIONS:TIME : {}", LocalDateTime.now());
+		log.info("RUN:CLEANUP_READ_NOTIFICATIONS:THREAD : {}", Thread.currentThread().getName());
 	}
 
 	private void resendMissedEvents(Long id, String userType, String emitterId, String lastEventId,
