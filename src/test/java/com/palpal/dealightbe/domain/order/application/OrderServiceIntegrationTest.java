@@ -1,7 +1,7 @@
 package com.palpal.dealightbe.domain.order.application;
 
 import static com.palpal.dealightbe.domain.order.domain.OrderStatus.CANCELED;
-import static com.palpal.dealightbe.domain.order.domain.OrderStatus.CONFIRMED;
+import static com.palpal.dealightbe.domain.order.domain.OrderStatus.RECEIVED;
 import static com.palpal.dealightbe.domain.store.domain.StoreStatus.OPENED;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -88,7 +88,7 @@ public class OrderServiceIntegrationTest {
 				assertThat(createdOrder.getStore().getId(), is(store.getId()));
 				assertThat(createdOrder.getMember().getId(), is(member.getId()));
 				assertThat(createdOrder.getStore().getName(), is(store.getName()));
-				assertThat(createdOrder.getOrderStatus().getText(), is(CONFIRMED.getText()));
+				assertThat(createdOrder.getOrderStatus().getText(), is(RECEIVED.getText()));
 
 				assertThat(createdOrder.getDemand(), is(orderCreateReq.demand()));
 				assertThat(createdOrder.getArrivalTime(), is(orderCreateReq.arrivalTime()));

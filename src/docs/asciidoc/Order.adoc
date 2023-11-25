@@ -65,6 +65,20 @@ include::{snippets}/order/order-create-fail-closed-store/response-fields.adoc[]
 
 == 2. 주문 상태 변경
 
+=== 주문 단계
+
+1. 주문 접수(RECEIVED) : 고객이 예약만 한 상태
+2. 주문 확인(CONFIRMED) : 주문 접수인 상태의 주문을 업체가 수락한 경우
+3. 주문 완료(COMPLETED) : 거래가 성사되고 끝난 경우
+4. 주문 취소(CANCELED) : 고객이 주문을 취소하거나 업체가 주문을 거절 또는 취소한 경우
+
+=== 주문 단계별 업체/고객 허용 요청
+
+1. 주문 접수 : 고객은 주문 취소 가능, 업체는 주문 확인 및 주문 취소로 변경 가능 (주문 완료로 바로 변경 불가능)
+2. 주문 확인 : 고객은 주문 취소 가능, 업체는 주문 완료 및 취소로 변경 가능 (주문 접수로 복구 불가능)
+3. 주문 완료 : 변경 불가능
+4. 주문 취소 : 변경 불가능
+
 === [PATCH] /api/orders/{orderId}
 
 include::{snippets}/order/order-status-update-success/http-request.adoc[]
@@ -94,7 +108,7 @@ include::{snippets}/order/order-status-update-success/response-fields.adoc[]
 include::{snippets}/order/order-create-fail-status/response-body.adoc[]
 include::{snippets}/order/order-create-fail-status/response-fields.adoc[]
 
-- 유효하지 않은 순서로 상태 변경을 요청하는 경우 (ex.주문 확인 -> 주문 완료)
+- 유효하지 않은 순서로 상태 변경을 요청하는 경우 (ex. 주문 접수 -> 주문 완료)
 include::{snippets}/order/order-create-fail-invalid-status/response-body.adoc[]
 include::{snippets}/order/order-create-fail-invalid-status/response-fields.adoc[]
 

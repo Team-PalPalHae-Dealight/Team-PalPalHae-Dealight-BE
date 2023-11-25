@@ -76,7 +76,7 @@ class ReviewServiceIntegrationTest {
 				);
 				long memberProviderId = member.getProviderId();
 
-				order.changeStatus(store.getMember(), "RECEIVED");
+				order.changeStatus(store.getMember(), "CONFIRMED");
 				order.changeStatus(store.getMember(), "COMPLETED");
 
 				// when
@@ -120,7 +120,7 @@ class ReviewServiceIntegrationTest {
 				);
 				long memberProviderId = member.getProviderId();
 
-				order.changeStatus(store.getMember(), "RECEIVED");
+				order.changeStatus(store.getMember(), "CONFIRMED");
 				order.changeStatus(store.getMember(), "COMPLETED");
 
 				// when
@@ -152,7 +152,7 @@ class ReviewServiceIntegrationTest {
 
 				ReviewCreateReq reviewCreateReq = new ReviewCreateReq(List.of("사장님이 친절해요", "가격이 저렴해요"));
 
-				order.changeStatus(store.getMember(), "RECEIVED");
+				order.changeStatus(store.getMember(), "CONFIRMED");
 				order.changeStatus(store.getMember(), "COMPLETED");
 
 				// when
@@ -178,11 +178,10 @@ class ReviewServiceIntegrationTest {
 
 				ReviewCreateReq reviewCreateReq = new ReviewCreateReq(List.of("사장님이 친절해요", "가격이 저렴해요"));
 
-				order.changeStatus(store.getMember(), "RECEIVED");
-
 				// when
 				// then
 				assertThat(order.getOrderStatus(), is(not(OrderStatus.COMPLETED)));
+
 				assertThrows(
 					BusinessException.class,
 					() ->
@@ -205,7 +204,7 @@ class ReviewServiceIntegrationTest {
 				);
 				long memberProviderId = member.getProviderId();
 
-				order.changeStatus(store.getMember(), "RECEIVED");
+				order.changeStatus(store.getMember(), "CONFIRMED");
 				order.changeStatus(store.getMember(), "COMPLETED");
 
 				// when
