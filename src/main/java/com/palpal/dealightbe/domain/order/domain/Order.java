@@ -215,7 +215,7 @@ public class Order extends BaseEntity {
 			storeCloseTime = storeCloseTime.plusHours(24);
 		}
 
-		if (arrivalTime.isBefore(storeOpenTime) && arrivalTime.isAfter(storeCloseTime)) {
+		if (arrivalTime.isBefore(storeOpenTime) || arrivalTime.isAfter(storeCloseTime)) {
 			log.warn("POST:WRITE:INVALID_ARRIVAL_TIME:STORE_OPEN {}, STORE_CLOSE {}, ARRIVAL_TIME {}", storeOpenTime,
 				storeCloseTime, arrivalTime);
 			throw new BusinessException(INVALID_ARRIVAL_TIME);

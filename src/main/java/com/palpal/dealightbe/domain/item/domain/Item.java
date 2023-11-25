@@ -1,7 +1,6 @@
 package com.palpal.dealightbe.domain.item.domain;
 
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_DISCOUNT_PRICE;
-import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_QUANTITY;
 import static com.palpal.dealightbe.global.error.ErrorCode.STORE_HAS_NO_ITEM;
 
 import javax.persistence.Column;
@@ -64,14 +63,6 @@ public class Item extends BaseEntity {
 		this.description = description;
 		this.image = image;
 		this.store = store;
-	}
-
-	public void deductStock(int quantity) {
-		if (this.stock < quantity) {
-			throw new BusinessException(INVALID_ITEM_QUANTITY);
-		}
-
-		this.stock -= quantity;
 	}
 
 	public void addStock(int quantity) {
