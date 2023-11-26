@@ -113,7 +113,7 @@ public class CartService {
 		List<Cart> updatedCarts = carts.stream()
 			.map(this::renewCart)
 			.filter(Objects::nonNull)
-			.collect(Collectors.toList());
+			.toList();
 
 		compareCartsSize(carts, updatedCarts);
 
