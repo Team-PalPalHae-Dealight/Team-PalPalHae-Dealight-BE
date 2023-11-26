@@ -1,4 +1,4 @@
-= REST Docs 장바구니 API
+= REST Docs Cart API
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs
@@ -6,15 +6,16 @@
 :toclevels: 2
 
 [[User-API]]
-== Cart API
-=== 장바구니 담기
+== POST : 장바구니 담기
 
-==== /api/carts/items?id={itemId}&type={cartAdditionType}
+=== /api/carts/items?id={itemId}&type={cartAdditionType}
 
 <cartAdditionType>
 
 - check (장바구니에 타 업체 상품 존재 시 에러 메시지 반환)
 - clear (장바구니에 타 업체 상품 존재 시 초기화 후 담기)
+
+=== 성공
 
 .Request Success - 성공
 include::{snippets}/cart/cart-add-item/http-request.adoc[]
@@ -33,6 +34,8 @@ include::{snippets}/cart/cart-add-item/response-fields.adoc[]
 
 ---
 
+=== 실패 : 유효하지 않은 장바구니 담기 타입
+
 .Request Fail - 유효하지 않은 장바구니 담기 타입
 include::{snippets}/cart/cart-add-item-invalid-cart-addition-type/http-request.adoc[]
 
@@ -49,6 +52,8 @@ include::{snippets}/cart/cart-add-item-invalid-cart-addition-type/http-response.
 include::{snippets}/cart/cart-add-item-invalid-cart-addition-type/response-fields.adoc[]
 
 ---
+
+=== 실패 : 본인이 등록한 업체의 상품 담기 불가
 
 .Request Fail - 본인이 등록한 업체의 상품 담기 불가
 include::{snippets}/cart/cart-add-item-invalid-attempt-own-store-item/http-request.adoc[]
@@ -67,6 +72,8 @@ include::{snippets}/cart/cart-add-item-invalid-attempt-own-store-item/response-f
 
 ---
 
+=== 실패 : 타 업체 상품이 존재하는 경우
+
 .Request Fail - 타 업체 상품이 존재하는 경우
 include::{snippets}/cart/cart-add-item-another-store-item-exists/http-request.adoc[]
 
@@ -83,6 +90,8 @@ include::{snippets}/cart/cart-add-item-another-store-item-exists/http-response.a
 include::{snippets}/cart/cart-add-item-another-store-item-exists/response-fields.adoc[]
 
 ---
+
+=== 실패 : 최대 5개 종류를 초과하여 장바구니 담기 시도하는 경우
 
 .Request Fail - 최대 5개 종류를 초과하여 장바구니 담기 시도하는 경우
 include::{snippets}/cart/cart-add-item-exceeded-cart-item-size/http-request.adoc[]
@@ -101,6 +110,8 @@ include::{snippets}/cart/cart-add-item-exceeded-cart-item-size/response-fields.a
 
 ---
 
+=== 실패 : 상품이 존재하지 않는 경우
+
 .Request Fail - 상품이 존재하지 않는 경우
 include::{snippets}/cart/cart-add-item-item-not-found/http-request.adoc[]
 
@@ -117,6 +128,8 @@ include::{snippets}/cart/cart-add-item-item-not-found/http-response.adoc[]
 include::{snippets}/cart/cart-add-item-item-not-found/response-fields.adoc[]
 
 ---
+
+=== 실패 : 장바구니의 최소, 최대 수량 조건에 맞지 않는 경우
 
 .Request Fail - 장바구니의 최소, 최대 수량 조건에 맞지 않는 경우
 include::{snippets}/cart/cart-add-item-invalid-cart-quantity/http-request.adoc[]
@@ -135,9 +148,11 @@ include::{snippets}/cart/cart-add-item-invalid-cart-quantity/response-fields.ado
 
 ---
 
-=== 장바구니 조회
+== GET : 장바구니 조회
 
-==== /api/carts
+=== /api/carts
+
+=== 성공
 
 .Request Success - 성공
 include::{snippets}/cart/cart-find-all-by-provider-id/http-request.adoc[]
@@ -153,9 +168,11 @@ include::{snippets}/cart/cart-find-all-by-provider-id/response-fields.adoc[]
 
 ---
 
-=== 장바구니 수정
+== PATCH : 장바구니 수정
 
-==== /api/carts
+=== /api/carts
+
+=== 성공
 
 .Request Success - 성공
 include::{snippets}/cart/cart-update/http-request.adoc[]
@@ -174,6 +191,8 @@ include::{snippets}/cart/cart-update/response-fields.adoc[]
 
 ---
 
+=== 실패 : 장바구니의 최소, 최대 수량 조건에 맞지 않는 경우
+
 .Request Fail - 장바구니의 최소, 최대 수량 조건에 맞지 않는 경우
 include::{snippets}/cart/cart-update-invalid-cart-quantity/http-request.adoc[]
 
@@ -190,6 +209,8 @@ include::{snippets}/cart/cart-update-invalid-cart-quantity/http-response.adoc[]
 include::{snippets}/cart/cart-update-invalid-cart-quantity/response-fields.adoc[]
 
 ---
+
+=== 실패 : 장바구니에 상품이 존재하지 않는 경우
 
 .Request Fail - 장바구니에 상품이 존재하지 않는 경우
 include::{snippets}/cart/cart-update-not-found-cart-item/http-request.adoc[]
@@ -208,9 +229,11 @@ include::{snippets}/cart/cart-update-not-found-cart-item/response-fields.adoc[]
 
 ---
 
-=== 장바구니 요소 삭제
+== DELETE : 장바구니 요소 삭제
 
-==== /api/carts/items?id={itemId}
+=== /api/carts/items?id={itemId}
+
+=== 성공
 
 .Request Success - 성공
 include::{snippets}/cart/cart-delete-one/http-request.adoc[]
@@ -225,6 +248,8 @@ include::{snippets}/cart/cart-delete-one/request-parameters.adoc[]
 include::{snippets}/cart/cart-delete-one/http-response.adoc[]
 
 ---
+
+=== 실패 : 장바구니에 상품이 존재하지 않는 경우
 
 .Request Fail - 장바구니에 상품이 존재하지 않는 경우
 include::{snippets}/cart/cart-delete-one-not-found-cart-item/http-request.adoc[]
@@ -243,9 +268,11 @@ include::{snippets}/cart/cart-delete-one-not-found-cart-item/response-fields.ado
 
 ---
 
-=== 장바구니 초기화
+== DELETE : 장바구니 초기화
 
-==== /api/carts
+=== /api/carts
+
+=== 성공
 
 .Request Success - 성공
 include::{snippets}/cart/cart-delete-all/http-request.adoc[]
