@@ -148,6 +148,44 @@ include::{snippets}/cart/cart-add-item-invalid-cart-quantity/response-fields.ado
 
 ---
 
+=== 실패 : 업체가 임의로 상품을 삭제하여 더 이상 존재하지 않는 상품이 장바구니에 존재하는 경우 (자동 삭제 & 안내 에러 메시지)
+
+.Request Fail - 업체가 임의로 상품을 삭제하여 더 이상 존재하지 않는 상품이 장바구니에 존재하는 경우 (자동 삭제 & 안내 에러 메시지)
+include::{snippets}/cart/cart-add-item-item-removed-no-longer-exists-item/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-add-item-item-removed-no-longer-exists-item/request-headers.adoc[]
+
+.request parameter
+include::{snippets}/cart/cart-add-item-item-removed-no-longer-exists-item/request-parameters.adoc[]
+
+.Response Fail - 업체가 임의로 상품을 삭제하여 더 이상 존재하지 않는 상품이 장바구니에 존재하는 경우 (자동 삭제 & 안내 에러 메시지)
+include::{snippets}/cart/cart-add-item-item-removed-no-longer-exists-item/http-response.adoc[]
+
+.response fields
+include::{snippets}/cart/cart-add-item-item-removed-no-longer-exists-item/response-fields.adoc[]
+
+---
+
+=== 실패 : 더 이상 존재하지 않는 업체의 상품이 장바구니에 존재하는 경우 (자동 삭제 & 안내 에러 메시지)
+
+.Request Fail - 더 이상 존재하지 않는 업체의 상품이 장바구니에 존재하는 경우 (자동 삭제 & 안내 에러 메시지)
+include::{snippets}/cart/cart-add-item-item-removed-no-longer-exists-store/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-add-item-item-removed-no-longer-exists-store/request-headers.adoc[]
+
+.request parameter
+include::{snippets}/cart/cart-add-item-item-removed-no-longer-exists-store/request-parameters.adoc[]
+
+.Response Fail - 더 이상 존재하지 않는 업체의 상품이 장바구니에 존재하는 경우 (자동 삭제 & 안내 에러 메시지)
+include::{snippets}/cart/cart-add-item-item-removed-no-longer-exists-store/http-response.adoc[]
+
+.response fields
+include::{snippets}/cart/cart-add-item-item-removed-no-longer-exists-store/response-fields.adoc[]
+
+---
+
 == GET : 장바구니 조회
 
 === /api/carts
@@ -165,6 +203,38 @@ include::{snippets}/cart/cart-find-all-by-provider-id/http-response.adoc[]
 
 .response fields
 include::{snippets}/cart/cart-find-all-by-provider-id/response-fields.adoc[]
+
+---
+
+=== 실패 : 업체가 임의로 상품을 삭제하여 더 이상 존재하지 않는 상품이 장바구니에 존재하는 경우 (자동 삭제 & 안내 에러 메시지)
+
+.Request Fail - 업체가 임의로 상품을 삭제하여 더 이상 존재하지 않는 상품이 장바구니에 존재하는 경우 (자동 삭제 & 안내 에러 메시지)
+include::{snippets}/cart/cart-find-all-by-provider-id-item-removed-no-longer-exists-item/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-find-all-by-provider-id-item-removed-no-longer-exists-item/request-headers.adoc[]
+
+.Response Fail - 업체가 임의로 상품을 삭제하여 더 이상 존재하지 않는 상품이 장바구니에 존재하는 경우 (자동 삭제 & 안내 에러 메시지)
+include::{snippets}/cart/cart-find-all-by-provider-id-item-removed-no-longer-exists-item/http-response.adoc[]
+
+.response fields
+include::{snippets}/cart/cart-find-all-by-provider-id-item-removed-no-longer-exists-item/response-fields.adoc[]
+
+---
+
+=== 실패 : 더 이상 존재하지 않는 업체의 상품이 장바구니에 존재하는 경우 (자동 삭제 & 안내 에러 메시지)
+
+.Request Fail - 더 이상 존재하지 않는 업체의 상품이 장바구니에 존재하는 경우 (자동 삭제 & 안내 에러 메시지)
+include::{snippets}/cart/cart-find-all-by-provider-id-item-removed-no-longer-exists-store/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-find-all-by-provider-id-item-removed-no-longer-exists-store/request-headers.adoc[]
+
+.Response Fail - 더 이상 존재하지 않는 업체의 상품이 장바구니에 존재하는 경우 (자동 삭제 & 안내 에러 메시지)
+include::{snippets}/cart/cart-find-all-by-provider-id-item-removed-no-longer-exists-store/http-response.adoc[]
+
+.response fields
+include::{snippets}/cart/cart-find-all-by-provider-id-item-removed-no-longer-exists-store/response-fields.adoc[]
 
 ---
 
@@ -226,6 +296,44 @@ include::{snippets}/cart/cart-update-not-found-cart-item/http-response.adoc[]
 
 .response fields
 include::{snippets}/cart/cart-update-not-found-cart-item/response-fields.adoc[]
+
+---
+
+=== 실패 : 업체가 임의로 상품을 삭제하여 더 이상 존재하지 않는 상품이 장바구니에 존재하는 경우 (자동 삭제 & 안내 에러 메시지)
+
+.Request Fail - 업체가 임의로 상품을 삭제하여 더 이상 존재하지 않는 상품이 장바구니에 존재하는 경우 (자동 삭제 & 안내 에러 메시지)
+include::{snippets}/cart/cart-update-item-removed-no-longer-exists-item/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-update-item-removed-no-longer-exists-item/request-headers.adoc[]
+
+.request fields
+include::{snippets}/cart/cart-update-item-removed-no-longer-exists-item/request-fields.adoc[]
+
+.Response Fail - 업체가 임의로 상품을 삭제하여 더 이상 존재하지 않는 상품이 장바구니에 존재하는 경우 (자동 삭제 & 안내 에러 메시지)
+include::{snippets}/cart/cart-update-item-removed-no-longer-exists-item/http-response.adoc[]
+
+.response fields
+include::{snippets}/cart/cart-update-item-removed-no-longer-exists-item/response-fields.adoc[]
+
+---
+
+=== 실패 : 더 이상 존재하지 않는 업체의 상품이 장바구니에 존재하는 경우 (자동 삭제 & 안내 에러 메시지)
+
+.Request Fail - 더 이상 존재하지 않는 업체의 상품이 장바구니에 존재하는 경우 (자동 삭제 & 안내 에러 메시지)
+include::{snippets}/cart/cart-update-item-removed-no-longer-exists-store/http-request.adoc[]
+
+.request header
+include::{snippets}/cart/cart-update-item-removed-no-longer-exists-store/request-headers.adoc[]
+
+.request fields
+include::{snippets}/cart/cart-update-item-removed-no-longer-exists-store/request-fields.adoc[]
+
+.Response Fail - 더 이상 존재하지 않는 업체의 상품이 장바구니에 존재하는 경우 (자동 삭제 & 안내 에러 메시지)
+include::{snippets}/cart/cart-update-item-removed-no-longer-exists-store/http-response.adoc[]
+
+.response fields
+include::{snippets}/cart/cart-update-item-removed-no-longer-exists-store/response-fields.adoc[]
 
 ---
 

@@ -4,6 +4,8 @@ import static com.palpal.dealightbe.global.error.ErrorCode.ANOTHER_STORE_ITEM_AL
 import static com.palpal.dealightbe.global.error.ErrorCode.EXCEEDED_CART_ITEM_SIZE;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ATTEMPT_TO_ADD_OWN_STORE_ITEM_TO_CART;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_CART_QUANTITY;
+import static com.palpal.dealightbe.global.error.ErrorCode.ITEM_REMOVED_NO_LONGER_EXISTS_STORE;
+import static com.palpal.dealightbe.global.error.ErrorCode.ITEM_REMOVED_NO_LONGER_EXISTS_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_CART_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
 import static org.mockito.ArgumentMatchers.any;
@@ -453,6 +455,88 @@ class CartControllerTest {
 			));
 	}
 
+	@DisplayName("장바구니 담기 실패 테스트 - 업체가 임의로 상품을 삭제하여 더 이상 존재하지 않는 상품이 장바구니에 존재하는 경우 (자동 삭제 & 안내 에러 메시지)")
+	@Test
+	void addItemFailureTest_itemRemovedNoLongerExistsItem() throws Exception {
+		//given
+		Long itemId = 1L;
+
+		doThrow(new EntityNotFoundException(ITEM_REMOVED_NO_LONGER_EXISTS_ITEM)).when(
+			cartService).addItem(any(), any(), any());
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.param("id", String.valueOf(itemId))
+				.param("type", "check"))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("CT007"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("더 이상 존재하지 않는 상품이 장바구니에서 자동으로 삭제되었습니다."))
+			.andDo(print())
+			.andDo(document("cart/cart-add-item-item-removed-no-longer-exists-item",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				requestParameters(
+					parameterWithName("id").description("상품 ID"),
+					parameterWithName("type").description("장바구니 담기 타입")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("예외 코드"),
+					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@DisplayName("장바구니 담기 실패 테스트 - 더 이상 존재하지 않는 업체의 상품이 장바구니에 존재하는 경우 (자동 삭제 & 안내 에러 메시지)")
+	@Test
+	void addItemFailureTest_itemRemovedNoLongerExistsStore() throws Exception {
+		//given
+		Long itemId = 1L;
+
+		doThrow(new EntityNotFoundException(ITEM_REMOVED_NO_LONGER_EXISTS_STORE)).when(
+			cartService).addItem(any(), any(), any());
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.param("id", String.valueOf(itemId))
+				.param("type", "check"))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("CT008"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("더 이상 존재하지 않는 업체의 상품이 장바구니에서 자동으로 삭제되었습니다."))
+			.andDo(print())
+			.andDo(document("cart/cart-add-item-item-removed-no-longer-exists-store",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				requestParameters(
+					parameterWithName("id").description("상품 ID"),
+					parameterWithName("type").description("장바구니 담기 타입")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("예외 코드"),
+					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
 	@DisplayName("장바구니 조회 성공 테스트")
 	@Test
 	void findAllByProviderIdSuccessTest() throws Exception {
@@ -504,6 +588,72 @@ class CartControllerTest {
 					fieldWithPath("carts[0].storeName").type(STRING).description("상호명"),
 					fieldWithPath("carts[0].storeCloseTime").type(STRING).description("마감 시간"),
 					fieldWithPath("carts[0].expirationDateTime").type(STRING).description("장바구니 만료 시점")
+				)
+			));
+	}
+
+	@DisplayName("장바구니 조회 실패 테스트 - 업체가 임의로 상품을 삭제하여 더 이상 존재하지 않는 상품이 장바구니에 존재하는 경우 (자동 삭제 & 안내 에러 메시지)")
+	@Test
+	void findAllByProviderIdSuccessTest_itemRemovedNoLongerExistsItem() throws Exception {
+		//given
+		doThrow(new EntityNotFoundException(ITEM_REMOVED_NO_LONGER_EXISTS_ITEM)).when(
+			cartService).findAllByProviderId(any());
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/carts")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}"))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("CT007"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("더 이상 존재하지 않는 상품이 장바구니에서 자동으로 삭제되었습니다."))
+			.andDo(print())
+			.andDo(document("cart/cart-find-all-by-provider-id-item-removed-no-longer-exists-item",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("예외 코드"),
+					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@DisplayName("장바구니 조회 실패 테스트 - 더 이상 존재하지 않는 업체의 상품이 장바구니에 존재하는 경우 (자동 삭제 & 안내 에러 메시지)")
+	@Test
+	void findAllByProviderIdSuccessTest_itemRemovedNoLongerExistsStore() throws Exception {
+		//given
+		doThrow(new EntityNotFoundException(ITEM_REMOVED_NO_LONGER_EXISTS_STORE)).when(
+			cartService).findAllByProviderId(any());
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/carts")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}"))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("CT008"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("더 이상 존재하지 않는 업체의 상품이 장바구니에서 자동으로 삭제되었습니다."))
+			.andDo(print())
+			.andDo(document("cart/cart-find-all-by-provider-id-item-removed-no-longer-exists-store",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("예외 코드"),
+					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
 				)
 			));
 	}
@@ -638,6 +788,92 @@ class CartControllerTest {
 			.andExpect(jsonPath("$.message").value("장바구니에 상품이 존재하지 않습니다."))
 			.andDo(print())
 			.andDo(document("cart/cart-update-not-found-cart-item",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				requestFields(
+					fieldWithPath("carts[0].itemId").description("상품 ID"),
+					fieldWithPath("carts[0].quantity").description("장바구니에 담은 개수")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("예외 코드"),
+					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@DisplayName("장바구니 수정 실패 테스트 - 업체가 임의로 상품을 삭제하여 더 이상 존재하지 않는 상품이 장바구니에 존재하는 경우 (자동 삭제 & 안내 에러 메시지)")
+	@Test
+	void updateFailureTest_itemRemovedNoLongerExistsItem() throws Exception {
+		//given
+		CartReq cartReq = new CartReq(1L, 2);
+		CartReq cartReq2 = new CartReq(2L, 3);
+
+		CartsReq cartsReq = new CartsReq(List.of(cartReq, cartReq2));
+
+		doThrow(new EntityNotFoundException(ITEM_REMOVED_NO_LONGER_EXISTS_ITEM)).when(
+			cartService).update(any(), any());
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/carts")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.content(objectMapper.writeValueAsString(cartsReq)))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("CT007"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("더 이상 존재하지 않는 상품이 장바구니에서 자동으로 삭제되었습니다."))
+			.andDo(print())
+			.andDo(document("cart/cart-update-item-removed-no-longer-exists-item",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				requestFields(
+					fieldWithPath("carts[0].itemId").description("상품 ID"),
+					fieldWithPath("carts[0].quantity").description("장바구니에 담은 개수")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("예외 코드"),
+					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@DisplayName("장바구니 수정 실패 테스트 - 더 이상 존재하지 않는 업체의 상품이 장바구니에 존재하는 경우 (자동 삭제 & 안내 에러 메시지)")
+	@Test
+	void updateFailureTest_itemRemovedNoLongerExistsStore() throws Exception {
+		//given
+		CartReq cartReq = new CartReq(1L, 2);
+		CartReq cartReq2 = new CartReq(2L, 3);
+
+		CartsReq cartsReq = new CartsReq(List.of(cartReq, cartReq2));
+
+		doThrow(new EntityNotFoundException(ITEM_REMOVED_NO_LONGER_EXISTS_STORE)).when(
+			cartService).update(any(), any());
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/carts")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.content(objectMapper.writeValueAsString(cartsReq)))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("CT008"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("더 이상 존재하지 않는 업체의 상품이 장바구니에서 자동으로 삭제되었습니다."))
+			.andDo(print())
+			.andDo(document("cart/cart-update-item-removed-no-longer-exists-store",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestHeaders(
