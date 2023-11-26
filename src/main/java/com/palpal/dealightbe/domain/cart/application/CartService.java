@@ -5,7 +5,8 @@ import static com.palpal.dealightbe.global.error.ErrorCode.EXCEEDED_CART_ITEM_SI
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ATTEMPT_TO_ADD_OWN_STORE_ITEM_TO_CART;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_CART_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
-import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_STORE;
+import static com.palpal.dealightbe.global.error.ErrorCode.ITEM_REMOVED_NO_LONGER_EXISTS_ITEM;
+import static com.palpal.dealightbe.global.error.ErrorCode.ITEM_REMOVED_NO_LONGER_EXISTS_STORE;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.springframework.stereotype.Service;
@@ -89,6 +91,7 @@ public class CartService {
 
 	private List<Cart> upToDateCarts(List<Cart> carts) {
 		List<Cart> unexpiredCarts = getUnexpiredCarts(carts);
+
 		return updateCarts(unexpiredCarts);
 	}
 
@@ -108,16 +111,29 @@ public class CartService {
 	}
 
 	private List<Cart> updateCarts(List<Cart> carts) {
-
-		return carts.stream()
+		List<Cart> updatedCarts = carts.stream()
 			.map(this::renewCart)
+			.filter(Objects::nonNull)
 			.sorted(Comparator.comparing(Cart::getItemId))
-			.toList();
+			.collect(Collectors.toList());
+
+		compareCartsSize(carts, updatedCarts);
+
+		return updatedCarts;
+	}
+
+	private void compareCartsSize(List<Cart> carts, List<Cart> updatedCarts) {
+		if (carts.size() != updatedCarts.size()) {
+			log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID_AND_ITEM_REMOVED_NO_LONGER_EXISTS_ITEM : carts.size() = {}, updatedCarts.size() = {}", carts.size(), updatedCarts.size());
+			throw new EntityNotFoundException(ITEM_REMOVED_NO_LONGER_EXISTS_ITEM);
+		}
 	}
 
 	private Cart renewCart(Cart cart) {
-		Long itemId = cart.getItemId();
-		Item item = getItem(itemId);
+		Item item = getExistingItem(cart);
+		if (item == null) {
+			return null;
+		}
 
 		cart.update(item.getName(), item.getStock(), item.getDiscountPrice(), item.getImage(), item.getStore().getCloseTime());
 
@@ -128,16 +144,25 @@ public class CartService {
 		return cartRepository.save(cart);
 	}
 
+	private boolean isUnexpiredCart(Cart cart) {
+		if (cart.isExpired()) {
+			deleteStoreClosedCart(cart);
+
+			return false;
+		}
+
+		return true;
+	}
+
 	private List<Cart> getUnexpiredCarts(List<Cart> carts) {
 
 		return carts.stream()
-			.peek(this::deleteExpiredCart)
-			.filter(cart -> !cart.isExpired())
+			.filter(this::isUnexpiredCart)
 			.toList();
 	}
 
-	private void deleteExpiredCart(Cart cart) {
-		Store store = getStore(cart.getStoreId());
+	private void deleteStoreClosedCart(Cart cart) {
+		Store store = getStore(cart);
 
 		if (isStoreClosed(store) || cart.isExpired()) {
 			cartRepository.delete(cart);
@@ -221,6 +246,15 @@ public class CartService {
 			});
 	}
 
+	private Item getExistingItem(Cart cart) {
+
+		return itemRepository.findById(cart.getItemId())
+			.orElseGet(() -> {
+				cartRepository.delete(cart);
+				return null;
+			});
+	}
+
 	private List<Cart> getCarts(CartsReq cartsReq, Long providerId) {
 
 		return cartsReq.carts().stream()
@@ -237,11 +271,13 @@ public class CartService {
 			});
 	}
 
-	private Store getStore(Long storeId) {
-		return storeRepository.findById(storeId)
+	private Store getStore(Cart cart) {
+		return storeRepository.findById(cart.getStoreId())
 			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_STORE_BY_ID : {}", storeId);
-				return new EntityNotFoundException(NOT_FOUND_STORE);
+				log.warn("GET:READ:NOT_FOUND_STORE_BY_ID_AND_ITEM_REMOVED_NO_LONGER_EXISTS_STORE : {}", cart.getStoreId());
+				deleteAll(cart.getMemberProviderId());
+
+				return new EntityNotFoundException(ITEM_REMOVED_NO_LONGER_EXISTS_STORE);
 			});
 	}
 
