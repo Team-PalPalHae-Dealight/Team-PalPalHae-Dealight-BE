@@ -11,7 +11,6 @@ import static com.palpal.dealightbe.global.error.ErrorCode.ITEM_REMOVED_NO_LONGE
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -52,7 +51,7 @@ public class CartService {
 
 		validateOwnStoreItem(providerId, item);
 
-		List<Cart> carts = cartRepository.findAllByMemberProviderId(providerId);
+		List<Cart> carts = cartRepository.findAllByMemberProviderIdOrderByItemIdAsc(providerId);
 		List<Cart> upToDateCarts = upToDateCarts(carts);
 
 		validateAnotherStoreItemExistence(upToDateCarts, item.getStore().getId(), cartAdditionType);
@@ -61,7 +60,7 @@ public class CartService {
 	}
 
 	public CartsRes findAllByProviderId(Long providerId) {
-		List<Cart> carts = cartRepository.findAllByMemberProviderId(providerId);
+		List<Cart> carts = cartRepository.findAllByMemberProviderIdOrderByItemIdAsc(providerId);
 
 		List<Cart> updatedCarts = upToDateCarts(carts);
 
@@ -84,7 +83,7 @@ public class CartService {
 	}
 
 	public void deleteAll(Long providerId) {
-		List<Cart> carts = cartRepository.findAllByMemberProviderId(providerId);
+		List<Cart> carts = cartRepository.findAllByMemberProviderIdOrderByItemIdAsc(providerId);
 
 		cartRepository.deleteAll(carts);
 	}
@@ -114,7 +113,6 @@ public class CartService {
 		List<Cart> updatedCarts = carts.stream()
 			.map(this::renewCart)
 			.filter(Objects::nonNull)
-			.sorted(Comparator.comparing(Cart::getItemId))
 			.collect(Collectors.toList());
 
 		compareCartsSize(carts, updatedCarts);
