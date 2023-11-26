@@ -55,7 +55,7 @@ public class CartService {
 
 		validateAnotherStoreItemExistence(upToDateCarts, item.getStore().getId(), cartAdditionType);
 
-		return addItem(providerId, itemId, upToDateCarts, cartAdditionType);
+		return addItem(providerId, item, upToDateCarts, cartAdditionType);
 	}
 
 	public CartsRes findAllByProviderId(Long providerId) {
@@ -181,17 +181,17 @@ public class CartService {
 		}
 	}
 
-	private CartRes addItem(Long providerId, Long itemId, List<Cart> carts, CartAdditionType cartAdditionType) {
-		Cart cart = getCartToAddItem(itemId, providerId, carts, cartAdditionType);
+	private CartRes addItem(Long providerId, Item item, List<Cart> carts, CartAdditionType cartAdditionType) {
+		Cart cart = getCartToAddItem(item, providerId, carts, cartAdditionType);
 
 		Cart savedCart = cartRepository.save(cart);
 
 		return CartRes.from(savedCart);
 	}
 
-	private Cart getCartToAddItem(Long itemId, Long providerId, List<Cart> carts, CartAdditionType cartAdditionType) {
+	private Cart getCartToAddItem(Item item, Long providerId, List<Cart> carts, CartAdditionType cartAdditionType) {
 
-		return cartRepository.findByItemIdAndMemberProviderId(itemId, providerId)
+		return cartRepository.findByItemIdAndMemberProviderId(item.getId(), providerId)
 			.map(cart -> {
 				cart.updateQuantity(cart.getQuantity() + 1);
 				return cart;
@@ -199,7 +199,6 @@ public class CartService {
 			.orElseGet(() -> {
 				validateExceedCartItemSize(carts, cartAdditionType);
 
-				Item item = getItem(itemId);
 				return toCart(providerId, item);
 			});
 	}
