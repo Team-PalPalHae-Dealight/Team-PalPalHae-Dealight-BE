@@ -95,7 +95,8 @@ public class StoreService {
 	public StoreStatusRes updateStatus(Long providerId, Long storeId, StoreStatusReq storeStatus) {
 		Store store = validateMemberAndStoreOwnerByProviderIdAndStoreId(providerId, storeId);
 
-		store.updateStatus(storeStatus.storeStatus());
+		StoreStatus updateStatus = StoreStatus.fromString(storeStatus.storeStatus().toString());
+		store.updateStatus(updateStatus);
 
 		deleteClosedStoreItems(store);
 
