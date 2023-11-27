@@ -27,6 +27,7 @@ import com.palpal.dealightbe.domain.member.domain.Role;
 import com.palpal.dealightbe.domain.member.domain.RoleRepository;
 import com.palpal.dealightbe.domain.member.domain.RoleType;
 import com.palpal.dealightbe.domain.notification.application.NotificationService;
+import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
@@ -42,6 +43,7 @@ public class AuthService {
 
 	private static final String MEMBER_DEFAULT_IMAGE_PATH = "https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/image/member-default-image.png";
 	private final MemberRepository memberRepository;
+	private final StoreRepository storeRepository;
 	private final RoleRepository roleRepository;
 	private final NotificationService notificationService;
 	private final MemberRoleRepository memberRoleRepository;
@@ -81,7 +83,7 @@ public class AuthService {
 
 		Member requestMember = MemberSignupAuthReq.toMember(request);
 
-		setDefaultAddress(requestMember);
+		// setDefaultAddress(requestMember);
 		setDefaultImageUrl(requestMember);
 		Member savedMember = memberRepository.save(requestMember);
 
@@ -111,8 +113,7 @@ public class AuthService {
 			log.info("이미지 삭제에 성공했습니다.");
 		}
 
-		log.info("사용자(ProviderId:{})의 정보를 삭제합니다...", providerId);
-		memberRepository.delete(member);
+		deleteMember(providerId, member);
 
 		log.info("회원탈퇴에 성공했습니다.");
 	}
@@ -168,6 +169,11 @@ public class AuthService {
 		String refreshToken = jwt.createRefreshToken(member);
 
 		return createMemberAuthRes(member, accessToken, refreshToken);
+	}
+
+	public void logout(Long providerId) {
+		log.info("사용자(ProviderId:{})의 로그아웃을 진행합니다...", providerId);
+		notificationService.deleteAll(providerId);
 	}
 
 	private boolean checkRefreshTokenAroundExpiryDate(String refreshToken) {
@@ -262,8 +268,11 @@ public class AuthService {
 			});
 	}
 
-	public void logout(Long providerId) {
-		log.info("사용자(ProviderId:{})의 로그아웃을 진행합니다...", providerId);
-		notificationService.deleteAll(providerId);
+	private void deleteMember(Long providerId, Member member) {
+		storeRepository.findByMemberProviderId(providerId)
+			.ifPresentOrElse(storeRepository::delete, () -> {
+				log.info("사용자(ProviderId:{})의 정보를 삭제합니다...", providerId);
+				memberRepository.delete(member);
+			});
 	}
 }

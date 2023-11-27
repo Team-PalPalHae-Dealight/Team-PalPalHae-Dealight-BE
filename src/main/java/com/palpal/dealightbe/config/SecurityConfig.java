@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -15,6 +14,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.palpal.dealightbe.domain.auth.application.CustomAuthAccessDeniedHandler;
+import com.palpal.dealightbe.domain.auth.application.CustomAuthenticationEntryPoint;
 import com.palpal.dealightbe.domain.auth.domain.Jwt;
 import com.palpal.dealightbe.domain.auth.filter.JwtAuthenticationFilter;
 
@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 public class SecurityConfig {
 
+	private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 	private final CustomAuthAccessDeniedHandler customAuthAccessDeniedHandler;
 	private final Jwt jwt;
 
@@ -51,16 +52,10 @@ public class SecurityConfig {
 			.and()
 			.authorizeRequests()
 			// 운영자용 URL
-			.antMatchers(HttpMethod.OPTIONS,
-				"/h2-console/**", "/actuator/**"
-			).permitAll()
+			.antMatchers("/h2-console/**", "/actuator/**").hasAnyRole("ADMIN")
 			// 서비스 URL
-			.antMatchers(HttpMethod.OPTIONS,
-				"/api/auth/signup", "/api/auth/duplicate"
-			).permitAll()
-			.antMatchers(HttpMethod.OPTIONS,
-				"/api/**"
-			).permitAll()
+			.antMatchers("/api/auth/signup", "/api/auth/duplicate").permitAll()
+			.antMatchers("/api/**").hasAnyRole("MEMBER", "STORE")
 			.and()
 			.headers().disable()
 			.csrf().disable()
@@ -70,7 +65,9 @@ public class SecurityConfig {
 			.rememberMe().disable()
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 			.and()
-			.exceptionHandling().accessDeniedHandler(customAuthAccessDeniedHandler)
+			.exceptionHandling()
+			.authenticationEntryPoint(customAuthenticationEntryPoint)
+			.accessDeniedHandler(customAuthAccessDeniedHandler)
 			.and()
 			.addFilterBefore(new JwtAuthenticationFilter(jwt), UsernamePasswordAuthenticationFilter.class)
 			.build();
