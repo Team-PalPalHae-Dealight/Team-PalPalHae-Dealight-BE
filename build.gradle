@@ -86,6 +86,7 @@ dependencies {
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     testImplementation 'org.springframework.security:spring-security-test'
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    testImplementation "org.testcontainers:testcontainers:1.17.2"
 
     // annotationProcessor
     annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
