@@ -10,10 +10,12 @@ import static com.palpal.dealightbe.global.error.ErrorCode.SSE_STREAM_ERROR;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 import java.util.Map;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -30,6 +32,7 @@ import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.member.domain.RoleType;
 import com.palpal.dealightbe.domain.notification.application.dto.response.NotificationRes;
+import com.palpal.dealightbe.domain.notification.application.dto.response.NotificationUserInfo;
 import com.palpal.dealightbe.domain.notification.application.dto.response.NotificationsRes;
 import com.palpal.dealightbe.domain.notification.domain.EmitterRepository;
 import com.palpal.dealightbe.domain.notification.domain.Notification;
@@ -37,6 +40,7 @@ import com.palpal.dealightbe.domain.notification.domain.NotificationRepository;
 import com.palpal.dealightbe.domain.order.domain.Order;
 import com.palpal.dealightbe.domain.order.domain.OrderStatus;
 import com.palpal.dealightbe.domain.store.domain.Store;
+import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
@@ -53,6 +57,7 @@ public class NotificationService {
 	private static final String DEFAULT_SCHEDULING_TIME = "0 0 2 ? * TUE";  //매주 화요일 새벽 2시에 진행
 	private final NotificationRepository notificationRepository;
 	private final MemberRepository memberRepository;
+	private final StoreRepository storeRepository;
 	private final EmitterRepository emitterRepository;
 
 	private final StringRedisTemplate stringRedisTemplate;
@@ -60,7 +65,12 @@ public class NotificationService {
 	private final RedisMessageListenerContainer redisMessageListenerContainer;
 	private final ObjectMapper objectMapper;
 
-	public SseEmitter subscribe(Long id, RoleType userType, String lastEventId) {
+	public SseEmitter subscribe(Long providerId, String lastEventId) {
+
+		NotificationUserInfo notificationUserInfo = findNotificationRoleByProviderId(providerId);
+
+		Long id = notificationUserInfo.id();
+		RoleType userType = notificationUserInfo.role();
 
 		String emitterId = getEmitterId(id, userType);
 		String eventId = getEventId(id, userType.getRole());
@@ -88,6 +98,30 @@ public class NotificationService {
 		this.redisMessageListenerContainer.addMessageListener(messageListener, ChannelTopic.of(channelId));
 		checkEmitterStatus(emitter, emitterId, messageListener);
 		return emitter;
+	}
+
+	private NotificationUserInfo findNotificationRoleByProviderId(Long providerId) {
+
+		Member member = memberRepository.findMemberWithRolesAndRoleByProviderId(providerId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_ID : {}", providerId);
+				return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
+			});
+
+		Long id = member.getId();
+		RoleType userType = member.getMemberRoles().get(0).getRole().getType();
+
+		if (userType == RoleType.ROLE_STORE) {
+			Store store = storeRepository.findByMemberProviderId(providerId)
+				.orElseThrow(() -> {
+					log.warn("GET:READ:NOT_FOUND_STORE_BY_PROVIDER_ID : {}", providerId);
+					return new EntityNotFoundException(ErrorCode.NOT_FOUND_STORE);
+				});
+			id = store.getId();
+			return new NotificationUserInfo(id, RoleType.ROLE_STORE);
+		}
+
+		return new NotificationUserInfo(id, RoleType.ROLE_MEMBER);
 	}
 
 	private NotificationRes serialize(final Message message) {
@@ -204,24 +238,33 @@ public class NotificationService {
 			.build();
 	}
 
-	public void deleteAll(Long memberId) {
-		Member member = memberRepository.findMemberByProviderId(memberId)
-			.orElseThrow(() -> {
-				log.warn("DELETE:DELETE:NOT_FOUND_MEMBER_BY_ID : {}", memberId);
-				return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
-			});
+	public void deleteAll(Long providerId) {
 
-		RoleType role = member.getMemberRoles().get(0).getRole().getType();
-		String id = getNotificationId(memberId, role);
-		emitterRepository.deleteAllStartWithId(id);
-		emitterRepository.deleteAllEventCacheStartWithId(id);
+		NotificationUserInfo notificationUserInfo = findNotificationRoleByProviderId(providerId);
+		Long id = notificationUserInfo.id();
+		RoleType role = notificationUserInfo.role();
+
+		String notificationId = getNotificationId(id, role);
+		emitterRepository.deleteAllStartWithId(notificationId);
+		emitterRepository.deleteAllEventCacheStartWithId(notificationId);
 	}
 
-	public NotificationsRes findAllByMemberId(Long memberId) {
-		List<Notification> responses = new ArrayList<>(
-			notificationRepository.findAllByMemberIdAndIsReadFalse(memberId));
+	public NotificationsRes findAllByProviderId(Long providerId, Pageable pageable) {
+		NotificationUserInfo notificationUserInfo = findNotificationRoleByProviderId(providerId);
+		Long id = notificationUserInfo.id();
+		RoleType role = notificationUserInfo.role();
 
-		return NotificationsRes.of(responses);
+		Slice<Notification> notifications;
+
+		if (role == RoleType.ROLE_STORE) {
+			notifications = notificationRepository.findAllByStoreIdAndIsReadFalse(id, pageable);
+		} else if (role == RoleType.ROLE_MEMBER) {
+			notifications = notificationRepository.findAllByMemberIdAndIsReadFalse(id, pageable);
+		} else {
+			notifications = new SliceImpl<>(Collections.emptyList());
+		}
+
+		return NotificationsRes.from(notifications);
 	}
 
 	@Transactional
