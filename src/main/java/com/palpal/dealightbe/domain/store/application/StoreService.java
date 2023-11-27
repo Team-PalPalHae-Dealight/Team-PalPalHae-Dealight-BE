@@ -51,7 +51,7 @@ public class StoreService {
 		Member member = memberRepository.findMemberByProviderId(providerId)
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_PROVIDER_ID : {}", providerId);
-				throw new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
+				return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
 			});
 
 		checkDuplicatedStore(providerId);
@@ -77,7 +77,7 @@ public class StoreService {
 		Store store = storeRepository.findById(storeId)
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_STORE_BY_ID : {}", storeId);
-				throw new EntityNotFoundException(ErrorCode.NOT_FOUND_STORE);
+				return new EntityNotFoundException(ErrorCode.NOT_FOUND_STORE);
 			});
 
 		return StoreInfoRes.from(store);
@@ -162,13 +162,13 @@ public class StoreService {
 		Member member = memberRepository.findMemberByProviderId(providerId)
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_PROVIDER_ID : {}", providerId);
-				throw new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
+				return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
 			});
 
 		Store store = storeRepository.findByMemberProviderId(member.getProviderId())
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_STORE_BY_PROVIDER_ID : {}", member.getProviderId());
-				throw new EntityNotFoundException(ErrorCode.NOT_FOUND_STORE);
+				return new EntityNotFoundException(ErrorCode.NOT_FOUND_STORE);
 			});
 
 		store.isSameOwnerAndTheRequester(member, store);
@@ -180,13 +180,13 @@ public class StoreService {
 		Member member = memberRepository.findMemberByProviderId(providerId)
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_PROVIDER_ID : {}", providerId);
-				throw new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
+				return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
 			});
 
 		Store store = storeRepository.findById(storeId)
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_STORE_BY_ID : {}", storeId);
-				throw new EntityNotFoundException(ErrorCode.NOT_FOUND_STORE);
+				return new EntityNotFoundException(ErrorCode.NOT_FOUND_STORE);
 			});
 
 		store.isSameOwnerAndTheRequester(member, store);

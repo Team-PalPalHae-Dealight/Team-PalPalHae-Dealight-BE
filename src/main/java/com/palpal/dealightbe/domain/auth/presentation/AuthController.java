@@ -95,6 +95,9 @@ public class AuthController {
 	@PostMapping("/logout")
 	public ResponseEntity<Void> logout(Long providerId) {
 		authService.logout(providerId);
-		return ResponseEntity.noContent().build();
+
+		return ResponseEntity
+			.noContent()
+			.build();
 	}
 }

@@ -43,7 +43,7 @@ public class Address extends BaseEntity {
 	}
 
 	public static Address defaultAddress() {
-		return new Address("", 0, 0);
+		return new Address();
 	}
 
 	public void updateInfo(Address address) {
