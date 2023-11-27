@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
@@ -35,7 +34,6 @@ import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 
-@Transactional
 @SpringBootTest
 public class OrderServiceIntegrationTest {
 
@@ -222,14 +220,15 @@ public class OrderServiceIntegrationTest {
 
 				store.updateStatus(OPENED);
 				int stock = item.getStock();
-				int quantity = 2;
+				int quantity = 3;
 
 				OrderCreateReq orderCreateReq = new OrderCreateReq(
 					new OrderProductsReq(
 						List.of(new OrderProductReq(item.getId(), quantity))
 					),
 					store.getId(), "도착할 때까지 상품 냉장고에 보관 부탁드려요",
-					LocalTime.of(12, 30), item.getDiscountPrice() * 2
+					LocalTime.of(12, 30),
+					item.getDiscountPrice() * quantity
 				);
 
 				// when
@@ -238,7 +237,7 @@ public class OrderServiceIntegrationTest {
 				long orderId = orderRes.orderId();
 				Order order = orderRepository.findById(orderId).get();
 
-				assertThat(item.getStock(), is(stock - 2));
+				assertThat(item.getStock(), is(0));
 
 				orderService.updateStatus(orderId, new OrderStatusUpdateReq("CANCELED"), member.getProviderId());
 				assertThat(order.getOrderStatus(), is(CANCELED));

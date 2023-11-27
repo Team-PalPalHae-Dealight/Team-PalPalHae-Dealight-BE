@@ -146,6 +146,10 @@ public class Order extends BaseEntity {
 		validateUpdaterAuthority(updater, orderStatus.name(), changedStatus);
 
 		this.orderStatus = OrderStatus.valueOf(changedStatus);
+
+		if (orderStatus.equals(CANCELED)) {
+			this.cancel();
+		}
 	}
 
 	public void validateStatusRequest(String changedStatus) {
@@ -198,6 +202,17 @@ public class Order extends BaseEntity {
 
 		reviewContains = true;
 
+	}
+
+	private void cancel() {
+		getOrderItems().forEach(
+			item -> {
+				int originalStock = item.getItem().getStock();
+				int newStock = originalStock + item.getQuantity();
+
+				item.getItem().updateStock(newStock);
+			}
+		);
 	}
 
 	private void validateDemand(String demand) {

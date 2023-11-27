@@ -30,7 +30,6 @@ import com.palpal.dealightbe.domain.order.domain.Order;
 import com.palpal.dealightbe.domain.order.domain.OrderItem;
 import com.palpal.dealightbe.domain.order.domain.OrderItemRepository;
 import com.palpal.dealightbe.domain.order.domain.OrderRepository;
-import com.palpal.dealightbe.domain.order.domain.OrderStatus;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
@@ -90,14 +89,7 @@ public class OrderService {
 
 		String changedStatus = request.status();
 		order.changeStatus(member, changedStatus);
-
 		// notificationService.send(member, store, order, OrderStatus.valueOf(changedStatus));
-
-		if (changedStatus.equals(OrderStatus.CANCELED.name())) {
-			order.getOrderItems().forEach(
-				item -> item.getItem().addStock(item.getQuantity())
-			);
-		}
 
 		return OrderStatusUpdateRes.from(order);
 	}
