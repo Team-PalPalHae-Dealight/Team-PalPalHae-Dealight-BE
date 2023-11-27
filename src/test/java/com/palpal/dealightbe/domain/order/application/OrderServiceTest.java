@@ -355,8 +355,8 @@ class OrderServiceTest {
 				// given
 				long storeId = 1L;
 
-				Order order1 = createOrder(LocalTime.of(18, 30), 30000);
-				Order order2 = createOrder(LocalTime.of(22, 0), 10000);
+				Order order1 = createOrder(LocalTime.of(17, 30), 30000);
+				Order order2 = createOrder(LocalTime.of(17, 0), 10000);
 
 				Slice<Order> ordersSlice = new SliceImpl<>(
 					Arrays.asList(order1, order2), PageRequest.of(0, 10), true
@@ -420,8 +420,8 @@ class OrderServiceTest {
 				// given
 				long memberProviderId = 1L;
 
-				Order order1 = createOrder(LocalTime.of(18, 30), 30000);
-				Order order2 = createOrder(LocalTime.of(22, 0), 10000);
+				Order order1 = createOrder(LocalTime.of(17, 30), 30000);
+				Order order2 = createOrder(LocalTime.of(17, 0), 10000);
 
 				Slice<Order> ordersSlice = new SliceImpl<>(
 					Arrays.asList(order1, order2), PageRequest.of(0, 10), true
