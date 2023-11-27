@@ -55,7 +55,7 @@ public class SecurityConfig {
 			.antMatchers("/h2-console/**", "/actuator/**").hasAnyRole("ADMIN")
 			// 서비스 URL
 			.antMatchers("/api/auth/signup", "/api/auth/duplicate").permitAll()
-			.antMatchers("/api/**").hasAnyRole("MEMBER", "STORE")
+			.antMatchers("/api/**").permitAll()
 			.and()
 			.headers().disable()
 			.csrf().disable()
