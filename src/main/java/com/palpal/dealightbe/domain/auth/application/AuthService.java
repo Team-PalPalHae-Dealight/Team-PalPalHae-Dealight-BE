@@ -83,7 +83,6 @@ public class AuthService {
 
 		Member requestMember = MemberSignupAuthReq.toMember(request);
 
-		// setDefaultAddress(requestMember);
 		setDefaultImageUrl(requestMember);
 		Member savedMember = memberRepository.save(requestMember);
 
@@ -206,13 +205,6 @@ public class AuthService {
 		String refreshToken = jwt.createRefreshToken(member);
 
 		return createMemberAuthRes(member, accessToken, refreshToken);
-	}
-
-	private void setDefaultAddress(Member newMember) {
-		log.info("새로운 회원에게 기본 위치를 부여합니다...");
-		Address defaultAddress = new Address();
-		newMember.updateAddress(defaultAddress);
-		log.info("기본 위치 지정이 완료됐습니다.");
 	}
 
 	private void setDefaultImageUrl(Member newMember) {
