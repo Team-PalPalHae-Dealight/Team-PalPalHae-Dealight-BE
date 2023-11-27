@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.member.domain.Member;
@@ -248,8 +249,17 @@ public class OrderServiceIntegrationTest {
 		}
 	}
 
+	private Address createAddress() {
+
+		return Address.builder()
+			.xCoordinate(127.0324773)
+			.yCoordinate(37.5893876)
+			.build();
+	}
+
 	private Store createStore() {
 		Member storeOwner = createMember();
+		Address address = createAddress();
 
 		Store store = Store.builder()
 			.name("GS25")
@@ -258,6 +268,7 @@ public class OrderServiceIntegrationTest {
 			.openTime(LocalTime.of(9, 0))
 			.closeTime(LocalTime.of(18, 0))
 			.dayOff(Set.of(DayOff.SAT, DayOff.SUN))
+			.address(address)
 			.build();
 
 		store.updateMember(storeOwner);
