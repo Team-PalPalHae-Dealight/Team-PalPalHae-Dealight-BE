@@ -16,8 +16,11 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.item.domain.Item;
+import com.palpal.dealightbe.domain.item.domain.ItemJpaRedisRepository;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
@@ -34,11 +37,15 @@ import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 
+@Transactional
 @SpringBootTest
 public class OrderServiceIntegrationTest {
 
 	@Autowired
 	private OrderRepository orderRepository;
+
+	@Autowired
+	private ItemJpaRedisRepository itemJpaRedisRepository;
 
 	@Autowired
 	private MemberRepository memberRepository;
@@ -64,9 +71,12 @@ public class OrderServiceIntegrationTest {
 			void member_create() {
 				// given
 				Store store = createStore();
-				store.updateStatus(OPENED);
 				Item item = createItem(store);
 				Member member = createMember();
+
+				itemJpaRedisRepository.save(item);
+
+				store.updateStatus(OPENED);
 
 				OrderCreateReq orderCreateReq = new OrderCreateReq(
 					new OrderProductsReq(
@@ -86,7 +96,7 @@ public class OrderServiceIntegrationTest {
 				assertThat(createdOrder.getStore().getId(), is(store.getId()));
 				assertThat(createdOrder.getMember().getId(), is(member.getId()));
 				assertThat(createdOrder.getStore().getName(), is(store.getName()));
-				assertThat(createdOrder.getOrderStatus().getText(), is(CONFIRMED.getText()));
+				assertThat(createdOrder.getOrderStatus(), is(CONFIRMED));
 
 				assertThat(createdOrder.getDemand(), is(orderCreateReq.demand()));
 				assertThat(createdOrder.getArrivalTime(), is(orderCreateReq.arrivalTime()));
@@ -218,6 +228,8 @@ public class OrderServiceIntegrationTest {
 				Item item = createItem(store);
 				Member member = createMember();
 
+				itemJpaRedisRepository.save(item);
+
 				store.updateStatus(OPENED);
 				int stock = item.getStock();
 				int quantity = 3;
@@ -227,8 +239,7 @@ public class OrderServiceIntegrationTest {
 						List.of(new OrderProductReq(item.getId(), quantity))
 					),
 					store.getId(), "도착할 때까지 상품 냉장고에 보관 부탁드려요",
-					LocalTime.of(12, 30),
-					item.getDiscountPrice() * quantity
+					LocalTime.of(12, 30), item.getDiscountPrice() * quantity
 				);
 
 				// when
@@ -237,7 +248,7 @@ public class OrderServiceIntegrationTest {
 				long orderId = orderRes.orderId();
 				Order order = orderRepository.findById(orderId).get();
 
-				assertThat(item.getStock(), is(0));
+				assertThat(item.getStock(), is(stock - 3));
 
 				orderService.updateStatus(orderId, new OrderStatusUpdateReq("CANCELED"), member.getProviderId());
 				assertThat(order.getOrderStatus(), is(CANCELED));
@@ -247,8 +258,17 @@ public class OrderServiceIntegrationTest {
 		}
 	}
 
+	private Address createAddress() {
+
+		return Address.builder()
+			.xCoordinate(127.0324773)
+			.yCoordinate(37.5893876)
+			.build();
+	}
+
 	private Store createStore() {
 		Member storeOwner = createMember();
+		Address address = createAddress();
 
 		Store store = Store.builder()
 			.name("GS25")
@@ -257,6 +277,7 @@ public class OrderServiceIntegrationTest {
 			.openTime(LocalTime.of(9, 0))
 			.closeTime(LocalTime.of(18, 0))
 			.dayOff(Set.of(DayOff.SAT, DayOff.SUN))
+			.address(address)
 			.build();
 
 		store.updateMember(storeOwner);

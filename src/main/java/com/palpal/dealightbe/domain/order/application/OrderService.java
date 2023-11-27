@@ -152,14 +152,14 @@ public class OrderService {
 			});
 	}
 
-	private List<OrderItem> createOrderItems(Order order, List<OrderProductReq> orderProductsReq) {
+	public List<OrderItem> createOrderItems(Order order, List<OrderProductReq> orderProductsReq) {
 		return orderProductsReq.stream()
 			.sorted()
 			.map(productReq -> createOrderItem(order, productReq))
 			.toList();
 	}
 
-	private OrderItem createOrderItem(Order order, OrderProductReq request) {
+	public OrderItem createOrderItem(Order order, OrderProductReq request) {
 
 		Item item = itemRepository.findById(request.itemId())
 			.orElseThrow(() -> {
@@ -169,7 +169,7 @@ public class OrderService {
 			});
 
 		int quantity = request.quantity();
-		itemJpaRedisRepository.save(item.getId(), quantity);
+		itemJpaRedisRepository.save(item, quantity);
 
 		return OrderItem.builder()
 			.item(item)

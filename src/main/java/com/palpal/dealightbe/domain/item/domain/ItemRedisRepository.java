@@ -3,6 +3,7 @@ package com.palpal.dealightbe.domain.item.domain;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_QUANTITY;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
 
+import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
+@RedisHash("item:")
 public class ItemRedisRepository {
 
 	private static final String PREFIX = "item:";
@@ -20,30 +22,22 @@ public class ItemRedisRepository {
 	private final RedisTemplate<String, String> redisTemplate;
 	private final ItemRepository itemRepository;
 
-	public Boolean save(Long key, Integer value) {
+	public long save(Long key, Integer value) {
 		redisTemplate
 			.opsForValue()
 			.set(generateKey(key), value.toString());
 
-		return Boolean.TRUE;
+		return key;
 	}
 
-	public Boolean update(long key, int quantity) {
-		String stock = redisTemplate
-			.opsForValue()
-			.get(generateKey(key));
-
-		if (stock == null) {
-			throw new EntityNotFoundException(NOT_FOUND_ITEM);
-		}
+	public long update(Item item, int quantity) {
+		long key = item.getId();
+		String stock = getStock(key);
 
 		int newStock = Integer.parseInt(stock) - quantity;
-		if (newStock == 0) {
-			Item item = itemRepository.findById(key)
-				.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_ITEM));
 
+		if (newStock == 0) {
 			item.updateStock(0);
-			itemRepository.save(item);
 		}
 
 		if (newStock < 0) {
@@ -51,6 +45,25 @@ public class ItemRedisRepository {
 		}
 
 		return save(key, newStock);
+	}
+
+	private Item getItem(long key) {
+		return itemRepository.findById(key)
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_ITEM));
+	}
+
+	private String getStock(long key) {
+		String stock = redisTemplate
+			.opsForValue()
+			.get(generateKey(key));
+
+		if (stock == null) {
+			Item item = getItem(key);
+
+			save(item.getId(), item.getStock());
+			stock = String.valueOf(item.getStock());
+		}
+		return stock;
 	}
 
 	private String generateKey(Long key) {

@@ -1,5 +1,6 @@
 package com.palpal.dealightbe.domain.item.domain;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,13 @@ public class ItemJpaRedisRepository {
 		return item;
 	}
 
-	public void save(long itemId, int quantity) {
-		itemRedisRepository.update(itemId, quantity);
+	public void save(Item item, int quantity) {
+		itemRedisRepository.update(item, quantity);
+		updateItem(item, quantity);
+	}
+
+	@Async
+	protected void updateItem(Item item, int quantity) {
+		item.updateStock(item.getStock() - quantity);
 	}
 }
