@@ -112,6 +112,13 @@ asciidoctor {
     dependsOn test
 }
 
+bootJar {
+    dependsOn asciidoctor
+    from("${asciidoctor.outputDir}") {
+        into 'static/docs'
+    }
+}
+
 // queryDSL 빌드 옵션
 def querydslDir = "$buildDir/generated/querydsl"
 
