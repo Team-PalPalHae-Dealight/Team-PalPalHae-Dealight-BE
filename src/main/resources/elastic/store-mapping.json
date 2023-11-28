@@ -1,0 +1,18 @@
+{
+  "properties": {
+    "id": {"type": "long"},
+        "address": {
+          "properties": {
+            "id": {"type": "long"},
+            "name": {"type": "text"},
+            "xCoordinate": {"type": "double"},
+            "yCoordinate": {"type": "double"}
+          }
+        },
+    "name": {"type": "text"},
+    "storeStatus": {"type": "keyword"},
+    "openTime": {"type": "date", "format": "HH:mm"},
+    "closeTime": {"type": "date", "format": "HH:mm"},
+    "image": {"type": "text"}
+  }
+}
