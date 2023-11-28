@@ -1,22 +1,31 @@
 package com.palpal.dealightbe.domain.notification.application;
 
 import static com.palpal.dealightbe.domain.notification.util.NotificationUtil.extractTimestampFromEventId;
+import static com.palpal.dealightbe.domain.notification.util.NotificationUtil.getChannelId;
 import static com.palpal.dealightbe.domain.notification.util.NotificationUtil.getEmitterId;
 import static com.palpal.dealightbe.domain.notification.util.NotificationUtil.getEventId;
 import static com.palpal.dealightbe.domain.notification.util.NotificationUtil.getNotificationId;
 import static com.palpal.dealightbe.global.error.ErrorCode.SSE_STREAM_ERROR;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.redis.connection.Message;
+import org.springframework.data.redis.connection.MessageListener;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.member.domain.RoleType;
@@ -40,22 +49,24 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class NotificationService {
 	private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
+
 	private static final String DEFAULT_SCHEDULING_TIME = "0 0 2 ? * TUE";  //매주 화요일 새벽 2시에 진행
-	private final EmitterRepository emitterRepository;
 	private final NotificationRepository notificationRepository;
 	private final MemberRepository memberRepository;
+	private final EmitterRepository emitterRepository;
+
+	private final StringRedisTemplate stringRedisTemplate;
+
+	private final RedisMessageListenerContainer redisMessageListenerContainer;
+	private final ObjectMapper objectMapper;
 
 	public SseEmitter subscribe(Long id, RoleType userType, String lastEventId) {
 
 		String emitterId = getEmitterId(id, userType);
+		String eventId = getEventId(id, userType.getRole());
 
 		SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
-
-		emitter.onCompletion(() -> emitterRepository.deleteById(emitterId));
-		emitter.onTimeout(() -> emitterRepository.deleteById(emitterId));
-
 		emitterRepository.save(emitterId, emitter);
-		String eventId = getEventId(id, userType.getRole());
 
 		sendEventToEmitter(emitter, emitterId, eventId, "EventStream Created. [" + userType + "Id=" + id + "]");
 
@@ -63,7 +74,42 @@ public class NotificationService {
 			resendMissedEvents(id, userType.getRole(), emitterId, lastEventId, emitter);
 		}
 
+		final MessageListener messageListener = (message, pattern) -> {
+			final NotificationRes notificationResponse = serialize(message);
+
+			String json = new String(message.getBody(), StandardCharsets.UTF_8);
+			log.info("JSON received: {}", json);
+
+			sendEventToEmitter(emitter, emitterId, notificationResponse.eventId(), notificationResponse);
+		};
+
+		String channelId = getChannelId(id, userType.getRole());
+
+		this.redisMessageListenerContainer.addMessageListener(messageListener, ChannelTopic.of(channelId));
+		checkEmitterStatus(emitter, emitterId, messageListener);
 		return emitter;
+	}
+
+	private NotificationRes serialize(final Message message) {
+		try {
+			String json = new String(message.getBody(), StandardCharsets.UTF_8);
+			log.info("JSON received: {}", json);
+			return objectMapper.readValue(json, NotificationRes.class);
+		} catch (IOException e) {
+			throw new BusinessException(ErrorCode.INVALID_REDIS_MESSAGE_FORMAT);
+		}
+	}
+
+	private void checkEmitterStatus(final SseEmitter emitter, final String emitterId,
+		final MessageListener messageListener) {
+		emitter.onCompletion(() -> {
+			emitterRepository.deleteById(emitterId);
+			this.redisMessageListenerContainer.removeMessageListener(messageListener);
+		});
+		emitter.onTimeout(() -> {
+			emitterRepository.deleteById(emitterId);
+			this.redisMessageListenerContainer.removeMessageListener(messageListener);
+		});
 	}
 
 	@Transactional
@@ -84,7 +130,7 @@ public class NotificationService {
 		for (Map.Entry<String, Notification> eventEntry : events.entrySet()) {
 			String eventId = eventEntry.getKey();
 			Notification notification = eventEntry.getValue();
-			sendEventToEmitter(emitter, emitterId, eventId, NotificationRes.from(notification));
+			sendEventToEmitter(emitter, emitterId, eventId, NotificationRes.from(notification, eventId));
 		}
 	}
 
@@ -107,25 +153,33 @@ public class NotificationService {
 	}
 
 	private void sendNotification(Long id, Notification notification, String userType) {
-		String emitterKeyPrefix = userType + "_" + id;
 
-		Map<String, SseEmitter> emitters = emitterRepository.findAllStartWithById(emitterKeyPrefix);
-
+		String channelId = getChannelId(id, userType);
 		String eventId = getEventId(id, userType);
+
+		NotificationRes notificationRes = NotificationRes.from(notification, eventId);
 		emitterRepository.saveEventCache(eventId, notification);
 
-		emitters.forEach((emitterId, emitter) -> {
-			sendEventToEmitter(emitter, emitterId, eventId, NotificationRes.from(notification));
-		});
+		try {
+			String notificationJson = objectMapper.writeValueAsString(notificationRes);
+
+			log.info("Generated JSON for Redis: {}", notificationJson);
+
+			stringRedisTemplate.convertAndSend(channelId, notificationJson);
+
+			log.info("Notification sent to Redis channel {}: {}", channelId, notificationJson);
+		} catch (JsonProcessingException e) {
+			log.error("Failed to serialize NotificationRes", e);
+			throw new BusinessException(ErrorCode.JSON_PARSING_ERROR);
+		}
 	}
 
 	@Transactional
 	public void send(Member member, Store store, Order order, OrderStatus orderStatus) {
-		// Notification 메시지 생성
+
 		String message = Notification.createMessage(orderStatus, order);
 
-		// 알림 대상에 따라 SseEmitter에 이벤트 전송
-		if (orderStatus == OrderStatus.RECEIVED || orderStatus == OrderStatus.CANCELED) {
+		if (orderStatus == OrderStatus.CONFIRMED || orderStatus == OrderStatus.CANCELED) {
 			// Store용 Notification 객체 생성 및 저장
 			Notification notification = createNotification(null, store, order, message);
 			notificationRepository.save(notification);
@@ -133,7 +187,7 @@ public class NotificationService {
 			return;
 		}
 
-		if (orderStatus == OrderStatus.CONFIRMED || orderStatus == OrderStatus.COMPLETED) {
+		if (orderStatus == OrderStatus.RECEIVED || orderStatus == OrderStatus.COMPLETED) {
 			// Member용 Notification 객체 생성 및 저장
 			Notification notification = createNotification(member, null, order, message);
 			notificationRepository.save(notification);

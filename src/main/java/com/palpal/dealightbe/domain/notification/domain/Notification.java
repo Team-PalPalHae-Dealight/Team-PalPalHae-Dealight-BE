@@ -59,11 +59,11 @@ public class Notification extends BaseEntity {
 		this.content = content;
 	}
 
-	public void markAsRead() {
-		this.isRead = true;
-	}
-
 	public static String createMessage(OrderStatus orderStatus, Order order) {
 		return orderStatus.createMessage(order.getId());
+	}
+
+	public void markAsRead() {
+		this.isRead = true;
 	}
 }
