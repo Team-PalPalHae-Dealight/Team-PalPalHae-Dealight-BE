@@ -1,5 +1,7 @@
 package com.palpal.dealightbe.domain.order.application.dto.response;
 
+import static com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING;
+
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -13,14 +15,13 @@ public record OrderRes(
 	String memberNickName,
 	String storeName,
 	String demand,
-
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
+	@JsonFormat(shape = STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
 	LocalTime arrivalTime,
 
 	OrderProductsRes orderProductsRes,
 	int totalPrice,
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
+	@JsonFormat(shape = STRING, pattern = "YYYY-MM-dd HH:mm", timezone = "Asia/Seoul")
 	LocalDateTime createdAt,
 	String status,
 
