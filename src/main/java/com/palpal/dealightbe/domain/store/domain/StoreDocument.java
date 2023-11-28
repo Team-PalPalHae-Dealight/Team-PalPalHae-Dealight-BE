@@ -1,12 +1,15 @@
 package com.palpal.dealightbe.domain.store.domain;
 
+import java.util.List;
+
 import javax.persistence.Id;
 
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Mapping;
 import org.springframework.data.elasticsearch.annotations.Setting;
+import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 
-import com.palpal.dealightbe.domain.address.domain.Address;
+import com.palpal.dealightbe.domain.item.domain.ItemDocument;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -24,9 +27,9 @@ import lombok.NoArgsConstructor;
 public class StoreDocument {
 
 	@Id
-	private Long id;
+	private String id;
 
-	private Address address;
+	private GeoPoint location;
 
 	private String name;
 
@@ -38,14 +41,18 @@ public class StoreDocument {
 
 	private String image;
 
-	public static StoreDocument from(Store store) {
+	private List<ItemDocument> items;
+
+	public static StoreDocument from(UpdatedStore updatedStore, Store store) {
 		return StoreDocument.builder()
-			.id(store.getId())
-			.address(store.getAddress())
-			.name(store.getName())
-			.openTime(store.getOpenTime().toString())
-			.closeTime(store.getCloseTime().toString())
-			.image(store.getImage())
+			.id(String.valueOf(updatedStore.getId()))
+			.location(new GeoPoint(updatedStore.getYCoordinate(), updatedStore.getXCoordinate()))
+			.name(updatedStore.getName())
+			.storeStatus(StoreStatus.OPENED)
+			.openTime(updatedStore.getOpenTime().toString())
+			.closeTime(updatedStore.getCloseTime().toString())
+			.image(updatedStore.getImage())
+			.items(ItemDocument.convertToItemDocuments(store.getItems()))
 			.build();
 	}
 }

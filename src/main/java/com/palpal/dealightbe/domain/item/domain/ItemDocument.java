@@ -1,5 +1,8 @@
 package com.palpal.dealightbe.domain.item.domain;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.persistence.Id;
 
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -22,7 +25,7 @@ import lombok.NoArgsConstructor;
 public class ItemDocument {
 
 	@Id
-	private Long id;
+	private String id;
 
 	private String name;
 
@@ -30,9 +33,19 @@ public class ItemDocument {
 
 	public static ItemDocument from(Item item) {
 		return ItemDocument.builder()
-			.id(item.getId())
+			.id(String.valueOf(item.getId()))
 			.name(item.getName())
 			.storeId(item.getStore().getId())
 			.build();
 	}
+
+	public static List<ItemDocument> convertToItemDocuments(List<Item> items) {
+		if (items == null) {
+			return null;
+		}
+		return items.stream()
+			.map(ItemDocument::from)
+			.collect(Collectors.toList());
+	}
+
 }
