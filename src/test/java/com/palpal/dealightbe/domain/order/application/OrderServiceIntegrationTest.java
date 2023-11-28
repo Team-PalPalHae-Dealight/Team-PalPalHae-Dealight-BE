@@ -248,7 +248,7 @@ public class OrderServiceIntegrationTest {
 				long orderId = orderRes.orderId();
 				Order order = orderRepository.findById(orderId).get();
 
-				assertThat(item.getStock(), is(stock - 3));
+				assertThat(item.getStock(), is(stock - quantity));
 
 				orderService.updateStatus(orderId, new OrderStatusUpdateReq("CANCELED"), member.getProviderId());
 				assertThat(order.getOrderStatus(), is(CANCELED));

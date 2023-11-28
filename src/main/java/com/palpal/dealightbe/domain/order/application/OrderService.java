@@ -168,13 +168,13 @@ public class OrderService {
 				return new EntityNotFoundException(NOT_FOUND_ITEM);
 			});
 
-		int quantity = request.quantity();
-		itemJpaRedisRepository.save(item, quantity);
+		int newStock = item.getStock() - request.quantity();
+		itemJpaRedisRepository.save(item, newStock);
 
 		return OrderItem.builder()
 			.item(item)
 			.order(order)
-			.quantity(quantity)
+			.quantity(request.quantity())
 			.build();
 
 	}

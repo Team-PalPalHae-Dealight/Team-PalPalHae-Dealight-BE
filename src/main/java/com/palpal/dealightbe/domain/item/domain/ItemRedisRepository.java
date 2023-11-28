@@ -1,13 +1,11 @@
 package com.palpal.dealightbe.domain.item.domain;
 
-import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_QUANTITY;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
 
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -30,19 +28,8 @@ public class ItemRedisRepository {
 		return key;
 	}
 
-	public long update(Item item, int quantity) {
+	public long update(Item item, int newStock) {
 		long key = item.getId();
-		String stock = getStock(key);
-
-		int newStock = Integer.parseInt(stock) - quantity;
-
-		if (newStock == 0) {
-			item.updateStock(0);
-		}
-
-		if (newStock < 0) {
-			throw new BusinessException(INVALID_ITEM_QUANTITY);
-		}
 
 		return save(key, newStock);
 	}

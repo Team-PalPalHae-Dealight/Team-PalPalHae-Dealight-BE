@@ -19,13 +19,13 @@ public class ItemJpaRedisRepository {
 		return item;
 	}
 
-	public void save(Item item, int quantity) {
-		itemRedisRepository.update(item, quantity);
-		updateItem(item, quantity);
+	public void save(Item item, int stock) {
+		itemRedisRepository.update(item, stock);
+		updateItem(item, stock);
 	}
 
 	@Async
-	protected void updateItem(Item item, int quantity) {
-		item.updateStock(item.getStock() - quantity);
+	protected void updateItem(Item item, int stock) {
+		item.updateStock(stock);
 	}
 }
