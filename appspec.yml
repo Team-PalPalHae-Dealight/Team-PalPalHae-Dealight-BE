@@ -5,12 +5,15 @@ files:
     destination: /home/ubuntu/app
     overwrite: yes
 
+file_exists_behavior: OVERWRITE
+
 permissions:
   - object: /
     pattern: "**"
     owner: ubuntu
     group: ubuntu
-    
+    mode: 755
+
 hooks:
   BeforeInstall:
     - location: beforeDeploy.sh
