@@ -8,6 +8,8 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -29,9 +31,11 @@ public class ProviderIdAop {
 
 	@Around("@annotation(ProviderId)")
 	public Object getProviderId(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
-		JwtAuthenticationToken authentication = (JwtAuthenticationToken)SecurityContextHolder.getContext()
+		AbstractAuthenticationToken authentication = (AbstractAuthenticationToken)SecurityContextHolder.getContext()
 			.getAuthentication();
-		if (authentication == null) {
+		if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+			log.warn("인증이 필요한 접근입니다. 현재 인증 정보(Principal: {}, Authorities: {})",
+				authentication.getPrincipal(), authentication.getAuthorities());
 			throw new RequiredAuthenticationException(ErrorCode.REQUIRED_AUTHENTICATION);
 		}
 		JwtAuthentication principal = (JwtAuthentication)authentication.getPrincipal();

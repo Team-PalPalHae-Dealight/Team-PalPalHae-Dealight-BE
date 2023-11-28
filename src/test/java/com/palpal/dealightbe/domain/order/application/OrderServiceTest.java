@@ -1,7 +1,10 @@
 package com.palpal.dealightbe.domain.order.application;
 
+import static com.palpal.dealightbe.domain.order.domain.OrderStatus.CANCELED;
+import static com.palpal.dealightbe.domain.order.domain.OrderStatus.COMPLETED;
+import static com.palpal.dealightbe.domain.order.domain.OrderStatus.CONFIRMED;
+import static com.palpal.dealightbe.domain.order.domain.OrderStatus.RECEIVED;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -32,11 +35,9 @@ import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderStatusUpdateReq;
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderRes;
-import com.palpal.dealightbe.domain.order.application.dto.response.OrderStatusUpdateRes;
 import com.palpal.dealightbe.domain.order.application.dto.response.OrdersRes;
 import com.palpal.dealightbe.domain.order.domain.Order;
 import com.palpal.dealightbe.domain.order.domain.OrderRepository;
-import com.palpal.dealightbe.domain.order.domain.OrderStatus;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
@@ -93,9 +94,10 @@ class OrderServiceTest {
 		@Nested
 		@DisplayName("고객")
 		class Member {
+
 			@Test
-			@DisplayName("'주문 확인' 상태에서 주문을 취소 할 수 있다")
-			void member_statusUpdate_ReceivedToCanceled() {
+			@DisplayName("'주문 접수' 상태 에서 주문을 취소 할 수 있다")
+			void member_statusUpdate_RECEIVEDToCanceled() {
 				// given
 				order = createOrder();
 
@@ -105,52 +107,50 @@ class OrderServiceTest {
 				when(orderRepository.findById(anyLong()))
 					.thenReturn(Optional.of(order));
 
-				OrderStatus changedStatus = OrderStatus.CANCELED;
-				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq(changedStatus.name());
+				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq("CANCELED");
 
 				// when
-				OrderStatusUpdateRes orderStatusUpdateRes
-					= orderService.updateStatus(0L, orderStatusUpdateReq, MEMBER_ID);
-
 				// then
-				assertThat(orderStatusUpdateRes.status(), is(equalTo(changedStatus.name())));
-				assertThat(order.getOrderStatus(), is(equalTo(changedStatus)));
+
+				assertThat(order.getOrderStatus(), is(RECEIVED));
+
+				orderService.updateStatus(0L, orderStatusUpdateReq, MEMBER_ID);
+
+				assertThat(order.getOrderStatus(), is(CANCELED));
 			}
 
 			@Test
-			@DisplayName("'주문 접수' 상태 에서 주문을 취소 할 수 있다")
-			void member_statusUpdate_ConfirmedToCanceled() {
+			@DisplayName("'주문 확인' 상태에서 주문을 취소 할 수 있다")
+			void member_statusUpdate_CONFIRMEDToCanceled() {
 				// given
 				order = createOrder();
 
-				when(memberRepository.findMemberByProviderId(MEMBER_ID))
-					.thenReturn(Optional.of(member));
-
 				when(memberRepository.findMemberByProviderId(STORE_OWNER_ID))
 					.thenReturn(Optional.of(storeOwner));
+
+				when(memberRepository.findMemberByProviderId(MEMBER_ID))
+					.thenReturn(Optional.of(member));
 
 				when(orderRepository.findById(anyLong()))
 					.thenReturn(Optional.of(order));
 
 				orderService.updateStatus(0L, new OrderStatusUpdateReq("CONFIRMED"), STORE_OWNER_ID);
 
-				OrderStatus changedStatus = OrderStatus.CANCELED;
-				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq(changedStatus.name());
+				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq("CANCELED");
 
 				// when
 				// then
-				assertThat(order.getOrderStatus(), is(equalTo(OrderStatus.CONFIRMED)));
 
-				OrderStatusUpdateRes orderStatusUpdateRes
-					= orderService.updateStatus(0L, orderStatusUpdateReq, MEMBER_ID);
+				assertThat(order.getOrderStatus(), is(CONFIRMED));
 
-				assertThat(orderStatusUpdateRes.status(), is(equalTo(changedStatus.name())));
-				assertThat(order.getOrderStatus(), is(equalTo(changedStatus)));
+				orderService.updateStatus(0L, orderStatusUpdateReq, MEMBER_ID);
+
+				assertThat(order.getOrderStatus(), is(CANCELED));
 			}
 
 			@Test
-			@DisplayName("'주문 확인' 상태 에서 '주문 접수'로 상태를 변경할 수 없다")
-			void member_statusUpdateFailed_toConfirmed() {
+			@DisplayName("'주문 접수' 상태 에서 '주문 확인'로 상태를 변경할 수 없다")
+			void member_statusUpdateFailed_toRECEIVED() {
 				// given
 				order = createOrder();
 
@@ -159,18 +159,19 @@ class OrderServiceTest {
 				when(memberRepository.findMemberByProviderId(MEMBER_ID))
 					.thenReturn(Optional.of(member));
 
-				OrderStatus changedStatus = OrderStatus.CONFIRMED;
-				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq(changedStatus.name());
-
 				// when
 				// then
+				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq("CONFIRMED");
+
+				assertThat(order.getOrderStatus(), is(RECEIVED));
+
 				assertThrows(BusinessException.class, () -> {
 					orderService.updateStatus(0L, orderStatusUpdateReq, MEMBER_ID);
 				});
 			}
 
 			@Test
-			@DisplayName("'주문 확인' 상태 에서 '주문 완료'로 상태를 변경할 수 없다")
+			@DisplayName("'주문 접수' 상태 에서 '주문 완료'로 상태를 변경할 수 없다")
 			void member_statusUpdateFailed_toCompleted() {
 				// given
 				order = createOrder();
@@ -180,11 +181,12 @@ class OrderServiceTest {
 				when(memberRepository.findMemberByProviderId(MEMBER_ID))
 					.thenReturn(Optional.of(member));
 
-				OrderStatus changedStatus = OrderStatus.COMPLETED;
-				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq(changedStatus.name());
+				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq("COMPLETED");
 
 				// when
 				// then
+				assertThat(order.getOrderStatus(), is(RECEIVED));
+
 				assertThrows(BusinessException.class, () -> {
 					orderService.updateStatus(0L, orderStatusUpdateReq, MEMBER_ID);
 				});
@@ -195,8 +197,8 @@ class OrderServiceTest {
 		@DisplayName("업체")
 		class Store {
 			@Test
-			@DisplayName("'주문 확인'에서 '주문 접수'로 상태를 변경 할 수 있다")
-			void store_statusUpdate_receivedToConfirmed() {
+			@DisplayName("주문을 승인 할 수 있다 : '주문 접수' -> '주문 확인'으로 상태 변경")
+			void store_statusUpdate_CONFIRMEDToRECEIVED() {
 				// given
 				order = createOrder();
 
@@ -206,24 +208,24 @@ class OrderServiceTest {
 				when(orderRepository.findById(anyLong()))
 					.thenReturn(Optional.of(order));
 
-				OrderStatus changedStatus = OrderStatus.CONFIRMED;
-				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq(changedStatus.name());
+				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq("CONFIRMED");
 
 				// when
-				OrderStatusUpdateRes orderStatusUpdateRes
-					= orderService.updateStatus(0L, orderStatusUpdateReq, STORE_OWNER_ID);
-
 				// then
-				assertThat(orderStatusUpdateRes.status(), is(equalTo(changedStatus.name())));
-				assertThat(order.getOrderStatus(), is(equalTo(changedStatus)));
+				assertThat(order.getOrderStatus(), is(RECEIVED));
+
+				orderService.updateStatus(0L, orderStatusUpdateReq, STORE_OWNER_ID);
+
+				assertThat(order.getOrderStatus(), is(CONFIRMED));
 			}
 
 			@Test
-			@DisplayName("'주문 접수'에서 '주문 완료'로 상태를 변경 할 수 있다")
-			void store_statusUpdate_confirmedToCompleted() {
+			@DisplayName("'주문 확인'에서 '주문 완료'로 상태를 변경 할 수 있다")
+			void store_statusUpdate_RECEIVEDToCompleted() {
 				// given
 
 				order = createOrder();
+
 				when(memberRepository.findMemberByProviderId(STORE_OWNER_ID))
 					.thenReturn(Optional.of(storeOwner));
 
@@ -232,47 +234,44 @@ class OrderServiceTest {
 
 				orderService.updateStatus(0L, new OrderStatusUpdateReq("CONFIRMED"), STORE_OWNER_ID);
 
-				OrderStatus changedStatus = OrderStatus.COMPLETED;
-				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq(changedStatus.name());
+				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq("COMPLETED");
 
 				// when
 				// then
-				assertThat(order.getOrderStatus(), is(equalTo(OrderStatus.CONFIRMED)));
+				assertThat(order.getOrderStatus(), is(CONFIRMED));
 
-				OrderStatusUpdateRes orderStatusUpdateRes
-					= orderService.updateStatus(0L, orderStatusUpdateReq, STORE_OWNER_ID);
+				orderService.updateStatus(0L, orderStatusUpdateReq, STORE_OWNER_ID);
 
-				assertThat(orderStatusUpdateRes.status(), is(equalTo(changedStatus.name())));
-				assertThat(order.getOrderStatus(), is(equalTo(changedStatus)));
-			}
-
-			@Test
-			@DisplayName("'주문 확인' 상태에서 주문을 취소할 수 있다")
-			void store_statusUpdate_receivedToCanceled() {
-				// given
-				order = createOrder();
-
-				when(memberRepository.findMemberByProviderId(STORE_OWNER_ID))
-					.thenReturn(Optional.of(storeOwner));
-
-				when(orderRepository.findById(anyLong()))
-					.thenReturn(Optional.of(order));
-
-				OrderStatus changedStatus = OrderStatus.CANCELED;
-				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq(changedStatus.name());
-
-				// when
-				OrderStatusUpdateRes orderStatusUpdateRes
-					= orderService.updateStatus(0L, orderStatusUpdateReq, STORE_OWNER_ID);
-
-				// then
-				assertThat(orderStatusUpdateRes.status(), is(equalTo(changedStatus.name())));
-				assertThat(order.getOrderStatus(), is(equalTo(changedStatus)));
+				assertThat(order.getOrderStatus(), is(COMPLETED));
 			}
 
 			@Test
 			@DisplayName("'주문 접수' 상태에서 주문을 취소할 수 있다")
-			void store_statusUpdate_confirmedToCanceled() {
+			void store_statusUpdate_CONFIRMEDToCanceled() {
+				// given
+				order = createOrder();
+
+				when(memberRepository.findMemberByProviderId(STORE_OWNER_ID))
+					.thenReturn(Optional.of(storeOwner));
+
+				when(orderRepository.findById(anyLong()))
+					.thenReturn(Optional.of(order));
+
+				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq("CANCELED");
+
+				// when
+				// then
+
+				assertThat(order.getOrderStatus(), is(RECEIVED));
+
+				orderService.updateStatus(0L, orderStatusUpdateReq, STORE_OWNER_ID);
+
+				assertThat(order.getOrderStatus(), is(CANCELED));
+			}
+
+			@Test
+			@DisplayName("'주문 확인' 상태에서 주문을 취소할 수 있다")
+			void store_statusUpdate_RECEIVEDToCanceled() {
 				// given
 				order = createOrder();
 
@@ -284,22 +283,19 @@ class OrderServiceTest {
 
 				orderService.updateStatus(0L, new OrderStatusUpdateReq("CONFIRMED"), STORE_OWNER_ID);
 
-				OrderStatus changedStatus = OrderStatus.CANCELED;
-				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq(changedStatus.name());
+				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq("CANCELED");
 
 				// when
 				// then
-				assertThat(order.getOrderStatus(), is(equalTo(OrderStatus.CONFIRMED)));
+				assertThat(order.getOrderStatus(), is(CONFIRMED));
 
-				OrderStatusUpdateRes orderStatusUpdateRes
-					= orderService.updateStatus(0L, orderStatusUpdateReq, STORE_OWNER_ID);
+				orderService.updateStatus(0L, orderStatusUpdateReq, STORE_OWNER_ID);
 
-				assertThat(orderStatusUpdateRes.status(), is(equalTo(changedStatus.name())));
-				assertThat(order.getOrderStatus(), is(equalTo(changedStatus)));
+				assertThat(order.getOrderStatus(), is(CANCELED));
 			}
 
 			@Test
-			@DisplayName("'주문 확인' 상태 에서 주문 접수 없이 바로 '주문 완료'로 상태를 변경할 수 없다")
+			@DisplayName("'주문 접수' 상태 에서 승인 없이 바로 '주문 완료'로 상태를 변경할 수 없다")
 			void store_statusUpdateFailed_miss() {
 				// given
 				order = createOrder();
@@ -309,18 +305,19 @@ class OrderServiceTest {
 				when(memberRepository.findMemberByProviderId(STORE_OWNER_ID))
 					.thenReturn(Optional.of(storeOwner));
 
-				OrderStatus changedStatus = OrderStatus.COMPLETED;
-				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq(changedStatus.name());
+				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq("COMPLETED");
 
 				// when
 				// then
+				assertThat(order.getOrderStatus(), is(RECEIVED));
+
 				assertThrows(BusinessException.class, () -> {
 					orderService.updateStatus(0L, orderStatusUpdateReq, STORE_OWNER_ID);
 				});
 			}
 
 			@Test
-			@DisplayName("'주문 접수' 상태 에서 '주문 확인' 인 이전 상태로 되돌아 갈 수 없다")
+			@DisplayName("'주문 확인' 상태 에서 이전 상태인 '주문 접수'로 되돌아 갈 수 없다")
 			void store_statusUpdateFailed_undo() {
 				// given
 				order = createOrder();
@@ -332,13 +329,12 @@ class OrderServiceTest {
 
 				orderService.updateStatus(0L, new OrderStatusUpdateReq("CONFIRMED"), STORE_OWNER_ID);
 
-				OrderStatus changedStatus = OrderStatus.RECEIVED;
-				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq(changedStatus.name());
+				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq("RECEIVED");
 
 				// when
 				// then
 
-				assertThat(order.getOrderStatus(), is(equalTo(OrderStatus.CONFIRMED)));
+				assertThat(order.getOrderStatus(), is(CONFIRMED));
 
 				assertThrows(BusinessException.class, () -> {
 					orderService.updateStatus(0L, orderStatusUpdateReq, STORE_OWNER_ID);
@@ -359,8 +355,8 @@ class OrderServiceTest {
 				// given
 				long storeId = 1L;
 
-				Order order1 = createOrder(LocalTime.of(18, 30), 30000);
-				Order order2 = createOrder(LocalTime.of(22, 0), 10000);
+				Order order1 = createOrder(LocalTime.of(17, 30), 30000);
+				Order order2 = createOrder(LocalTime.of(17, 0), 10000);
 
 				Slice<Order> ordersSlice = new SliceImpl<>(
 					Arrays.asList(order1, order2), PageRequest.of(0, 10), true
@@ -424,8 +420,8 @@ class OrderServiceTest {
 				// given
 				long memberProviderId = 1L;
 
-				Order order1 = createOrder(LocalTime.of(18, 30), 30000);
-				Order order2 = createOrder(LocalTime.of(22, 0), 10000);
+				Order order1 = createOrder(LocalTime.of(17, 30), 30000);
+				Order order2 = createOrder(LocalTime.of(17, 0), 10000);
 
 				Slice<Order> ordersSlice = new SliceImpl<>(
 					Arrays.asList(order1, order2), PageRequest.of(0, 10), true

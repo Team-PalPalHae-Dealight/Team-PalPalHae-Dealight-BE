@@ -83,8 +83,8 @@ public class Order extends BaseEntity {
 	private static final Set<OrderStatus> UNCHANGEABLE_STATUS = Set.of(COMPLETED, CANCELED);
 
 	private static final Set<Pair<String, String>> orderStatusSequenceOfMember = Set.of(
-		Pair.of("RECEIVED", "CANCELED"),
-		Pair.of("CONFIRMED", "CANCELED")
+		Pair.of("CONFIRMED", "CANCELED"),
+		Pair.of("RECEIVED", "CANCELED")
 	);
 
 	private static final Set<Pair<String, String>> orderStatusSequenceOfStore = Set.of(
@@ -201,7 +201,7 @@ public class Order extends BaseEntity {
 	}
 
 	private void validateDemand(String demand) {
-		if (demand.length() > MAX_DEMAND_LENGTH) {
+		if (demand != null && demand.length() > MAX_DEMAND_LENGTH) {
 			log.warn("POST:WRITE:TOO_LONG_DEMAND:LENGTH {}", demand.length());
 			throw new BusinessException(INVALID_DEMAND_LENGTH);
 		}
@@ -215,7 +215,7 @@ public class Order extends BaseEntity {
 			storeCloseTime = storeCloseTime.plusHours(24);
 		}
 
-		if (arrivalTime.isBefore(storeOpenTime) && arrivalTime.isAfter(storeCloseTime)) {
+		if (arrivalTime.isBefore(storeOpenTime) || arrivalTime.isAfter(storeCloseTime)) {
 			log.warn("POST:WRITE:INVALID_ARRIVAL_TIME:STORE_OPEN {}, STORE_CLOSE {}, ARRIVAL_TIME {}", storeOpenTime,
 				storeCloseTime, arrivalTime);
 			throw new BusinessException(INVALID_ARRIVAL_TIME);

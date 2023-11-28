@@ -17,6 +17,7 @@ public enum ErrorCode {
 	DEFAULT_IMAGE_ALREADY_SET("C003", "기본 이미지로 설정된 이미지는 삭제할 수 없습니다."),
 	INVALID_LIST_SORT_TYPE("C004", "유효하지 않은 정렬 조건입니다."),
 	REQUIRE_QUERY_PARAM("C005", "URL에 추가적인 요청 조건이 필요합니다."),
+	JSON_PARSING_ERROR("C006", "유효하지 않은 JSON 형식입니다."),
 
 	//멤버
 	NOT_FOUND_MEMBER("M001", "고객을 찾을 수 없습니다."),
@@ -61,6 +62,8 @@ public enum ErrorCode {
 	INVALID_ATTEMPT_TO_ADD_OWN_STORE_ITEM_TO_CART("CT004", "본인이 등록한 업체의 상품은 장바구니에 담을 수 없습니다."),
 	EXCEEDED_CART_ITEM_SIZE("CT005", "최대 5가지 종류의 상품까지만 장바구니에 담을 수 있습니다."),
 	INVALID_CART_ADDITION_TYPE("CT006", "유효하지 않은 장바구니 담기 타입 입니다."),
+	ITEM_REMOVED_NO_LONGER_EXISTS_ITEM("CT007", "더 이상 존재하지 않는 상품이 장바구니에서 자동으로 삭제되었습니다."),
+	ITEM_REMOVED_NO_LONGER_EXISTS_STORE("CT008", "더 이상 존재하지 않는 업체의 상품이 장바구니에서 자동으로 삭제되었습니다."),
 
 	//인증, 인가
 	ACCESS_DENIED("AUTH001", "사용자 인증에 실패했습니다."),
@@ -86,9 +89,8 @@ public enum ErrorCode {
 
 	//알림
 	NOT_FOUND_NOTIFICATION("N001", "존재하지 않는 알림입니다."),
-
-	// SSE
-	SSE_STREAM_ERROR("SSE001", "SSE 스트림 연결 중 오류가 발생했습니다."),
+	SSE_STREAM_ERROR("N002", "SSE 스트림 연결 중 오류가 발생했습니다."),
+	INVALID_REDIS_MESSAGE_FORMAT("N003", "Redis 메시지 형식이 유효하지 않습니다."),
 	;
 
 	private final String code;

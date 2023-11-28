@@ -422,8 +422,8 @@ public class OrderControllerTest {
 	class updateStatusTest {
 		String updateStatusApiPath = "/api/orders/{orderId}";
 
-		OrderStatusUpdateRes orderStatusUpdateRes = new OrderStatusUpdateRes(1L, "RECEIVED");
-		OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq("RECEIVED");
+		OrderStatusUpdateRes orderStatusUpdateRes = new OrderStatusUpdateRes(1L, "CONFIRMED");
+		OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq("CONFIRMED");
 
 		@Test
 		@DisplayName("성공 - 주문 상태를 변경한다")
@@ -754,7 +754,7 @@ public class OrderControllerTest {
 						requestParameters(
 							parameterWithName("id").description("업체의 아이디"),
 							parameterWithName("status")
-								.description("주문 목록 중 보고자 하는 주문의 상태 - RECEIVED, CONFIRMED, COMPLETED, CANCELED")
+								.description("주문 목록 중 보고자 하는 주문의 상태 - CONFIRMED, RECEIVED, COMPLETED, CANCELED")
 								.optional(),
 							parameterWithName("page").description("데이터 조회 시작 위치(==offset)").optional(),
 							parameterWithName("size").description("한 번에 조회할 데이터 개수(초기값:10)").optional()
@@ -894,7 +894,7 @@ public class OrderControllerTest {
 						),
 						requestParameters(
 							parameterWithName("status")
-								.description("주문 목록 중 보고자 하는 주문의 상태 - RECEIVED, CONFIRMED, COMPLETED, CANCELED")
+								.description("주문 목록 중 보고자 하는 주문의 상태 - CONFIRMED, RECEIVED, COMPLETED, CANCELED")
 								.optional(),
 							parameterWithName("page").description("데이터 조회 시작 위치(==offset)").optional(),
 							parameterWithName("size").description("한 번에 조회할 데이터 개수(초기값:10)").optional()

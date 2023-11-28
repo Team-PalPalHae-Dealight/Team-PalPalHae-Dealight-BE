@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NotificationUtil {
 
+	private static final String REDIS_CHANNEL_PREFIX = "notification:";
+
 	public static long extractTimestampFromEventId(String eventId) {
 		String[] parts = eventId.split("_");
 		return Long.parseLong(parts[parts.length - 1]);
@@ -23,5 +25,9 @@ public final class NotificationUtil {
 
 	public static String getNotificationId(Long id, RoleType userType) {
 		return userType + "_" + id;
+	}
+
+	public static String getChannelId(Long id, String userType) {
+		return REDIS_CHANNEL_PREFIX + userType + "_" + id;
 	}
 }

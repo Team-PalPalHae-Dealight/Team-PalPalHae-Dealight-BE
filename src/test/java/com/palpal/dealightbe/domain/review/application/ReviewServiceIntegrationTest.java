@@ -108,6 +108,36 @@ class ReviewServiceIntegrationTest {
 					.isEqualTo(reviewCreateReq.messages());
 
 			}
+
+			@DisplayName("고객이 선택한 리뷰에 중복이 있어도 자동으로 제거하여 정상 작동한다.")
+			@Test
+			void createTest_duplicated_reviews() {
+				// given
+				Member member = createMember();
+				Store store = createStore();
+				Order order = createOrder(member, store);
+
+				long orderId = order.getId();
+
+				ReviewCreateReq reviewCreateReq = new ReviewCreateReq(
+					List.of(ReviewContent.Q1.getMessage(), ReviewContent.Q1.getMessage())
+				);
+				long memberProviderId = member.getProviderId();
+
+				order.changeStatus(store.getMember(), "CONFIRMED");
+				order.changeStatus(store.getMember(), "COMPLETED");
+
+				// when
+				// then
+				ReviewCreateRes reviewCreateRes = reviewService.create(orderId, reviewCreateReq,
+					memberProviderId);
+
+				List<Review> allByOrderId = reviewRepository.findAllByOrderId(orderId);
+
+				assertThat(allByOrderId, hasSize(1));
+				assertThat(reviewCreateRes.ids(), hasSize(1));
+				assertThat(allByOrderId.get(0).getContent().getMessage(), is(ReviewContent.Q1.getMessage()));
+			}
 		}
 
 		@Nested
@@ -152,11 +182,10 @@ class ReviewServiceIntegrationTest {
 
 				ReviewCreateReq reviewCreateReq = new ReviewCreateReq(List.of("사장님이 친절해요", "가격이 저렴해요"));
 
-				order.changeStatus(store.getMember(), "CONFIRMED");
-
 				// when
 				// then
 				assertThat(order.getOrderStatus(), is(not(OrderStatus.COMPLETED)));
+
 				assertThrows(
 					BusinessException.class,
 					() ->

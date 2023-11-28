@@ -65,7 +65,7 @@ public class ReviewService {
 			throw new BusinessException(UNAUTHORIZED_REQUEST);
 		}
 
-		List<ReviewStatistics> reviews = reviewRepository.selectStatisticsByStoreId(providerId);
+		List<ReviewStatistics> reviews = reviewRepository.selectStatisticsByStoreId(store.getId());
 
 		return StoreReviewsRes.of(store.getId(), reviews);
 	}
@@ -89,9 +89,9 @@ public class ReviewService {
 	}
 
 	private Store getStoreByProviderId(Long providerId) {
-		return storeRepository.findById(providerId)
+		return storeRepository.findByMemberProviderId(providerId)
 			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_STORE_BY_ID : {}", providerId);
+				log.warn("GET:READ:NOT_FOUND_STORE_BY_OWNER_PROVIDER_ID : {}", providerId);
 				return new EntityNotFoundException(NOT_FOUND_STORE);
 			});
 	}
