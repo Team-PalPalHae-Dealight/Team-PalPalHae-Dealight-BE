@@ -12,9 +12,7 @@ hooks:
   BeforeInstall:
     - location: beforeDeploy.sh
       timeout: 60
-      runas: root
 
   AfterInstall:
     - location: deploy.sh
       timeout: 60
-      runas: root
