@@ -69,6 +69,9 @@ services:
       - node.name=single-node
       - cluster.name=dealight
       - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.transport.ssl.enabled=false
     ports:
       - "9200:9200"
       - "9300:9300"
