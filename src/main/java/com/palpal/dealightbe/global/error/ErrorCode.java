@@ -17,6 +17,7 @@ public enum ErrorCode {
 	DEFAULT_IMAGE_ALREADY_SET("C003", "기본 이미지로 설정된 이미지는 삭제할 수 없습니다."),
 	INVALID_LIST_SORT_TYPE("C004", "유효하지 않은 정렬 조건입니다."),
 	REQUIRE_QUERY_PARAM("C005", "URL에 추가적인 요청 조건이 필요합니다."),
+	JSON_PARSING_ERROR("C006", "유효하지 않은 JSON 형식입니다."),
 
 	//멤버
 	NOT_FOUND_MEMBER("M001", "고객을 찾을 수 없습니다."),
@@ -88,9 +89,8 @@ public enum ErrorCode {
 
 	//알림
 	NOT_FOUND_NOTIFICATION("N001", "존재하지 않는 알림입니다."),
-
-	// SSE
-	SSE_STREAM_ERROR("SSE001", "SSE 스트림 연결 중 오류가 발생했습니다."),
+	SSE_STREAM_ERROR("N002", "SSE 스트림 연결 중 오류가 발생했습니다."),
+	INVALID_REDIS_MESSAGE_FORMAT("N003", "Redis 메시지 형식이 유효하지 않습니다."),
 	;
 
 	private final String code;
