@@ -17,6 +17,7 @@ public record OrderCreateReq(
 	@NotNull(message = "상품을 주문한 업체의 아이디를 입력해 주세요")
 	Long storeId,
 
+	@NotNull(message = "요청 사항을 입력해주세요")
 	String demand,
 
 	@NotNull(message = "도착 예정 시간을 입력해 주세요")

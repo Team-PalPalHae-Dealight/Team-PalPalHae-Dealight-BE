@@ -53,7 +53,7 @@ public class StoreController {
 		return ResponseEntity.ok(infoRes);
 	}
 
-	@GetMapping("/profiles/{storeId}")
+	@GetMapping("/details/{storeId}")
 	public ResponseEntity<StoreInfoRes> getDetails(@PathVariable Long storeId) {
 		StoreInfoRes detailsRes = storeService.getDetails(storeId);
 
@@ -113,7 +113,7 @@ public class StoreController {
 	}
 
 	@ProviderId
-	@GetMapping("/CONFIRMED")
+	@GetMapping("/confirm")
 	public ResponseEntity<StoreByMemberRes> findByProviderId(Long providerId) {
 		StoreByMemberRes storeByMemberRes = storeService.findByProviderId(providerId);
 

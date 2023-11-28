@@ -44,6 +44,7 @@ import com.palpal.dealightbe.domain.member.domain.MemberRoleRepository;
 import com.palpal.dealightbe.domain.member.domain.Role;
 import com.palpal.dealightbe.domain.member.domain.RoleRepository;
 import com.palpal.dealightbe.domain.member.domain.RoleType;
+import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
@@ -58,6 +59,8 @@ class AuthServiceTest {
 	private MemberRoleRepository memberRoleRepository;
 	@Mock
 	private RoleRepository roleRepository;
+	@Mock
+	private StoreRepository storeRepository;
 	@Mock
 	private Jwt jwt;
 
@@ -376,8 +379,8 @@ class AuthServiceTest {
 		verify(memberRepository, times(1))
 			.findMemberByProviderId(providerId);
 	}
-  
-  @DisplayName("닉네임 중복 검사 실패")
+
+	@DisplayName("닉네임 중복 검사 실패")
 	@Test
 	void successNickNameDuplicateCheck() {
 		// given
@@ -388,5 +391,5 @@ class AuthServiceTest {
 		// when -> then
 		assertThatThrownBy(() -> authService.checkDuplicateNickName(request))
 			.isInstanceOf(BusinessException.class);
-  }
+	}
 }

@@ -1,7 +1,7 @@
 package com.palpal.dealightbe.domain.order.application;
 
 import static com.palpal.dealightbe.domain.order.domain.OrderStatus.CANCELED;
-import static com.palpal.dealightbe.domain.order.domain.OrderStatus.CONFIRMED;
+import static com.palpal.dealightbe.domain.order.domain.OrderStatus.RECEIVED;
 import static com.palpal.dealightbe.domain.store.domain.StoreStatus.OPENED;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.member.domain.Member;
@@ -88,7 +89,7 @@ public class OrderServiceIntegrationTest {
 				assertThat(createdOrder.getStore().getId(), is(store.getId()));
 				assertThat(createdOrder.getMember().getId(), is(member.getId()));
 				assertThat(createdOrder.getStore().getName(), is(store.getName()));
-				assertThat(createdOrder.getOrderStatus().getText(), is(CONFIRMED.getText()));
+				assertThat(createdOrder.getOrderStatus().getText(), is(RECEIVED.getText()));
 
 				assertThat(createdOrder.getDemand(), is(orderCreateReq.demand()));
 				assertThat(createdOrder.getArrivalTime(), is(orderCreateReq.arrivalTime()));
@@ -248,8 +249,17 @@ public class OrderServiceIntegrationTest {
 		}
 	}
 
+	private Address createAddress() {
+
+		return Address.builder()
+			.xCoordinate(127.0324773)
+			.yCoordinate(37.5893876)
+			.build();
+	}
+
 	private Store createStore() {
 		Member storeOwner = createMember();
+		Address address = createAddress();
 
 		Store store = Store.builder()
 			.name("GS25")
@@ -258,6 +268,7 @@ public class OrderServiceIntegrationTest {
 			.openTime(LocalTime.of(9, 0))
 			.closeTime(LocalTime.of(18, 0))
 			.dayOff(Set.of(DayOff.SAT, DayOff.SUN))
+			.address(address)
 			.build();
 
 		store.updateMember(storeOwner);

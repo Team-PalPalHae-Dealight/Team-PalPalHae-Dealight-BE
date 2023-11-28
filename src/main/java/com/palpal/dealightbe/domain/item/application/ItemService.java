@@ -42,8 +42,8 @@ public class ItemService {
 		checkDuplicatedItemName(itemReq.itemName(), store.getId());
 
 		String imageUrl = saveImage(imageUploadReq);
-
 		Item item = ItemReq.toItem(itemReq, store, imageUrl);
+		item.updateStore(store);
 		Item savedItem = itemRepository.save(item);
 
 		return ItemRes.from(savedItem);

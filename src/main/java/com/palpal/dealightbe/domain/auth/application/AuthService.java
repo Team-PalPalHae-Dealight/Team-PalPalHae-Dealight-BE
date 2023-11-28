@@ -27,6 +27,7 @@ import com.palpal.dealightbe.domain.member.domain.Role;
 import com.palpal.dealightbe.domain.member.domain.RoleRepository;
 import com.palpal.dealightbe.domain.member.domain.RoleType;
 import com.palpal.dealightbe.domain.notification.application.NotificationService;
+import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
@@ -42,6 +43,7 @@ public class AuthService {
 
 	private static final String MEMBER_DEFAULT_IMAGE_PATH = "https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/image/member-default-image.png";
 	private final MemberRepository memberRepository;
+	private final StoreRepository storeRepository;
 	private final RoleRepository roleRepository;
 	private final NotificationService notificationService;
 	private final MemberRoleRepository memberRoleRepository;
@@ -81,7 +83,6 @@ public class AuthService {
 
 		Member requestMember = MemberSignupAuthReq.toMember(request);
 
-		setDefaultAddress(requestMember);
 		setDefaultImageUrl(requestMember);
 		Member savedMember = memberRepository.save(requestMember);
 
@@ -111,8 +112,7 @@ public class AuthService {
 			log.info("이미지 삭제에 성공했습니다.");
 		}
 
-		log.info("사용자(ProviderId:{})의 정보를 삭제합니다...", providerId);
-		memberRepository.delete(member);
+		deleteMember(providerId, member);
 
 		log.info("회원탈퇴에 성공했습니다.");
 	}
@@ -170,6 +170,11 @@ public class AuthService {
 		return createMemberAuthRes(member, accessToken, refreshToken);
 	}
 
+	public void logout(Long providerId) {
+		log.info("사용자(ProviderId:{})의 로그아웃을 진행합니다...", providerId);
+		notificationService.deleteAll(providerId);
+	}
+
 	private boolean checkRefreshTokenAroundExpiryDate(String refreshToken) {
 		log.info("Refresh Token의 만료일을 체크합니다...");
 
@@ -200,13 +205,6 @@ public class AuthService {
 		String refreshToken = jwt.createRefreshToken(member);
 
 		return createMemberAuthRes(member, accessToken, refreshToken);
-	}
-
-	private void setDefaultAddress(Member newMember) {
-		log.info("새로운 회원에게 기본 위치를 부여합니다...");
-		Address defaultAddress = new Address();
-		newMember.updateAddress(defaultAddress);
-		log.info("기본 위치 지정이 완료됐습니다.");
 	}
 
 	private void setDefaultImageUrl(Member newMember) {
@@ -262,8 +260,11 @@ public class AuthService {
 			});
 	}
 
-	public void logout(Long providerId) {
-		log.info("사용자(ProviderId:{})의 로그아웃을 진행합니다...", providerId);
-		notificationService.deleteAll(providerId);
+	private void deleteMember(Long providerId, Member member) {
+		storeRepository.findByMemberProviderId(providerId)
+			.ifPresentOrElse(storeRepository::delete, () -> {
+				log.info("사용자(ProviderId:{})의 정보를 삭제합니다...", providerId);
+				memberRepository.delete(member);
+			});
 	}
 }

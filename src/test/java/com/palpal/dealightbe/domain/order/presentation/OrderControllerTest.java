@@ -1,6 +1,6 @@
 package com.palpal.dealightbe.domain.order.presentation;
 
-import static com.palpal.dealightbe.domain.order.domain.OrderStatus.CONFIRMED;
+import static com.palpal.dealightbe.domain.order.domain.OrderStatus.RECEIVED;
 import static com.palpal.dealightbe.global.error.ErrorCode.CLOSED_STORE;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ORDER_STATUS;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_STORE;
@@ -104,7 +104,7 @@ public class OrderControllerTest {
 
 		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "member nickName", "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요",
 			LocalTime.of(12, 30),
-			productsRes, 30000, createdAt, CONFIRMED.getText(),
+			productsRes, 30000, createdAt, RECEIVED.getText(),
 			false);
 
 		@Test
@@ -143,7 +143,7 @@ public class OrderControllerTest {
 					jsonPath("$.orderProductsRes.orderProducts[0].originalPrice").value(productRes.originalPrice()))
 				.andExpect(jsonPath("$.orderProductsRes.orderProducts[0].image").value(productRes.image()))
 				.andExpect(jsonPath("$.totalPrice").value(orderCreateReq.totalPrice()))
-				.andExpect(jsonPath("$.status").value(CONFIRMED.getText()))
+				.andExpect(jsonPath("$.status").value(RECEIVED.getText()))
 				.andExpect(jsonPath("$.reviewContains").value(FALSE))
 				.andDo(document("order/order-create-success", preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
@@ -461,7 +461,7 @@ public class OrderControllerTest {
 						),
 						requestFields(
 							fieldWithPath("status").type(STRING)
-								.description("변경 후의 주문 상태(RECEIVED, COMPLETED, CANCELED)")
+								.description("변경 후의 주문 상태(CONFIRMED, COMPLETED, CANCELED)")
 						),
 						responseFields(
 							fieldWithPath("orderId").type(NUMBER).description("상태가 변경된 주문의 아이디"),
@@ -574,7 +574,7 @@ public class OrderControllerTest {
 
 		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "member nickName", "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요",
 			LocalTime.of(12, 30),
-			productsRes, 10000, createdAt, CONFIRMED.getText(), false);
+			productsRes, 10000, createdAt, RECEIVED.getText(), false);
 
 		OrderProductRes productRes = productsRes.orderProducts().get(0);
 
@@ -613,7 +613,7 @@ public class OrderControllerTest {
 				.andExpect(jsonPath("$.orderProductsRes.orderProducts[0].image").value(productRes.image()))
 				.andExpect(jsonPath("$.reviewContains").value(FALSE))
 				.andExpect(jsonPath("$.totalPrice").value(orderCreateReq.totalPrice()))
-				.andExpect(jsonPath("$.status").value(CONFIRMED.getText()))
+				.andExpect(jsonPath("$.status").value(RECEIVED.getText()))
 				.andDo(document("order/order-find-by-id-success", preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
 					pathParameters(
@@ -705,7 +705,7 @@ public class OrderControllerTest {
 
 		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "member nickName", "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요",
 			LocalTime.of(12, 30),
-			productsRes, 10000, createdAt, CONFIRMED.getText(), false);
+			productsRes, 10000, createdAt, RECEIVED.getText(), false);
 
 		OrdersRes ordersRes = new OrdersRes(List.of(orderRes), false);
 
@@ -741,7 +741,7 @@ public class OrderControllerTest {
 					.value(productRes.originalPrice()))
 				.andExpect(jsonPath("$.orders[0].orderProductsRes.orderProducts[0].image").value(productRes.image()))
 				.andExpect(jsonPath("$.orders[0].totalPrice").value(orderRes.totalPrice()))
-				.andExpect(jsonPath("$.orders[0].status").value(CONFIRMED.getText()))
+				.andExpect(jsonPath("$.orders[0].status").value(RECEIVED.getText()))
 				.andExpect(jsonPath("$.orders[0].reviewContains").value(false))
 				.andExpect(jsonPath("$.hasNext").value(false))
 				.andDo(
@@ -847,7 +847,7 @@ public class OrderControllerTest {
 
 		OrderRes orderRes = new OrderRes(1L, 1L, 1L, "member nickName", "GS25", "도착할 때까지 상품 냉장고에 보관 부탁드려요",
 			LocalTime.of(12, 30),
-			productsRes, 10000, createdAt, CONFIRMED.getText(), false);
+			productsRes, 10000, createdAt, RECEIVED.getText(), false);
 
 		OrdersRes ordersRes = new OrdersRes(List.of(orderRes), false);
 
@@ -882,7 +882,7 @@ public class OrderControllerTest {
 					.value(productRes.originalPrice()))
 				.andExpect(jsonPath("$.orders[0].orderProductsRes.orderProducts[0].image").value(productRes.image()))
 				.andExpect(jsonPath("$.orders[0].totalPrice").value(orderRes.totalPrice()))
-				.andExpect(jsonPath("$.orders[0].status").value(CONFIRMED.getText()))
+				.andExpect(jsonPath("$.orders[0].status").value(RECEIVED.getText()))
 				.andExpect(jsonPath("$.orders[0].reviewContains").value(FALSE))
 				.andExpect(jsonPath("$.hasNext").value(false))
 				.andDo(

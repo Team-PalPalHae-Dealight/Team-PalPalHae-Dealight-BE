@@ -1,6 +1,8 @@
 package com.palpal.dealightbe.domain.store.domain;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -14,10 +16,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.palpal.dealightbe.domain.address.domain.Address;
+import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.global.BaseEntity;
 import com.palpal.dealightbe.global.error.ErrorCode;
@@ -70,8 +74,12 @@ public class Store extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private Set<DayOff> dayOffs;
 
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "store")
+	private List<Item> items = new ArrayList<>();
+
 	@Builder
-	public Store(Member member, Address address, String name, String storeNumber, String telephone, LocalTime openTime, LocalTime closeTime, Set<DayOff> dayOff) {
+	public Store(Member member, Address address, String name, String storeNumber, String telephone, LocalTime openTime,
+		LocalTime closeTime, Set<DayOff> dayOff) {
 		validateBusinessTimes(openTime, closeTime);
 		this.member = member;
 		this.address = address;
@@ -122,6 +130,10 @@ public class Store extends BaseEntity {
 
 	public void updateStatus(StoreStatus storeStatus) {
 		this.storeStatus = storeStatus;
+	}
+
+	public void addItem(Item item) {
+		this.items.add(item);
 	}
 
 	private void validateBusinessTimes(LocalTime openTime, LocalTime closeTime) {

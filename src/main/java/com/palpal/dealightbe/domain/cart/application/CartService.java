@@ -5,11 +5,12 @@ import static com.palpal.dealightbe.global.error.ErrorCode.EXCEEDED_CART_ITEM_SI
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ATTEMPT_TO_ADD_OWN_STORE_ITEM_TO_CART;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_CART_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
+import static com.palpal.dealightbe.global.error.ErrorCode.ITEM_REMOVED_NO_LONGER_EXISTS_ITEM;
+import static com.palpal.dealightbe.global.error.ErrorCode.ITEM_REMOVED_NO_LONGER_EXISTS_STORE;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
@@ -27,6 +28,8 @@ import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.store.domain.Store;
+import com.palpal.dealightbe.domain.store.domain.StoreRepository;
+import com.palpal.dealightbe.domain.store.domain.StoreStatus;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
@@ -40,22 +43,23 @@ public class CartService {
 
 	private final CartRepository cartRepository;
 	private final ItemRepository itemRepository;
+	private final StoreRepository storeRepository;
 
 	public CartRes addItem(Long providerId, Long itemId, CartAdditionType cartAdditionType) {
 		Item item = getItem(itemId);
 
 		validateOwnStoreItem(providerId, item);
 
-		List<Cart> carts = cartRepository.findAllByMemberProviderId(providerId);
+		List<Cart> carts = cartRepository.findAllByMemberProviderIdOrderByItemIdAsc(providerId);
 		List<Cart> upToDateCarts = upToDateCarts(carts);
 
 		validateAnotherStoreItemExistence(upToDateCarts, item.getStore().getId(), cartAdditionType);
 
-		return addItem(providerId, itemId, upToDateCarts, cartAdditionType);
+		return addItem(providerId, item, upToDateCarts, cartAdditionType);
 	}
 
 	public CartsRes findAllByProviderId(Long providerId) {
-		List<Cart> carts = cartRepository.findAllByMemberProviderId(providerId);
+		List<Cart> carts = cartRepository.findAllByMemberProviderIdOrderByItemIdAsc(providerId);
 
 		List<Cart> updatedCarts = upToDateCarts(carts);
 
@@ -78,14 +82,15 @@ public class CartService {
 	}
 
 	public void deleteAll(Long providerId) {
-		List<Cart> carts = cartRepository.findAllByMemberProviderId(providerId);
+		List<Cart> carts = cartRepository.findAllByMemberProviderIdOrderByItemIdAsc(providerId);
 
 		cartRepository.deleteAll(carts);
 	}
 
 	private List<Cart> upToDateCarts(List<Cart> carts) {
-		List<Cart> updatedCarts = updateCarts(carts);
-		return getUnexpiredCarts(updatedCarts);
+		List<Cart> unexpiredCarts = getUnexpiredCarts(carts);
+
+		return updateCarts(unexpiredCarts);
 	}
 
 	private List<Cart> updateCartsQuantity(List<Cart> carts, CartsReq cartsReq) {
@@ -104,16 +109,28 @@ public class CartService {
 	}
 
 	private List<Cart> updateCarts(List<Cart> carts) {
-
-		return carts.stream()
+		List<Cart> updatedCarts = carts.stream()
 			.map(this::renewCart)
-			.sorted(Comparator.comparing(Cart::getItemId))
+			.filter(Objects::nonNull)
 			.toList();
+
+		compareCartsSize(carts, updatedCarts);
+
+		return updatedCarts;
+	}
+
+	private void compareCartsSize(List<Cart> carts, List<Cart> updatedCarts) {
+		if (carts.size() != updatedCarts.size()) {
+			log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID_AND_ITEM_REMOVED_NO_LONGER_EXISTS_ITEM : carts.size() = {}, updatedCarts.size() = {}", carts.size(), updatedCarts.size());
+			throw new EntityNotFoundException(ITEM_REMOVED_NO_LONGER_EXISTS_ITEM);
+		}
 	}
 
 	private Cart renewCart(Cart cart) {
-		Long itemId = cart.getItemId();
-		Item item = getItem(itemId);
+		Item item = getExistingItem(cart);
+		if (item == null) {
+			return null;
+		}
 
 		cart.update(item.getName(), item.getStock(), item.getDiscountPrice(), item.getImage(), item.getStore().getCloseTime());
 
@@ -124,18 +141,34 @@ public class CartService {
 		return cartRepository.save(cart);
 	}
 
+	private boolean isUnexpiredCart(Cart cart) {
+		if (cart.isExpired()) {
+			deleteStoreClosedCart(cart);
+
+			return false;
+		}
+
+		return true;
+	}
+
 	private List<Cart> getUnexpiredCarts(List<Cart> carts) {
 
 		return carts.stream()
-			.peek(this::deleteExpiredCart)
-			.filter(cart -> !cart.isExpired())
+			.filter(this::isUnexpiredCart)
 			.toList();
 	}
 
-	private void deleteExpiredCart(Cart cart) {
-		if (cart.isExpired()) {
+	private void deleteStoreClosedCart(Cart cart) {
+		Store store = getStore(cart);
+
+		if (isStoreClosed(store) || cart.isExpired()) {
 			cartRepository.delete(cart);
 		}
+	}
+
+	private boolean isStoreClosed(Store store) {
+
+		return store.getStoreStatus().equals(StoreStatus.CLOSED);
 	}
 
 	private void validateOwnStoreItem(Long providerId, Item item) {
@@ -148,17 +181,17 @@ public class CartService {
 		}
 	}
 
-	private CartRes addItem(Long providerId, Long itemId, List<Cart> carts, CartAdditionType cartAdditionType) {
-		Cart cart = getCartToAddItem(itemId, providerId, carts, cartAdditionType);
+	private CartRes addItem(Long providerId, Item item, List<Cart> carts, CartAdditionType cartAdditionType) {
+		Cart cart = getCartToAddItem(item, providerId, carts, cartAdditionType);
 
 		Cart savedCart = cartRepository.save(cart);
 
 		return CartRes.from(savedCart);
 	}
 
-	private Cart getCartToAddItem(Long itemId, Long providerId, List<Cart> carts, CartAdditionType cartAdditionType) {
+	private Cart getCartToAddItem(Item item, Long providerId, List<Cart> carts, CartAdditionType cartAdditionType) {
 
-		return cartRepository.findByItemIdAndMemberProviderId(itemId, providerId)
+		return cartRepository.findByItemIdAndMemberProviderId(item.getId(), providerId)
 			.map(cart -> {
 				cart.updateQuantity(cart.getQuantity() + 1);
 				return cart;
@@ -166,7 +199,6 @@ public class CartService {
 			.orElseGet(() -> {
 				validateExceedCartItemSize(carts, cartAdditionType);
 
-				Item item = getItem(itemId);
 				return toCart(providerId, item);
 			});
 	}
@@ -210,6 +242,15 @@ public class CartService {
 			});
 	}
 
+	private Item getExistingItem(Cart cart) {
+
+		return itemRepository.findById(cart.getItemId())
+			.orElseGet(() -> {
+				cartRepository.delete(cart);
+				return null;
+			});
+	}
+
 	private List<Cart> getCarts(CartsReq cartsReq, Long providerId) {
 
 		return cartsReq.carts().stream()
@@ -223,6 +264,16 @@ public class CartService {
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_CART_BY_ITEM_ID_AND_PROVIDER_ID : itemId = {}, providerId = {}", itemId, providerId);
 				return new EntityNotFoundException(NOT_FOUND_CART_ITEM);
+			});
+	}
+
+	private Store getStore(Cart cart) {
+		return storeRepository.findById(cart.getStoreId())
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_STORE_BY_ID_AND_ITEM_REMOVED_NO_LONGER_EXISTS_STORE : {}", cart.getStoreId());
+				deleteAll(cart.getMemberProviderId());
+
+				return new EntityNotFoundException(ITEM_REMOVED_NO_LONGER_EXISTS_STORE);
 			});
 	}
 

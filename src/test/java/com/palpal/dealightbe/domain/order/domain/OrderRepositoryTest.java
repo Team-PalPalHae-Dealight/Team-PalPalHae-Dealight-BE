@@ -72,7 +72,7 @@ class OrderRepositoryTest {
 		// given
 		long storeId = store.getId();
 
-		String status = "CONFIRMED";
+		String status = "RECEIVED";
 		Pageable pageable = PageRequest.of(0, 2);
 
 		Order order = createOrder(LocalTime.of(13, 0), 10000);
@@ -102,7 +102,7 @@ class OrderRepositoryTest {
 	void findAllByMemberProviderId() {
 		long memberProviderId = member.getId();
 
-		String status = "CONFIRMED";
+		String status = "RECEIVED";
 		Pageable pageable = PageRequest.of(0, 2);
 
 		Order order = createOrder(LocalTime.of(13, 0), 10000);
