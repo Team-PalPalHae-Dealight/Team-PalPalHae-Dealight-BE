@@ -1,21 +1,15 @@
 {
-  "index": {
-    "max_ngram_diff": 5
-  },
   "analysis": {
     "analyzer": {
-      "korean": {
-        "type": "nori"
-      },
-      "my_ngram_analyzer": {
-        "tokenizer": "my_ngram_tokenizer"
+      "nori": {
+        "type": "custom",
+        "tokenizer": "nori_mixed"
       }
     },
     "tokenizer": {
-      "my_ngram_tokenizer": {
-        "type": "ngram",
-        "min_gram": "2",
-        "max_gram": "5"
+      "nori_mixed": {
+        "type": "nori_tokenizer",
+        "decompound_mode": "mixed"
       }
     }
   }
