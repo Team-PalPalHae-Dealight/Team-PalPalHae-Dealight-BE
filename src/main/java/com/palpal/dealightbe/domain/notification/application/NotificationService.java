@@ -31,8 +31,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.member.domain.RoleType;
+import com.palpal.dealightbe.domain.notification.application.dto.NotificationUserInfo;
 import com.palpal.dealightbe.domain.notification.application.dto.response.NotificationRes;
-import com.palpal.dealightbe.domain.notification.application.dto.response.NotificationUserInfo;
 import com.palpal.dealightbe.domain.notification.application.dto.response.NotificationsRes;
 import com.palpal.dealightbe.domain.notification.domain.EmitterRepository;
 import com.palpal.dealightbe.domain.notification.domain.Notification;
@@ -86,10 +86,6 @@ public class NotificationService {
 
 		final MessageListener messageListener = (message, pattern) -> {
 			final NotificationRes notificationResponse = serialize(message);
-
-			String json = new String(message.getBody(), StandardCharsets.UTF_8);
-			log.info("JSON received: {}", json);
-
 			sendEventToEmitter(emitter, emitterId, notificationResponse.eventId(), notificationResponse);
 		};
 
