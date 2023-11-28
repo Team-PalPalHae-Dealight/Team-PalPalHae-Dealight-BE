@@ -1,216 +1,217 @@
 // queryDSL buildscript
 // reference : https://ittrue.tistory.com/293
 buildscript {
-	ext {
-		queryDslVersion = "5.0.0"
-	}
+    ext {
+        queryDslVersion = "5.0.0"
+    }
 }
 
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '2.7.17'
-	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
-	id 'org.asciidoctor.jvm.convert' version '3.3.2'
-	// queryDSL plugin
-	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
-	// git info
-	id "com.gorylenko.gradle-git-properties" version "2.4.1"
-	// jacoco
-	id 'jacoco'
-	// sonar cloud
-	id 'org.sonarqube' version '4.4.1.3373'
+    id 'java'
+    id 'org.springframework.boot' version '2.7.17'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
+    // queryDSL plugin
+    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+    // git info
+    id "com.gorylenko.gradle-git-properties" version "2.4.1"
+    // jacoco
+    id 'jacoco'
+    // sonar cloud
+    id 'org.sonarqube' version '4.4.1.3373'
 }
 
 group = 'com.palpal'
 version = '0.0.1-SNAPSHOT'
 
 java {
-	sourceCompatibility = '17'
+    sourceCompatibility = '17'
 }
 
 jacoco {
-	toolVersion = "0.8.7"
+    toolVersion = "0.8.7"
 }
 
 configurations {
-	asciidoctorExt
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    asciidoctorExt
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 ext {
-	set('snippetsDir', file("build/generated-snippets"))
+    set('snippetsDir', file("build/generated-snippets"))
 }
 
 
 dependencies {
-	// implementation
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    // implementation
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
-	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
-	// elasticsearch
-	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+    // elasticsearch
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 
 
-	// monitoring tools: actuator, prometheus, grafana
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'io.micrometer:micrometer-registry-prometheus'
+    // monitoring tools: actuator, prometheus, grafana
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 
-	implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
 
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '2.7.0'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '2.7.0'
 
-	// compileOnly
-	compileOnly 'org.projectlombok:lombok'
+    // compileOnly
+    compileOnly 'org.projectlombok:lombok'
 
-	// runtimeOnly
-	runtimeOnly 'com.h2database:h2'
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    // runtimeOnly
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-	// testImplementation
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-	testImplementation 'org.springframework.security:spring-security-test'
-	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    // testImplementation
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation("org.testcontainers:junit-jupiter:1.16.3")
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 
-	// annotationProcessor
-	annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
-	annotationProcessor 'org.projectlombok:lombok'
+    // annotationProcessor
+    annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
+    annotationProcessor 'org.projectlombok:lombok'
 }
 
 test {
-	outputs.dir snippetsDir
-	finalizedBy 'jacocoTestReport'
+    outputs.dir snippetsDir
+    finalizedBy 'jacocoTestReport'
 }
 
 // asciidoctor 빌드 옵션
 tasks.named('test') {
-	outputs.dir snippetsDir
-	useJUnitPlatform()
+    outputs.dir snippetsDir
+    useJUnitPlatform()
 }
 
 tasks.named('asciidoctor') {
-	inputs.dir snippetsDir
-	dependsOn test
+    inputs.dir snippetsDir
+    dependsOn test
 }
 
 asciidoctor {
-	inputs.dir snippetsDir
-	configurations 'asciidoctorExt'
-	dependsOn test
+    inputs.dir snippetsDir
+    configurations 'asciidoctorExt'
+    dependsOn test
 }
 
 bootJar {
-	dependsOn asciidoctor
-	from("${asciidoctor.outputDir}") {
-		into 'static/docs'
-	}
+    dependsOn asciidoctor
+    from("${asciidoctor.outputDir}") {
+        into 'static/docs'
+    }
 }
 
 // queryDSL 빌드 옵션
 def querydslDir = "$buildDir/generated/querydsl"
 
 querydsl {
-	jpa = true
-	querydslSourcesDir = querydslDir
+    jpa = true
+    querydslSourcesDir = querydslDir
 }
 
 sourceSets {
-	main.java.srcDir querydslDir
+    main.java.srcDir querydslDir
 }
 
 configurations {
-	querydsl.extendsFrom compileClasspath
+    querydsl.extendsFrom compileClasspath
 }
 
 compileQuerydsl {
-	options.annotationProcessorPath = configurations.querydsl
+    options.annotationProcessorPath = configurations.querydsl
 }
 
 // prometheus 설정
 springBoot {
-	buildInfo()
+    buildInfo()
 }
 
 // jacoco 빌드 옵션
 jacocoTestReport {
-	reports {
-		xml.required = true
-		csv.required = true
-		html.required = true
+    reports {
+        xml.required = true
+        csv.required = true
+        html.required = true
 
-		xml.destination file("${buildDir}/jacoco/index.xml")
-		csv.destination file("${buildDir}/jacoco/index.csv")
-		html.destination file("${buildDir}/jacoco/index.html")
-	}
+        xml.destination file("${buildDir}/jacoco/index.xml")
+        csv.destination file("${buildDir}/jacoco/index.csv")
+        html.destination file("${buildDir}/jacoco/index.html")
+    }
 
-	def Qdomains = []
-	for (qPattern in "**/QA".."**/QZ") {
-		Qdomains.add(qPattern + "*")
-	}
+    def Qdomains = []
+    for (qPattern in "**/QA".."**/QZ") {
+        Qdomains.add(qPattern + "*")
+    }
 
-	afterEvaluate {
-		classDirectories.setFrom(
-			files(classDirectories.files.collect {
-				fileTree(dir: it, excludes: [
-					'**/*Application*',
-					'**/*Exception*',
-					'**/dto/**'
-				] + Qdomains)
-			})
-		)
-	}
+    afterEvaluate {
+        classDirectories.setFrom(
+                files(classDirectories.files.collect {
+                    fileTree(dir: it, excludes: [
+                            '**/*Application*',
+                            '**/*Exception*',
+                            '**/dto/**'
+                    ] + Qdomains)
+                })
+        )
+    }
 
-	finalizedBy 'jacocoTestCoverageVerification'
+    finalizedBy 'jacocoTestCoverageVerification'
 }
 
 jacocoTestCoverageVerification {
-	def Qdomains = []
-	for (qPattern in '*.QA'..'*.QZ') {
-		Qdomains.add(qPattern + '*')
-	}
+    def Qdomains = []
+    for (qPattern in '*.QA'..'*.QZ') {
+        Qdomains.add(qPattern + '*')
+    }
 
-	violationRules {
-		rule {
-			enabled = true
-			element = 'CLASS'
+    violationRules {
+        rule {
+            enabled = true
+            element = 'CLASS'
 
-			limit {
-				counter = 'LINE'
-				value = 'COVEREDRATIO'
-				minimum = 0.0
-			}
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.0
+            }
 
-			excludes = [
-				'*.*Application',
-				'*.*Exception',
-				'*.dto.*'
-			] + Qdomains
-		}
-	}
+            excludes = [
+                    '*.*Application',
+                    '*.*Exception',
+                    '*.dto.*'
+            ] + Qdomains
+        }
+    }
 }
 // sonar cloud 빌드 옵션
 sonar {
-	properties {
-		property "sonar.projectKey", "Team-PalPalHae-Dealight_Team-PalPalHae-Dealight-BE"
-		property "sonar.organization", "dealight-be"
-		property "sonar.host.url", "https://sonarcloud.io"
-		property 'sonar.coverage.jacoco.xmlReportPaths', 'build/jacoco/index.xml'
-	}
+    properties {
+        property "sonar.projectKey", "Team-PalPalHae-Dealight_Team-PalPalHae-Dealight-BE"
+        property "sonar.organization", "dealight-be"
+        property "sonar.host.url", "https://sonarcloud.io"
+        property 'sonar.coverage.jacoco.xmlReportPaths', 'build/jacoco/index.xml'
+    }
 }
