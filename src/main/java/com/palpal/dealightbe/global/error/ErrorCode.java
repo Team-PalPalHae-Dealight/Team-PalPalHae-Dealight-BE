@@ -31,6 +31,7 @@ public enum ErrorCode {
 	NOT_FOUND_STATUS("ST005", "존재하지 않는 영업 상태 입니다."),
 	CLOSED_STORE("ST006", "영업이 종료된 업체입니다."),
 	ALREADY_HAS_STORE("ST007", "이미 업체를 보유하고 있습니다"),
+	UPDATABLE_STORE_NOT_EXIST("ST008", "업데이트 가능한 업체가 없습니다."),
 
 	//상품
 	INVALID_ITEM_DISCOUNT_PRICE("I001", "상품 할인가는 원가보다 클 수 없습니다."),

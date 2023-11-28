@@ -137,4 +137,25 @@ public class StoreController {
 		return ResponseEntity.ok(storeResponse);
 	}
 
+	@PostMapping("/es")
+	public ResponseEntity<Void> uploadToES() {
+		storeService.uploadToES();
+		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/searchES")
+	public ResponseEntity<StoresInfoSliceRes> searchByES(
+		@RequestParam("x-coordinate") double xCoordinate, @RequestParam("y-coordinate") double yCoordinate,
+		@RequestParam String keyword,
+		@RequestParam(required = false, defaultValue = "0") int page,
+		@RequestParam(required = false, defaultValue = DEFAULT_PAGING_SIZE) int size) {
+
+		page = Math.max(page - 1, 0);
+		PageRequest pageable = PageRequest.of(page, size);
+
+		StoresInfoSliceRes storeResponse = storeService.searchToES(xCoordinate, yCoordinate, keyword, pageable);
+
+		return ResponseEntity.ok(storeResponse);
+	}
+
 }
