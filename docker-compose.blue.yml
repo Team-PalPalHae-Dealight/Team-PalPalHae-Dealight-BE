@@ -6,7 +6,7 @@ services:
     container_name: dealight-blue-container
     build:
       context: ./
-      dockerfile: Dockerfile
+      dockerfile: dealight.Dockerfile
     ports:
       - "8080:8080"
     volumes:
