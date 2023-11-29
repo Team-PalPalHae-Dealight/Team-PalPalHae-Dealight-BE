@@ -2,7 +2,7 @@ package com.palpal.dealightbe.domain.order.domain;
 
 import static com.palpal.dealightbe.domain.order.domain.OrderStatus.CANCELED;
 import static com.palpal.dealightbe.domain.order.domain.OrderStatus.COMPLETED;
-import static com.palpal.dealightbe.domain.order.domain.OrderStatus.CONFIRMED;
+import static com.palpal.dealightbe.domain.order.domain.OrderStatus.RECEIVED;
 import static com.palpal.dealightbe.global.error.ErrorCode.ALREADY_EXIST_REVIEW;
 import static com.palpal.dealightbe.global.error.ErrorCode.EXCEEDED_ORDER_ITEMS;
 import static com.palpal.dealightbe.global.error.ErrorCode.ILLEGAL_REVIEW_REQUEST;
@@ -66,7 +66,7 @@ public class Order extends BaseEntity {
 	private List<OrderItem> orderItems = new ArrayList<>();
 
 	@Enumerated(EnumType.STRING)
-	private OrderStatus orderStatus = CONFIRMED;
+	private OrderStatus orderStatus = RECEIVED;
 
 	private LocalTime arrivalTime;
 
@@ -88,10 +88,10 @@ public class Order extends BaseEntity {
 	);
 
 	private static final Set<Pair<String, String>> orderStatusSequenceOfStore = Set.of(
-		Pair.of("CONFIRMED", "RECEIVED"),
-		Pair.of("CONFIRMED", "CANCELED"),
-		Pair.of("RECEIVED", "COMPLETED"),
-		Pair.of("RECEIVED", "CANCELED")
+		Pair.of("RECEIVED", "CONFIRMED"),
+		Pair.of("RECEIVED", "CANCELED"),
+		Pair.of("CONFIRMED", "COMPLETED"),
+		Pair.of("CONFIRMED", "CANCELED")
 	);
 
 	@Builder
@@ -216,7 +216,7 @@ public class Order extends BaseEntity {
 	}
 
 	private void validateDemand(String demand) {
-		if (demand.length() > MAX_DEMAND_LENGTH) {
+		if (demand != null && demand.length() > MAX_DEMAND_LENGTH) {
 			log.warn("POST:WRITE:TOO_LONG_DEMAND:LENGTH {}", demand.length());
 			throw new BusinessException(INVALID_DEMAND_LENGTH);
 		}
@@ -252,5 +252,16 @@ public class Order extends BaseEntity {
 			log.warn("PATCH:UPDATE:ORDER:CANNOT_CHANGE_STATUS(STORE):{} -> {}", originalStatus, changedStatus);
 			throw new BusinessException(INVALID_ORDER_STATUS);
 		}
+	}
+
+	private void cancel() {
+		getOrderItems().forEach(
+			item -> {
+				int originalStock = item.getItem().getStock();
+				int newStock = originalStock + item.getQuantity();
+
+				item.getItem().updateStock(newStock);
+			}
+		);
 	}
 }

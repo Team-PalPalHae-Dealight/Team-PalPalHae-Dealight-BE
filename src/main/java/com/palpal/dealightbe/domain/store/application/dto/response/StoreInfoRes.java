@@ -14,6 +14,8 @@ public record StoreInfoRes(
 	String name,
 	String telephone,
 	String addressName,
+	double xCoordinate,
+	double yCoordinate,
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
 	LocalTime openTime,
@@ -32,7 +34,8 @@ public record StoreInfoRes(
 			.collect(Collectors.toSet());
 
 		return new StoreInfoRes(
-			store.getStoreNumber(), store.getName(), store.getTelephone(), store.getAddress().getName(),
+			store.getStoreNumber(), store.getName(), store.getTelephone(),
+			store.getAddress().getName(), store.getAddress().getXCoordinate(), store.getAddress().getYCoordinate(),
 			store.getOpenTime(), store.getCloseTime(), dayOffNames, store.getStoreStatus(), store.getImage());
 	}
 }

@@ -1,6 +1,7 @@
 package com.palpal.dealightbe.domain.item.domain;
 
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_DISCOUNT_PRICE;
+import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_QUANTITY;
 import static com.palpal.dealightbe.global.error.ErrorCode.STORE_HAS_NO_ITEM;
 
 import javax.persistence.Column;
@@ -85,6 +86,11 @@ public class Item extends BaseEntity {
 			log.warn("STORE_HAS_NO_ITEM : itemId = {}, storeId = {}", this.getId(), store.getId());
 			throw new BusinessException(STORE_HAS_NO_ITEM);
 		}
+	}
+
+	public void updateStore(Store store) {
+		this.store = store;
+		store.addItem(this);
 	}
 
 	private void validateDiscountPrice(int discountPrice, int originalPrice) {

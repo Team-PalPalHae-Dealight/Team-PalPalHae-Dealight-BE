@@ -317,7 +317,7 @@ class StoreControllerTest {
 		//given
 		LocalTime openTime = LocalTime.of(9, 0);
 		LocalTime closeTime = LocalTime.of(23, 0);
-		StoreInfoRes storeInfoRes = new StoreInfoRes("123123213", "피나치공", "02123456", "서울시 강남구", openTime, closeTime,
+		StoreInfoRes storeInfoRes = new StoreInfoRes("123123213", "피나치공", "02123456", "서울시 강남구", 127.0028245, 37.5805009, openTime, closeTime,
 			dayOffs, StoreStatus.OPENED, null);
 
 		given(storeService.getInfo(any()))
@@ -341,6 +341,8 @@ class StoreControllerTest {
 					fieldWithPath("name").description("상호명"),
 					fieldWithPath("telephone").description("업체 전화번호"),
 					fieldWithPath("addressName").description("업체 주소"),
+					fieldWithPath("xCoordinate").description("경도"),
+					fieldWithPath("yCoordinate").description("위도"),
 					fieldWithPath("openTime").description("오픈 시간"),
 					fieldWithPath("closeTime").description("마감 시간"),
 					fieldWithPath("dayOff").description("휴무일"),
@@ -361,7 +363,7 @@ class StoreControllerTest {
 		Long storeId = 1L;
 		LocalTime openTime = LocalTime.of(9, 0);
 		LocalTime closeTime = LocalTime.of(23, 0);
-		StoreInfoRes storeInfoRes = new StoreInfoRes("123123213", "피나치공", "02123456", "서울시 강남구", openTime, closeTime,
+		StoreInfoRes storeInfoRes = new StoreInfoRes("123123213", "피나치공", "02123456", "서울시 강남구", 127.0028245, 37.5805009, openTime, closeTime,
 			dayOffs, StoreStatus.OPENED, null);
 
 		given(storeService.getDetails(any()))
@@ -369,7 +371,7 @@ class StoreControllerTest {
 
 		//when -> then
 		mockMvc.perform(
-				RestDocumentationRequestBuilders.get("/api/stores/profiles/{storeId}", storeId)
+				RestDocumentationRequestBuilders.get("/api/stores/details/{storeId}", storeId)
 					.contentType(APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andDo(print())
@@ -384,6 +386,8 @@ class StoreControllerTest {
 					fieldWithPath("name").description("상호명"),
 					fieldWithPath("telephone").description("업체 전화번호"),
 					fieldWithPath("addressName").description("업체 주소"),
+					fieldWithPath("xCoordinate").description("경도"),
+					fieldWithPath("yCoordinate").description("위도"),
 					fieldWithPath("openTime").description("오픈 시간"),
 					fieldWithPath("closeTime").description("마감 시간"),
 					fieldWithPath("dayOff").description("휴무일"),
@@ -438,7 +442,7 @@ class StoreControllerTest {
 
 		StoreUpdateReq updateReq = new StoreUpdateReq("888222111", "부산시", 777.777, 123.123234, openTime, closeTime,
 			Set.of(DayOff.TUE));
-		StoreInfoRes storeInfoRes = new StoreInfoRes("888222111", "맛짱조개", "01066772291", "부산시", openTime, closeTime,
+		StoreInfoRes storeInfoRes = new StoreInfoRes("888222111", "맛짱조개", "01066772291", "부산시", 127.0028245, 37.5805009, openTime, closeTime,
 			dayOffs, StoreStatus.OPENED, null);
 
 		given(storeService.updateInfo(any(), eq(storeId), eq(updateReq)))
@@ -466,6 +470,8 @@ class StoreControllerTest {
 					fieldWithPath("name").description("상호명"),
 					fieldWithPath("telephone").description("업체 전화번호"),
 					fieldWithPath("addressName").description("업체 주소"),
+					fieldWithPath("xCoordinate").description("경도"),
+					fieldWithPath("yCoordinate").description("위도"),
 					fieldWithPath("openTime").description("오픈 시간"),
 					fieldWithPath("closeTime").description("마감 시간"),
 					fieldWithPath("dayOff").description("휴무일"),
@@ -663,7 +669,7 @@ class StoreControllerTest {
 			.willReturn(storeByMemberRes);
 
 		//when -> then
-		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/stores/CONFIRMED")
+		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/stores/confirm")
 				.header("Authorization", "Bearer {ACCESS_TOKEN}"))
 			.andExpect(status().isOk())
 			.andDo(print())
@@ -690,7 +696,7 @@ class StoreControllerTest {
 
 		//when -> then
 		mockMvc.perform(
-				RestDocumentationRequestBuilders.get("/api/stores/CONFIRMED")
+				RestDocumentationRequestBuilders.get("/api/stores/confirm")
 					.header("Authorization", "Bearer {ACCESS_TOKEN}"))
 			.andExpect(status().isNotFound())
 			.andDo(print())

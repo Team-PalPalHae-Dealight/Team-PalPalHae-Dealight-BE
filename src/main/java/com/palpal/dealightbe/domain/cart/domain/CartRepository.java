@@ -7,7 +7,7 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface CartRepository extends CrudRepository<Cart, String> {
 
-	List<Cart> findAllByMemberProviderId(Long providerId);
+	List<Cart> findAllByMemberProviderIdOrderByItemIdAsc(Long providerId);
 
 	Optional<Cart> findByItemIdAndMemberProviderId(Long itemId, Long providerId);
 }

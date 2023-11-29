@@ -15,7 +15,6 @@ import com.palpal.dealightbe.domain.item.application.dto.request.ItemReq;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemsRes;
 import com.palpal.dealightbe.domain.item.domain.Item;
-import com.palpal.dealightbe.domain.item.domain.ItemJpaRedisRepository;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
@@ -36,7 +35,6 @@ public class ItemService {
 	private final ItemRepository itemRepository;
 	private final StoreRepository storeRepository;
 	private final ImageService imageService;
-	private final ItemJpaRedisRepository itemJpaRedisRepository;
 
 	public ItemRes create(ItemReq itemReq, Long providerId, ImageUploadReq imageUploadReq) {
 		Store store = getStore(providerId);
@@ -46,7 +44,8 @@ public class ItemService {
 		String imageUrl = saveImage(imageUploadReq);
 
 		Item item = ItemReq.toItem(itemReq, store, imageUrl);
-		Item savedItem = itemJpaRedisRepository.save(item);
+		item.updateStore(store);
+		Item savedItem = itemRepository.save(item);
 
 		return ItemRes.from(savedItem);
 	}

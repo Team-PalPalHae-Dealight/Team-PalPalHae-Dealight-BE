@@ -17,6 +17,7 @@ public record OrderRes(
 	String demand,
 	@JsonFormat(shape = STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
 	LocalTime arrivalTime,
+
 	OrderProductsRes orderProductsRes,
 	int totalPrice,
 

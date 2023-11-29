@@ -2,6 +2,7 @@ package com.palpal.dealightbe.domain.order.application;
 
 import static com.palpal.dealightbe.domain.store.domain.StoreStatus.CLOSED;
 import static com.palpal.dealightbe.global.error.ErrorCode.CLOSED_STORE;
+import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_QUANTITY;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_MEMBER;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ORDER;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.palpal.dealightbe.domain.item.domain.Item;
-import com.palpal.dealightbe.domain.item.domain.ItemJpaRedisRepository;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
@@ -30,6 +30,7 @@ import com.palpal.dealightbe.domain.order.domain.Order;
 import com.palpal.dealightbe.domain.order.domain.OrderItem;
 import com.palpal.dealightbe.domain.order.domain.OrderItemRepository;
 import com.palpal.dealightbe.domain.order.domain.OrderRepository;
+import com.palpal.dealightbe.domain.order.domain.OrderStatus;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
@@ -48,7 +49,6 @@ public class OrderService {
 	private final MemberRepository memberRepository;
 	private final StoreRepository storeRepository;
 	private final ItemRepository itemRepository;
-	private final ItemJpaRedisRepository itemJpaRedisRepository;
 	private final OrderItemRepository orderItemRepository;
 	// private final NotificationService notificationService;
 
@@ -64,8 +64,8 @@ public class OrderService {
 
 		order.addOrderItems(orderItems);
 		orderItemRepository.saveAll(orderItems);
-		return OrderRes.from(order);
 
+		return OrderRes.from(order);
 	}
 
 	private Store getStore(Long storeId) {
@@ -89,6 +89,7 @@ public class OrderService {
 
 		String changedStatus = request.status();
 		order.changeStatus(member, changedStatus);
+
 		// notificationService.send(member, store, order, OrderStatus.valueOf(changedStatus));
 
 		return OrderStatusUpdateRes.from(order);
@@ -152,30 +153,33 @@ public class OrderService {
 			});
 	}
 
-	public List<OrderItem> createOrderItems(Order order, List<OrderProductReq> orderProductsReq) {
+	private List<OrderItem> createOrderItems(Order order, List<OrderProductReq> orderProductsReq) {
 		return orderProductsReq.stream()
-			.sorted()
 			.map(productReq -> createOrderItem(order, productReq))
 			.toList();
 	}
 
-	public OrderItem createOrderItem(Order order, OrderProductReq request) {
+	private OrderItem createOrderItem(Order order, OrderProductReq request) {
+		long itemId = request.itemId();
+		int quantity = request.quantity();
 
-		Item item = itemRepository.findById(request.itemId())
+		int orderedCount = itemRepository.updateStock(itemId, quantity);
+
+		if (orderedCount == 0) {
+			throw new BusinessException(INVALID_ITEM_QUANTITY);
+		}
+
+		Item item = itemRepository.findById(itemId)
 			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", request.itemId());
+				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", itemId);
 
 				return new EntityNotFoundException(NOT_FOUND_ITEM);
 			});
 
-		int newStock = item.getStock() - request.quantity();
-		itemJpaRedisRepository.save(item, newStock);
-
 		return OrderItem.builder()
 			.item(item)
 			.order(order)
-			.quantity(request.quantity())
+			.quantity(quantity)
 			.build();
-
 	}
 }

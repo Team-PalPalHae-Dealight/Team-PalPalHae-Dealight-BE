@@ -17,6 +17,7 @@ public record ReviewCreateReq(
 
 	public static List<Review> toReviews(ReviewCreateReq request, Order order) {
 		return request.messages.stream()
+			.distinct()
 			.map(message ->
 				Review.builder()
 					.order(order)
