@@ -236,7 +236,8 @@ public class Order extends BaseEntity {
 		}
 
 		if (isInvalidArrivalTime) {
-			log.warn("POST:WRITE:INVALID_ARRIVAL_TIME:STORE_OPEN {}, STORE_CLOSE {}, ARRIVAL_TIME {}", storeOpenTime,
+			log.warn("POST:WRITE:INVALID_ARRIVAL_TIME:STORE_OPEN {}, STORE_CLOSE {}, ARRIVAL_TIME {}",
+				storeOpenTime, storeCloseTime, arrivalTime);
 
 			throw new BusinessException(INVALID_ARRIVAL_TIME);
 		}
