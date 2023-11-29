@@ -58,6 +58,7 @@ public class CartService {
 		return addItem(providerId, item, upToDateCarts, cartAdditionType);
 	}
 
+	@Transactional(readOnly = true)
 	public CartsRes findAllByProviderId(Long providerId) {
 		List<Cart> carts = cartRepository.findAllByMemberProviderIdOrderByItemIdAsc(providerId);
 
