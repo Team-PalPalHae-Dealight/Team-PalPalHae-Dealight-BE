@@ -30,7 +30,6 @@ import com.palpal.dealightbe.domain.order.domain.Order;
 import com.palpal.dealightbe.domain.order.domain.OrderItem;
 import com.palpal.dealightbe.domain.order.domain.OrderItemRepository;
 import com.palpal.dealightbe.domain.order.domain.OrderRepository;
-import com.palpal.dealightbe.domain.order.domain.OrderStatus;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
@@ -66,20 +65,6 @@ public class OrderService {
 		orderItemRepository.saveAll(orderItems);
 
 		return OrderRes.from(order);
-	}
-
-	private Store getStore(Long storeId) {
-		Store store = storeRepository.findById(storeId)
-			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_STORE_BY_ID : {}", storeId);
-				return new EntityNotFoundException(NOT_FOUND_STORE);
-			});
-
-		if (store.getStoreStatus().equals(CLOSED)) {
-			throw new BusinessException(CLOSED_STORE);
-		}
-
-		return store;
 	}
 
 	public OrderStatusUpdateRes updateStatus(Long orderId, OrderStatusUpdateReq request, Long memberProviderId) {
@@ -135,6 +120,20 @@ public class OrderService {
 		return OrdersRes.from(orders);
 	}
 
+	private Store getStore(Long storeId) {
+		Store store = storeRepository.findById(storeId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_STORE_BY_ID : {}", storeId);
+				return new EntityNotFoundException(NOT_FOUND_STORE);
+			});
+
+		if (store.getStoreStatus().equals(CLOSED)) {
+			throw new BusinessException(CLOSED_STORE);
+		}
+
+		return store;
+	}
+
 	private Order getOrder(Long orderId) {
 		return orderRepository.findById(orderId)
 			.orElseThrow(() -> {
@@ -176,10 +175,7 @@ public class OrderService {
 				return new EntityNotFoundException(NOT_FOUND_ITEM);
 			});
 
-		return OrderItem.builder()
-			.item(item)
-			.order(order)
-			.quantity(quantity)
-			.build();
+		return OrderProductReq.toOrderItem(item, order, request);
+
 	}
 }
