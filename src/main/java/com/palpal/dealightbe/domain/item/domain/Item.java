@@ -1,8 +1,8 @@
 package com.palpal.dealightbe.domain.item.domain;
 
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_DISCOUNT_PRICE;
-import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_QUANTITY;
 import static com.palpal.dealightbe.global.error.ErrorCode.STORE_HAS_NO_ITEM;
+import static java.lang.Boolean.FALSE;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -58,10 +58,11 @@ public class Item extends BaseEntity {
 	@JoinColumn(name = "store_id")
 	private Store store;
 
-	private boolean isDeleted = Boolean.FALSE;
+	private boolean isDeleted = FALSE;
 
 	@Builder
-	public Item(String name, int stock, int discountPrice, int originalPrice, String description, String image, Store store) {
+	public Item(String name, int stock, int discountPrice, int originalPrice, String description, String image,
+		Store store) {
 		validateDiscountPrice(discountPrice, originalPrice);
 
 		this.name = name;
