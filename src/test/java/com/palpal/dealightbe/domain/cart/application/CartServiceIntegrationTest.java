@@ -11,12 +11,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.palpal.dealightbe.config.RedisTestContainerConfig;
+import com.palpal.dealightbe.config.RedisConfig;
 import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.address.domain.AddressRepository;
 import com.palpal.dealightbe.domain.cart.application.dto.request.CartReq;
@@ -35,7 +35,8 @@ import com.palpal.dealightbe.domain.store.domain.StoreStatus;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
-@ExtendWith(RedisTestContainerConfig.class)
+@Import(RedisConfig.class)
+//@ExtendWith(RedisTestContainerConfig.class)
 @Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CartServiceIntegrationTest {
