@@ -164,7 +164,7 @@ public class OrderService {
 			throw new BusinessException(INVALID_ITEM_QUANTITY);
 		}
 
-		Item item = itemRepository.findById(itemId)
+		Item item = itemRepository.findByIdIgnoringStatus(itemId)
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", itemId);
 

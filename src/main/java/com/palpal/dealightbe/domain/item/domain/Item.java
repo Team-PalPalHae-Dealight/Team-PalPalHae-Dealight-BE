@@ -1,8 +1,8 @@
 package com.palpal.dealightbe.domain.item.domain;
 
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_DISCOUNT_PRICE;
-import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_QUANTITY;
 import static com.palpal.dealightbe.global.error.ErrorCode.STORE_HAS_NO_ITEM;
+import static java.lang.Boolean.FALSE;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,6 +13,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.global.BaseEntity;
@@ -29,6 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 @Entity
 @Table(name = "items")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Where(clause = "is_deleted = false")
+@SQLDelete(sql = "UPDATE items SET is_deleted = true WHERE id = ?")
 public class Item extends BaseEntity {
 
 	@Id
@@ -53,8 +58,11 @@ public class Item extends BaseEntity {
 	@JoinColumn(name = "store_id")
 	private Store store;
 
+	private boolean isDeleted = FALSE;
+
 	@Builder
-	public Item(String name, int stock, int discountPrice, int originalPrice, String description, String image, Store store) {
+	public Item(String name, int stock, int discountPrice, int originalPrice, String description, String image,
+		Store store) {
 		validateDiscountPrice(discountPrice, originalPrice);
 
 		this.name = name;
@@ -97,7 +105,7 @@ public class Item extends BaseEntity {
 		if (discountPrice >= originalPrice) {
 			log.warn("INVALID_ITEM_DISCOUNT_PRICE : discount price = {}, original price = {}", discountPrice,
 				originalPrice);
-      
+
 			throw new BusinessException(INVALID_ITEM_DISCOUNT_PRICE);
 		}
 	}

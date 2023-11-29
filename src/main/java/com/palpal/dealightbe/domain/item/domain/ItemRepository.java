@@ -18,6 +18,15 @@ public interface ItemRepository extends JpaRepository<Item, Long>, ItemRepositor
 	@Query("SELECT i FROM Item i JOIN FETCH i.store s JOIN FETCH s.address WHERE i.id = :id")
 	Optional<Item> findById(@Param("id") Long id);
 
+	@Query(value = """
+		SELECT i.*, s.*, a.*\s
+		FROM items i
+		INNER JOIN stores s ON i.store_id = s.id
+		INNER JOIN addresses a ON s.address_id = a.id\s
+			WHERE i.id = :id
+		""", nativeQuery = true)
+	Optional<Item> findByIdIgnoringStatus(@Param("id") Long id);
+
 	@Modifying(clearAutomatically = true, flushAutomatically = true)
 	@Query("UPDATE Item i SET i.stock = i.stock - :quantity WHERE i.id = :itemId AND i.stock > 0 AND i.stock >= :quantity")
 	int updateStock(Long itemId, int quantity);
