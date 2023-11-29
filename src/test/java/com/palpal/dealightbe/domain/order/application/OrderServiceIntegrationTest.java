@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.palpal.dealightbe.config.ElasticTestContainer;
+import com.palpal.dealightbe.config.RedisConfig;
 import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
@@ -43,7 +44,7 @@ import com.palpal.dealightbe.global.error.exception.BusinessException;
 
 @SpringBootTest
 @Transactional
-@Import(ElasticTestContainer.class)
+@Import({ElasticTestContainer.class, RedisConfig.class})
 public class OrderServiceIntegrationTest {
 
 	@Autowired
