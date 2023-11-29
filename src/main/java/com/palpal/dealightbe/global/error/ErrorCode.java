@@ -64,6 +64,7 @@ public enum ErrorCode {
 	INVALID_CART_ADDITION_TYPE("CT006", "유효하지 않은 장바구니 담기 타입 입니다."),
 	ITEM_REMOVED_NO_LONGER_EXISTS_ITEM("CT007", "더 이상 존재하지 않는 상품이 장바구니에서 자동으로 삭제되었습니다."),
 	ITEM_REMOVED_NO_LONGER_EXISTS_STORE("CT008", "더 이상 존재하지 않는 업체의 상품이 장바구니에서 자동으로 삭제되었습니다."),
+	INVALID_ADD_ITEM_IN_CART_ITEM_STOCK_ZERO("CT009", "재고가 0개인 상품은 담을 수 없습니다."),
 
 	//인증, 인가
 	ACCESS_DENIED("AUTH001", "사용자 인증에 실패했습니다."),
