@@ -26,6 +26,7 @@ services:
     image: redis:latest
     ports:
       - "6379:6379"
+    restart: always
     networks:
       - dealight-network
 
@@ -37,6 +38,7 @@ services:
     volumes:
       - /home/ubuntu/volumes/loki/config:/etc/loki
     command: -config.file=/etc/loki/local-config.yaml
+    restart: always
     networks:
       - dealight-network
 
@@ -47,5 +49,6 @@ services:
       - /home/ubuntu/volumes/logs:/var/log
       - /home/ubuntu/volumes/promtail/config.yml:/etc/promtail/config.yml
     command: -config.file=/etc/promtail/config.yml
+    restart: always
     networks:
       - dealight-network
