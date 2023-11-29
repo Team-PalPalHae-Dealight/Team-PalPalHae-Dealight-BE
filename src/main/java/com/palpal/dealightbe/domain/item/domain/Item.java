@@ -75,8 +75,8 @@ public class Item extends BaseEntity {
 		this.stock -= quantity;
 	}
 
-	public void addStock(int quantity) {
-		stock += quantity;
+	public void updateStock(int stock) {
+		this.stock = stock;
 	}
 
 	public void update(Item item) {

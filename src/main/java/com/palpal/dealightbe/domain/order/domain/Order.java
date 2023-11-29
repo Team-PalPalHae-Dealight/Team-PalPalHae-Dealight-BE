@@ -146,6 +146,10 @@ public class Order extends BaseEntity {
 		validateUpdaterAuthority(updater, orderStatus.name(), changedStatus);
 
 		this.orderStatus = OrderStatus.valueOf(changedStatus);
+
+		if (orderStatus.equals(CANCELED)) {
+			this.cancel();
+		}
 	}
 
 	public void validateStatusRequest(String changedStatus) {
@@ -237,5 +241,16 @@ public class Order extends BaseEntity {
 			log.warn("PATCH:UPDATE:ORDER:CANNOT_CHANGE_STATUS(STORE):{} -> {}", originalStatus, changedStatus);
 			throw new BusinessException(INVALID_ORDER_STATUS);
 		}
+	}
+
+	private void cancel() {
+		getOrderItems().forEach(
+			item -> {
+				int originalStock = item.getItem().getStock();
+				int newStock = originalStock + item.getQuantity();
+
+				item.getItem().updateStock(newStock);
+			}
+		);
 	}
 }
