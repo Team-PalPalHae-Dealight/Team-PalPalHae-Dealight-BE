@@ -61,8 +61,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
-    implementation 'org.redisson:redisson-spring-boot-starter:3.17.6'
-
 
     // elasticsearch
     implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
