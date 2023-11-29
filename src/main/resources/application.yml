@@ -5,3 +5,4 @@ spring:
       - classpath:application-aws.yml
       - classpath:application-actuator.yml
       - classpath:application-rds.yml
+      - classpath:application-els.yml

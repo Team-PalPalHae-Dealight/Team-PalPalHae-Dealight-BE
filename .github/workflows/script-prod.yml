@@ -2,10 +2,10 @@
 name: CI/CD using Actions & S3 & Code Deploy & Docker & SonarCloud
 
 # event trigger
-# develop 브랜치에 push가 되었을 때 실행
+# main 브랜치에 push가 되었을 때 실행
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "main" ]
 
 permissions:
   contents: read
@@ -39,47 +39,47 @@ jobs:
       # application-oauth.yml 생성
       - name: Make application-oauth.yml
         if: |
-          contains(github.ref, 'develop')
+          contains(github.ref, 'main')
         run: |
           cd ./src/main/resources
           touch ./application-oauth.yml
-          echo "${{ secrets.YML_DEV_OAUTH }}" > ./application-oauth.yml
+          echo "${{ secrets.YML_PROD_OAUTH }}" > ./application-oauth.yml
         shell: bash
 
       # application-aws.yml 생성
       - name: Make application-aws.yml
         if: |
-          contains(github.ref, 'develop')
+          contains(github.ref, 'main')
         run: |
           cd ./src/main/resources
           touch ./application-aws.yml
-          echo "${{ secrets.YML_DEV_AWS }}" > ./application-aws.yml
+          echo "${{ secrets.YML_PROD_AWS }}" > ./application-aws.yml
         shell: bash
 
       # application-actuator.yml 생성
       - name: Make application-actuator.yml
         if: |
-          contains(github.ref, 'develop')
+          contains(github.ref, 'main')
         run: |
           cd ./src/main/resources
           touch ./application-actuator.yml
-          echo "${{ secrets.YML_DEV_ACTUATOR }}" > ./application-actuator.yml
+          echo "${{ secrets.YML_PROD_ACTUATOR }}" > ./application-actuator.yml
         shell: bash
 
       # application-rds.yml 생성
       - name: Make application-rds.yml
         if: |
-          contains(github.ref, 'develop')
+          contains(github.ref, 'main')
         run: |
           cd ./src/main/resources
           touch ./application-rds.yml
-          echo "${{ secrets.YML_DEV_RDS }}" > ./application-rds.yml
+          echo "${{ secrets.YML_PROD_RDS }}" > ./application-rds.yml
         shell: bash
 
       # 테스트를 위한 application.yml 생성
       - name: Make Test application.yml
         if: |
-          contains(github.ref, 'develop')
+          contains(github.ref, 'main')
         run: |
           mkdir ./src/test/resources
           cd ./src/test/resources
@@ -106,7 +106,7 @@ jobs:
           cp ./*.Dockerfile ./deploy/
           cp ./scripts/*.sh ./deploy/
           cp ./build/libs/dealight-be-0.0.1-SNAPSHOT.jar ./deploy/
-          zip -r -qq -j ./delight-spring-dev-build.zip ./deploy
+          zip -r -qq -j ./delight-spring-prod-build.zip ./deploy
 
       # AWS credentials 값을 가져옴
       - name: Configure AWS credentials
@@ -121,4 +121,11 @@ jobs:
         run: |
           aws s3 cp \
             --region ap-northeast-2 \
-            ./delight-spring-dev-build.zip s3://team-08-bucket
+            ./delight-spring-prod-build.zip s3://team-08-bucket
+
+      # Code Deploy를 사용
+      - name: Code Deploy
+        run: aws deploy create-deployment --application-name team-08-dev
+          --deployment-config-name CodeDeployDefault.OneAtATime
+          --deployment-group-name team-palpal-dev-deploy
+          --s3-location bucket=team-08-bucket,bundleType=zip,key=delight-spring-prod-build.zip
