@@ -17,6 +17,7 @@ public enum ErrorCode {
 	DEFAULT_IMAGE_ALREADY_SET("C003", "기본 이미지로 설정된 이미지는 삭제할 수 없습니다."),
 	INVALID_LIST_SORT_TYPE("C004", "유효하지 않은 정렬 조건입니다."),
 	REQUIRE_QUERY_PARAM("C005", "URL에 추가적인 요청 조건이 필요합니다."),
+	JSON_PARSING_ERROR("C006", "유효하지 않은 JSON 형식입니다."),
 
 	//멤버
 	NOT_FOUND_MEMBER("M001", "고객을 찾을 수 없습니다."),
@@ -32,7 +33,7 @@ public enum ErrorCode {
 	ALREADY_HAS_STORE("ST007", "이미 업체를 보유하고 있습니다"),
 
 	//상품
-	INVALID_ITEM_DISCOUNT_PRICE("I001", "상품 할인가는 원가보다 클 수 없습니다."),
+	INVALID_ITEM_DISCOUNT_PRICE("I001", "상품 할인가는 원가보다 크거나 같을 수 없습니다."),
 	NOT_FOUND_ITEM("I002", "상품이 존재하지 않습니다."),
 	DUPLICATED_ITEM_NAME("I003", "동일한 이름을 가진 상품이 이미 등록되어 있습니다."),
 	INVALID_ITEM_QUANTITY("I004", "상품 재고가 부족합니다"),
@@ -63,6 +64,7 @@ public enum ErrorCode {
 	INVALID_CART_ADDITION_TYPE("CT006", "유효하지 않은 장바구니 담기 타입 입니다."),
 	ITEM_REMOVED_NO_LONGER_EXISTS_ITEM("CT007", "더 이상 존재하지 않는 상품이 장바구니에서 자동으로 삭제되었습니다."),
 	ITEM_REMOVED_NO_LONGER_EXISTS_STORE("CT008", "더 이상 존재하지 않는 업체의 상품이 장바구니에서 자동으로 삭제되었습니다."),
+	INVALID_ADD_ITEM_IN_CART_ITEM_STOCK_ZERO("CT009", "재고가 0개인 상품은 담을 수 없습니다."),
 
 	//인증, 인가
 	ACCESS_DENIED("AUTH001", "사용자 인증에 실패했습니다."),
@@ -88,9 +90,8 @@ public enum ErrorCode {
 
 	//알림
 	NOT_FOUND_NOTIFICATION("N001", "존재하지 않는 알림입니다."),
-
-	// SSE
-	SSE_STREAM_ERROR("SSE001", "SSE 스트림 연결 중 오류가 발생했습니다."),
+	SSE_STREAM_ERROR("N002", "SSE 스트림 연결 중 오류가 발생했습니다."),
+	INVALID_REDIS_MESSAGE_FORMAT("N003", "Redis 메시지 형식이 유효하지 않습니다."),
 	;
 
 	private final String code;

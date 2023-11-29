@@ -6,7 +6,7 @@ services:
     container_name: dealight-green-container
     build:
       context: ./
-      dockerfile: Dockerfile
+      dockerfile: dealight.Dockerfile
     ports:
       - "8081:8080"
     volumes:

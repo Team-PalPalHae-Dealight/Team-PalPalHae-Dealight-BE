@@ -103,7 +103,7 @@ public class Item extends BaseEntity {
 	}
 
 	private void validateDiscountPrice(int discountPrice, int originalPrice) {
-		if (discountPrice > originalPrice) {
+		if (discountPrice >= originalPrice) {
 			log.warn("INVALID_ITEM_DISCOUNT_PRICE : discount price = {}, original price = {}", discountPrice,
 				originalPrice);
 			throw new BusinessException(INVALID_ITEM_DISCOUNT_PRICE);

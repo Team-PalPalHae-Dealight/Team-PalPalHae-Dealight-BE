@@ -211,13 +211,18 @@ public class Order extends BaseEntity {
 		LocalTime storeCloseTime = store.getCloseTime();
 		LocalTime storeOpenTime = store.getOpenTime();
 
+		boolean isInvalidArrivalTime;
+
 		if (storeCloseTime.isBefore(storeOpenTime)) {
-			storeCloseTime = storeCloseTime.plusHours(24);
+			isInvalidArrivalTime = arrivalTime.isAfter(storeCloseTime) && arrivalTime.isBefore(storeOpenTime);
+		} else {
+			isInvalidArrivalTime = arrivalTime.isAfter(storeCloseTime) || arrivalTime.isBefore(storeOpenTime);
 		}
 
-		if (arrivalTime.isBefore(storeOpenTime) || arrivalTime.isAfter(storeCloseTime)) {
+		if (isInvalidArrivalTime) {
 			log.warn("POST:WRITE:INVALID_ARRIVAL_TIME:STORE_OPEN {}, STORE_CLOSE {}, ARRIVAL_TIME {}", storeOpenTime,
 				storeCloseTime, arrivalTime);
+			
 			throw new BusinessException(INVALID_ARRIVAL_TIME);
 		}
 	}
