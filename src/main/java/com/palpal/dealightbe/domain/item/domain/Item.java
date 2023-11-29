@@ -14,6 +14,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.global.BaseEntity;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
@@ -27,6 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 @Entity
+@Where(clause = "is_deleted = false")
+@SQLDelete(sql = "UPDATE items SET is_deleted = true WHERE id = ?")
 @Table(name = "items")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Item extends BaseEntity {
@@ -52,6 +57,8 @@ public class Item extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "store_id")
 	private Store store;
+
+	private boolean isDeleted = Boolean.FALSE;
 
 	@Builder
 	public Item(String name, int stock, int discountPrice, int originalPrice, String description, String image, Store store) {
@@ -97,7 +104,7 @@ public class Item extends BaseEntity {
 		if (discountPrice >= originalPrice) {
 			log.warn("INVALID_ITEM_DISCOUNT_PRICE : discount price = {}, original price = {}", discountPrice,
 				originalPrice);
-      
+
 			throw new BusinessException(INVALID_ITEM_DISCOUNT_PRICE);
 		}
 	}
