@@ -27,6 +27,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 	private static final String DISCOUNT_RATE = "(item.originalPrice - item.discountPrice) * 1.0 / item.originalPrice";
 
 	private final JPAQueryFactory queryFactory;
+
 	private QItem item = QItem.item;
 	private QStore store = QStore.store;
 	private QAddress address = QAddress.address;
@@ -47,7 +48,8 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 	}
 
 	@Override
-	public Slice<Item> findAllByOpenedStatusAndDistanceWithin3KmAndSortCondition(double xCoordinate, double yCoordinate, String sortBy, Pageable pageable) {
+	public Slice<Item> findAllByOpenedStatusAndDistanceWithin3KmAndSortCondition(double xCoordinate, double yCoordinate,
+		String sortBy, Pageable pageable) {
 		BooleanExpression distancePredicate = getDistancePredicate(xCoordinate, yCoordinate);
 
 		OrderSpecifier[] orderSpecifiers = orderSpecifiers(xCoordinate, yCoordinate, sortBy);
@@ -121,4 +123,5 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
 		return new SliceImpl<>(results, pageable, hasNext);
 	}
+
 }

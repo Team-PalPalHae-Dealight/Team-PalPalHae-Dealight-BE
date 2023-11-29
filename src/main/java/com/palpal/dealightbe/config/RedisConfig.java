@@ -44,7 +44,7 @@ public class RedisConfig {
 		StringRedisTemplate stringRedisTemplate = new StringRedisTemplate();
 		stringRedisTemplate.setConnectionFactory(redisConnectionFactory());
 
-		stringRedisTemplate.setEnableTransactionSupport(true);
+		// stringRedisTemplate.setEnableTransactionSupport(true);
 
 		return stringRedisTemplate;
 	}

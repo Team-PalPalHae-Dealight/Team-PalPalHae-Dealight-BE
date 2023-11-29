@@ -2,6 +2,7 @@ package com.palpal.dealightbe.domain.order.application;
 
 import static com.palpal.dealightbe.domain.store.domain.StoreStatus.CLOSED;
 import static com.palpal.dealightbe.global.error.ErrorCode.CLOSED_STORE;
+import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_QUANTITY;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_MEMBER;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ORDER;
@@ -29,7 +30,6 @@ import com.palpal.dealightbe.domain.order.domain.Order;
 import com.palpal.dealightbe.domain.order.domain.OrderItem;
 import com.palpal.dealightbe.domain.order.domain.OrderItemRepository;
 import com.palpal.dealightbe.domain.order.domain.OrderRepository;
-import com.palpal.dealightbe.domain.order.domain.OrderStatus;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
@@ -49,7 +49,6 @@ public class OrderService {
 	private final StoreRepository storeRepository;
 	private final ItemRepository itemRepository;
 	private final OrderItemRepository orderItemRepository;
-	// private final NotificationService notificationService;
 
 	public OrderRes create(OrderCreateReq orderCreateReq, Long memberProviderId) {
 		long storeId = orderCreateReq.storeId();
@@ -64,40 +63,15 @@ public class OrderService {
 		order.addOrderItems(orderItems);
 		orderItemRepository.saveAll(orderItems);
 
-		// notificationService.send(member, store, order, OrderStatus.CONFIRMED);
-
 		return OrderRes.from(order);
-	}
-
-	private Store getStore(Long storeId) {
-		Store store = storeRepository.findById(storeId)
-			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_STORE_BY_ID : {}", storeId);
-				return new EntityNotFoundException(NOT_FOUND_STORE);
-			});
-
-		if (store.getStoreStatus().equals(CLOSED)) {
-			throw new BusinessException(CLOSED_STORE);
-		}
-
-		return store;
 	}
 
 	public OrderStatusUpdateRes updateStatus(Long orderId, OrderStatusUpdateReq request, Long memberProviderId) {
 		Member member = getMember(memberProviderId);
 		Order order = getOrder(orderId);
-		// Store store = getStore(order.getStore().getId());
 
 		String changedStatus = request.status();
 		order.changeStatus(member, changedStatus);
-
-		// notificationService.send(member, store, order, OrderStatus.valueOf(changedStatus));
-
-		if (changedStatus.equals(OrderStatus.CANCELED.name())) {
-			order.getOrderItems().forEach(
-				item -> item.getItem().addStock(item.getQuantity())
-			);
-		}
 
 		return OrderStatusUpdateRes.from(order);
 	}
@@ -142,6 +116,20 @@ public class OrderService {
 		return OrdersRes.from(orders);
 	}
 
+	private Store getStore(Long storeId) {
+		Store store = storeRepository.findById(storeId)
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_STORE_BY_ID : {}", storeId);
+				return new EntityNotFoundException(NOT_FOUND_STORE);
+			});
+
+		if (store.getStoreStatus().equals(CLOSED)) {
+			throw new BusinessException(CLOSED_STORE);
+		}
+
+		return store;
+	}
+
 	private Order getOrder(Long orderId) {
 		return orderRepository.findById(orderId)
 			.orElseThrow(() -> {
@@ -167,20 +155,23 @@ public class OrderService {
 	}
 
 	private OrderItem createOrderItem(Order order, OrderProductReq request) {
-		Item item = itemRepository.findById(request.itemId())
+		long itemId = request.itemId();
+		int quantity = request.quantity();
+
+		int orderedCount = itemRepository.updateStock(itemId, quantity);
+
+		if (orderedCount == 0) {
+			throw new BusinessException(INVALID_ITEM_QUANTITY);
+		}
+
+		Item item = itemRepository.findById(itemId)
 			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", request.itemId());
+				log.warn("GET:READ:NOT_FOUND_ITEM_BY_ID : {}", itemId);
 
 				return new EntityNotFoundException(NOT_FOUND_ITEM);
 			});
 
-		int quantity = request.quantity();
-		item.deductStock(quantity);
+		return OrderProductReq.toOrderItem(item, order, request);
 
-		return OrderItem.builder()
-			.item(item)
-			.order(order)
-			.quantity(quantity)
-			.build();
 	}
 }

@@ -7,5 +7,6 @@ public interface ItemRepositoryCustom {
 
 	Slice<Item> findAllByStoreIdOrderByUpdatedAtDesc(Long storeId, Pageable pageable);
 
-	Slice<Item> findAllByOpenedStatusAndDistanceWithin3KmAndSortCondition(double xCoordinate, double yCoordinate, String sortBy, Pageable pageable);
+	Slice<Item> findAllByOpenedStatusAndDistanceWithin3KmAndSortCondition(double xCoordinate, double yCoordinate,
+		String sortBy, Pageable pageable);
 }

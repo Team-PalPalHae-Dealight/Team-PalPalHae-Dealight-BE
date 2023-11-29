@@ -98,6 +98,7 @@ public class Order extends BaseEntity {
 	public Order(Member member, Store store, LocalTime arrivalTime, String demand, int totalPrice) {
 		validateArrivalTime(store, arrivalTime);
 		validateDemand(demand);
+
 		this.member = member;
 		this.store = store;
 		this.arrivalTime = arrivalTime;
@@ -146,6 +147,10 @@ public class Order extends BaseEntity {
 		validateUpdaterAuthority(updater, orderStatus.name(), changedStatus);
 
 		this.orderStatus = OrderStatus.valueOf(changedStatus);
+
+		if (orderStatus.equals(CANCELED)) {
+			this.cancel();
+		}
 	}
 
 	public void validateStatusRequest(String changedStatus) {
@@ -200,6 +205,17 @@ public class Order extends BaseEntity {
 
 	}
 
+	private void cancel() {
+		getOrderItems().forEach(
+			item -> {
+				int originalStock = item.getItem().getStock();
+				int newStock = originalStock + item.getQuantity();
+
+				item.getItem().updateStock(newStock);
+			}
+		);
+	}
+
 	private void validateDemand(String demand) {
 		if (demand != null && demand.length() > MAX_DEMAND_LENGTH) {
 			log.warn("POST:WRITE:TOO_LONG_DEMAND:LENGTH {}", demand.length());
@@ -221,8 +237,7 @@ public class Order extends BaseEntity {
 
 		if (isInvalidArrivalTime) {
 			log.warn("POST:WRITE:INVALID_ARRIVAL_TIME:STORE_OPEN {}, STORE_CLOSE {}, ARRIVAL_TIME {}", storeOpenTime,
-				storeCloseTime, arrivalTime);
-			
+
 			throw new BusinessException(INVALID_ARRIVAL_TIME);
 		}
 	}
@@ -235,11 +250,11 @@ public class Order extends BaseEntity {
 		Pair<String, String> inputSequence = Pair.of(originalStatus, changedStatus);
 
 		if (isMember(updater) && !orderStatusSequenceOfMember.contains(inputSequence)) {
-			log.warn("PATCH:UPDATE:MEMBER:CANNOT_CHANGE_STATUS:{} -> {}", originalStatus, changedStatus);
+			log.warn("PATCH:UPDATE:ORDER:CANNOT_CHANGE_STATUS(MEMBER):{} -> {}", originalStatus, changedStatus);
 			throw new BusinessException(INVALID_ORDER_STATUS);
 		}
 		if (isStoreOwner(updater) && !orderStatusSequenceOfStore.contains(inputSequence)) {
-			log.warn("PATCH:UPDATE:STORE:CANNOT_CHANGE_STATUS:{} -> {}", originalStatus, changedStatus);
+			log.warn("PATCH:UPDATE:ORDER:CANNOT_CHANGE_STATUS(STORE):{} -> {}", originalStatus, changedStatus);
 			throw new BusinessException(INVALID_ORDER_STATUS);
 		}
 	}
