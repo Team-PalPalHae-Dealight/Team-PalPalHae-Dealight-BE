@@ -126,6 +126,6 @@ jobs:
       # Code Deploy를 사용
       - name: Code Deploy
         run: aws deploy create-deployment --application-name team-08-dev
-          --deployment-config-name CodeDeployDefault.OneAtATime
+          --deployment-config-name CodeDeployDefault.AllAtOnce
           --deployment-group-name team-palpal-prod-deploy
           --s3-location bucket=team-08-bucket,bundleType=zip,key=delight-spring-prod-build.zip
