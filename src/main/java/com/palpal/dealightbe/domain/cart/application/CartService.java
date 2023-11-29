@@ -7,6 +7,7 @@ import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_CART_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.ITEM_REMOVED_NO_LONGER_EXISTS_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.ITEM_REMOVED_NO_LONGER_EXISTS_STORE;
+import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ADD_ITEM_IN_CART_ITEM_STOCK_ZERO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +49,7 @@ public class CartService {
 	public CartRes addItem(Long providerId, Long itemId, CartAdditionType cartAdditionType) {
 		Item item = getItem(itemId);
 
+		validateItemStock(item);
 		validateOwnStoreItem(providerId, item);
 
 		List<Cart> carts = cartRepository.findAllByMemberProviderIdOrderByItemIdAsc(providerId);
@@ -269,12 +271,19 @@ public class CartService {
 
 	private Store getStore(Cart cart) {
 		return storeRepository.findById(cart.getStoreId())
-			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_STORE_BY_ID_AND_ITEM_REMOVED_NO_LONGER_EXISTS_STORE : {}", cart.getStoreId());
-				deleteAll(cart.getMemberProviderId());
+				.orElseThrow(() -> {
+					log.warn("GET:READ:NOT_FOUND_STORE_BY_ID_AND_ITEM_REMOVED_NO_LONGER_EXISTS_STORE : {}", cart.getStoreId());
+					deleteAll(cart.getMemberProviderId());
 
-				return new EntityNotFoundException(ITEM_REMOVED_NO_LONGER_EXISTS_STORE);
-			});
+					return new EntityNotFoundException(ITEM_REMOVED_NO_LONGER_EXISTS_STORE);
+				});
+		}
+
+		private void validateItemStock(Item item) {
+			if (item.getStock() == 0) {
+				log.warn("GET:READ:INVALID_ADD_ITEM_IN_CART_ITEM_STOCK_ZERO : item id = {}", item.getId());
+				throw new BusinessException(INVALID_ADD_ITEM_IN_CART_ITEM_STOCK_ZERO);
+		}
 	}
 
 	private Cart toCart(Long memberProviderId, Item item) {

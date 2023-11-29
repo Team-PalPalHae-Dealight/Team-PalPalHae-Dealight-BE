@@ -95,8 +95,8 @@ class ReviewRepositoryTest {
 		assertThat(storeReviewsRes.reviews()).hasSize(2)
 			.extracting("content", "count")
 			.containsExactlyInAnyOrder(
-				tuple("Q1", 3),
-				tuple("Q2", 2)
+				tuple(ReviewContent.Q1.getMessage(), 3),
+				tuple(ReviewContent.Q2.getMessage(), 2)
 			);
 	}
 

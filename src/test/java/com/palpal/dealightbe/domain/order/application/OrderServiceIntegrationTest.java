@@ -19,8 +19,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.palpal.dealightbe.config.ElasticTestContainer;
 import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
@@ -41,6 +43,7 @@ import com.palpal.dealightbe.global.error.exception.BusinessException;
 
 @SpringBootTest
 @Transactional
+@Import(ElasticTestContainer.class)
 public class OrderServiceIntegrationTest {
 
 	@Autowired

@@ -64,6 +64,10 @@ dependencies {
     implementation 'org.redisson:redisson-spring-boot-starter:3.17.6'
 
 
+    // elasticsearch
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+
+
     // monitoring tools: actuator, prometheus, grafana
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-registry-prometheus'
@@ -85,6 +89,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation("org.testcontainers:junit-jupiter:1.16.3")
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
     testImplementation "org.testcontainers:testcontainers:1.17.2"
 

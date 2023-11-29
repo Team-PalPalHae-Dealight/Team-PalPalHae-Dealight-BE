@@ -2,6 +2,7 @@ package com.palpal.dealightbe.domain.cart.presentation;
 
 import static com.palpal.dealightbe.global.error.ErrorCode.ANOTHER_STORE_ITEM_ALREADY_EXISTS_IN_THE_CART;
 import static com.palpal.dealightbe.global.error.ErrorCode.EXCEEDED_CART_ITEM_SIZE;
+import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ADD_ITEM_IN_CART_ITEM_STOCK_ZERO;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ATTEMPT_TO_ADD_OWN_STORE_ITEM_TO_CART;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_CART_QUANTITY;
 import static com.palpal.dealightbe.global.error.ErrorCode.ITEM_REMOVED_NO_LONGER_EXISTS_STORE;
@@ -517,6 +518,47 @@ class CartControllerTest {
 			.andExpect(jsonPath("$.code").value("CT008"))
 			.andExpect(jsonPath("$.errors").isEmpty())
 			.andExpect(jsonPath("$.message").value("더 이상 존재하지 않는 업체의 상품이 장바구니에서 자동으로 삭제되었습니다."))
+			.andDo(print())
+			.andDo(document("cart/cart-add-item-item-removed-no-longer-exists-store",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				requestParameters(
+					parameterWithName("id").description("상품 ID"),
+					parameterWithName("type").description("장바구니 담기 타입")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("예외 코드"),
+					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@DisplayName("장바구니 담기 실패 테스트 - 재고가 0인 상품을 담기 시도하는 경우")
+	@Test
+	void addItemFailureTest_InvalidAddItemInCartItemStockZero() throws Exception {
+		//given
+		Long itemId = 1L;
+
+		doThrow(new BusinessException(INVALID_ADD_ITEM_IN_CART_ITEM_STOCK_ZERO)).when(
+			cartService).addItem(any(), any(), any());
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
+				.contentType(MediaType.APPLICATION_JSON)
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.param("id", String.valueOf(itemId))
+				.param("type", "check"))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("CT009"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("재고가 0개인 상품은 담을 수 없습니다."))
 			.andDo(print())
 			.andDo(document("cart/cart-add-item-item-removed-no-longer-exists-store",
 				preprocessRequest(prettyPrint()),

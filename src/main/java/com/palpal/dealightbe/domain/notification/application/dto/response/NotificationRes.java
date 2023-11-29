@@ -8,14 +8,26 @@ public record NotificationRes(
 	Long id,
 	String content,
 	LocalDateTime createdAt,
-	boolean isRead
+	boolean isRead,
+	String eventId
 ) {
+	public static NotificationRes from(Notification notification, String eventId) {
+		return new NotificationRes(
+			notification.getId(),
+			notification.getContent(),
+			notification.getCreatedAt(),
+			notification.isRead(),
+			eventId
+		);
+	}
+
 	public static NotificationRes from(Notification notification) {
 		return new NotificationRes(
 			notification.getId(),
 			notification.getContent(),
 			notification.getCreatedAt(),
-			notification.isRead()
+			notification.isRead(),
+			""
 		);
 	}
 }
