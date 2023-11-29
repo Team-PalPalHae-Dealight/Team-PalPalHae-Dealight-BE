@@ -36,7 +36,6 @@ import com.palpal.dealightbe.domain.item.application.dto.request.ItemReq;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemsRes;
 import com.palpal.dealightbe.domain.item.domain.Item;
-import com.palpal.dealightbe.domain.item.domain.ItemJpaRedisRepository;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
@@ -52,9 +51,6 @@ class ItemServiceTest {
 
 	@Mock
 	private ItemRepository itemRepository;
-
-	@Mock
-	private ItemJpaRedisRepository itemJpaRedisRepository;
 
 	@Mock
 	private StoreRepository storeRepository;
@@ -136,7 +132,7 @@ class ItemServiceTest {
 
 		when(storeRepository.findByMemberProviderId(any())).thenReturn(Optional.of(store));
 		when(itemRepository.existsByNameAndStoreId(any(), any())).thenReturn(false);
-		when(itemJpaRedisRepository.save(any(Item.class))).thenReturn(item);
+		when(itemRepository.save(any(Item.class))).thenReturn(item);
 		when(imageService.store(file)).thenReturn(imageUrl);
 
 		//when

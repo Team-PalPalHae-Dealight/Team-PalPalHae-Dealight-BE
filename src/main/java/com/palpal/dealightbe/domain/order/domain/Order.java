@@ -253,15 +253,4 @@ public class Order extends BaseEntity {
 			throw new BusinessException(INVALID_ORDER_STATUS);
 		}
 	}
-
-	private void cancel() {
-		getOrderItems().forEach(
-			item -> {
-				int originalStock = item.getItem().getStock();
-				int newStock = originalStock + item.getQuantity();
-
-				item.getItem().updateStock(newStock);
-			}
-		);
-	}
 }
