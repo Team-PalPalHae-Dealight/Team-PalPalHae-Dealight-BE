@@ -1,0 +1,201 @@
+ifndef::snippets[]
+:basedir: {docdir}/../../../
+:snippets: build/generated-snippets
+:sources-root: {basedir}/src
+:resources: {sources-root}/main/resources
+:resources-test: {sources-root}/test/resources
+:java: {sources-root}/main/java
+:java-test: {sources-root}/test/java
+endif::[]
+= API Document
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 5
+:sectlinks:
+
+= 주문 관련 API
+
+== 1. 주문 생성
+
+=== [POST] /api/orders
+
+include::{snippets}/order/order-create-success/http-request.adoc[]
+
+=== 성공
+
+==== 요청
+
+- header
+include::{snippets}/order/order-create-success/request-headers.adoc[]
+
+- body
+include::{snippets}/order/order-create-success/request-body.adoc[]
+include::{snippets}/order/order-create-success/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/order/order-create-success/response-body.adoc[]
+include::{snippets}/order/order-create-success/response-fields.adoc[]
+
+=== 실패
+
+- 주문시 도착 예정 시간을 입력하지 않은 경우
+include::{snippets}/order/order-create-fail-arrival-time/response-body.adoc[]
+include::{snippets}/order/order-create-fail-arrival-time/response-fields.adoc[]
+
+- 주문시 업체 아이디를 입력하지 않은 경우
+include::{snippets}/order/order-create-fail-store-id/response-body.adoc[]
+include::{snippets}/order/order-create-fail-store-id/response-fields.adoc[]
+
+- 주문시 상품이 0개인 경우
+include::{snippets}/order/order-create-fail-empty-item/response-body.adoc[]
+include::{snippets}/order/order-create-fail-empty-item/response-fields.adoc[]
+
+- 업체 아이디가 잘못 입력된 경우
+include::{snippets}/order/order-create-fail-invalid-store-id/response-body.adoc[]
+include::{snippets}/order/order-create-fail-invalid-store-id/response-fields.adoc[]
+
+- 영업 종료된 업체에 주문한 경우
+include::{snippets}/order/order-create-fail-closed-store/response-body.adoc[]
+include::{snippets}/order/order-create-fail-closed-store/response-fields.adoc[]
+
+---
+
+== 2. 주문 상태 변경
+
+=== 주문 단계
+
+1. 주문 접수(RECEIVED) : 고객이 예약만 한 상태
+2. 주문 확인(CONFIRMED) : 주문 접수인 상태의 주문을 업체가 수락한 경우
+3. 주문 완료(COMPLETED) : 거래가 성사되고 끝난 경우
+4. 주문 취소(CANCELED) : 고객이 주문을 취소하거나 업체가 주문을 거절 또는 취소한 경우
+
+=== 주문 단계별 업체/고객 허용 요청
+
+1. 주문 접수 : 고객은 주문 취소 가능, 업체는 주문 확인 및 주문 취소로 변경 가능 (주문 완료로 바로 변경 불가능)
+2. 주문 확인 : 고객은 주문 취소 가능, 업체는 주문 완료 및 취소로 변경 가능 (주문 접수로 복구 불가능)
+3. 주문 완료 : 변경 불가능
+4. 주문 취소 : 변경 불가능
+
+=== [PATCH] /api/orders/{orderId}
+
+include::{snippets}/order/order-status-update-success/http-request.adoc[]
+
+=== 성공
+
+==== 요청
+
+- header
+include::{snippets}/order/order-status-update-success/request-headers.adoc[]
+
+- path variables
+include::{snippets}/order/order-status-update-success/path-parameters.adoc[]
+
+- body
+include::{snippets}/order/order-status-update-success/request-body.adoc[]
+include::{snippets}/order/order-status-update-success/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/order/order-status-update-success/response-body.adoc[]
+include::{snippets}/order/order-status-update-success/response-fields.adoc[]
+
+=== 실패
+
+- 변경 후의 주문 상태를 입력하지 않은 경우
+include::{snippets}/order/order-create-fail-status/response-body.adoc[]
+include::{snippets}/order/order-create-fail-status/response-fields.adoc[]
+
+- 유효하지 않은 순서로 상태 변경을 요청하는 경우 (ex. 주문 접수 -> 주문 완료)
+include::{snippets}/order/order-create-fail-invalid-status/response-body.adoc[]
+include::{snippets}/order/order-create-fail-invalid-status/response-fields.adoc[]
+
+---
+
+== 3. 주문 상세 내용 조회 (단건)
+
+=== [GET] /api/orders/{orderId}
+
+include::{snippets}/order/order-find-by-id-success/http-request.adoc[]
+
+=== 성공
+
+==== 요청
+
+- header
+include::{snippets}/order/order-find-by-id-success/request-headers.adoc[]
+
+- path variables
+include::{snippets}/order/order-find-by-id-success/path-parameters.adoc[]
+
+- body
+include::{snippets}/order/order-find-by-id-success/request-body.adoc[]
+
+==== 응답
+
+include::{snippets}/order/order-find-by-id-success/response-body.adoc[]
+include::{snippets}/order/order-find-by-id-success/response-fields.adoc[]
+
+=== 실패
+
+- 주문한 고객 본인이나 업체 주인외의 다른 사람이 상세정보 조회를 요청한 경우
+include::{snippets}/order/order-create-fail-unauthorized/response-body.adoc[]
+include::{snippets}/order/order-create-fail-unauthorized/response-fields.adoc[]
+
+---
+
+== 4. 주문 조회 (다건) - 업체
+
+=== [GET] /api/orders/stores?id={storeId}&status={status}&page={page}&size={size}
+
+include::{snippets}/order/order-find-by-store-id-success/http-request.adoc[]
+
+=== 성공
+
+==== 요청
+
+- header
+include::{snippets}/order/order-find-by-store-id-success/request-headers.adoc[]
+
+- request parameters
+include::{snippets}/order/order-find-by-store-id-success/request-parameters.adoc[]
+
+- body
+include::{snippets}/order/order-find-by-store-id-success/request-body.adoc[]
+
+==== 응답
+
+include::{snippets}/order/order-find-by-store-id-success/response-body.adoc[]
+include::{snippets}/order/order-find-by-store-id-success/response-fields.adoc[]
+
+=== 실패
+
+- 업체의 주인외의 다른 사람이 업체의 주문 목록을 조회한 경우
+include::{snippets}/order/order-find-by-store-fail-unauthorized/response-body.adoc[]
+include::{snippets}/order/order-find-by-store-fail-unauthorized/response-fields.adoc[]
+
+
+---
+
+== 5. 주문 조회 (다건) - 고객
+
+=== [GET] /api/orders?status={status}&page={page}&size={size}
+
+include::{snippets}/order/order-find-by-member-success/http-request.adoc[]
+
+
+- header
+include::{snippets}/order/order-find-by-member-success/request-headers.adoc[]
+
+- request parameters
+include::{snippets}/order/order-find-by-member-success/request-parameters.adoc[]
+
+- body
+include::{snippets}/order/order-find-by-member-success/request-body.adoc[]
+
+==== 응답
+
+include::{snippets}/order/order-find-by-member-success/response-body.adoc[]
+include::{snippets}/order/order-find-by-member-success/response-fields.adoc[]

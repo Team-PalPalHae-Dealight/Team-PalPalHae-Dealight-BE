@@ -1,0 +1,217 @@
+= REST Docs 업체 API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+[[User-API]]
+== Store API
+
+=== 업체 등록 - 성공
+
+==== POST - /api/stores
+
+.Request
+include::{snippets}/store/store-register/http-request.adoc[]
+
+include::{snippets}/store/store-register/request-fields.adoc[]
+
+.Response
+include::{snippets}/store/store-register/http-response.adoc[]
+
+include::{snippets}/store/store-register/response-fields.adoc[]
+
+=== 업체 등록 - 실패
+
+.Request Fail - 잘못된 영업 시간
+include::{snippets}/store/store-register-fail-invalid-business-time/http-response.adoc[]
+
+include::{snippets}/store/store-register-fail-invalid-business-time/response-fields.adoc[]
+
+.Request Fail - 이미 업체를 보유한 고객
+include::{snippets}/store/store-register-fail-aleady-has-store/http-response.adoc[]
+
+include::{snippets}/store/store-register-fail-aleady-has-store/response-fields.adoc[]
+
+.Request Fail - 존재하지 않는 고객
+include::{snippets}/store/store-register-fail-not-found-member/http-response.adoc[]
+
+include::{snippets}/store/store-register-fail-not-found-member/response-fields.adoc[]
+
+=== 업체 마이 페이지 조회 - 업체 사용
+
+==== GET - /api/stores/profiles
+
+.Request
+include::{snippets}/store/store-get-info/http-request.adoc[]
+
+.Response
+include::{snippets}/store/store-get-info/http-response.adoc[]
+include::{snippets}/store/store-get-info/response-fields.adoc[]
+
+=== 업체 마이 페이지 정보 수정
+
+==== PATCH - /api/stores/profiles/{storeId}
+
+.Request
+include::{snippets}/store/store-update-info/http-request.adoc[]
+include::{snippets}/store/store-update-info/path-parameters.adoc[]
+
+.Response
+include::{snippets}/store/store-update-info/http-response.adoc[]
+include::{snippets}/store/store-update-info/response-fields.adoc[]
+
+=== 업체 상세 페이지 조회 - 고객 사용
+
+==== GET - /api/stores/details/{storeId}
+
+.Request
+include::{snippets}/store/store-get-details/http-request.adoc[]
+include::{snippets}/store/store-get-details/path-parameters.adoc[]
+
+.Response
+include::{snippets}/store/store-get-info/http-response.adoc[]
+include::{snippets}/store/store-get-info/response-fields.adoc[]
+
+=== 업체 영업 상태 조회
+
+==== GET - /api/stores/status/{storeId}
+
+.Request
+include::{snippets}/store/store-get-status/http-request.adoc[]
+include::{snippets}/store/store-get-status/path-parameters.adoc[]
+.Response
+include::{snippets}/store/store-get-status/http-response.adoc[]
+include::{snippets}/store/store-get-status/response-fields.adoc[]
+
+=== 업체 영업 상태 수정
+
+==== PATCH - /api/stores/status/{storeId}
+
+.Request
+include::{snippets}/store/store-status-update/http-request.adoc[]
+include::{snippets}/store/store-status-update/path-parameters.adoc[]
+include::{snippets}/store/store-status-update/request-fields.adoc[]
+.Response
+include::{snippets}/store/store-status-update/http-response.adoc[]
+include::{snippets}/store/store-status-update/response-fields.adoc[]
+
+=== 업체 이미지 등록
+
+==== POST - /api/stores/images/{storeId}
+
+.Request
+include::{snippets}/store/store-upload-image/http-request.adoc[]
+include::{snippets}/store/store-status-update/path-parameters.adoc[]
+include::{snippets}/store/store-upload-image/request-parts.adoc[]
+.Response
+include::{snippets}/store/store-upload-image/http-response.adoc[]
+include::{snippets}/store/store-upload-image/response-fields.adoc[]
+
+=== 업체 이미지 수정
+
+==== PATCH - /api/stores/images/{storeId}
+
+.Request
+include::{snippets}/store/store-update-image/http-request.adoc[]
+include::{snippets}/store/store-update-image/path-parameters.adoc[]
+include::{snippets}/store/store-update-image/request-parts.adoc[]
+.Response
+include::{snippets}/store/store-update-image/http-response.adoc[]
+include::{snippets}/store/store-update-image/response-fields.adoc[]
+
+=== 업체 이미지 삭제
+
+==== DELETE - /api/stores/images/{storeId}
+
+.Request
+include::{snippets}/store/store-delete-image/http-request.adoc[]
+include::{snippets}/store/store-delete-image/path-parameters.adoc[]
+.Response
+include::{snippets}/store/store-delete-image/http-response.adoc[]
+
+=== 업체 소유자와 요청자가 같은 고객이 아닌 경우
+
+.Request Fail
+include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/http-request.adoc[]
+
+.Response
+include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/http-response.adoc[]
+include::{snippets}/store/store-get-info-fail-not-match-owner-and-requester/response-fields.adoc[]
+
+=== 회원가입 한 고객의 업체 등록 유무 -> 업체 등록 O
+
+==== GET - /api/stores/confirm
+
+.Request
+include::{snippets}/store/store-find-by-provider-id/http-request.adoc[]
+.Response
+include::{snippets}/store/store-find-by-provider-id/http-response.adoc[]
+include::{snippets}/store/store-find-by-provider-id/response-fields.adoc[]
+
+=== 회원가입 한 고객의 업체 등록 유무 -> 업체 등록 X
+
+==== GET - /api/stores/confirm
+
+.Request
+include::{snippets}/store/store-customer-not-register-store/http-request.adoc[]
+.Response
+include::{snippets}/store/store-customer-not-register-store/http-response.adoc[]
+include::{snippets}/store/store-customer-not-register-store/response-fields.adoc[]
+
+=== 검색어로 업체 검색 (기본(거리순) - 정렬X)
+
+==== GET - /api/stores/search?x-coordinate={xCoordinate}&y-Coordinate={yCoordinate}&keyword={keywords}&last-id={lastId}&size={size}&page={page}
+
+.Request
+include::{snippets}/store/search-by-default-option/http-request.adoc[]
+include::{snippets}/store/search-by-default-option/request-parameters.adoc[]
+.Response
+include::{snippets}/store/search-by-default-option/http-response.adoc[]
+include::{snippets}/store/search-by-default-option/response-fields.adoc[]
+
+=== 검색어로 업체 검색 (거리순)
+
+==== GET - /api/stores/search?x-coordinate={xcoordinate}&y-coordinate={yCoordinate}&keyword={keywords}sort-by={sortBy}&last-id={lastId}&size={size}&page={page}
+
+.Request
+include::{snippets}/store/search-by-distance/http-request.adoc[]
+include::{snippets}/store/search-by-distance/request-parameters.adoc[]
+.Response
+include::{snippets}/store/search-by-distance/http-response.adoc[]
+include::{snippets}/store/search-by-distance/response-fields.adoc[]
+
+=== 검색어로 업체 검색 (업체 마감 임박순)
+
+==== GET - /api/stores/search?x-coordinate={xcoordinate}&y-coordinate={yCoordinate}&keyword={keywords}sort-by={sortBy}&last-id={lastId}&size={size}&page={page}
+
+.Request
+include::{snippets}/store/search-by-deadline/http-request.adoc[]
+include::{snippets}/store/search-by-deadline/request-parameters.adoc[]
+.Response
+include::{snippets}/store/search-by-deadline/http-response.adoc[]
+include::{snippets}/store/search-by-deadline/response-fields.adoc[]
+
+=== 검색어로 업체 검색 (상품 할인율순)
+
+==== GET - /api/stores/search?x-coordinate={xCoordinate}&y-coordinate={yCoordinate}&keyword={keywords}sort-by={sortBy}&last-id={lastId}&size={size}&page={page}
+
+.Request
+include::{snippets}/store/search-by-discount-rate/http-request.adoc[]
+include::{snippets}/store/search-by-discount-rate/request-parameters.adoc[]
+
+.Response
+include::{snippets}/store/search-by-discount-rate/http-response.adoc[]
+include::{snippets}/store/search-by-discount-rate/response-fields.adoc[]
+
+=== 검색어로 업체 검색시 해당하는 업체X
+
+==== GET - /api/stores/search?x-coordinate={xCoordinate}&y-coordinate={yCoordinate}&keyword={keywords}sort-by={sortBy}&last-id={lastId}&size={size}&page={page}
+
+.Request
+include::{snippets}/store/search-by-no-condition/http-request.adoc[]
+include::{snippets}/store/search-by-no-condition/request-parameters.adoc[]
+.Response
+include::{snippets}/store/search-by-no-condition/http-response.adoc[]
+include::{snippets}/store/search-by-no-condition/response-fields.adoc[]

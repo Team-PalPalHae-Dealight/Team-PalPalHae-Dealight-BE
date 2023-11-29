@@ -1,0 +1,21 @@
+# green
+# green 컨테이너는 8081으로 포트를 노출해서 실행
+version: '3.3'
+services:
+  dealight-green:
+    container_name: dealight-green-container
+    build:
+      context: ./
+      dockerfile: dealight.Dockerfile
+    ports:
+      - "8081:8080"
+    volumes:
+      - /home/ubuntu/volumes/logs:/logs
+    environment:
+      TZ: "Asia/Seoul"
+    networks:
+      - dealight-network
+
+networks:
+  dealight-network:
+    external: true

@@ -1,0 +1,261 @@
+= REST Docs Auth API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+[[User-API]]
+== POST: 닉네임 중복 검사
+=== 성공
+
+.Request
+include::{snippets}/auth/auth-duplicate-nickName-check-success/http-request.adoc[]
+.Request Fields
+include::{snippets}/auth/auth-duplicate-nickName-check-success/request-fields.adoc[]
+.Request Body
+include::{snippets}/auth/auth-duplicate-nickName-check-success/request-body.adoc[]
+
+.Response
+include::{snippets}/auth/auth-duplicate-nickName-check-success/http-response.adoc[]
+---
+
+=== 실패: 이미 존재하는 닉네임
+
+.Request
+include::{snippets}/auth/auth-duplicate-nickName-check-fail-already-exist/http-request.adoc[]
+.Request Body
+include::{snippets}/auth/auth-duplicate-nickName-check-fail-already-exist/request-body.adoc[]
+
+.Response
+include::{snippets}/auth/auth-duplicate-nickName-check-fail-already-exist/http-response.adoc[]
+.Response Fields
+include::{snippets}/auth/auth-duplicate-nickName-check-fail-already-exist/response-fields.adoc[]
+.Response Body
+include::{snippets}/auth/auth-duplicate-nickName-check-fail-already-exist/response-body.adoc[]
+---
+
+=== 실패: 조건에 맞지 않는 닉네임
+
+.Request
+include::{snippets}/auth/auth-duplicate-nickName-check-fail-not-valid-form/http-request.adoc[]
+.Request Body
+include::{snippets}/auth/auth-duplicate-nickName-check-fail-not-valid-form/request-body.adoc[]
+
+.Response
+include::{snippets}/auth/auth-duplicate-nickName-check-fail-not-valid-form/http-response.adoc[]
+.Response Fields
+include::{snippets}/auth/auth-duplicate-nickName-check-fail-not-valid-form/response-fields.adoc[]
+.Response Body
+include::{snippets}/auth/auth-duplicate-nickName-check-fail-not-valid-form/response-body.adoc[]
+
+== POST: 회원가입
+=== 성공
+
+.Request
+include::{snippets}/auth/auth-signup-success/http-request.adoc[]
+.Request Fields
+include::{snippets}/auth/auth-signup-success/request-fields.adoc[]
+.Request Body
+include::{snippets}/auth/auth-signup-success/request-body.adoc[]
+
+.Response
+include::{snippets}/auth/auth-signup-success/http-response.adoc[]
+.Response Fields
+include::{snippets}/auth/auth-signup-success/response-fields.adoc[]
+.Response Body
+include::{snippets}/auth/auth-signup-success/response-body.adoc[]
+---
+
+=== 실패: Provider 정보가 없는 경우
+
+.Request
+include::{snippets}/auth/auth-signup-fail-no-provider/http-request.adoc[]
+.Request Fields
+include::{snippets}/auth/auth-signup-fail-no-provider/request-fields.adoc[]
+.Request Body
+include::{snippets}/auth/auth-signup-fail-no-provider/request-body.adoc[]
+
+.Response
+include::{snippets}/auth/auth-signup-fail-no-provider/http-response.adoc[]
+.Response Fields
+include::{snippets}/auth/auth-signup-fail-no-provider/response-fields.adoc[]
+.Response Body
+include::{snippets}/auth/auth-signup-fail-no-provider/response-body.adoc[]
+---
+
+=== 실패: Provider Id 정보가 없는 경우
+
+.Request
+include::{snippets}/auth/auth-signup-fail-no-providerId/http-request.adoc[]
+.Request Fields
+include::{snippets}/auth/auth-signup-fail-no-providerId/request-fields.adoc[]
+.Request Body
+include::{snippets}/auth/auth-signup-fail-no-providerId/request-body.adoc[]
+
+.Response
+include::{snippets}/auth/auth-signup-fail-no-providerId/http-response.adoc[]
+.Response Fields
+include::{snippets}/auth/auth-signup-fail-no-providerId/response-fields.adoc[]
+.Response Body
+include::{snippets}/auth/auth-signup-fail-no-providerId/response-body.adoc[]
+---
+
+=== 실패: 이미 가입이 된 경우
+
+.Request
+include::{snippets}/auth/auth-signup-fail-already-exist/http-request.adoc[]
+.Request Fields
+include::{snippets}/auth/auth-signup-fail-already-exist/request-fields.adoc[]
+.Request Body
+include::{snippets}/auth/auth-signup-fail-already-exist/request-body.adoc[]
+
+.Response
+include::{snippets}/auth/auth-signup-fail-already-exist/http-response.adoc[]
+.Response Fields
+include::{snippets}/auth/auth-signup-fail-already-exist/response-fields.adoc[]
+.Response Body
+include::{snippets}/auth/auth-signup-fail-already-exist/response-body.adoc[]
+
+== GET: 로그인
+
+=== 성공: 이미 회원인 경우
+
+.Request
+include::{snippets}/auth/auth-login-success/http-request.adoc[]
+.Request Parameters
+include::{snippets}/auth/auth-login-success/request-parameters.adoc[]
+
+.Response
+include::{snippets}/auth/auth-login-success/http-response.adoc[]
+.Response Fields
+include::{snippets}/auth/auth-login-success/response-fields.adoc[]
+.Response Body
+include::{snippets}/auth/auth-login-success/response-body.adoc[]
+
+=== 성공: 가입이 필요한 경우
+
+.Request
+include::{snippets}/auth/auth-require-signup/http-request.adoc[]
+.Request Parameters
+include::{snippets}/auth/auth-require-signup/request-parameters.adoc[]
+
+.Response
+include::{snippets}/auth/auth-require-signup/http-response.adoc[]
+.Response Fields
+include::{snippets}/auth/auth-require-signup/response-fields.adoc[]
+.Response Body
+include::{snippets}/auth/auth-require-signup/response-body.adoc[]
+
+=== 실패: Authorization Code가 없는 경우
+
+.Request
+include::{snippets}/auth/auth-null-authorization-code-fail/http-request.adoc[]
+.Request Parameters
+include::{snippets}/auth/auth-null-authorization-code-fail//request-parameters.adoc[]
+
+.Response
+include::{snippets}/auth/auth-null-authorization-code-fail//http-response.adoc[]
+.Response Fields
+include::{snippets}/auth/auth-null-authorization-code-fail//response-fields.adoc[]
+.Response Body
+include::{snippets}/auth/auth-null-authorization-code-fail//response-body.adoc[]
+
+=== 실패: Authorization Code가 잘못된 경우
+.Request
+include::{snippets}/auth/auth-invalid-authorization-code/http-request.adoc[]
+.Request Parameters
+include::{snippets}/auth/auth-invalid-authorization-code/request-parameters.adoc[]
+
+.Response
+include::{snippets}/auth/auth-invalid-authorization-code/http-response.adoc[]
+.Response Fields
+include::{snippets}/auth/auth-invalid-authorization-code/response-fields.adoc[]
+.Response Body
+include::{snippets}/auth/auth-invalid-authorization-code/response-body.adoc[]
+
+== DELETE: 회원탈퇴
+
+=== 성공
+
+.Request
+include::{snippets}/auth/auth-unregister-success-request/http-request.adoc[]
+.Request Headers
+include::{snippets}/auth/auth-unregister-success-request/request-headers.adoc[]
+
+.Response
+include::{snippets}/auth/auth-unregister-success-request/http-response.adoc[]
+
+=== 실패: 인증이 유효하지 않음
+
+.Request
+include::{snippets}/auth/auth-unregister-fail-if-authentication-not-valid/http-request.adoc[]
+.Request Headers
+include::{snippets}/auth/auth-unregister-fail-if-authentication-not-valid/request-headers.adoc[]
+
+.Response
+include::{snippets}/auth/auth-unregister-fail-if-authentication-not-valid/http-response.adoc[]
+.Response Fields
+include::{snippets}/auth/auth-unregister-fail-if-authentication-not-valid/response-fields.adoc[]
+.Response Body
+include::{snippets}/auth/auth-unregister-fail-if-authentication-not-valid/response-body.adoc[]
+
+=== 실패: 회원 조회에 실패
+
+.Request
+include::{snippets}/auth/auth-unregister-fail-if-member-not-found/http-request.adoc[]
+.Request Headers
+include::{snippets}/auth/auth-unregister-fail-if-member-not-found/request-headers.adoc[]
+
+.Response
+include::{snippets}/auth/auth-unregister-fail-if-member-not-found/http-response.adoc[]
+.Response Fields
+include::{snippets}/auth/auth-unregister-fail-if-member-not-found/response-fields.adoc[]
+.Response Body
+include::{snippets}/auth/auth-unregister-fail-if-member-not-found/response-body.adoc[]
+
+== GET: 토큰 재발급
+
+=== 성공
+
+.Request
+include::{snippets}/auth/auth-reissue-token-success-request/http-request.adoc[]
+.Request Headers
+include::{snippets}/auth/auth-reissue-token-success-request/request-headers.adoc[]
+
+.Response
+include::{snippets}/auth/auth-reissue-token-success-request/http-response.adoc[]
+.Response Fields
+include::{snippets}/auth/auth-reissue-token-success-request/response-fields.adoc[]
+.Response Body
+include::{snippets}/auth/auth-reissue-token-success-request/response-body.adoc[]
+
+=== 실패: 회원 조회에 실패
+
+.Request
+include::{snippets}/auth/auth-reissue-token-fail-if-not-found-member/http-request.adoc[]
+.Request Headers
+include::{snippets}/auth/auth-reissue-token-fail-if-not-found-member/request-headers.adoc[]
+
+.Response
+include::{snippets}/auth/auth-reissue-token-fail-if-not-found-member/http-response.adoc[]
+.Response Fields
+include::{snippets}/auth/auth-reissue-token-fail-if-not-found-member/response-fields.adoc[]
+.Response Body
+include::{snippets}/auth/auth-reissue-token-fail-if-not-found-member/response-body.adoc[]
+
+== PATCH: ROLE을 store로 변경
+
+=== 성공
+
+.Request
+include::{snippets}/auth/auth-change-role-success/http-request.adoc[]
+.Request Headers
+include::{snippets}/auth/auth-change-role-success/request-headers.adoc[]
+
+.Response
+include::{snippets}/auth/auth-change-role-success/http-response.adoc[]
+.Response Fields
+include::{snippets}/auth/auth-change-role-success/response-fields.adoc[]
+.Response Body
+include::{snippets}/auth/auth-change-role-success/response-body.adoc[]
