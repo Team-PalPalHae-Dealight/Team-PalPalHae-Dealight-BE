@@ -106,7 +106,7 @@ jobs:
           cp ./*.Dockerfile ./deploy/
           cp ./scripts/*.sh ./deploy/
           cp ./build/libs/dealight-be-0.0.1-SNAPSHOT.jar ./deploy/
-          zip -r -qq -j ./delight-spring-prod-build.zip ./deploy
+          zip -r -qq -j ./dealight-spring-prod-build.zip ./deploy
 
       # AWS credentials 값을 가져옴
       - name: Configure AWS credentials
@@ -121,11 +121,11 @@ jobs:
         run: |
           aws s3 cp \
             --region ap-northeast-2 \
-            ./delight-spring-prod-build.zip s3://team-08-bucket
+            ./dealight-spring-prod-build.zip s3://team-08-bucket
 
       # Code Deploy를 사용
       - name: Code Deploy
         run: aws deploy create-deployment --application-name team-08-dev
           --deployment-config-name CodeDeployDefault.AllAtOnce
           --deployment-group-name team-palpal-prod-deploy
-          --s3-location bucket=team-08-bucket,bundleType=zip,key=delight-spring-prod-build.zip
+          --s3-location bucket=team-08-bucket,bundleType=zip,key=dealight-spring-prod-build.zip
