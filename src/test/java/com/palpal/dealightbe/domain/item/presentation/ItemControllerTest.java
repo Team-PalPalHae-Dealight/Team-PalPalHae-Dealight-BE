@@ -330,7 +330,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
 			.andExpect(jsonPath("$.code").value("I001"))
 			.andExpect(jsonPath("$.errors").isEmpty())
-			.andExpect(jsonPath("$.message").value("상품 할인가는 원가보다 클 수 없습니다."))
+			.andExpect(jsonPath("$.message").value("상품 할인가는 원가보다 크거나 같을 수 없습니다."))
 			.andDo(print())
 			.andDo(document("item/item-create-fail-invalid-discount-price",
 				preprocessRequest(prettyPrint()),
@@ -946,7 +946,7 @@ class ItemControllerTest {
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
 			.andExpect(jsonPath("$.code").value("I001"))
 			.andExpect(jsonPath("$.errors").isEmpty())
-			.andExpect(jsonPath("$.message").value("상품 할인가는 원가보다 클 수 없습니다."))
+			.andExpect(jsonPath("$.message").value("상품 할인가는 원가보다 크거나 같을 수 없습니다."))
 			.andDo(print())
 			.andDo(document("item/item-update-fail-invalid-discount-price",
 				preprocessRequest(prettyPrint()),

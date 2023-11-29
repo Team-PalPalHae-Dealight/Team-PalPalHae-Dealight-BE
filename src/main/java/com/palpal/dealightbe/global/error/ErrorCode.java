@@ -33,7 +33,7 @@ public enum ErrorCode {
 	ALREADY_HAS_STORE("ST007", "이미 업체를 보유하고 있습니다"),
 
 	//상품
-	INVALID_ITEM_DISCOUNT_PRICE("I001", "상품 할인가는 원가보다 클 수 없습니다."),
+	INVALID_ITEM_DISCOUNT_PRICE("I001", "상품 할인가는 원가보다 크거나 같을 수 없습니다."),
 	NOT_FOUND_ITEM("I002", "상품이 존재하지 않습니다."),
 	DUPLICATED_ITEM_NAME("I003", "동일한 이름을 가진 상품이 이미 등록되어 있습니다."),
 	INVALID_ITEM_QUANTITY("I004", "상품 재고가 부족합니다"),
