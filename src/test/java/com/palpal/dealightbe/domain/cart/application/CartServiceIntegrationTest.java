@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.palpal.dealightbe.config.ElasticTestContainer;
 import com.palpal.dealightbe.config.RedisConfig;
 import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.address.domain.AddressRepository;
@@ -35,7 +36,7 @@ import com.palpal.dealightbe.domain.store.domain.StoreStatus;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
-@Import(RedisConfig.class)
+@Import({ElasticTestContainer.class, RedisConfig.class})
 //@ExtendWith(RedisTestContainerConfig.class)
 @Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
