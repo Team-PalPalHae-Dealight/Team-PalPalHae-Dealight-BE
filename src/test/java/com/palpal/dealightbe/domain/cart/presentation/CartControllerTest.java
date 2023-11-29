@@ -2,13 +2,13 @@ package com.palpal.dealightbe.domain.cart.presentation;
 
 import static com.palpal.dealightbe.global.error.ErrorCode.ANOTHER_STORE_ITEM_ALREADY_EXISTS_IN_THE_CART;
 import static com.palpal.dealightbe.global.error.ErrorCode.EXCEEDED_CART_ITEM_SIZE;
-import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ADD_ITEM_IN_CART_ITEM_STOCK_ZERO;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ATTEMPT_TO_ADD_OWN_STORE_ITEM_TO_CART;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_CART_QUANTITY;
 import static com.palpal.dealightbe.global.error.ErrorCode.ITEM_REMOVED_NO_LONGER_EXISTS_STORE;
 import static com.palpal.dealightbe.global.error.ErrorCode.ITEM_REMOVED_NO_LONGER_EXISTS_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_CART_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
+import static com.palpal.dealightbe.global.error.ErrorCode.UNABLE_TO_ADD_TO_CART_ITEM_STOCK_ZERO;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -544,7 +544,7 @@ class CartControllerTest {
 		//given
 		Long itemId = 1L;
 
-		doThrow(new BusinessException(INVALID_ADD_ITEM_IN_CART_ITEM_STOCK_ZERO)).when(
+		doThrow(new BusinessException(UNABLE_TO_ADD_TO_CART_ITEM_STOCK_ZERO)).when(
 			cartService).addItem(any(), any(), any());
 
 		//when

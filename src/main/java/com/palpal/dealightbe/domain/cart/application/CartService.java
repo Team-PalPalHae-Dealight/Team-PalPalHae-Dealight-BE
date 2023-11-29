@@ -7,7 +7,7 @@ import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_CART_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.ITEM_REMOVED_NO_LONGER_EXISTS_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.ITEM_REMOVED_NO_LONGER_EXISTS_STORE;
-import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ADD_ITEM_IN_CART_ITEM_STOCK_ZERO;
+import static com.palpal.dealightbe.global.error.ErrorCode.UNABLE_TO_ADD_TO_CART_ITEM_STOCK_ZERO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -282,7 +282,7 @@ public class CartService {
 		private void validateItemStock(Item item) {
 			if (item.getStock() == 0) {
 				log.warn("GET:READ:INVALID_ADD_ITEM_IN_CART_ITEM_STOCK_ZERO : item id = {}", item.getId());
-				throw new BusinessException(INVALID_ADD_ITEM_IN_CART_ITEM_STOCK_ZERO);
+				throw new BusinessException(UNABLE_TO_ADD_TO_CART_ITEM_STOCK_ZERO);
 		}
 	}
 

@@ -30,6 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 @Entity
+@Where(clause = "is_deleted = false")
+@SQLDelete(sql = "UPDATE items SET is_deleted = true WHERE id = ?")
 @Table(name = "items")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Where(clause = "is_deleted = false")
