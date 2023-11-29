@@ -19,10 +19,10 @@ public interface ItemRepository extends JpaRepository<Item, Long>, ItemRepositor
 	Optional<Item> findById(@Param("id") Long id);
 
 	@Query(value = """
-		SELECT i.*, s.*, a.*\s
+		SELECT i.*, s.*, a.*
 		FROM items i
 		INNER JOIN stores s ON i.store_id = s.id
-		INNER JOIN addresses a ON s.address_id = a.id\s
+		INNER JOIN addresses a ON s.address_id = a.id
 			WHERE i.id = :id
 		""", nativeQuery = true)
 	Optional<Item> findByIdIgnoringStatus(@Param("id") Long id);
