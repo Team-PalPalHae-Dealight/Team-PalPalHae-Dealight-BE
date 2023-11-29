@@ -76,6 +76,16 @@ jobs:
           echo "${{ secrets.YML_PROD_RDS }}" > ./application-rds.yml
         shell: bash
 
+      # application-els.yml 생성
+      - name: Make application-els.yml
+        if: |
+          contains(github.ref, 'main')
+        run: |
+          cd ./src/main/resources
+          touch ./application-els.yml
+          echo "${{ secrets.YML_PROD_ELS }}" > ./application-els.yml
+        shell: bash
+
       # 테스트를 위한 application.yml 생성
       - name: Make Test application.yml
         if: |
