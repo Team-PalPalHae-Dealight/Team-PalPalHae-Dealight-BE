@@ -51,7 +51,6 @@ import com.palpal.dealightbe.domain.member.domain.MemberRoleRepository;
 import com.palpal.dealightbe.domain.member.domain.Role;
 import com.palpal.dealightbe.domain.member.domain.RoleRepository;
 import com.palpal.dealightbe.domain.member.domain.RoleType;
-import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
@@ -66,8 +65,6 @@ class AuthServiceTest {
 	private MemberRoleRepository memberRoleRepository;
 	@Mock
 	private RoleRepository roleRepository;
-	@Mock
-	private StoreRepository storeRepository;
 	@Mock
 	private Jwt jwt;
 
