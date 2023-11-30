@@ -44,18 +44,10 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.palpal.dealightbe.domain.order.application.OrderService;
+import com.palpal.dealightbe.common.ControllerTest;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderCreateReq;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderProductReq;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderProductsReq;
@@ -65,28 +57,10 @@ import com.palpal.dealightbe.domain.order.application.dto.response.OrderProducts
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderRes;
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderStatusUpdateRes;
 import com.palpal.dealightbe.domain.order.application.dto.response.OrdersRes;
-import com.palpal.dealightbe.domain.store.application.StoreService;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
-@AutoConfigureRestDocs
-@WebMvcTest(
-	value = OrderController.class,
-	excludeAutoConfiguration = {SecurityAutoConfiguration.class, OAuth2ClientAutoConfiguration.class}
-)
-public class OrderControllerTest {
-
-	@Autowired
-	private MockMvc mockMvc;
-
-	@Autowired
-	private ObjectMapper objectMapper;
-
-	@MockBean
-	private OrderService orderService;
-
-	@MockBean
-	private StoreService storeService;
+public class OrderControllerTest extends ControllerTest {
 
 	@Nested
 	@DisplayName("<주문 생성>")
