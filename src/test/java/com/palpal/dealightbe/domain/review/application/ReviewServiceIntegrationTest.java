@@ -40,7 +40,7 @@ import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 
 @Transactional
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import({ElasticTestContainer.class, RedisConfig.class})
 class ReviewServiceIntegrationTest {
 

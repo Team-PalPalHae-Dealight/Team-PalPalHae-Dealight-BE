@@ -1,7 +1,14 @@
 package com.palpal.dealightbe.domain.auth.application;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.doNothing;
+import static org.mockito.BDDMockito.doThrow;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.times;
+import static org.mockito.BDDMockito.verify;
+import static org.mockito.BDDMockito.when;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -44,7 +51,6 @@ import com.palpal.dealightbe.domain.member.domain.MemberRoleRepository;
 import com.palpal.dealightbe.domain.member.domain.Role;
 import com.palpal.dealightbe.domain.member.domain.RoleRepository;
 import com.palpal.dealightbe.domain.member.domain.RoleType;
-import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
@@ -59,8 +65,6 @@ class AuthServiceTest {
 	private MemberRoleRepository memberRoleRepository;
 	@Mock
 	private RoleRepository roleRepository;
-	@Mock
-	private StoreRepository storeRepository;
 	@Mock
 	private Jwt jwt;
 
