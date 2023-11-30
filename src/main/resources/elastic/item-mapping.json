@@ -4,10 +4,11 @@
       "type": "text"
     },
     "name": {
-      "type": "text"
+      "type": "text",
+      "analyzer": "nori"
     },
     "storeId": {
-      "type": "long"
+      "type": "text"
     }
   }
 }

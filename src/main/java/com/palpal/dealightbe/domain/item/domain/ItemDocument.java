@@ -1,7 +1,6 @@
 package com.palpal.dealightbe.domain.item.domain;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.persistence.Id;
 
@@ -29,23 +28,23 @@ public class ItemDocument {
 
 	private String name;
 
-	private Long storeId;
+	private String storeId;
 
-	public static ItemDocument from(Item item) {
+	public static ItemDocument from(UpdatedItem item) {
 		return ItemDocument.builder()
 			.id(String.valueOf(item.getId()))
 			.name(item.getName())
-			.storeId(item.getStore().getId())
+			.storeId(String.valueOf(item.getStore().getId()))
 			.build();
 	}
 
-	public static List<ItemDocument> convertToItemDocuments(List<Item> items) {
+	public static List<ItemDocument> convertToItemDocuments(List<UpdatedItem> items) {
 		if (items == null) {
 			return null;
 		}
+
 		return items.stream()
 			.map(ItemDocument::from)
-			.collect(Collectors.toList());
+			.toList();
 	}
-
 }
