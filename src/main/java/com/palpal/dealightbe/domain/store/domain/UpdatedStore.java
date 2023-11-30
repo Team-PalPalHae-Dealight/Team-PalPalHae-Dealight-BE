@@ -1,13 +1,19 @@
 package com.palpal.dealightbe.domain.store.domain;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.palpal.dealightbe.domain.item.domain.UpdatedItem;
 import com.palpal.dealightbe.global.BaseEntity;
 
 import lombok.AccessLevel;
@@ -37,9 +43,15 @@ public class UpdatedStore extends BaseEntity {
 
 	private String image;
 
+	@Enumerated(EnumType.STRING)
+	private DocumentStatus documentStatus = DocumentStatus.READY;
+
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "store")
+	private List<UpdatedItem> items = new ArrayList<>();
+
 	@Builder
-	public UpdatedStore(Long id, double xCoordinate, double yCoordinate, String name, StoreStatus storeStatus,
-						LocalTime openTime, LocalTime closeTime, String image) {
+	private UpdatedStore(Long id, double xCoordinate, double yCoordinate, String name, StoreStatus storeStatus,
+						 LocalTime openTime, LocalTime closeTime, String image) {
 		this.id = id;
 		this.xCoordinate = xCoordinate;
 		this.yCoordinate = yCoordinate;
@@ -61,5 +73,21 @@ public class UpdatedStore extends BaseEntity {
 			.closeTime(store.getCloseTime())
 			.image(store.getImage())
 			.build();
+	}
+
+	public void addItem(UpdatedItem item) {
+		this.items.add(item);
+	}
+
+	public void updateDocumentStatus(DocumentStatus status) {
+		this.documentStatus = status;
+	}
+
+	public void updateStoreStatus(StoreStatus storeStatus) {
+		this.storeStatus = storeStatus;
+	}
+
+	public void markAsDone() {
+		this.documentStatus = DocumentStatus.DONE;
 	}
 }

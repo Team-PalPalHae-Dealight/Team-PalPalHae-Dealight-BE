@@ -43,16 +43,26 @@ public class StoreDocument {
 
 	private List<ItemDocument> items;
 
-	public static StoreDocument from(UpdatedStore updatedStore, Store store) {
+	public static StoreDocument from(UpdatedStore updatedStore) {
 		return StoreDocument.builder()
 			.id(String.valueOf(updatedStore.getId()))
 			.location(new GeoPoint(updatedStore.getYCoordinate(), updatedStore.getXCoordinate()))
 			.name(updatedStore.getName())
-			.storeStatus(StoreStatus.OPENED)
+			.storeStatus(updatedStore.getStoreStatus())
 			.openTime(updatedStore.getOpenTime().toString())
 			.closeTime(updatedStore.getCloseTime().toString())
 			.image(updatedStore.getImage())
-			.items(ItemDocument.convertToItemDocuments(store.getItems()))
+			.items(ItemDocument.convertToItemDocuments(updatedStore.getItems()))
 			.build();
+	}
+
+	public static List<StoreDocument> convertToStoreDocuments(List<UpdatedStore> stores) {
+		if (stores == null) {
+			return null;
+		}
+
+		return stores.stream()
+			.map(StoreDocument::from)
+			.toList();
 	}
 }

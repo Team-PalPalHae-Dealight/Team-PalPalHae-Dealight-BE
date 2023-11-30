@@ -1,6 +1,5 @@
 package com.palpal.dealightbe.domain.store.application;
 
-import java.util.List;
 import java.util.Objects;
 
 import org.springframework.data.domain.Pageable;
@@ -25,12 +24,10 @@ import com.palpal.dealightbe.domain.store.application.dto.response.StoreInfoRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoreStatusRes;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoresInfoSliceRes;
 import com.palpal.dealightbe.domain.store.domain.Store;
-import com.palpal.dealightbe.domain.store.domain.StoreDocument;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.domain.store.domain.StoreStatus;
 import com.palpal.dealightbe.domain.store.domain.UpdatedStore;
 import com.palpal.dealightbe.domain.store.domain.UpdatedStoreRepository;
-import com.palpal.dealightbe.domain.store.infrastructure.StoreSearchRepositoryImpl;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
@@ -48,7 +45,6 @@ public class StoreService {
 
 	private final StoreRepository storeRepository;
 	private final UpdatedStoreRepository updatedStoreRepository;
-	private final StoreSearchRepositoryImpl storeSearchRepositoryImpl;
 	private final MemberRepository memberRepository;
 	private final ItemRepository itemRepository;
 	private final AddressService addressService;
@@ -67,6 +63,9 @@ public class StoreService {
 
 		Store store = StoreCreateReq.toStore(req, address, member);
 		storeRepository.save(store);
+
+		UpdatedStore updatedStore = UpdatedStore.from(store);
+		updatedStoreRepository.save(updatedStore);
 
 		return StoreCreateRes.from(store);
 	}
@@ -104,13 +103,18 @@ public class StoreService {
 		StoreStatus updateStatus = StoreStatus.fromString(storeStatus.storeStatus().toString());
 		store.updateStatus(updateStatus);
 
-		statusCheckAndManageUpdatedStore(store);
+		UpdatedStore updatedStore = updatedStoreRepository.findById(store.getId())
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_UPDATED_STORE_BY_ID : {}", store.getId());
+				return new EntityNotFoundException(ErrorCode.NOT_FOUND_UPDATED_STORE);
+			});
+
+		updatedStore.updateStoreStatus(updateStatus);
 
 		deleteClosedStoreItems(store);
 
 		return StoreStatusRes.from(store);
 	}
-
 
 	@Transactional(readOnly = true)
 	public StoreStatusRes getStatus(Long providerId, Long storeId) {
@@ -166,43 +170,6 @@ public class StoreService {
 		Slice<Store> stores = storeRepository.findByKeywordAndDistanceWithin3KmAndSortCondition(xCoordinate, yCoordinate, keyword, sortBy, cursor, pageable);
 
 		return StoresInfoSliceRes.from(stores);
-	}
-
-	@Transactional(readOnly = true)
-	public StoresInfoSliceRes searchToES(double xCoordinate, double yCoordinate, String keyword, Pageable pageable) {
-		Slice<StoreDocument> storeDocuments = storeSearchRepositoryImpl.searchStores(xCoordinate, yCoordinate, keyword, pageable);
-
-		return StoresInfoSliceRes.fromDocuments(storeDocuments);
-	}
-
-	public void uploadToES() {
-		List<UpdatedStore> updatedStoreList = updatedStoreRepository.findAll();
-
-		if (updatedStoreList.isEmpty()) {
-			throw new BusinessException(ErrorCode.UPDATABLE_STORE_NOT_EXIST);
-		}
-
-		List<StoreDocument> storeDocuments = updatedStoreList.stream()
-			.map(updatedStore -> {
-				Store store = storeRepository.findById(updatedStore.getId())
-					.orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_STORE));
-				return StoreDocument.from(updatedStore, store);
-			})
-			.toList();
-
-		storeSearchRepositoryImpl.bulkInsertOrUpdate(storeDocuments);
-		updatedStoreRepository.deleteAll();
-	}
-
-	private void statusCheckAndManageUpdatedStore(Store store) {
-		if (store.getStoreStatus() == StoreStatus.OPENED) {
-			UpdatedStore updatedStore = UpdatedStore.from(store);
-			updatedStoreRepository.save(updatedStore);
-		}
-		if (store.getStoreStatus() == StoreStatus.CLOSED) {
-			UpdatedStore updatedStore = UpdatedStore.from(store);
-			updatedStoreRepository.delete(updatedStore);
-		}
 	}
 
 	private Store getStoreByProviderId(Long providerId) {
