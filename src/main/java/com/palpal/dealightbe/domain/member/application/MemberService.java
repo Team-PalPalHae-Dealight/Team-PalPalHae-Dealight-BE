@@ -46,6 +46,13 @@ public class MemberService {
 	}
 
 	public MemberUpdateRes updateMemberProfile(Long memberId, MemberUpdateReq request) {
+
+		String nickName = request.nickName();
+		boolean isDuplicate = memberRepository.existsByNickName(nickName);
+		if (isDuplicate) {
+			throw new BusinessException(ErrorCode.DUPLICATED_NICK_NAME);
+		}
+
 		Member member = memberRepository.findMemberByProviderId(memberId)
 			.orElseThrow(() -> {
 				log.warn("PATCH:UPDATE:NOT_FOUND_MEMBER_BY_ID : {}", memberId);

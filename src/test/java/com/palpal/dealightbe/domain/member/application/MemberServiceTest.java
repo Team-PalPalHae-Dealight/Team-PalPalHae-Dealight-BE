@@ -137,7 +137,7 @@ class MemberServiceTest {
 		MemberUpdateRes updatedMemberRes = memberService.updateMemberProfile(memberId, request);
 
 		// then
-		assertEquals("유느님", updatedMemberRes.nickname());
+		assertEquals("유느님", updatedMemberRes.nickName());
 		assertEquals("01087654321", updatedMemberRes.phoneNumber());
 		assertEquals("부산", updatedMemberRes.address().name());
 		assertEquals(35.1796, updatedMemberRes.address().xCoordinate());
