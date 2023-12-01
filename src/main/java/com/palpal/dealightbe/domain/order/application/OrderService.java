@@ -79,26 +79,16 @@ public class OrderService {
 	@Transactional(readOnly = true)
 	public OrderRes findById(Long orderId, Long memberProviderId) {
 		Order order = getOrder(orderId);
-
 		Member member = getMember(memberProviderId);
 
-		if (!(order.isMember(member) || order.isStoreOwner(member))) {
-			log.warn("GET:READ:UNAUTHORIZED: ORDERED_MEMBER {}, STORE_OWNER {}, REQUESTER {}",
-				member, order.getStore().getMember().getProviderId(), memberProviderId);
-
-			throw new BusinessException(UNAUTHORIZED_REQUEST);
-		}
+		order.validateOrderUpdater(member);
 
 		return OrderRes.from(order);
 	}
 
 	@Transactional(readOnly = true)
 	public OrdersRes findAllByStoreId(Long storeId, Long memberProviderId, String status, Pageable pageable) {
-		Store store = storeRepository.findById(storeId)
-			.orElseThrow(() -> {
-				log.warn("GET:READ:NOT_FOUND_STORE_BY_ID : {}", storeId);
-				return new EntityNotFoundException(NOT_FOUND_STORE);
-			});
+		Store store = getStore(storeId);
 
 		if (!store.isSameOwnerAndTheRequester(memberProviderId)) {
 			throw new BusinessException(UNAUTHORIZED_REQUEST);
