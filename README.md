@@ -20,7 +20,7 @@
 <img src="https://img.shields.io/badge/Spring Security-6DB33F?style=for-the-badge&logo=spring security&logoColor=white" />
 <img src="https://img.shields.io/badge/Hibernate-59666C?style=for-the-badge&logo=Hibernate&logoColor=white" />
 <img src="https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=Gradle&logoColor=white"/> 
-<img src="https://img.shields.io/badge/JUnit5-25A162?style=for-the-badge&logo=JUnit5&logoColor=white"/>
+  
 <br>
   
 <img src="https://img.shields.io/badge/MySQL 8-4479A1?style=for-the-badge&logo=MySQL&logoColor=white"/> 
@@ -32,6 +32,8 @@
 <img src="https://img.shields.io/badge/JWT-ED8106?style=for-the-badge&logoColor=white"/> 
 <img src="https://img.shields.io/badge/Oauth-7F5AB6?style=for-the-badge&logoColor=white"/> 
 <img src="https://img.shields.io/badge/Logback-231F20?style=for-the-badge&logoColor=white"/> 
+<img src="https://img.shields.io/badge/JUnit5-25A162?style=for-the-badge&logo=JUnit5&logoColor=white"/>
+
 <br>
 
 <img src="https://img.shields.io/badge/AWS S3-569A31?style=for-the-badge&logo=Amazon S3&logoColor=white"/> 
@@ -47,6 +49,7 @@
 <img src="https://img.shields.io/badge/Elastic Search-005571?style=for-the-badge&logo=ElasticSearch&logoColor=white"/>
 <img src="https://img.shields.io/badge/Kibana-005571?style=for-the-badge&logo=Kibana&logoColor=white"/>
 <img src="https://img.shields.io/badge/NGINX-009639?style=for-the-badge&logo=nginx&logoColor=white"/>
+<img src="https://img.shields.io/badge/Server Sent Event-09B3AF?style=for-the-badge&logoColor=white"/>
 
 <br>
 <img src="https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=Notion&logoColor=white"/> 
@@ -62,7 +65,15 @@
    🔗 배포 링크 
 </h2>
 
-- [배포 링크](https://dev-dealight.vercel.app/)
+- [🌱 즐거운 가격, 함께하는 맛의 기쁨 Dealight](https://dev-dealight.vercel.app/)
+
+<br>
+
+<h2> 
+   🎬 시연 영상 
+</h2>
+
+<br>
 
 <h2>
   👨🏻‍💻 팀원 소개
@@ -74,12 +85,15 @@
 |:---------------------------------------:|:---------------------------------------:|:----------------------------------------:|:---------------------------------------:|:----------------------------------------:|
 | <img src="https://avatars.githubusercontent.com/u/59169881?v=4" width="100" /> | <img src="https://avatars.githubusercontent.com/u/97447334?v=4" width="100" /> | <img src="https://avatars.githubusercontent.com/u/134909318?v=4" width="100" /> | <img src="https://avatars.githubusercontent.com/u/49016275?v=4" width="100" /> | <img src="https://avatars.githubusercontent.com/u/71485411?s=96&v=4" width="100" /> |
 
+<br>
+
 <h2>
   💡 프로젝트 소개
 </h2>
 
   소상공인들의 당일 폐기 예정 식품의 할인 정보 공유 및 구매/판매 서비스
 
+<br>
 
 <h2>
   💪🏻 핵심 기능
@@ -90,6 +104,8 @@
   - 사용자들은 웹 사이트를 통해 할인된 상품 정보를 확인할 수 있습니다.
 
   - 상품 주문 기능을 제공하여 저렴한 식품을 구매할 수 있습니다.
+
+<br>
 
 <h2>
   🔫 타겟층
@@ -103,39 +119,83 @@
   - 매출 증대: 당일 폐기 예정인 식품을 할인하여 판매합니다. 고객들에게 더욱 합리적인 가격으로 제공함으로써 판매량을 늘리고 매출을 높일 수 있습니다.
   - 음식물 폐기 비용 절감: 당일 판매 상품의 낭비가 없어져 폐기 비용을 절감할 수 있습니다.
 
+<br>
+
 <h2>
   📄 프로젝트 문서
 </h2>
 
+- [Github Discussions](https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/discussions)
+
+- [Github Wiki](https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/wiki)
+
+<br>
+
 <h2>
-  🛠️ Backend 기술 스택
+  💌 API 명세
 </h2>
+
+- [API 명세 링크](https://server.dealight.store/docs/)
+
+<details>
+<summary> API 명세 예시 (업체 등록 API)</summary>
+
+<img width="736" alt="API 명세 예시" src="https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/59169881/5184607f-c09b-4122-8e43-d336f0034544">
+
+</details>
+
+<br>
+
+<h2>
+  🧱 Backend 기술 스택
+</h2>
+
+<br>
 
 <h2>
   🛠️ 시스템 구조
 </h2>
+
+<br>
 
 <h2>
   🤝🏻 CI/CD
 </h2>
 <img width="1327" alt="image" src="https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/97447334/119bdd5d-1f39-43e2-ad5a-0dd01910b476">
 
+<br>
+<br>
+
+<h2>
+  🌌 유저 요청 Flow
+</h2>
+
+![유저 요청 Flow](https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/59169881/bcbe6140-6d19-431f-b812-ae98fd85654a)
+
+<br>
+
 <h2>
   📈 플로우 차트
 </h2>
 
-- 업체
+#### 업체
 ![업체 Flow Chart](https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/59169881/7de0655a-3b51-4da2-9815-1cb50e72ce83)
 
-- 고객
+#### 고객
 ![고객 Flow Chart](https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/59169881/abd79a70-ea95-466f-ac6e-65b192664339)
+
+<br>
 
 <h2>
   💻 ERD
 </h2>
 
+![dealight BE ERD](https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/59169881/b7107b3f-9ff2-49c0-825a-e42bf1fb5502)
+
+<br>
+
 <h2>
-  🗂️ 폴더 구조
+  🗂️ 패키지 구조
 </h2>
 <details>
 <summary>패키지 구조</summary>
@@ -485,6 +545,7 @@ Team-PalPalHae-Dealight-BE [dealight-be]
 
 <!-- ## 🤝🏻 Backend Architecture -->
 
+<br>
 
 <h2>
   🎯 주요 기능 소개
