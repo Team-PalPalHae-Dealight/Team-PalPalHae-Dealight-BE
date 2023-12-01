@@ -9,6 +9,15 @@
     },
     "storeId": {
       "type": "text"
+    },
+    "discountPrice": {
+      "type": "integer"
+    },
+    "originalPrice": {
+      "type": "integer"
+    },
+    "discountRate": {
+      "type": "double"
     }
   }
 }
