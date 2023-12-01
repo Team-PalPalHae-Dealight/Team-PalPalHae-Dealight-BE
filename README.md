@@ -33,7 +33,7 @@
 
 ------
 
-### ☁️ 인프라
+### 🛠️ 인프라
 
 <p align="center">
   <img src="https://img.shields.io/badge/NGINX-009639?style=for-the-badge&logo=nginx&logoColor=white"/>
