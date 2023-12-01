@@ -138,10 +138,10 @@ class MemberControllerTest {
 
 		// given
 		AddressReq addressReq = new AddressReq("서울", 37.5665, 126.9780);
-		MemberUpdateReq updateRequest = new MemberUpdateReq("박명수", "유산슬", addressReq);
+		MemberUpdateReq updateRequest = new MemberUpdateReq("박명수", "01012341234", addressReq);
 
 		AddressRes addressRes = new AddressRes("서울", 37.5665, 126.9780);
-		MemberUpdateRes updateResponse = new MemberUpdateRes("박명수", "유산슬", addressRes);
+		MemberUpdateRes updateResponse = new MemberUpdateRes("박명수", "01012341234", addressRes);
 
 		given(memberService.updateMemberProfile(any(), eq(updateRequest)))
 			.willReturn(updateResponse);
@@ -160,14 +160,14 @@ class MemberControllerTest {
 					headerWithName("Authorization").description("Access Token")
 				),
 				requestFields(
-					fieldWithPath("nickname").description("업데이트하려는 닉네임"),
+					fieldWithPath("nickName").description("업데이트하려는 닉네임"),
 					fieldWithPath("phoneNumber").description("업데이트하려는 전화번호"),
 					fieldWithPath("address.name").description("업데이트하려는 주소명"),
 					fieldWithPath("address.xCoordinate").description("업데이트하려는 주소의 X 좌표"),
 					fieldWithPath("address.yCoordinate").description("업데이트하려는 주소의 Y 좌표")
 				),
 				responseFields(
-					fieldWithPath("nickname").description("업데이트된 닉네임"),
+					fieldWithPath("nickName").description("업데이트된 닉네임"),
 					fieldWithPath("phoneNumber").description("업데이트된 전화번호"),
 					fieldWithPath("address.name").description("업데이트된 주소명"),
 					fieldWithPath("address.xCoordinate").description("업데이트된 주소의 X 좌표"),
@@ -201,7 +201,7 @@ class MemberControllerTest {
 					headerWithName("Authorization").description("Access Token")
 				),
 				requestFields(
-					fieldWithPath("nickname").description("업데이트하려는 닉네임"),
+					fieldWithPath("nickName").description("업데이트하려는 닉네임"),
 					fieldWithPath("phoneNumber").description("업데이트하려는 전화번호"),
 					fieldWithPath("address.name").description("업데이트하려는 주소명"),
 					fieldWithPath("address.xCoordinate").description("업데이트하려는 주소의 X 좌표"),
