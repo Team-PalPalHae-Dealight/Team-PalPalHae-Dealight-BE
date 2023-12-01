@@ -36,8 +36,8 @@ public class SearchService {
 	private final ItemSearchRepositoryImpl itemSearchRepositoryImpl;
 
 	@Transactional(readOnly = true)
-	public StoresInfoSliceRes searchToES(double xCoordinate, double yCoordinate, String keyword, Pageable pageable) {
-		Slice<StoreDocument> storeDocuments = storeSearchRepositoryImpl.searchStores(xCoordinate, yCoordinate, keyword, pageable);
+	public StoresInfoSliceRes searchToES(double xCoordinate, double yCoordinate, String keyword, String sortBy, Pageable pageable) {
+		Slice<StoreDocument> storeDocuments = storeSearchRepositoryImpl.searchStores(xCoordinate, yCoordinate, keyword, sortBy, pageable);
 
 		return StoresInfoSliceRes.fromDocuments(storeDocuments);
 	}

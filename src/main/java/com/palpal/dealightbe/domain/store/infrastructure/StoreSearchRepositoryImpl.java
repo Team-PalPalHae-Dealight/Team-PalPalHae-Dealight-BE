@@ -6,12 +6,18 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.lucene.search.join.ScoreMode;
+import org.elasticsearch.common.unit.DistanceUnit;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MultiMatchQueryBuilder;
-import org.elasticsearch.index.query.NestedQueryBuilder;
 import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.script.Script;
+import org.elasticsearch.script.ScriptType;
+import org.elasticsearch.search.sort.NestedSortBuilder;
+import org.elasticsearch.search.sort.ScriptSortBuilder;
+import org.elasticsearch.search.sort.SortBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -27,6 +33,7 @@ import org.springframework.stereotype.Repository;
 import com.palpal.dealightbe.domain.item.domain.ItemDocument;
 import com.palpal.dealightbe.domain.store.domain.StoreDocument;
 import com.palpal.dealightbe.domain.store.domain.StoreStatus;
+import com.palpal.dealightbe.global.ListSortType;
 
 import lombok.RequiredArgsConstructor;
 
@@ -80,24 +87,16 @@ public class StoreSearchRepositoryImpl {
 		}
 	}
 
-	public Slice<StoreDocument> searchStores(double x, double y, String keyword, Pageable pageable) {
-		NativeSearchQuery searchQuery = buildStoreSearchQuery(x, y, keyword, pageable);
+	public Slice<StoreDocument> searchStores(double x, double y, String keyword, String sortBy, Pageable pageable) {
+		NativeSearchQuery searchQuery = buildStoreSearchQuery(x, y, keyword, sortBy, pageable);
 		SearchHits<StoreDocument> results = operations.search(searchQuery, StoreDocument.class);
 		List<StoreDocument> storeDocuments = results.stream().map(SearchHit::getContent).toList();
 
 		return toSlice(storeDocuments, pageable);
 	}
 
-	public NativeSearchQuery buildStoreSearchQuery(double x, double y, String keyword, Pageable pageable) {
+	public NativeSearchQuery buildStoreSearchQuery(double x, double y, String keyword, String sortBy, Pageable pageable) {
 		BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
-
-		// 키워드 검색 (업체명)
-		MultiMatchQueryBuilder keywordQuery = QueryBuilders.multiMatchQuery(keyword, "name")
-			.operator(Operator.OR)
-			.type(MultiMatchQueryBuilder.Type.BEST_FIELDS);
-
-		// 키워드 검색 (업체가 가진 상품)
-		NestedQueryBuilder itemQuery = QueryBuilders.nestedQuery("items", QueryBuilders.matchQuery("items.name", keyword), ScoreMode.Avg);
 
 		// 거리 필터링
 		QueryBuilder geoQuery = QueryBuilders.geoDistanceQuery("location")
@@ -107,17 +106,54 @@ public class StoreSearchRepositoryImpl {
 		// 업체 상태 필터링
 		QueryBuilder statusQuery = QueryBuilders.matchQuery("storeStatus", "OPENED");
 
-		// 모든 조건을 must로 추가
-		boolQuery.should(keywordQuery);
-		boolQuery.should(itemQuery);
+		// Keyword 검색 (업체명 또는 아이템명)
+		QueryBuilder keywordQuery = QueryBuilders.boolQuery()
+			.should(QueryBuilders.matchQuery("name", keyword).operator(Operator.AND))
+			.should(QueryBuilders.nestedQuery("items", QueryBuilders.matchQuery("items.name", keyword), ScoreMode.None));
+
 		boolQuery.must(geoQuery);
+		boolQuery.must(keywordQuery);
 		boolQuery.must(statusQuery);
 
-		// NativeSearchQueryBuilder를 사용하여 쿼리 빌드
+		SortBuilder<?> sortBuilder = getSortBuilder(x, y, sortBy);
+
 		return new NativeSearchQueryBuilder()
 			.withQuery(boolQuery)
+			.withSorts(sortBuilder)
 			.withPageable(pageable)
 			.build();
+	}
+
+	private SortBuilder<?> getSortBuilder(double x, double y, String sortBy) {
+		ListSortType sortType = ListSortType.findSortType(sortBy);
+
+		switch (sortType) {
+			case DISTANCE:
+				return SortBuilders.geoDistanceSort("location", y, x)
+					.point(y, x)
+					.unit(DistanceUnit.KILOMETERS)
+					.order(SortOrder.ASC);
+			case DEADLINE:
+				long currentTimeMillis = System.currentTimeMillis();
+
+				String script = "Math.abs(doc['closeTime'].value.toInstant().toEpochMilli() - params.currentTimeMillis)";
+				Map<String, Object> params = Collections.singletonMap("currentTimeMillis", currentTimeMillis);
+
+				return SortBuilders.scriptSort(new Script(ScriptType.INLINE, "painless", script, params),
+						ScriptSortBuilder.ScriptSortType.NUMBER)
+					.order(SortOrder.DESC);
+			case DISCOUNT_RATE:
+				String nestedPath = "items";
+
+				return SortBuilders.fieldSort("items.discountRate")
+					.setNestedSort(new NestedSortBuilder(nestedPath))
+					.order(SortOrder.DESC);
+			default:
+				return SortBuilders.geoDistanceSort("location", y, x)
+					.point(y, x)
+					.unit(DistanceUnit.KILOMETERS)
+					.order(SortOrder.ASC);
+		}
 	}
 
 	private Slice<StoreDocument> toSlice(List<StoreDocument> contents, Pageable pageable) {

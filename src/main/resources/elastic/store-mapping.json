@@ -36,6 +36,15 @@
         },
         "storeId": {
           "type": "long"
+        },
+        "discountPrice": {
+          "type": "integer"
+        },
+        "originalPrice": {
+          "type": "integer"
+        },
+        "discountRate": {
+          "type": "double"
         }
       }
     }
