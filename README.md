@@ -1,66 +1,76 @@
-<p align="middle" >
-  <img width="550px" height=“300px” src="https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/59169881/cf4c41b7-4301-4a4a-bb7a-4ab910784d21">
+<p align="center">
+  <img width="550px" height="300px" src="https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/59169881/cf4c41b7-4301-4a4a-bb7a-4ab910784d21">
   <br>
-  <h2 align="middle">
-    🌱 즐거운 가격, 함께하는 맛의 기쁨 Dealight
-  </h2>
-  </p>
+  <h1 align="center">🌱 Dealight - 즐거운 가격, 함께하는 맛의 기쁨</h1>
 </p>
 
 <br>
-<p align="middle">
-👨🏻‍💻 프로젝트 기간 👨🏻‍💻<br />2023.10.12 ~ 2023.12.04
+
+<p align="center">
+  <h3>👨🏻‍💻 프로젝트 기간 👨🏻‍💻<br />2023.10.12 ~ 2023.12.04</h3>
 </p>
 
 ------
-서비스 기술
 
-<div align="middle">
-<img src="https://img.shields.io/badge/Java 17-007396?style=for-the-badge&logo=openJDK&logoColor=white"/> 
-<img src="https://img.shields.io/badge/Spring 5-6DB33F?style=for-the-badge&logo=Spring&logoColor=white" />
-<img src="https://img.shields.io/badge/Springboot 2.7.17-6DB33F?style=for-the-badge&logo=Springboot&logoColor=white"/> 
-<img src="https://img.shields.io/badge/Spring Security-6DB33F?style=for-the-badge&logo=spring security&logoColor=white" />
-<img src="https://img.shields.io/badge/Hibernate-59666C?style=for-the-badge&logo=Hibernate&logoColor=white" />
-<img src="https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=Gradle&logoColor=white"/>
-<img src="https://img.shields.io/badge/QueryDSL-0769AD?style=for-the-badge&logoColor=white"/>
-<img src="https://img.shields.io/badge/Asciidoctor-E40046?style=for-the-badge&logo=asciidoctor&logoColor=white">
-<img src="https://img.shields.io/badge/Server Sent Event-09B3AF?style=for-the-badge&logoColor=white"/>
-<img src="https://img.shields.io/badge/JWT-ED8106?style=for-the-badge&logoColor=white"/>
-<img src="https://img.shields.io/badge/Oauth-7F5AB6?style=for-the-badge&logoColor=white"/>
-<img src="https://img.shields.io/badge/Logback-231F20?style=for-the-badge&logoColor=white"/> 
-<img src="https://img.shields.io/badge/JUnit5-25A162?style=for-the-badge&logo=JUnit5&logoColor=white"/>
-<img src="https://img.shields.io/badge/Jacoco-9C4121?style=for-the-badge&logoColor=white"/>
-  
--------
-인프라
+### 🚀 서비스 기술
 
-<img src="https://img.shields.io/badge/NGINX-009639?style=for-the-badge&logo=nginx&logoColor=white"/>
-<img src="https://img.shields.io/badge/MySQL 8-4479A1?style=for-the-badge&logo=MySQL&logoColor=white"/>
-<img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=Redis&logoColor=white"/>
-<img src="https://img.shields.io/badge/Loki-008080?style=for-the-badge&logoColor=white"/>
-<img src="https://img.shields.io/badge/Prometheus-E6522C?style=for-the-badge&logo=Prometheus&logoColor=white"/>
-<img src="https://img.shields.io/badge/Grafana-F46800?style=for-the-badge&logo=Grafana&logoColor=white"/>
-<img src="https://img.shields.io/badge/Kibana-005571?style=for-the-badge&logo=Kibana&logoColor=white"/>
-<img src="https://img.shields.io/badge/Elastic Search-005571?style=for-the-badge&logo=ElasticSearch&logoColor=white"/>
+<p align="center">
+  <img src="https://img.shields.io/badge/Java%2017-007396?style=for-the-badge&logo=openJDK&logoColor=white"/> 
+  <img src="https://img.shields.io/badge/Spring%205-6DB33F?style=for-the-badge&logo=Spring&logoColor=white" />
+  <img src="https://img.shields.io/badge/Springboot%202.7.17-6DB33F?style=for-the-badge&logo=Springboot&logoColor=white"/> 
+  <img src="https://img.shields.io/badge/Spring%20Security-6DB33F?style=for-the-badge&logo=spring-security&logoColor=white" />
+  <img src="https://img.shields.io/badge/Hibernate-59666C?style=for-the-badge&logo=Hibernate&logoColor=white" />
+  <img src="https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=Gradle&logoColor=white"/>
+  <img src="https://img.shields.io/badge/QueryDSL-0769AD?style=for-the-badge&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Asciidoctor-E40046?style=for-the-badge&logo=asciidoctor&logoColor=white">
+  <img src="https://img.shields.io/badge/Server%20Sent%20Event-09B3AF?style=for-the-badge&logoColor=white"/>
+  <img src="https://img.shields.io/badge/JWT-ED8106?style=for-the-badge&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Oauth-7F5AB6?style=for-the-badge&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Logback-231F20?style=for-the-badge&logoColor=white"/> 
+  <img src="https://img.shields.io/badge/JUnit5-25A162?style=for-the-badge&logo=JUnit5&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Jacoco-9C4121?style=for-the-badge&logoColor=white"/>
+</p>
 
--------
-클라우드
+------
 
-<img src="https://img.shields.io/badge/AWS EC2-FF9900?style=for-the-badge&logo=Amazon EC2&logoColor=white"/>
-<img src="https://img.shields.io/badge/AWS S3-569A31?style=for-the-badge&logo=Amazon S3&logoColor=white"/>
-<img src="https://img.shields.io/badge/AWS RDS-527FFF?style=for-the-badge&logo=Amazon RDS&logoColor=white"/>
-<img src="https://img.shields.io/badge/GitHub Actions-2088FF?style=for-the-badge&logo=GitHub Actions&logoColor=white"/>
-<img src="https://img.shields.io/badge/Code Deploy-2F93E0?style=for-the-badge&logoColor=white"/>
-<img src="https://img.shields.io/badge/SonarCloud-F3702A?style=for-the-badge&logo=SonarCloud&logoColor=white"/>
+### ☁️ 인프라
 
--------
-협업도구
+<p align="center">
+  <img src="https://img.shields.io/badge/NGINX-009639?style=for-the-badge&logo=nginx&logoColor=white"/>
+  <img src="https://img.shields.io/badge/MySQL%208-4479A1?style=for-the-badge&logo=MySQL&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=Redis&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Loki-008080?style=for-the-badge&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Prometheus-E6522C?style=for-the-badge&logo=Prometheus&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Grafana-F46800?style=for-the-badge&logo=Grafana&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Kibana-005571?style=for-the-badge&logo=Kibana&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Elastic%20Search-005571?style=for-the-badge&logo=ElasticSearch&logoColor=white"/>
+</p>
 
-<img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">
-<img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=GitHub&logoColor=white"/>
-<img src="https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=Notion&logoColor=white"/> 
-<img src="https://img.shields.io/badge/Slack-4A154B?style=for-the-badge&logo=Slack&logoColor=white"/>
-<img src="https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white"/>
+------
+
+### ☁️ 클라우드
+
+<p align="center">
+  <img src="https://img.shields.io/badge/AWS%20EC2-FF9900?style=for-the-badge&logo=Amazon-EC2&logoColor=white"/>
+  <img src="https://img.shields.io/badge/AWS%20S3-569A31?style=for-the-badge&logo=Amazon-S3&logoColor=white"/>
+  <img src="https://img.shields.io/badge/AWS%20RDS-527FFF?style=for-the-badge&logo=Amazon-RDS&logoColor=white"/>
+  <img src="https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=GitHub-Actions&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Code%20Deploy-2F93E0?style=for-the-badge&logoColor=white"/>
+  <img src="https://img.shields.io/badge/SonarCloud-F3702A?style=for-the-badge&logo=SonarCloud&logoColor=white"/>
+</p>
+
+------
+
+### 🤝 협업도구
+
+<p align="center">
+  <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">
+  <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=GitHub&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=Notion&logoColor=white"/> 
+  <img src="https://img.shields.io/badge/Slack-4A154B?style=for-the-badge&logo=Slack&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white"/>
+</p>
+
 
 <h2> 
    🔗 배포 링크 
