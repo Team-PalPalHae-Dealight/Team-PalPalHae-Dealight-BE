@@ -1,6 +1,7 @@
 package com.palpal.dealightbe.domain.member.presentation;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -41,7 +42,7 @@ public class MemberController {
 	@PatchMapping("/profiles")
 	@ProviderId
 	public ResponseEntity<MemberUpdateRes> updateMemberProfile(Long providerId,
-		@RequestBody MemberUpdateReq request) {
+		@RequestBody @Validated MemberUpdateReq request) {
 		MemberUpdateRes updatedMember = memberService.updateMemberProfile(providerId, request);
 
 		return ResponseEntity.ok(updatedMember);
