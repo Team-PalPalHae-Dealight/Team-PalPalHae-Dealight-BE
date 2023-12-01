@@ -11,24 +11,15 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.EntityManager;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.palpal.dealightbe.config.ElasticTestContainer;
-import com.palpal.dealightbe.config.RedisConfig;
+import com.palpal.dealightbe.common.IntegrationTest;
 import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.item.domain.Item;
-import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.member.domain.Member;
-import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderCreateReq;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderProductReq;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderProductsReq;
@@ -36,34 +27,11 @@ import com.palpal.dealightbe.domain.order.application.dto.request.OrderStatusUpd
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderRes;
 import com.palpal.dealightbe.domain.order.domain.Order;
 import com.palpal.dealightbe.domain.order.domain.OrderItem;
-import com.palpal.dealightbe.domain.order.domain.OrderRepository;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
-import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Transactional
-@Import({ElasticTestContainer.class, RedisConfig.class})
-public class OrderServiceIntegrationTest {
-
-	@Autowired
-	private OrderRepository orderRepository;
-
-	@Autowired
-	private MemberRepository memberRepository;
-
-	@Autowired
-	private StoreRepository storeRepository;
-
-	@Autowired
-	private OrderService orderService;
-
-	@Autowired
-	private ItemRepository itemRepository;
-
-	@Autowired
-	private EntityManager entityManager;
+public class OrderServiceIntegrationTest extends IntegrationTest {
 
 	@Nested
 	@DisplayName("주문 생성")
