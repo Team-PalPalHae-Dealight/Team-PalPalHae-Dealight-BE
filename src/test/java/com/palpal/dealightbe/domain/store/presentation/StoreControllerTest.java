@@ -24,6 +24,8 @@ import static org.springframework.restdocs.request.RequestDocumentation.partWith
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -35,27 +37,16 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.test.web.servlet.MockMvc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.palpal.dealightbe.config.SecurityConfig;
+import com.palpal.dealightbe.common.ControllerTest;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
 import com.palpal.dealightbe.domain.image.application.dto.request.ImageUploadReq;
 import com.palpal.dealightbe.domain.image.application.dto.response.ImageRes;
-import com.palpal.dealightbe.domain.store.application.StoreService;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreCreateReq;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreStatusReq;
 import com.palpal.dealightbe.domain.store.application.dto.request.StoreUpdateReq;
@@ -71,20 +62,7 @@ import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
-@WebMvcTest(value = StoreController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class,
-	OAuth2ClientAutoConfiguration.class}, excludeFilters = {
-	@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class)})
-@AutoConfigureRestDocs
-class StoreControllerTest {
-
-	@Autowired
-	MockMvc mockMvc;
-
-	@Autowired
-	ObjectMapper objectMapper;
-
-	@MockBean
-	StoreService storeService;
+class StoreControllerTest extends ControllerTest {
 
 	public static final String DEFAULT_PATH = "https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/image/free-store-icon.png";
 
@@ -110,6 +88,8 @@ class StoreControllerTest {
 		//when -> then
 		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/stores")
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(storeCreateReq)))
 			.andExpect(status().isOk())
@@ -170,6 +150,8 @@ class StoreControllerTest {
 		//when -> then
 		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/stores")
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(storeCreateReq)))
 			.andExpect(status().isBadRequest())
@@ -221,6 +203,8 @@ class StoreControllerTest {
 		//when -> then
 		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/stores")
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(storeCreateReq)))
 			.andExpect(status().isBadRequest())
@@ -272,6 +256,8 @@ class StoreControllerTest {
 		//when -> then
 		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/stores")
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(storeCreateReq)))
 			.andExpect(status().isBadRequest())
@@ -452,6 +438,8 @@ class StoreControllerTest {
 		mockMvc.perform(
 				RestDocumentationRequestBuilders.patch("/api/stores/profiles/{storeId}", storeId)
 					.header("Authorization", "Bearer {ACCESS_TOKEN}")
+					.with(user("username").roles("MEMBER"))
+					.with(csrf().asHeader())
 					.contentType(APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(updateReq)))
 			.andExpect(status().isOk())
@@ -532,6 +520,8 @@ class StoreControllerTest {
 		mockMvc.perform(
 				RestDocumentationRequestBuilders.patch("/api/stores/status/{storeId}", storeId)
 					.header("Authorization", "Bearer {ACCESS_TOKEN}")
+					.with(user("username").roles("MEMBER"))
+					.with(csrf().asHeader())
 					.contentType(APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(storeStatusReq)))
 			.andExpect(status().isOk())
@@ -571,6 +561,8 @@ class StoreControllerTest {
 		mockMvc.perform(
 				RestDocumentationRequestBuilders.multipart("/api/stores/images/{storeId}", storeId)
 					.file(file)
+					.with(user("username").roles("MEMBER"))
+					.with(csrf().asHeader())
 					.header("Authorization", "Bearer {ACCESS_TOKEN}")
 					.contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
 			.andExpect(status().isOk())
@@ -613,6 +605,8 @@ class StoreControllerTest {
 					updateRequest.setMethod("PATCH");
 					return updateRequest;
 				})
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}"))
 			.andExpect(status().isOk())
 			.andDo(print())
@@ -644,6 +638,8 @@ class StoreControllerTest {
 
 		//when -> then
 		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/stores/images/{storeId}", storeId)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}"))
 			.andExpect(status().isNoContent())
 			.andDo(print())

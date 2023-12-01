@@ -11,24 +11,14 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.EntityManager;
-
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.palpal.dealightbe.config.ElasticTestContainer;
-import com.palpal.dealightbe.config.RedisConfig;
+import com.palpal.dealightbe.common.IntegrationTest;
 import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.item.domain.Item;
-import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.member.domain.Member;
-import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderCreateReq;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderProductReq;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderProductsReq;
@@ -36,37 +26,14 @@ import com.palpal.dealightbe.domain.order.application.dto.request.OrderStatusUpd
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderRes;
 import com.palpal.dealightbe.domain.order.domain.Order;
 import com.palpal.dealightbe.domain.order.domain.OrderItem;
-import com.palpal.dealightbe.domain.order.domain.OrderRepository;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
-import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 
-@SpringBootTest
-@Transactional
-@Import({ElasticTestContainer.class, RedisConfig.class})
-public class OrderServiceIntegrationTest {
-
-	@Autowired
-	private OrderRepository orderRepository;
-
-	@Autowired
-	private MemberRepository memberRepository;
-
-	@Autowired
-	private StoreRepository storeRepository;
-
-	@Autowired
-	private OrderService orderService;
-
-	@Autowired
-	private ItemRepository itemRepository;
-
-	@Autowired
-	private EntityManager entityManager;
+public class OrderServiceIntegrationTest extends IntegrationTest {
 
 	@Nested
-	@DisplayName("주문 생성")
+	@DisplayName("[주문 생성]")
 	class createTest {
 		@Nested
 		@DisplayName("성공")
@@ -219,15 +186,11 @@ public class OrderServiceIntegrationTest {
 	}
 
 	@Nested
-	@DisplayName("주문 상태 변경")
+	@DisplayName("[주문 상태 변경]")
 	class updateStatusTest {
 		@Nested
 		@DisplayName("성공")
 		class Success {
-			@BeforeEach
-			void setUp() {
-
-			}
 
 			@DisplayName("고객이 주문한 상품을 취소하면 재고가 다시 늘어난다.")
 			@Test
@@ -265,6 +228,39 @@ public class OrderServiceIntegrationTest {
 				assertThat(order.getOrderStatus(), is(CANCELED));
 				assertThat(item.getStock(), is(originalStock));
 			}
+		}
+	}
+
+	@DisplayName("[주문 단건 조회]")
+	@Nested
+	class findById {
+		@DisplayName("성공")
+		@Test
+		void success() {
+			// given
+			Store store = createStore();
+			Item item = createItem(store);
+			Member member = createMember();
+
+			int quantity = 2;
+
+			OrderCreateReq orderCreateReq = new OrderCreateReq(
+				new OrderProductsReq(
+					List.of(new OrderProductReq(item.getId(), quantity))
+				),
+				store.getId(), "도착할 때까지 상품 냉장고에 보관 부탁드려요",
+				LocalTime.of(12, 30), item.getDiscountPrice() * 2
+			);
+
+			// when
+			// then
+			OrderRes orderRes = orderService.create(orderCreateReq, member.getProviderId());
+			Order order = orderRepository.findById(orderRes.orderId()).get();
+			Long actualItemId = order.getOrderItems().get(0).getItem().getId();
+			long orderedItemId = orderCreateReq.orderProductsReq().orderProducts().get(0).itemId();
+
+			assertThat(order.getId(), is(orderRes.orderId()));
+			assertThat(actualItemId, is(orderedItemId));
 		}
 	}
 

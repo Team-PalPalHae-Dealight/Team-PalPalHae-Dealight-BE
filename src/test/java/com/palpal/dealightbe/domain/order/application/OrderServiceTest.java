@@ -4,6 +4,7 @@ import static com.palpal.dealightbe.domain.order.domain.OrderStatus.CANCELED;
 import static com.palpal.dealightbe.domain.order.domain.OrderStatus.COMPLETED;
 import static com.palpal.dealightbe.domain.order.domain.OrderStatus.CONFIRMED;
 import static com.palpal.dealightbe.domain.order.domain.OrderStatus.RECEIVED;
+import static com.palpal.dealightbe.domain.store.domain.StoreStatus.OPENED;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -345,7 +346,7 @@ class OrderServiceTest {
 
 	@Nested
 	@DisplayName("<업체의 주문 목록 조회>")
-	class FindByStoreIdTest {
+	class FindAllByStoreIdTest {
 		@Nested
 		@DisplayName("성공")
 		class Success {
@@ -361,6 +362,7 @@ class OrderServiceTest {
 				Slice<Order> ordersSlice = new SliceImpl<>(
 					Arrays.asList(order1, order2), PageRequest.of(0, 10), true
 				);
+				store.updateStatus(OPENED);
 
 				when(orderRepository.findAllByStoreId(anyLong(), any(), any()))
 					.thenReturn(ordersSlice);
