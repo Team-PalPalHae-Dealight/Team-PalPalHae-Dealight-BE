@@ -150,18 +150,15 @@
   🧱 Backend 기술 스택
 </h2>
 
-<br>
-
-<h2>
-  🛠️ 시스템 구조
-</h2>
+![backend architecture](https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/59169881/a7d26fce-fb1d-4e45-8a69-eb27bc61a923)
 
 <br>
 
 <h2>
   🤝🏻 CI/CD
 </h2>
-<img width="1327" alt="image" src="https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/97447334/119bdd5d-1f39-43e2-ad5a-0dd01910b476">
+
+<img width="1327" alt="image" src="https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/59169881/2e593475-2140-4048-92a4-c48ac2923abd">
 
 <br>
 <br>
@@ -175,13 +172,21 @@
 <br>
 
 <h2>
+  👀 Monitoring Architecture
+</h2>
+
+<img width="1327" alt="image" src="https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/59169881/4a83589d-c9f3-4a7c-9c0a-93057ba1a9f1">
+
+<br><br>
+
+<h2>
   📈 플로우 차트
 </h2>
 
-#### 업체
+### 업체
 ![업체 Flow Chart](https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/59169881/7de0655a-3b51-4da2-9815-1cb50e72ce83)
 
-#### 고객
+### 고객
 ![고객 Flow Chart](https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/59169881/abd79a70-ea95-466f-ac6e-65b192664339)
 
 <br>
@@ -542,8 +547,6 @@ Team-PalPalHae-Dealight-BE [dealight-be]
 
 </details>
 
-
-<!-- ## 🤝🏻 Backend Architecture -->
 
 <br>
 
