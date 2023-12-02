@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Getter
 @Entity
-@Table(name = "members")
+@Table(name = "members", indexes = {@Index(name = "index_providerId", columnList = "providerId")})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Slf4j
 public class Member extends BaseEntity {
