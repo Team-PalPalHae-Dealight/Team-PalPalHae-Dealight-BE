@@ -49,20 +49,29 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
 	@Override
 	public Slice<Item> findAllByOpenedStatusAndDistanceWithin3KmAndSortCondition(double xCoordinate, double yCoordinate,
-		String sortBy, Pageable pageable) {
+																				 String sortBy, Pageable pageable) {
 		BooleanExpression distancePredicate = getDistancePredicate(xCoordinate, yCoordinate);
 
 		OrderSpecifier[] orderSpecifiers = orderSpecifiers(xCoordinate, yCoordinate, sortBy);
 
-		List<Item> result = queryFactory
-			.selectFrom(item)
-			.join(item.store, store).fetchJoin()
-			.join(store.address, address).fetchJoin()
+		List<Long> itemIds = queryFactory
+			.select(item.id)
+			.from(item)
+			.leftJoin(item.store, store)
+			.leftJoin(store.address, address)
 			.where(store.storeStatus.eq(StoreStatus.OPENED),
 				distancePredicate)
 			.orderBy(orderSpecifiers)
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize() + 1)
+			.fetch();
+
+		List<Item> result = queryFactory
+			.selectFrom(item)
+			.join(item.store, store).fetchJoin()
+			.join(store.address, address).fetchJoin()
+			.where(item.id.in(itemIds))
+			.orderBy(orderSpecifiers)
 			.fetch();
 
 		return checkLastPage(pageable, result);
@@ -123,5 +132,4 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
 		return new SliceImpl<>(results, pageable, hasNext);
 	}
-
 }
