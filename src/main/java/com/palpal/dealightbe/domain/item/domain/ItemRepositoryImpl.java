@@ -57,8 +57,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 	}
 
 	@Override
-	public Slice<Item> findAllByOpenedStatusAndDistanceWithin3KmAndSortCondition(double xCoordinate, double yCoordinate,
-																				 String sortBy, Pageable pageable) {
+	public Slice<Item> findAllByOpenedStatusAndDistanceWithin3KmAndSortCondition(double xCoordinate, double yCoordinate, String sortBy, Pageable pageable) {
 		BooleanExpression distancePredicate = getDistancePredicate(xCoordinate, yCoordinate);
 
 		OrderSpecifier[] orderSpecifiers = orderSpecifiers(xCoordinate, yCoordinate, sortBy);
@@ -113,7 +112,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
 	private OrderSpecifier[] createOrderSpecifier(OrderSpecifier<Double> orderSpecifier) {
 
-		return new OrderSpecifier[] {orderSpecifier, item.updatedAt.desc()};
+		return new OrderSpecifier[]{orderSpecifier, item.updatedAt.desc()};
 	}
 
 	private NumberTemplate<Double> getDistanceWithin3KmExpression(double xCoordinate, double yCoordinate) {
