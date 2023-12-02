@@ -12,6 +12,7 @@ import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ORDER_STATUS;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ORDER_TOTAL_PRICE;
 import static com.palpal.dealightbe.global.error.ErrorCode.UNAUTHORIZED_REQUEST;
 import static com.palpal.dealightbe.global.error.ErrorCode.UNCHANGEABLE_ORDER_STATUS;
+import static javax.persistence.CascadeType.ALL;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public class Order extends BaseEntity {
 	@JoinColumn(name = "store_id")
 	private Store store;
 
-	@OneToMany(mappedBy = "order")
+	@OneToMany(mappedBy = "order", cascade = ALL)
 	private List<OrderItem> orderItems = new ArrayList<>();
 
 	@Enumerated(EnumType.STRING)
@@ -79,6 +80,8 @@ public class Order extends BaseEntity {
 	private static final int MAX_DEMAND_LENGTH = 100;
 
 	private static final int MAX_ORDER_ITEMS = 5;
+
+	public static final int STORAGE_PERIOD_MONTH = 3;
 
 	private static final Set<OrderStatus> UNCHANGEABLE_STATUS = Set.of(COMPLETED, CANCELED);
 
