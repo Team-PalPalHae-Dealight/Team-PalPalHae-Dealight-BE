@@ -34,14 +34,23 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
 	@Override
 	public Slice<Item> findAllByStoreIdOrderByUpdatedAtDesc(Long storeId, Pageable pageable) {
-		List<Item> result = queryFactory
-			.selectFrom(item)
-			.join(item.store, store).fetchJoin()
-			.join(store.address, address).fetchJoin()
+		List<Long> itemIds = queryFactory
+			.select(item.id)
+			.from(item)
+			.leftJoin(item.store, store)
+			.leftJoin(store.address, address)
 			.where(item.store.id.eq(storeId))
 			.orderBy(item.updatedAt.desc())
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize() + 1)
+			.fetch();
+
+		List<Item> result = queryFactory
+			.selectFrom(item)
+			.join(item.store, store).fetchJoin()
+			.join(store.address, address).fetchJoin()
+			.where(item.id.in(itemIds))
+			.orderBy(item.updatedAt.desc())
 			.fetch();
 
 		return checkLastPage(pageable, result);
