@@ -33,4 +33,12 @@ public interface ItemRepository extends JpaRepository<Item, Long>, ItemRepositor
 		WHERE i.id = :itemId AND i.stock > 0 AND i.stock >= :quantity
 		""")
 	int updateStock(Long itemId, int quantity);
+
+	@Modifying
+	@Query(value = """
+		DELETE i
+		FROM items i LEFT OUTER JOIN order_items oi ON oi.item_id = i.id
+		WHERE oi.id IS NULL AND i.is_deleted = true;
+		""", nativeQuery = true)
+	void clearItemsDeleted();
 }
