@@ -53,7 +53,7 @@ VALUES (5000002, '2023-11-13 09:56:05.011788', '2023-11-13 09:56:05.011788',
 INSERT INTO member_role(ID, MEMBER_ID, ROLE_ID)
 VALUES (5000002, 5000002, 2);
 
--- Item 조건별 목록 조회 index
+-- ITEM 조건별 목록 조회 INDEX
 CREATE INDEX idx_store_id_updated_at ON items (store_id, updated_at);
 CREATE INDEX idx_store_status ON stores (store_status);
 CREATE INDEX idx_coordinates ON addresses (x_coordinate, y_coordinate);
