@@ -28,6 +28,9 @@ public interface ItemRepository extends JpaRepository<Item, Long>, ItemRepositor
 	Optional<Item> findByIdIgnoringStatus(@Param("id") Long id);
 
 	@Modifying(clearAutomatically = true, flushAutomatically = true)
-	@Query("UPDATE Item i SET i.stock = i.stock - :quantity WHERE i.id = :itemId AND i.stock > 0 AND i.stock >= :quantity")
+	@Query(value = """
+		UPDATE Item i SET i.stock = i.stock - :quantity
+		WHERE i.id = :itemId AND i.stock > 0 AND i.stock >= :quantity
+		""")
 	int updateStock(Long itemId, int quantity);
 }
