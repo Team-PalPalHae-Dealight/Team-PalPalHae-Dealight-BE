@@ -39,6 +39,7 @@ public class MemberService {
 		Member member = memberRepository.findMemberByProviderId(providerId)
 			.orElseThrow(() -> {
 				log.warn("GET:READ:NOT_FOUND_MEMBER_BY_ID : {}", providerId);
+
 				return new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
 			});
 
