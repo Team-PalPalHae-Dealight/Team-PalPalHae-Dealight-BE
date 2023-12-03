@@ -537,7 +537,7 @@ class CartControllerTest extends ControllerTest {
 
 	@DisplayName("장바구니 담기 실패 테스트 - 재고가 0인 상품을 담기 시도하는 경우")
 	@Test
-	void addItemFailureTest_InvalidAddItemInCartItemStockZero() throws Exception {
+	void addItemFailureTest_UnableToAddToCartItemStockZero() throws Exception {
 		//given
 		Long itemId = 1L;
 
@@ -559,7 +559,7 @@ class CartControllerTest extends ControllerTest {
 			.andExpect(jsonPath("$.errors").isEmpty())
 			.andExpect(jsonPath("$.message").value("재고가 0개인 상품은 담을 수 없습니다."))
 			.andDo(print())
-			.andDo(document("cart/cart-add-item-item-removed-no-longer-exists-store",
+			.andDo(document("cart/cart-add-item-unable-to-add-to-cart-item-stock-zero",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestHeaders(
