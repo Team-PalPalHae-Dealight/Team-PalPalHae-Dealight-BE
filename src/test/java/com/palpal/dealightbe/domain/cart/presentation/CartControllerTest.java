@@ -8,6 +8,7 @@ import static com.palpal.dealightbe.global.error.ErrorCode.ITEM_REMOVED_NO_LONGE
 import static com.palpal.dealightbe.global.error.ErrorCode.ITEM_REMOVED_NO_LONGER_EXISTS_STORE;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_CART_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
+import static com.palpal.dealightbe.global.error.ErrorCode.TOO_MANY_CART_REQUESTS;
 import static com.palpal.dealightbe.global.error.ErrorCode.UNABLE_TO_ADD_TO_CART_ITEM_STOCK_ZERO;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -56,6 +57,7 @@ import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
+import com.palpal.dealightbe.global.error.exception.ExcessiveRequestException;
 
 class CartControllerTest extends ControllerTest {
 	private Store store;
@@ -576,6 +578,49 @@ class CartControllerTest extends ControllerTest {
 			));
 	}
 
+	@DisplayName("장바구니 담기 실패 테스트 - 단 시간에 너무 많은 담기 요청을 시도하는 경우")
+	@Test
+	void addItemFailureTest_TooManyCartRequests() throws Exception {
+		//given
+		Long itemId = 1L;
+
+		doThrow(new ExcessiveRequestException(TOO_MANY_CART_REQUESTS)).when(
+			cartService).addItem(any(), any(), any());
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
+				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.param("id", String.valueOf(itemId))
+				.param("type", "check"))
+			.andExpect(status().isTooManyRequests())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("CT010"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("너무 많은 장바구니 요청을 시도했습니다. 잠시 후에 다시 시도해주세요."))
+			.andDo(print())
+			.andDo(document("cart/cart-add-item-too-many-cart-requests",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				requestParameters(
+					parameterWithName("id").description("상품 ID"),
+					parameterWithName("type").description("장바구니 담기 타입")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("예외 코드"),
+					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
 	@DisplayName("장바구니 조회 성공 테스트")
 	@Test
 	void findAllByProviderIdSuccessTest() throws Exception {
@@ -929,6 +974,51 @@ class CartControllerTest extends ControllerTest {
 			.andExpect(jsonPath("$.message").value("더 이상 존재하지 않는 업체의 상품이 장바구니에서 자동으로 삭제되었습니다."))
 			.andDo(print())
 			.andDo(document("cart/cart-update-item-removed-no-longer-exists-store",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				requestFields(
+					fieldWithPath("carts[0].itemId").description("상품 ID"),
+					fieldWithPath("carts[0].quantity").description("장바구니에 담은 개수")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("예외 코드"),
+					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@DisplayName("장바구니 수정 실패 테스트 - 단 시간에 너무 많은 수정 요청을 시도하는 경우")
+	@Test
+	void updateFailureTest_TooManyCartRequests() throws Exception {
+		//given
+		CartReq cartReq = new CartReq(1L, 2);
+		CartReq cartReq2 = new CartReq(2L, 3);
+
+		CartsReq cartsReq = new CartsReq(List.of(cartReq, cartReq2));
+
+		doThrow(new ExcessiveRequestException(TOO_MANY_CART_REQUESTS)).when(
+			cartService).update(any(), any());
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/carts")
+				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.content(objectMapper.writeValueAsString(cartsReq)))
+			.andExpect(status().isTooManyRequests())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("CT010"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("너무 많은 장바구니 요청을 시도했습니다. 잠시 후에 다시 시도해주세요."))
+			.andDo(print())
+			.andDo(document("cart/cart-update-too-many-cart-requests",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestHeaders(
