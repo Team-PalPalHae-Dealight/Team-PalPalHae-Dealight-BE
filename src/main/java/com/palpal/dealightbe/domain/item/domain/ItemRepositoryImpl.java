@@ -34,35 +34,52 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
 	@Override
 	public Slice<Item> findAllByStoreIdOrderByUpdatedAtDesc(Long storeId, Pageable pageable) {
-		List<Item> result = queryFactory
-			.selectFrom(item)
-			.join(item.store, store).fetchJoin()
-			.join(store.address, address).fetchJoin()
+		List<Long> itemIds = queryFactory
+			.select(item.id)
+			.from(item)
+			.leftJoin(item.store, store)
+			.leftJoin(store.address, address)
 			.where(item.store.id.eq(storeId))
 			.orderBy(item.updatedAt.desc())
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize() + 1)
 			.fetch();
 
-		return checkLastPage(pageable, result);
-	}
-
-	@Override
-	public Slice<Item> findAllByOpenedStatusAndDistanceWithin3KmAndSortCondition(double xCoordinate, double yCoordinate,
-		String sortBy, Pageable pageable) {
-		BooleanExpression distancePredicate = getDistancePredicate(xCoordinate, yCoordinate);
-
-		OrderSpecifier[] orderSpecifiers = orderSpecifiers(xCoordinate, yCoordinate, sortBy);
-
 		List<Item> result = queryFactory
 			.selectFrom(item)
 			.join(item.store, store).fetchJoin()
 			.join(store.address, address).fetchJoin()
+			.where(item.id.in(itemIds))
+			.orderBy(item.updatedAt.desc())
+			.fetch();
+
+		return checkLastPage(pageable, result);
+	}
+
+	@Override
+	public Slice<Item> findAllByOpenedStatusAndDistanceWithin3KmAndSortCondition(double xCoordinate, double yCoordinate, String sortBy, Pageable pageable) {
+		BooleanExpression distancePredicate = getDistancePredicate(xCoordinate, yCoordinate);
+
+		OrderSpecifier[] orderSpecifiers = orderSpecifiers(xCoordinate, yCoordinate, sortBy);
+
+		List<Long> itemIds = queryFactory
+			.select(item.id)
+			.from(item)
+			.leftJoin(item.store, store)
+			.leftJoin(store.address, address)
 			.where(store.storeStatus.eq(StoreStatus.OPENED),
 				distancePredicate)
 			.orderBy(orderSpecifiers)
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize() + 1)
+			.fetch();
+
+		List<Item> result = queryFactory
+			.selectFrom(item)
+			.join(item.store, store).fetchJoin()
+			.join(store.address, address).fetchJoin()
+			.where(item.id.in(itemIds))
+			.orderBy(orderSpecifiers)
 			.fetch();
 
 		return checkLastPage(pageable, result);
@@ -95,7 +112,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
 	private OrderSpecifier[] createOrderSpecifier(OrderSpecifier<Double> orderSpecifier) {
 
-		return new OrderSpecifier[] {orderSpecifier, item.updatedAt.desc()};
+		return new OrderSpecifier[]{orderSpecifier, item.updatedAt.desc()};
 	}
 
 	private NumberTemplate<Double> getDistanceWithin3KmExpression(double xCoordinate, double yCoordinate) {
@@ -123,5 +140,4 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom {
 
 		return new SliceImpl<>(results, pageable, hasNext);
 	}
-
 }
