@@ -12,6 +12,7 @@ import com.palpal.dealightbe.domain.auth.exception.OAuth2AuthorizationException;
 import com.palpal.dealightbe.domain.auth.exception.RequiredAuthenticationException;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
+import com.palpal.dealightbe.global.error.exception.ExcessiveRequestException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -67,5 +68,12 @@ public class GlobalExceptionHandler {
 		ErrorResponse errorResponse = ErrorResponse.of(e.getErrorCode());
 
 		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler(ExcessiveRequestException.class)
+	public ResponseEntity<ErrorResponse> excessiveRequestException(ExcessiveRequestException e) {
+		ErrorResponse errorResponse = ErrorResponse.of(e.getErrorCode());
+
+		return new ResponseEntity<>(errorResponse, HttpStatus.TOO_MANY_REQUESTS);
 	}
 }
