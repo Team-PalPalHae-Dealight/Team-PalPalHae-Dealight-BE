@@ -16,9 +16,19 @@ import lombok.RequiredArgsConstructor;
 public class ItemSearchRepositoryImpl {
 
 	private final ElasticsearchOperations operations;
+	private static final int BATCH_SIZE = 500;
 
 	public void bulkInsertOrUpdate(List<ItemDocument> itemDocuments) {
-		List<UpdateQuery> updateQueries = itemDocuments.stream().map(itemDocument ->
+		for (int i = 0; i < itemDocuments.size(); i += BATCH_SIZE) {
+			int endIndex = Math.min(i + BATCH_SIZE, itemDocuments.size());
+			List<ItemDocument> batch = itemDocuments.subList(i, endIndex);
+
+			bulkIndexBatch(batch);
+		}
+	}
+
+	private void bulkIndexBatch(List<ItemDocument> batch) {
+		List<UpdateQuery> updateQueries = batch.stream().map(itemDocument ->
 			UpdateQuery.builder(String.valueOf(itemDocument.getId()))
 				.withDocument(operations.getElasticsearchConverter().mapObject(itemDocument))
 				.withDocAsUpsert(true)

@@ -1,20 +1,20 @@
 package com.palpal.dealightbe.domain.search.application;
 
 import static com.palpal.dealightbe.domain.item.domain.ItemDocument.convertToItemDocuments;
-import static com.palpal.dealightbe.domain.store.domain.StoreDocument.convertToStoreDocuments;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.palpal.dealightbe.domain.item.domain.ItemDocument;
 import com.palpal.dealightbe.domain.item.domain.UpdatedItem;
 import com.palpal.dealightbe.domain.item.domain.UpdatedItemRepository;
 import com.palpal.dealightbe.domain.item.infrastructure.ItemSearchRepositoryImpl;
 import com.palpal.dealightbe.domain.store.application.dto.response.StoresInfoSliceRes;
-import com.palpal.dealightbe.domain.store.domain.DocumentStatus;
 import com.palpal.dealightbe.domain.store.domain.StoreDocument;
 import com.palpal.dealightbe.domain.store.domain.StoreStatus;
 import com.palpal.dealightbe.domain.store.domain.UpdatedStore;
@@ -43,17 +43,17 @@ public class SearchService {
 	}
 
 	public void uploadToES() {
-		List<UpdatedStore> updatedStoreList = updatedStoreRepository.findAll();
+		List<UpdatedStore> updatedStoreList = updatedStoreRepository.findAllByDocumentStatusIsReady();
 		validateAndBulkStores(updatedStoreList, storeSearchRepositoryImpl);
 
-		List<UpdatedItem> updatedItemList = updatedItemRepository.findAll();
+		List<UpdatedItem> updatedItemList = updatedItemRepository.findAllByDocumentStatusIsReady();
 		validateAndBulkItems(updatedItemList, itemSearchRepositoryImpl);
 
 		markDocumentsAsDone(updatedItemList, updatedStoreList);
 	}
 
 	public void updateStatusToES() {
-		List<UpdatedStore> updatedStoreList = updatedStoreRepository.findAll();
+		List<UpdatedStore> updatedStoreList = updatedStoreRepository.findAllByDocumentStatusIsDone();
 		updateStoreDocuments(updatedStoreList, storeSearchRepositoryImpl);
 	}
 
@@ -62,34 +62,37 @@ public class SearchService {
 			throw new BusinessException(ErrorCode.UPDATABLE_STORE_NOT_EXIST);
 		}
 
-		updatedStoreList.forEach(updatedStore -> {
-			if (updatedStore.getDocumentStatus() != DocumentStatus.DONE) {
-				storeSearchRepository.bulkInsertOrUpdate(convertToStoreDocuments(updatedStoreList));
-			}
-		});
+		List<StoreDocument> storeDocumentsToBulkInsertOrUpdate = updatedStoreList.stream()
+			.map(StoreDocument::from)
+			.collect(Collectors.toList());
+
+		if (!storeDocumentsToBulkInsertOrUpdate.isEmpty()) {
+			storeSearchRepository.bulkInsertOrUpdate(storeDocumentsToBulkInsertOrUpdate);
+		}
 	}
 
 	private void validateAndBulkItems(List<UpdatedItem> updatedItemList, ItemSearchRepositoryImpl itemSearchRepository) {
-		updatedItemList.forEach(updatedItem -> {
-			if (updatedItem.getDocumentStatus() != DocumentStatus.DONE) {
-				itemSearchRepository.bulkInsertOrUpdate(convertToItemDocuments(updatedItemList));
-			}
-		});
+		List<ItemDocument> itemDocumentsToBulkInsertOrUpdate = updatedItemList.stream()
+			.map(ItemDocument::from)
+			.collect(Collectors.toList());
+
+		if (!itemDocumentsToBulkInsertOrUpdate.isEmpty()) {
+			itemSearchRepository.bulkInsertOrUpdate(itemDocumentsToBulkInsertOrUpdate);
+		}
 	}
 
 	private void markDocumentsAsDone(List<UpdatedItem> updatedItemList, List<UpdatedStore> updatedStoreList) {
 		updatedItemList.forEach(UpdatedItem::markAsDone);
+
 		updatedStoreList.forEach(UpdatedStore::markAsDone);
 	}
 
 	private void updateStoreDocuments(List<UpdatedStore> updatedStoreList, StoreSearchRepositoryImpl storeSearchRepositoryImpl) {
 		updatedStoreList.forEach(updatedStore -> {
-			if (updatedStore.getDocumentStatus() == DocumentStatus.DONE) {
-				StoreDocument existingStoreDocument = storeSearchRepositoryImpl.findById(String.valueOf(updatedStore.getId()));
-				if (existingStoreDocument != null) {
-					updateStoreStatusIfNeeded(updatedStore, existingStoreDocument, storeSearchRepositoryImpl);
-					updateStoreItemsIfNeeded(updatedStore, storeSearchRepositoryImpl);
-				}
+			StoreDocument existingStoreDocument = storeSearchRepositoryImpl.findById(String.valueOf(updatedStore.getId()));
+			if (existingStoreDocument != null) {
+				updateStoreStatusIfNeeded(updatedStore, existingStoreDocument, storeSearchRepositoryImpl);
+				updateStoreItemsIfNeeded(updatedStore, storeSearchRepositoryImpl);
 			}
 		});
 	}

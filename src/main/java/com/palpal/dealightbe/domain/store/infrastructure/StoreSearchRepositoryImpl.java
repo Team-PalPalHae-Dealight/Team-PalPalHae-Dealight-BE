@@ -25,6 +25,7 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.document.Document;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.UpdateQuery;
@@ -42,15 +43,28 @@ import lombok.RequiredArgsConstructor;
 public class StoreSearchRepositoryImpl {
 
 	private final ElasticsearchOperations operations;
+	private static final int BATCH_SIZE = 500;
 
 	public void bulkInsertOrUpdate(List<StoreDocument> storeDocuments) {
-		List<UpdateQuery> updateQueries = storeDocuments.stream().map(storeDocument ->
-			UpdateQuery.builder(String.valueOf(storeDocument.getId()))
-				.withDocument(operations.getElasticsearchConverter().mapObject(storeDocument))
-				.withDocAsUpsert(true)
-				.build()).toList();
+		for (int i = 0; i < storeDocuments.size(); i += BATCH_SIZE) {
+			int endIndex = Math.min(i + BATCH_SIZE, storeDocuments.size());
+			List<StoreDocument> batch = storeDocuments.subList(i, endIndex);
 
-		operations.bulkUpdate(updateQueries, operations.getIndexCoordinatesFor(StoreDocument.class));
+			bulkIndexBatch(batch);
+		}
+	}
+
+	private void bulkIndexBatch(List<StoreDocument> batch) {
+		batch.forEach(storeDocument -> {
+			Document document = operations.getElasticsearchConverter().mapObject(storeDocument);
+
+			UpdateQuery updateQuery = UpdateQuery.builder(String.valueOf(storeDocument.getId()))
+				.withDocument(document)
+				.withDocAsUpsert(true)
+				.build();
+
+			operations.update(updateQuery, IndexCoordinates.of("store"));
+		});
 	}
 
 	public void updateStoreItems(String storeId, List<ItemDocument> updatedItems) {
