@@ -26,6 +26,8 @@ import com.palpal.dealightbe.domain.store.application.dto.response.StoresInfoSli
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.domain.store.domain.StoreStatus;
+import com.palpal.dealightbe.domain.store.domain.UpdatedStore;
+import com.palpal.dealightbe.domain.store.domain.UpdatedStoreRepository;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
@@ -42,6 +44,7 @@ public class StoreService {
 	public static final String DEFAULT_PATH = "https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/image/free-store-icon.png";
 
 	private final StoreRepository storeRepository;
+	private final UpdatedStoreRepository updatedStoreRepository;
 	private final MemberRepository memberRepository;
 	private final ItemRepository itemRepository;
 	private final AddressService addressService;
@@ -59,8 +62,10 @@ public class StoreService {
 		Address address = addressService.register(req.addressName(), req.xCoordinate(), req.yCoordinate());
 
 		Store store = StoreCreateReq.toStore(req, address, member);
-
 		storeRepository.save(store);
+
+		UpdatedStore updatedStore = UpdatedStore.from(store);
+		updatedStoreRepository.save(updatedStore);
 
 		return StoreCreateRes.from(store);
 	}
@@ -97,6 +102,14 @@ public class StoreService {
 
 		StoreStatus updateStatus = StoreStatus.fromString(storeStatus.storeStatus().toString());
 		store.updateStatus(updateStatus);
+
+		UpdatedStore updatedStore = updatedStoreRepository.findById(store.getId())
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_UPDATED_STORE_BY_ID : {}", store.getId());
+				return new EntityNotFoundException(ErrorCode.NOT_FOUND_UPDATED_STORE);
+			});
+
+		updatedStore.updateStoreStatus(updateStatus);
 
 		deleteClosedStoreItems(store);
 

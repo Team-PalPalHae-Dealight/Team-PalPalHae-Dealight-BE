@@ -2,6 +2,7 @@ package com.palpal.dealightbe.domain.store.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -44,6 +45,8 @@ import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.domain.store.domain.StoreStatus;
+import com.palpal.dealightbe.domain.store.domain.UpdatedStore;
+import com.palpal.dealightbe.domain.store.domain.UpdatedStoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
@@ -52,6 +55,9 @@ class StoreServiceTest {
 
 	@Mock
 	private StoreRepository storeRepository;
+
+	@Mock
+	private UpdatedStoreRepository updatedStoreRepository;
 
 	@Mock
 	private MemberRepository memberRepository;
@@ -72,6 +78,7 @@ class StoreServiceTest {
 	private Store store;
 	private Store store2;
 	private Store store3;
+	private UpdatedStore updatedStore;
 	private Item item;
 	private Item item2;
 	private Item item3;
@@ -183,6 +190,17 @@ class StoreServiceTest {
 			.store(store3)
 			.build();
 
+		updatedStore = UpdatedStore.builder()
+			.id(store.getId())
+			.name(store.getName())
+			.xCoordinate(store.getAddress().getXCoordinate())
+			.yCoordinate(store.getAddress().getYCoordinate())
+			.openTime(store.getOpenTime())
+			.closeTime(store.getCloseTime())
+			.image(store.getImage())
+			.storeStatus(store.getStoreStatus())
+			.build();
+
 	}
 
 	@DisplayName("업체 등록 성공")
@@ -197,6 +215,8 @@ class StoreServiceTest {
 			.thenReturn(Optional.of(member));
 		when(addressService.register(eq("서울시 강남구"), eq(67.89), eq(293.2323)))
 			.thenReturn(new Address("서울시 강남구", 67.89, 293.2323));
+		when(updatedStoreRepository.save(any()))
+			.thenReturn(updatedStore);
 
 		//when
 		StoreCreateRes storeCreateRes = storeService.register(member.getProviderId(), storeCreateReq);
@@ -371,6 +391,8 @@ class StoreServiceTest {
 			.thenReturn(Optional.of(member));
 		when(storeRepository.findById(store.getId()))
 			.thenReturn(Optional.of(store));
+		when(updatedStoreRepository.findById(any()))
+			.thenReturn(Optional.of(updatedStore));
 
 		//when
 		StoreStatusRes storeStatusRes = storeService.updateStatus(member.getProviderId(), store.getId(), requestStoreStatus);

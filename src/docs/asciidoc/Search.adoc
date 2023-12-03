@@ -1,0 +1,19 @@
+= REST Docs 검색 API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+[[Search-API]]
+== Search API
+=== 검색어로 업체 검색
+
+==== GET - /api/search?x-coordinate={xcoordinate}&y-coordinate={yCoordinate}&keyword={keywords}sortBy={sortBy}&size={size}&page={page}
+
+.Request
+include::{snippets}/search/search-by-option/http-request.adoc[]
+include::{snippets}/search/search-by-option/request-parameters.adoc[]
+.Response
+include::{snippets}/search/search-by-option/http-response.adoc[]
+include::{snippets}/search/search-by-option/response-fields.adoc[]
