@@ -65,6 +65,7 @@ public enum ErrorCode {
 	ITEM_REMOVED_NO_LONGER_EXISTS_ITEM("CT007", "더 이상 존재하지 않는 상품이 장바구니에서 자동으로 삭제되었습니다."),
 	ITEM_REMOVED_NO_LONGER_EXISTS_STORE("CT008", "더 이상 존재하지 않는 업체의 상품이 장바구니에서 자동으로 삭제되었습니다."),
 	UNABLE_TO_ADD_TO_CART_ITEM_STOCK_ZERO("CT009", "재고가 0개인 상품은 담을 수 없습니다."),
+	TOO_MANY_CART_REQUESTS("CT010", "너무 많은 장바구니 요청을 시도했습니다. 잠시 후에 다시 시도해주세요."),
 
 	//인증, 인가
 	ACCESS_DENIED("AUTH001", "사용자 인증에 실패했습니다."),

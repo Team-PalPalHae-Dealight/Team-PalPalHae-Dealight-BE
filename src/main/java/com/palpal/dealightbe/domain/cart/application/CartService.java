@@ -7,8 +7,10 @@ import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_CART_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.ITEM_REMOVED_NO_LONGER_EXISTS_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.ITEM_REMOVED_NO_LONGER_EXISTS_STORE;
+import static com.palpal.dealightbe.global.error.ErrorCode.TOO_MANY_CART_REQUESTS;
 import static com.palpal.dealightbe.global.error.ErrorCode.UNABLE_TO_ADD_TO_CART_ITEM_STOCK_ZERO;
 
+import io.github.bucket4j.Bucket;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,6 +35,7 @@ import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.domain.store.domain.StoreStatus;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
+import com.palpal.dealightbe.global.error.exception.ExcessiveRequestException;
 
 @Transactional
 @Slf4j
@@ -41,14 +44,17 @@ import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 public class CartService {
 
 	private static final int MAXIMUM_CART_SIZE = 5;
+	private static final int CONSUME_BUCKET_COUNT = 1;
 
 	private final CartRepository cartRepository;
 	private final ItemRepository itemRepository;
 	private final StoreRepository storeRepository;
+	private final Bucket bucket;
 
 	public CartRes addItem(Long providerId, Long itemId, CartAdditionType cartAdditionType) {
-		Item item = getItem(itemId);
+		checkBucketCount(bucket);
 
+		Item item = getItem(itemId);
 		validateItemStock(item);
 		validateOwnStoreItem(providerId, item);
 
@@ -69,6 +75,8 @@ public class CartService {
 	}
 
 	public CartsRes update(Long providerId, CartsReq cartsReq) {
+		checkBucketCount(bucket);
+
 		List<Cart> carts = getCarts(cartsReq, providerId);
 
 		List<Cart> renewedCarts = upToDateCarts(carts);
@@ -299,5 +307,14 @@ public class CartService {
 			.storeName(item.getStore().getName())
 			.storeCloseTime(item.getStore().getCloseTime())
 			.build();
+	}
+
+	private void checkBucketCount(Bucket bucket) {
+		if (bucket.tryConsume(CONSUME_BUCKET_COUNT)) {
+			return;
+		}
+
+		log.warn("POST/PATCH:CREATE/UPDATE:TOO_MANY_CART_REQUESTS");
+		throw new ExcessiveRequestException(TOO_MANY_CART_REQUESTS);
 	}
 }
