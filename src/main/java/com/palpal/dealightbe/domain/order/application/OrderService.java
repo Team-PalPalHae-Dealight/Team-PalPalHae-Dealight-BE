@@ -56,12 +56,11 @@ public class OrderService {
 		Store store = getStore(storeId);
 
 		Order order = OrderCreateReq.toOrder(orderCreateReq, member, store);
-		orderRepository.save(order);
 
 		List<OrderItem> orderItems = createOrderItems(order, orderCreateReq.orderProductsReq().orderProducts());
 
 		order.addOrderItems(orderItems);
-		orderItemRepository.saveAll(orderItems);
+		orderRepository.save(order);
 
 		return OrderRes.from(order);
 	}

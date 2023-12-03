@@ -1,5 +1,7 @@
 package com.palpal.dealightbe.domain.order.domain;
 
+import java.util.List;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -90,4 +92,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 		@Param("status") String status,
 		Pageable pageable
 	);
+
+	@Query(value = """
+		select distinct o.id
+		from orders o join order_items oi on o.id = oi.order_id
+		where timestampdiff(MONTH, o.updated_at, now()) >= :period
+		""", nativeQuery = true)
+	List<Long> findAllByUpdatedMoreThan(@Param("period") int period);
+
+	void deleteAllInBatchByIdIn(@Param("ids") List<Long> ids);
 }
