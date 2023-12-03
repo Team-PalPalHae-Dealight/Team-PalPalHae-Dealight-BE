@@ -34,8 +34,8 @@ public class OrderController {
 
 	private final OrderService orderService;
 
-	private final String DEFAULT_PAGING_SIZE = "10";
-	private final String DEFAULT_SORTING = "created_at";
+	private static final String DEFAULT_PAGING_SIZE = "10";
+	private static final String DEFAULT_SORTING = "created_at";
 
 	@PostMapping
 	@ProviderId
