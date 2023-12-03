@@ -289,7 +289,7 @@ public class CartService {
 
 		private void validateItemStock(Item item) {
 			if (item.getStock() == 0) {
-				log.warn("GET:READ:INVALID_ADD_ITEM_IN_CART_ITEM_STOCK_ZERO : item id = {}", item.getId());
+				log.warn("GET:READ:UNABLE_TO_ADD_TO_CART_ITEM_STOCK_ZERO : item id = {}", item.getId());
 				throw new BusinessException(UNABLE_TO_ADD_TO_CART_ITEM_STOCK_ZERO);
 		}
 	}
