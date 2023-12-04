@@ -9,7 +9,6 @@ import static com.palpal.dealightbe.global.error.ErrorCode.SSE_STREAM_ERROR;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Map;
 
@@ -21,7 +20,6 @@ import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -140,15 +138,6 @@ public class NotificationService {
 			emitterRepository.deleteById(emitterId);
 			this.redisMessageListenerContainer.removeMessageListener(messageListener);
 		});
-	}
-
-	@Transactional
-	@Scheduled(cron = DEFAULT_SCHEDULING_TIME)
-	public void cleanupReadNotifications() {
-		notificationRepository.deleteReadNotifications();
-
-		log.info("RUN:CLEANUP_READ_NOTIFICATIONS:TIME : {}", LocalDateTime.now());
-		log.info("RUN:CLEANUP_READ_NOTIFICATIONS:THREAD : {}", Thread.currentThread().getName());
 	}
 
 	private void resendMissedEvents(Long id, String userType, String emitterId, String lastEventId,
