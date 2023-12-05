@@ -14,8 +14,10 @@ import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Import;
 
 import com.palpal.dealightbe.common.IntegrationTest;
+import com.palpal.dealightbe.config.RedisConfig;
 import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.member.domain.Member;
@@ -30,6 +32,7 @@ import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 
+@Import(RedisConfig.class)
 public class OrderServiceIntegrationTest extends IntegrationTest {
 
 	@Nested
