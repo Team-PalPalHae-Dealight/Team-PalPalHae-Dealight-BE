@@ -46,6 +46,7 @@ public class MemberService {
 	}
 
 	public MemberUpdateRes updateMemberProfile(Long memberId, MemberUpdateReq request) {
+
 		Member member = memberRepository.findMemberByProviderId(memberId)
 			.orElseThrow(() -> {
 				log.warn("PATCH:UPDATE:NOT_FOUND_MEMBER_BY_ID : {}", memberId);

@@ -16,8 +16,13 @@ import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemsRes;
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
+import com.palpal.dealightbe.domain.item.domain.UpdatedItem;
+import com.palpal.dealightbe.domain.item.domain.UpdatedItemRepository;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
+import com.palpal.dealightbe.domain.store.domain.UpdatedStore;
+import com.palpal.dealightbe.domain.store.domain.UpdatedStoreRepository;
+import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
@@ -33,7 +38,9 @@ public class ItemService {
 	public static final String DEFAULT_ITEM_IMAGE_PATH = "https://team-08-bucket.s3.ap-northeast-2.amazonaws.com/image/default-item-image.png";
 
 	private final ItemRepository itemRepository;
+	private final UpdatedItemRepository updatedItemRepository;
 	private final StoreRepository storeRepository;
+	private final UpdatedStoreRepository updatedStoreRepository;
 	private final ImageService imageService;
 
 	public ItemRes create(ItemReq itemReq, Long providerId, ImageUploadReq imageUploadReq) {
@@ -42,9 +49,22 @@ public class ItemService {
 		checkDuplicatedItemName(itemReq.itemName(), store.getId());
 
 		String imageUrl = saveImage(imageUploadReq);
+
 		Item item = ItemReq.toItem(itemReq, store, imageUrl);
 		item.updateStore(store);
 		Item savedItem = itemRepository.save(item);
+		store.addItem(item);
+
+		UpdatedStore updatedStore = updatedStoreRepository.findById(store.getId())
+			.orElseThrow(() -> {
+				log.warn("GET:READ:NOT_FOUND_UPDATED_STORE_BY_STORE_ID : {}", store.getId());
+				return new BusinessException(ErrorCode.NOT_FOUND_UPDATED_STORE);
+			});
+
+		UpdatedItem updatedItem = UpdatedItem.from(item);
+		updatedItem.updateStore(updatedStore);
+		updatedItemRepository.save(updatedItem);
+		updatedStore.addItem(updatedItem);
 
 		return ItemRes.from(savedItem);
 	}

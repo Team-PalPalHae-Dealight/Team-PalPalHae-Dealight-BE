@@ -16,7 +16,7 @@ permissions:
 
 hooks:
   BeforeInstall:
-    - location: beforeDeploy.sh
+    - location: infra.sh
       timeout: 60
       runas: ubuntu
 

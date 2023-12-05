@@ -13,6 +13,7 @@ services:
       - /home/ubuntu/volumes/logs:/logs
     environment:
       TZ: "Asia/Seoul"
+    restart: always
     networks:
       - dealight-network
 

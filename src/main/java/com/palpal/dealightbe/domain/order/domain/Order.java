@@ -9,9 +9,10 @@ import static com.palpal.dealightbe.global.error.ErrorCode.ILLEGAL_REVIEW_REQUES
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ARRIVAL_TIME;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_DEMAND_LENGTH;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ORDER_STATUS;
-import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ORDER_STATUS_UPDATER;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ORDER_TOTAL_PRICE;
+import static com.palpal.dealightbe.global.error.ErrorCode.UNAUTHORIZED_REQUEST;
 import static com.palpal.dealightbe.global.error.ErrorCode.UNCHANGEABLE_ORDER_STATUS;
+import static javax.persistence.CascadeType.ALL;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public class Order extends BaseEntity {
 	@JoinColumn(name = "store_id")
 	private Store store;
 
-	@OneToMany(mappedBy = "order")
+	@OneToMany(mappedBy = "order", cascade = ALL)
 	private List<OrderItem> orderItems = new ArrayList<>();
 
 	@Enumerated(EnumType.STRING)
@@ -79,6 +80,8 @@ public class Order extends BaseEntity {
 	private static final int MAX_DEMAND_LENGTH = 100;
 
 	private static final int MAX_ORDER_ITEMS = 5;
+
+	public static final int STORAGE_PERIOD_MONTH = 3;
 
 	private static final Set<OrderStatus> UNCHANGEABLE_STATUS = Set.of(COMPLETED, CANCELED);
 
@@ -98,6 +101,7 @@ public class Order extends BaseEntity {
 	public Order(Member member, Store store, LocalTime arrivalTime, String demand, int totalPrice) {
 		validateArrivalTime(store, arrivalTime);
 		validateDemand(demand);
+
 		this.member = member;
 		this.store = store;
 		this.arrivalTime = arrivalTime;
@@ -116,27 +120,15 @@ public class Order extends BaseEntity {
 		this.orderItems = orderItems;
 	}
 
-	private void validateTotalPrice(List<OrderItem> orderItems) {
-		int actualTotalPrice = orderItems.stream()
-			.mapToInt(item -> item.getItem().getDiscountPrice() * item.getQuantity())
-			.sum();
-
-		if (totalPrice != actualTotalPrice) {
-			log.warn("POST:WRITE:INVALID_TOTAL_PRICE: input {} actual {}",
-				totalPrice, actualTotalPrice);
-			throw new BusinessException(INVALID_ORDER_TOTAL_PRICE);
-		}
-	}
-
 	public void validateOrderUpdater(Member updater) {
-		Long storeOwnerId = store.getMember().getProviderId();
-		Long memberId = member.getProviderId();
-		Long updaterId = updater.getProviderId();
+		long storeOwnerId = store.getMember().getProviderId();
+		long memberId = member.getProviderId();
+		long updaterId = updater.getProviderId();
 
-		if (!(updaterId.equals(storeOwnerId) || updaterId.equals(memberId))) {
-			log.warn("GET:READ:NO_AUTHORITY_TO_UPDATE_ORDER_STATUS: STORE_OWNER{} MEMBER{} UPDATER{}", storeOwnerId,
-				memberId, updaterId);
-			throw new BusinessException(INVALID_ORDER_STATUS_UPDATER);
+		if (!((updaterId == storeOwnerId) || (updaterId == memberId))) {
+			log.warn("UNAUTHORIZED:STORE_OWNER{} MEMBER{} UPDATER{}",
+				storeOwnerId, memberId, updaterId);
+			throw new BusinessException(UNAUTHORIZED_REQUEST);
 		}
 	}
 
@@ -146,6 +138,10 @@ public class Order extends BaseEntity {
 		validateUpdaterAuthority(updater, orderStatus.name(), changedStatus);
 
 		this.orderStatus = OrderStatus.valueOf(changedStatus);
+
+		if (orderStatus.equals(CANCELED)) {
+			this.cancel();
+		}
 	}
 
 	public void validateStatusRequest(String changedStatus) {
@@ -197,7 +193,29 @@ public class Order extends BaseEntity {
 		}
 
 		reviewContains = true;
+	}
 
+	private void validateTotalPrice(List<OrderItem> orderItems) {
+		int actualTotalPrice = orderItems.stream()
+			.mapToInt(item -> item.getItem().getDiscountPrice() * item.getQuantity())
+			.sum();
+
+		if (totalPrice != actualTotalPrice) {
+			log.warn("POST:WRITE:INVALID_TOTAL_PRICE: input {} actual {}",
+				totalPrice, actualTotalPrice);
+			throw new BusinessException(INVALID_ORDER_TOTAL_PRICE);
+		}
+	}
+
+	private void cancel() {
+		getOrderItems().forEach(
+			item -> {
+				int originalStock = item.getItem().getStock();
+				int newStock = originalStock + item.getQuantity();
+
+				item.getItem().updateStock(newStock);
+			}
+		);
 	}
 
 	private void validateDemand(String demand) {
@@ -220,9 +238,9 @@ public class Order extends BaseEntity {
 		}
 
 		if (isInvalidArrivalTime) {
-			log.warn("POST:WRITE:INVALID_ARRIVAL_TIME:STORE_OPEN {}, STORE_CLOSE {}, ARRIVAL_TIME {}", storeOpenTime,
-				storeCloseTime, arrivalTime);
-			
+			log.warn("POST:WRITE:INVALID_ARRIVAL_TIME:STORE_OPEN {}, STORE_CLOSE {}, ARRIVAL_TIME {}",
+				storeOpenTime, storeCloseTime, arrivalTime);
+
 			throw new BusinessException(INVALID_ARRIVAL_TIME);
 		}
 	}
@@ -235,11 +253,11 @@ public class Order extends BaseEntity {
 		Pair<String, String> inputSequence = Pair.of(originalStatus, changedStatus);
 
 		if (isMember(updater) && !orderStatusSequenceOfMember.contains(inputSequence)) {
-			log.warn("PATCH:UPDATE:MEMBER:CANNOT_CHANGE_STATUS:{} -> {}", originalStatus, changedStatus);
+			log.warn("PATCH:UPDATE:ORDER:CANNOT_CHANGE_STATUS(MEMBER):{} -> {}", originalStatus, changedStatus);
 			throw new BusinessException(INVALID_ORDER_STATUS);
 		}
 		if (isStoreOwner(updater) && !orderStatusSequenceOfStore.contains(inputSequence)) {
-			log.warn("PATCH:UPDATE:STORE:CANNOT_CHANGE_STATUS:{} -> {}", originalStatus, changedStatus);
+			log.warn("PATCH:UPDATE:ORDER:CANNOT_CHANGE_STATUS(STORE):{} -> {}", originalStatus, changedStatus);
 			throw new BusinessException(INVALID_ORDER_STATUS);
 		}
 	}

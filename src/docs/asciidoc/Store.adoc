@@ -5,7 +5,7 @@
 :toc: left
 :toclevels: 2
 
-[[User-API]]
+[[Store-API]]
 == Store API
 
 === 업체 등록 - 성공

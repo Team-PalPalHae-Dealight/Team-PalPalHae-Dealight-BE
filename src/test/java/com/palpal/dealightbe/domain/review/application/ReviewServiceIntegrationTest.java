@@ -16,47 +16,21 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.palpal.dealightbe.config.ElasticTestContainer;
+import com.palpal.dealightbe.common.IntegrationTest;
 import com.palpal.dealightbe.domain.member.domain.Member;
-import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.order.domain.Order;
-import com.palpal.dealightbe.domain.order.domain.OrderRepository;
 import com.palpal.dealightbe.domain.order.domain.OrderStatus;
 import com.palpal.dealightbe.domain.review.application.dto.request.ReviewCreateReq;
 import com.palpal.dealightbe.domain.review.application.dto.response.ReviewCreateRes;
 import com.palpal.dealightbe.domain.review.application.dto.response.ReviewRes;
 import com.palpal.dealightbe.domain.review.domain.Review;
 import com.palpal.dealightbe.domain.review.domain.ReviewContent;
-import com.palpal.dealightbe.domain.review.domain.ReviewRepository;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
-import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 
-@Transactional
-@SpringBootTest
-@Import(ElasticTestContainer.class)
-class ReviewServiceIntegrationTest {
-
-	@Autowired
-	private OrderRepository orderRepository;
-
-	@Autowired
-	private MemberRepository memberRepository;
-
-	@Autowired
-	private StoreRepository storeRepository;
-
-	@Autowired
-	private ReviewRepository reviewRepository;
-
-	@Autowired
-	private ReviewService reviewService;
+class ReviewServiceIntegrationTest extends IntegrationTest {
 
 	@Nested
 	@DisplayName("<리뷰 생성>")

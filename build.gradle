@@ -61,11 +61,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+    implementation 'com.bucket4j:bucket4j-core:8.3.0'
     implementation 'org.springframework.boot:spring-boot-starter-batch'
 
     // elasticsearch
     implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
-
 
     // monitoring tools: actuator, prometheus, grafana
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -90,6 +90,7 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation("org.testcontainers:junit-jupiter:1.16.3")
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    testImplementation "org.testcontainers:testcontainers:1.17.2"
 
     // annotationProcessor
     annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"

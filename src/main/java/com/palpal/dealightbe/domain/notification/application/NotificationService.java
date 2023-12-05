@@ -52,7 +52,6 @@ import lombok.extern.slf4j.Slf4j;
 public class NotificationService {
 	private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
 
-	private static final String DEFAULT_SCHEDULING_TIME = "0 0 2 ? * TUE";  //매주 화요일 새벽 2시에 진행
 	private final NotificationRepository notificationRepository;
 	private final MemberRepository memberRepository;
 	private final StoreRepository storeRepository;

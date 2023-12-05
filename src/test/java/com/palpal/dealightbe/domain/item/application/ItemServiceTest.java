@@ -37,9 +37,13 @@ import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemsRes;
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.item.domain.ItemRepository;
+import com.palpal.dealightbe.domain.item.domain.UpdatedItem;
+import com.palpal.dealightbe.domain.item.domain.UpdatedItemRepository;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.domain.store.domain.StoreRepository;
+import com.palpal.dealightbe.domain.store.domain.UpdatedStore;
+import com.palpal.dealightbe.domain.store.domain.UpdatedStoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
@@ -53,6 +57,11 @@ class ItemServiceTest {
 	private ItemRepository itemRepository;
 
 	@Mock
+	private UpdatedItemRepository updatedItemRepository;
+	@Mock
+	private UpdatedStoreRepository updatedStoreRepository;
+
+	@Mock
 	private StoreRepository storeRepository;
 
 	@Mock
@@ -62,6 +71,8 @@ class ItemServiceTest {
 	private Store store2;
 	private Item item;
 	private Item item2;
+	private UpdatedStore updatedStore;
+	private UpdatedItem updatedItem;
 
 	@BeforeEach
 	void setUp() {
@@ -83,6 +94,17 @@ class ItemServiceTest {
 			.address(address)
 			.build();
 
+		updatedStore = UpdatedStore.builder()
+			.id(store.getId())
+			.name(store.getName())
+			.xCoordinate(store.getAddress().getXCoordinate())
+			.yCoordinate(store.getAddress().getYCoordinate())
+			.openTime(store.getOpenTime())
+			.closeTime(store.getCloseTime())
+			.image(store.getImage())
+			.storeStatus(store.getStoreStatus())
+			.build();
+
 		item = Item.builder()
 			.name("떡볶이")
 			.stock(2)
@@ -91,6 +113,13 @@ class ItemServiceTest {
 			.description("기본 떡볶이 입니다.")
 			.image("https://fake-image.com/item1.png")
 			.store(store)
+			.build();
+
+		updatedItem = UpdatedItem.builder()
+			.name(item.getName())
+			.stock(item.getStock())
+			.originalPrice(item.getOriginalPrice())
+			.discountPrice(item.getDiscountPrice())
 			.build();
 
 		Address address2 = Address.builder()
@@ -134,6 +163,10 @@ class ItemServiceTest {
 		when(itemRepository.existsByNameAndStoreId(any(), any())).thenReturn(false);
 		when(itemRepository.save(any(Item.class))).thenReturn(item);
 		when(imageService.store(file)).thenReturn(imageUrl);
+		when(updatedStoreRepository.findById(any()))
+			.thenReturn(Optional.of(updatedStore));
+		when(updatedItemRepository.save(any()))
+			.thenReturn(updatedItem);
 
 		//when
 		ItemRes itemRes = itemService.create(itemReq, providerId, imageUploadReq);

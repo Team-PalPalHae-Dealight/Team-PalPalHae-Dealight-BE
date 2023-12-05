@@ -4,7 +4,7 @@ import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
 import com.palpal.dealightbe.domain.member.domain.Member;
 
 public record MemberUpdateRes(
-	String nickname,
+	String nickName,
 	String phoneNumber,
 	AddressRes address
 ) {

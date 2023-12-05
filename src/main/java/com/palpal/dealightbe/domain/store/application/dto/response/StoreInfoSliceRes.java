@@ -19,6 +19,6 @@ public record StoreInfoSliceRes(
 	}
 
 	public static StoreInfoSliceRes from(StoreDocument storeDocument) {
-		return new StoreInfoSliceRes(storeDocument.getId(), storeDocument.getName(), LocalTime.parse(storeDocument.getCloseTime()), storeDocument.getImage());
+		return new StoreInfoSliceRes(Long.parseLong(storeDocument.getId()), storeDocument.getName(), LocalTime.parse(storeDocument.getCloseTime()), storeDocument.getImage());
 	}
 }

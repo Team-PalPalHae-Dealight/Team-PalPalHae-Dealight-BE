@@ -36,18 +36,10 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.palpal.dealightbe.domain.review.application.ReviewService;
+import com.palpal.dealightbe.common.ControllerTest;
 import com.palpal.dealightbe.domain.review.application.dto.request.ReviewCreateReq;
 import com.palpal.dealightbe.domain.review.application.dto.response.ReviewCreateRes;
 import com.palpal.dealightbe.domain.review.application.dto.response.ReviewRes;
@@ -55,22 +47,7 @@ import com.palpal.dealightbe.domain.review.application.dto.response.StoreReviewR
 import com.palpal.dealightbe.domain.review.application.dto.response.StoreReviewsRes;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 
-@AutoConfigureRestDocs
-@WebMvcTest(
-	value = ReviewController.class,
-	excludeAutoConfiguration = {SecurityAutoConfiguration.class, OAuth2ClientAutoConfiguration.class}
-)
-class ReviewControllerTest {
-
-	@Autowired
-	private MockMvc mockMvc;
-
-	@Autowired
-	private ObjectMapper objectMapper;
-
-	@MockBean
-	private ReviewService reviewService;
-
+class ReviewControllerTest extends ControllerTest {
 	@Nested
 	@DisplayName("<리뷰 생성>")
 	class createTest {

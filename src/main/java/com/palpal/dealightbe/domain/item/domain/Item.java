@@ -1,8 +1,8 @@
 package com.palpal.dealightbe.domain.item.domain;
 
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_DISCOUNT_PRICE;
-import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ITEM_QUANTITY;
 import static com.palpal.dealightbe.global.error.ErrorCode.STORE_HAS_NO_ITEM;
+import static java.lang.Boolean.FALSE;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,6 +13,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.global.BaseEntity;
@@ -27,6 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 @Entity
+@Where(clause = "is_deleted = false")
+@SQLDelete(sql = "UPDATE items SET is_deleted = true WHERE id = ?")
 @Table(name = "items")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Item extends BaseEntity {
@@ -53,6 +58,8 @@ public class Item extends BaseEntity {
 	@JoinColumn(name = "store_id")
 	private Store store;
 
+	private boolean isDeleted = FALSE;
+
 	@Builder
 	public Item(String name, int stock, int discountPrice, int originalPrice, String description, String image,
 		Store store) {
@@ -67,16 +74,8 @@ public class Item extends BaseEntity {
 		this.store = store;
 	}
 
-	public void deductStock(int quantity) {
-		if (this.stock < quantity) {
-			throw new BusinessException(INVALID_ITEM_QUANTITY);
-		}
-
-		this.stock -= quantity;
-	}
-
-	public void addStock(int quantity) {
-		stock += quantity;
+	public void updateStock(int stock) {
+		this.stock = stock;
 	}
 
 	public void update(Item item) {
@@ -106,6 +105,7 @@ public class Item extends BaseEntity {
 		if (discountPrice >= originalPrice) {
 			log.warn("INVALID_ITEM_DISCOUNT_PRICE : discount price = {}, original price = {}", discountPrice,
 				originalPrice);
+
 			throw new BusinessException(INVALID_ITEM_DISCOUNT_PRICE);
 		}
 	}

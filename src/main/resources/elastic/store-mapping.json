@@ -1,18 +1,52 @@
 {
   "properties": {
-    "id": {"type": "long"},
-        "address": {
-          "properties": {
-            "id": {"type": "long"},
-            "name": {"type": "text"},
-            "xCoordinate": {"type": "double"},
-            "yCoordinate": {"type": "double"}
-          }
+    "id": {
+      "type": "text"
+    },
+    "location": {
+      "type": "geo_point"
+    },
+    "name": {
+      "type": "text",
+      "analyzer": "nori"
+    },
+    "storeStatus": {
+      "type": "keyword"
+    },
+    "openTime": {
+      "type": "date",
+      "format": "HH:mm"
+    },
+    "closeTime": {
+      "type": "date",
+      "format": "HH:mm"
+    },
+    "image": {
+      "type": "text"
+    },
+    "items": {
+      "type": "nested",
+      "properties": {
+        "id": {
+          "type": "long"
         },
-    "name": {"type": "text"},
-    "storeStatus": {"type": "keyword"},
-    "openTime": {"type": "date", "format": "HH:mm"},
-    "closeTime": {"type": "date", "format": "HH:mm"},
-    "image": {"type": "text"}
+        "name": {
+          "type": "text",
+          "analyzer": "nori"
+        },
+        "storeId": {
+          "type": "long"
+        },
+        "discountPrice": {
+          "type": "integer"
+        },
+        "originalPrice": {
+          "type": "integer"
+        },
+        "discountRate": {
+          "type": "double"
+        }
+      }
+    }
   }
 }

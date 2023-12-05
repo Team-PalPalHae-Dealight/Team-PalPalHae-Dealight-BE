@@ -1,0 +1,141 @@
+# github repository actions 페이지에 나타날 이름
+name: CI/CD using Actions & S3 & Code Deploy & Docker & SonarCloud
+
+# event trigger
+# main 브랜치에 push가 되었을 때 실행
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  CI-CD:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # JDK setting - github actions에서 사용할 JDK 설정 (프로젝트나 AWS의 java 버전과 달라도 무방)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+
+      # gradle caching - 빌드 시간 향상
+      - name: Gradle Caching
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # 서비스에 필요한 yml 파일 생성
+      # application-oauth.yml 생성
+      - name: Make application-oauth.yml
+        if: |
+          contains(github.ref, 'main')
+        run: |
+          cd ./src/main/resources
+          touch ./application-oauth.yml
+          echo "${{ secrets.YML_PROD_OAUTH }}" > ./application-oauth.yml
+        shell: bash
+
+      # application-aws.yml 생성
+      - name: Make application-aws.yml
+        if: |
+          contains(github.ref, 'main')
+        run: |
+          cd ./src/main/resources
+          touch ./application-aws.yml
+          echo "${{ secrets.YML_PROD_AWS }}" > ./application-aws.yml
+        shell: bash
+
+      # application-actuator.yml 생성
+      - name: Make application-actuator.yml
+        if: |
+          contains(github.ref, 'main')
+        run: |
+          cd ./src/main/resources
+          touch ./application-actuator.yml
+          echo "${{ secrets.YML_PROD_ACTUATOR }}" > ./application-actuator.yml
+        shell: bash
+
+      # application-rds.yml 생성
+      - name: Make application-rds.yml
+        if: |
+          contains(github.ref, 'main')
+        run: |
+          cd ./src/main/resources
+          touch ./application-rds.yml
+          echo "${{ secrets.YML_PROD_RDS }}" > ./application-rds.yml
+        shell: bash
+
+      # application-els.yml 생성
+      - name: Make application-els.yml
+        if: |
+          contains(github.ref, 'main')
+        run: |
+          cd ./src/main/resources
+          touch ./application-els.yml
+          echo "${{ secrets.YML_PROD_ELS }}" > ./application-els.yml
+        shell: bash
+
+      # 테스트를 위한 application.yml 생성
+      - name: Make Test application.yml
+        if: |
+          contains(github.ref, 'main')
+        run: |
+          mkdir ./src/test/resources
+          cd ./src/test/resources
+          touch ./application.yml
+          echo "${{ secrets.YML_TEST }}" > ./application.yml
+        shell: bash
+
+      # Gradle에 실행 권한을 부여
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # Gradle로 clean build
+      - name: Build with Gradle
+        run: ./gradlew clean build
+
+      # S3에 업로드하기 위해 zip파일로 만듦
+      - name: Make zip file
+        run: |
+          mkdir deploy
+          mkdir deploy/docs
+          cp ./build/docs/asciidoc/*.html ./deploy/docs/
+          cp ./docker-compose.*.yml ./deploy/
+          cp ./appspec.yml ./deploy/
+          cp ./*.Dockerfile ./deploy/
+          cp ./scripts/*.sh ./deploy/
+          cp ./build/libs/dealight-be-0.0.1-SNAPSHOT.jar ./deploy/
+          zip -r -qq -j ./dealight-spring-prod-build.zip ./deploy
+
+      # AWS credentials 값을 가져옴
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      # S3에 zip파일을 업로드
+      - name: Upload to S3
+        run: |
+          aws s3 cp \
+            --region ap-northeast-2 \
+            ./dealight-spring-prod-build.zip s3://team-08-bucket
+
+      # Code Deploy를 사용
+      - name: Code Deploy
+        run: aws deploy create-deployment --application-name team-08-dev
+          --deployment-config-name CodeDeployDefault.AllAtOnce
+          --deployment-group-name team-palpal-prod-deploy
+          --s3-location bucket=team-08-bucket,bundleType=zip,key=dealight-spring-prod-build.zip

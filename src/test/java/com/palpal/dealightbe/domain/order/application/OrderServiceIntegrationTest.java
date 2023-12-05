@@ -14,17 +14,11 @@ import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.palpal.dealightbe.config.ElasticTestContainer;
+import com.palpal.dealightbe.common.IntegrationTest;
 import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.item.domain.Item;
-import com.palpal.dealightbe.domain.item.domain.ItemRepository;
 import com.palpal.dealightbe.domain.member.domain.Member;
-import com.palpal.dealightbe.domain.member.domain.MemberRepository;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderCreateReq;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderProductReq;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderProductsReq;
@@ -32,34 +26,14 @@ import com.palpal.dealightbe.domain.order.application.dto.request.OrderStatusUpd
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderRes;
 import com.palpal.dealightbe.domain.order.domain.Order;
 import com.palpal.dealightbe.domain.order.domain.OrderItem;
-import com.palpal.dealightbe.domain.order.domain.OrderRepository;
 import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
-import com.palpal.dealightbe.domain.store.domain.StoreRepository;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 
-@Transactional
-@SpringBootTest
-@Import(ElasticTestContainer.class)
-public class OrderServiceIntegrationTest {
-
-	@Autowired
-	private OrderRepository orderRepository;
-
-	@Autowired
-	private MemberRepository memberRepository;
-
-	@Autowired
-	private StoreRepository storeRepository;
-
-	@Autowired
-	private OrderService orderService;
-
-	@Autowired
-	private ItemRepository itemRepository;
+public class OrderServiceIntegrationTest extends IntegrationTest {
 
 	@Nested
-	@DisplayName("주문 생성")
+	@DisplayName("[주문 생성]")
 	class createTest {
 		@Nested
 		@DisplayName("성공")
@@ -70,13 +44,16 @@ public class OrderServiceIntegrationTest {
 			void member_create() {
 				// given
 				Store store = createStore();
-				store.updateStatus(OPENED);
 				Item item = createItem(store);
 				Member member = createMember();
 
+				int originalStock = item.getStock();
+				long itemId = item.getId();
+				int quantity = 2;
+
 				OrderCreateReq orderCreateReq = new OrderCreateReq(
 					new OrderProductsReq(
-						List.of(new OrderProductReq(item.getId(), 2))
+						List.of(new OrderProductReq(item.getId(), quantity))
 					),
 					store.getId(), "도착할 때까지 상품 냉장고에 보관 부탁드려요",
 					LocalTime.of(12, 30), item.getDiscountPrice() * 2
@@ -84,27 +61,25 @@ public class OrderServiceIntegrationTest {
 
 				// when
 				OrderRes orderRes = orderService.create(orderCreateReq, member.getProviderId());
+				item = itemRepository.findById(itemId).get();
 
 				// then
 				long orderId = orderRes.orderId();
 				Order createdOrder = orderRepository.findById(orderId).get();
+				itemRepository.flush();
 
 				assertThat(createdOrder.getStore().getId(), is(store.getId()));
 				assertThat(createdOrder.getMember().getId(), is(member.getId()));
 				assertThat(createdOrder.getStore().getName(), is(store.getName()));
-				assertThat(createdOrder.getOrderStatus().getText(), is(RECEIVED.getText()));
+				assertThat(createdOrder.getOrderStatus(), is(RECEIVED));
 
 				assertThat(createdOrder.getDemand(), is(orderCreateReq.demand()));
 				assertThat(createdOrder.getArrivalTime(), is(orderCreateReq.arrivalTime()));
 				assertThat(createdOrder.getTotalPrice(), is(orderCreateReq.totalPrice()));
 
 				OrderItem orderedItem = createdOrder.getOrderItems().get(0);
-				assertThat(orderedItem.getItem(), is(item));
-				assertThat(orderedItem.getQuantity(),
-					is(orderCreateReq.orderProductsReq().orderProducts().get(0).quantity()));
-
-				OrderItem orderItem = createdOrder.getOrderItems().get(0);
-				assertThat(orderItem.getOrder(), is(createdOrder));
+				assertThat(orderedItem.getItem().getId(), is(item.getId()));
+				assertThat(item.getStock(), is(originalStock - quantity));
 			}
 		}
 
@@ -211,11 +186,12 @@ public class OrderServiceIntegrationTest {
 	}
 
 	@Nested
-	@DisplayName("주문 상태 변경")
+	@DisplayName("[주문 상태 변경]")
 	class updateStatusTest {
 		@Nested
 		@DisplayName("성공")
 		class Success {
+
 			@DisplayName("고객이 주문한 상품을 취소하면 재고가 다시 늘어난다.")
 			@Test
 			void cancel_order() {
@@ -224,31 +200,67 @@ public class OrderServiceIntegrationTest {
 				Item item = createItem(store);
 				Member member = createMember();
 
-				store.updateStatus(OPENED);
-				int stock = item.getStock();
+				int originalStock = item.getStock();
 				int quantity = 2;
+				long itemId = item.getId();
 
 				OrderCreateReq orderCreateReq = new OrderCreateReq(
 					new OrderProductsReq(
-						List.of(new OrderProductReq(item.getId(), quantity))
+						List.of(new OrderProductReq(itemId, quantity))
 					),
 					store.getId(), "도착할 때까지 상품 냉장고에 보관 부탁드려요",
-					LocalTime.of(12, 30), item.getDiscountPrice() * 2
+					LocalTime.of(12, 30), item.getDiscountPrice() * quantity
 				);
 
-				// when
-				// then
 				OrderRes orderRes = orderService.create(orderCreateReq, member.getProviderId());
+
 				long orderId = orderRes.orderId();
 				Order order = orderRepository.findById(orderId).get();
 
-				assertThat(item.getStock(), is(stock - 2));
+				item = itemRepository.findById(itemId).get();
+
+				// when
+				// then
+
+				assertThat(item.getStock(), is(originalStock - quantity));
 
 				orderService.updateStatus(orderId, new OrderStatusUpdateReq("CANCELED"), member.getProviderId());
 				assertThat(order.getOrderStatus(), is(CANCELED));
-
-				assertThat(item.getStock(), is(stock));
+				assertThat(item.getStock(), is(originalStock));
 			}
+		}
+	}
+
+	@DisplayName("[주문 단건 조회]")
+	@Nested
+	class findById {
+		@DisplayName("성공")
+		@Test
+		void success() {
+			// given
+			Store store = createStore();
+			Item item = createItem(store);
+			Member member = createMember();
+
+			int quantity = 2;
+
+			OrderCreateReq orderCreateReq = new OrderCreateReq(
+				new OrderProductsReq(
+					List.of(new OrderProductReq(item.getId(), quantity))
+				),
+				store.getId(), "도착할 때까지 상품 냉장고에 보관 부탁드려요",
+				LocalTime.of(12, 30), item.getDiscountPrice() * 2
+			);
+
+			// when
+			// then
+			OrderRes orderRes = orderService.create(orderCreateReq, member.getProviderId());
+			Order order = orderRepository.findById(orderRes.orderId()).get();
+			Long actualItemId = order.getOrderItems().get(0).getItem().getId();
+			long orderedItemId = orderCreateReq.orderProductsReq().orderProducts().get(0).itemId();
+
+			assertThat(order.getId(), is(orderRes.orderId()));
+			assertThat(actualItemId, is(orderedItemId));
 		}
 	}
 
@@ -274,8 +286,10 @@ public class OrderServiceIntegrationTest {
 			.address(address)
 			.build();
 
-		store.updateMember(storeOwner);
 		storeRepository.save(store);
+
+		store.updateMember(storeOwner);
+		store.updateStatus(OPENED);
 
 		return store;
 	}

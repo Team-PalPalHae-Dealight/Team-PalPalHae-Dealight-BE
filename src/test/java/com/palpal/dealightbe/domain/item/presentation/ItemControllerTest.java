@@ -28,6 +28,8 @@ import static org.springframework.restdocs.request.RequestDocumentation.partWith
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -39,26 +41,15 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.palpal.dealightbe.config.SecurityConfig;
+import com.palpal.dealightbe.common.ControllerTest;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
 import com.palpal.dealightbe.domain.address.domain.Address;
-import com.palpal.dealightbe.domain.item.application.ItemService;
 import com.palpal.dealightbe.domain.item.application.dto.request.ItemReq;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemRes;
 import com.palpal.dealightbe.domain.item.application.dto.response.ItemsRes;
@@ -68,20 +59,7 @@ import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
-@WebMvcTest(value = ItemController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class,
-	OAuth2ClientAutoConfiguration.class}, excludeFilters = {
-	@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class)})
-@AutoConfigureRestDocs
-class ItemControllerTest {
-
-	@Autowired
-	MockMvc mockMvc;
-
-	@Autowired
-	ObjectMapper objectMapper;
-
-	@MockBean
-	ItemService itemService;
+class ItemControllerTest extends ControllerTest {
 
 	private Store store;
 	private Store store2;
@@ -177,6 +155,7 @@ class ItemControllerTest {
 				.file(file)
 				.file(request)
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.with(csrf().asHeader())
 				.contentType(MediaType.MULTIPART_FORM_DATA)
 				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
@@ -261,7 +240,7 @@ class ItemControllerTest {
 				.file(file)
 				.file(request)
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
-
+				.with(csrf().asHeader())
 				.contentType(MediaType.MULTIPART_FORM_DATA)
 				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isBadRequest())
@@ -324,6 +303,8 @@ class ItemControllerTest {
 				.file(file)
 				.file(request)
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.contentType(MediaType.MULTIPART_FORM_DATA)
 				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isBadRequest())
@@ -378,6 +359,8 @@ class ItemControllerTest {
 				.file(file)
 				.file(request)
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.contentType(MediaType.MULTIPART_FORM_DATA)
 				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isBadRequest())
@@ -768,6 +751,8 @@ class ItemControllerTest {
 		mockMvc.perform(builder
 				.file(file)
 				.file(request)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.contentType(MediaType.MULTIPART_FORM_DATA)
 				.accept(MediaType.APPLICATION_JSON))
@@ -866,6 +851,8 @@ class ItemControllerTest {
 		mockMvc.perform(builder
 				.file(file)
 				.file(request)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.contentType(MediaType.MULTIPART_FORM_DATA)
 				.accept(MediaType.APPLICATION_JSON))
@@ -939,6 +926,8 @@ class ItemControllerTest {
 		mockMvc.perform(builder
 				.file(file)
 				.file(request)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.contentType(MediaType.MULTIPART_FORM_DATA)
 				.accept(MediaType.APPLICATION_JSON))
@@ -1017,6 +1006,8 @@ class ItemControllerTest {
 				.file(file)
 				.file(request)
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.contentType(MediaType.MULTIPART_FORM_DATA)
 				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isBadRequest())
@@ -1064,6 +1055,7 @@ class ItemControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/items/{id}", itemId)
 				.contentType(MediaType.APPLICATION_JSON)
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}"))
 			.andExpect(status().isNoContent())
 			.andDo(print())
@@ -1090,7 +1082,10 @@ class ItemControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/items/{id}", itemId)
 				.contentType(MediaType.APPLICATION_JSON)
-				.header("Authorization", "Bearer {ACCESS_TOKEN}"))
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
+			)
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
 			.andExpect(jsonPath("$.code").value("I005"))

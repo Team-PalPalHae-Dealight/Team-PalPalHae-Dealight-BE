@@ -76,6 +76,16 @@ jobs:
           echo "${{ secrets.YML_DEV_RDS }}" > ./application-rds.yml
         shell: bash
 
+      # application-els.yml 생성
+      - name: Make application-els.yml
+        if: |
+          contains(github.ref, 'develop')
+        run: |
+          cd ./src/main/resources
+          touch ./application-els.yml
+          echo "${{ secrets.YML_DEV_ELS }}" > ./application-els.yml
+        shell: bash
+
       # 테스트를 위한 application.yml 생성
       - name: Make Test application.yml
         if: |
@@ -106,7 +116,7 @@ jobs:
           cp ./*.Dockerfile ./deploy/
           cp ./scripts/*.sh ./deploy/
           cp ./build/libs/dealight-be-0.0.1-SNAPSHOT.jar ./deploy/
-          zip -r -qq -j ./delight-spring-build.zip ./deploy
+          zip -r -qq -j ./delight-spring-dev-build.zip ./deploy
 
       # AWS credentials 값을 가져옴
       - name: Configure AWS credentials
@@ -121,11 +131,4 @@ jobs:
         run: |
           aws s3 cp \
             --region ap-northeast-2 \
-            ./delight-spring-build.zip s3://team-08-bucket
-
-      # Code Deploy를 사용
-      - name: Code Deploy
-        run: aws deploy create-deployment --application-name team-08-dev
-          --deployment-config-name CodeDeployDefault.OneAtATime
-          --deployment-group-name team-palpal-dev-deploy
-          --s3-location bucket=team-08-bucket,bundleType=zip,key=delight-spring-build.zip
+            ./delight-spring-dev-build.zip s3://team-08-bucket
