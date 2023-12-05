@@ -17,11 +17,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: docker-compose.test up
+      - name: docker-compose-test up
         run: |
           pwd
           echo '도커 컴포즈 테스트 up'
-          ./docker-compose -f docker-compose.test.yml up -d
+          docker-compose -f ./docker-compose-test.yml up -d
 
       # JDK setting - github actions에서 사용할 JDK 설정 (프로젝트나 AWS의 java 버전과 달라도 무방)
       - name: Set up JDK 17
