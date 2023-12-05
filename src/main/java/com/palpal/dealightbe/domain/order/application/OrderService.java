@@ -73,7 +73,8 @@ public class OrderService {
 	public OrderStatusUpdateRes updateStatus(Long orderId, OrderStatusUpdateReq request, Long memberProviderId) {
 		Member member = getMember(memberProviderId);
 		Order order = getOrder(orderId);
-		Store store = getStore(order.getStore().getId());
+		Long storeId = order.getStore().getId();
+		Store store = getStore(storeId);
 
 		String changedStatus = request.status();
 		order.changeStatus(member, changedStatus);
