@@ -1,0 +1,15 @@
+version: "3"
+
+networks:
+  dealight-network:
+    external: true
+
+services:
+  redis:
+    container_name: dealight-cart-redis
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    restart: always
+    networks:
+      - dealight-network
