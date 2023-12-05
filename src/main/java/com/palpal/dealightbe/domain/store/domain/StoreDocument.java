@@ -33,7 +33,7 @@ public class StoreDocument {
 
 	private String name;
 
-	private StoreStatus storeStatus = StoreStatus.CLOSED;
+	private StoreStatus storeStatus;
 
 	private String openTime;
 
