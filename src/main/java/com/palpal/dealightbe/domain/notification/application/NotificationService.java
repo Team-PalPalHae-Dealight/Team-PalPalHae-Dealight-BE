@@ -139,7 +139,6 @@ public class NotificationService {
 		});
 	}
 
-
 	private void resendMissedEvents(Long id, String userType, String emitterId, String lastEventId,
 		SseEmitter emitter) {
 

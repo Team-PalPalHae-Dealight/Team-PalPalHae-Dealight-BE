@@ -62,6 +62,7 @@ dependencies {
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
     implementation 'com.bucket4j:bucket4j-core:8.3.0'
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
 
     // elasticsearch
     implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'

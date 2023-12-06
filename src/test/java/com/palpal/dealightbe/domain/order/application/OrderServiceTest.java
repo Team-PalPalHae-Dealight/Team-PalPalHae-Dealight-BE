@@ -11,6 +11,8 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalTime;
@@ -34,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.palpal.dealightbe.domain.member.domain.Member;
 import com.palpal.dealightbe.domain.member.domain.MemberRepository;
+import com.palpal.dealightbe.domain.notification.application.NotificationService;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderStatusUpdateReq;
 import com.palpal.dealightbe.domain.order.application.dto.response.OrderRes;
 import com.palpal.dealightbe.domain.order.application.dto.response.OrdersRes;
@@ -54,6 +57,8 @@ class OrderServiceTest {
 	private MemberRepository memberRepository;
 	@Mock
 	private StoreRepository storeRepository;
+	@Mock
+	private NotificationService notificationService;
 
 	@InjectMocks
 	private OrderService orderService;
@@ -86,6 +91,7 @@ class OrderServiceTest {
 			.build();
 
 		store.updateMember(storeOwner);
+		store.updateStatus(OPENED);
 
 	}
 
@@ -107,6 +113,11 @@ class OrderServiceTest {
 
 				when(orderRepository.findById(anyLong()))
 					.thenReturn(Optional.of(order));
+
+				when(storeRepository.findById(isNull()))
+					.thenReturn(Optional.of(store));
+
+				doNothing().when(notificationService).send(any(), any(), any(), any());
 
 				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq("CANCELED");
 
@@ -135,6 +146,11 @@ class OrderServiceTest {
 				when(orderRepository.findById(anyLong()))
 					.thenReturn(Optional.of(order));
 
+				when(storeRepository.findById(isNull()))
+					.thenReturn(Optional.of(store));
+
+				doNothing().when(notificationService).send(any(), any(), any(), any());
+
 				orderService.updateStatus(0L, new OrderStatusUpdateReq("CONFIRMED"), STORE_OWNER_ID);
 
 				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq("CANCELED");
@@ -159,7 +175,9 @@ class OrderServiceTest {
 					.thenReturn(Optional.of(order));
 				when(memberRepository.findMemberByProviderId(MEMBER_ID))
 					.thenReturn(Optional.of(member));
-
+				when(storeRepository.findById(isNull()))
+					.thenReturn(Optional.of(store));
+				
 				// when
 				// then
 				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq("CONFIRMED");
@@ -181,6 +199,8 @@ class OrderServiceTest {
 					.thenReturn(Optional.of(order));
 				when(memberRepository.findMemberByProviderId(MEMBER_ID))
 					.thenReturn(Optional.of(member));
+				when(storeRepository.findById(isNull()))
+					.thenReturn(Optional.of(store));
 
 				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq("COMPLETED");
 
@@ -209,6 +229,11 @@ class OrderServiceTest {
 				when(orderRepository.findById(anyLong()))
 					.thenReturn(Optional.of(order));
 
+				when(storeRepository.findById(isNull()))
+					.thenReturn(Optional.of(store));
+
+				doNothing().when(notificationService).send(any(), any(), any(), any());
+
 				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq("CONFIRMED");
 
 				// when
@@ -232,6 +257,11 @@ class OrderServiceTest {
 
 				when(orderRepository.findById(anyLong()))
 					.thenReturn(Optional.of(order));
+
+				when(storeRepository.findById(isNull()))
+					.thenReturn(Optional.of(store));
+
+				doNothing().when(notificationService).send(any(), any(), any(), any());
 
 				orderService.updateStatus(0L, new OrderStatusUpdateReq("CONFIRMED"), STORE_OWNER_ID);
 
@@ -258,6 +288,11 @@ class OrderServiceTest {
 				when(orderRepository.findById(anyLong()))
 					.thenReturn(Optional.of(order));
 
+				when(storeRepository.findById(isNull()))
+					.thenReturn(Optional.of(store));
+
+				doNothing().when(notificationService).send(any(), any(), any(), any());
+
 				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq("CANCELED");
 
 				// when
@@ -282,6 +317,11 @@ class OrderServiceTest {
 				when(orderRepository.findById(anyLong()))
 					.thenReturn(Optional.of(order));
 
+				when(storeRepository.findById(isNull()))
+					.thenReturn(Optional.of(store));
+
+				doNothing().when(notificationService).send(any(), any(), any(), any());
+
 				orderService.updateStatus(0L, new OrderStatusUpdateReq("CONFIRMED"), STORE_OWNER_ID);
 
 				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq("CANCELED");
@@ -305,6 +345,8 @@ class OrderServiceTest {
 					.thenReturn(Optional.of(order));
 				when(memberRepository.findMemberByProviderId(STORE_OWNER_ID))
 					.thenReturn(Optional.of(storeOwner));
+				when(storeRepository.findById(isNull()))
+					.thenReturn(Optional.of(store));
 
 				OrderStatusUpdateReq orderStatusUpdateReq = new OrderStatusUpdateReq("COMPLETED");
 
@@ -327,6 +369,10 @@ class OrderServiceTest {
 					.thenReturn(Optional.of(order));
 				when(memberRepository.findMemberByProviderId(STORE_OWNER_ID))
 					.thenReturn(Optional.of(storeOwner));
+				when(storeRepository.findById(isNull()))
+					.thenReturn(Optional.of(store));
+
+				doNothing().when(notificationService).send(any(), any(), any(), any());
 
 				orderService.updateStatus(0L, new OrderStatusUpdateReq("CONFIRMED"), STORE_OWNER_ID);
 
