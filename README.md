@@ -14,7 +14,7 @@
 
 |종류|기술 스택|
 |---|------|
-|🚀 서비스 기술|<img src="https://img.shields.io/badge/Java%2017-007396?style=for-the-badge&logo=openJDK&logoColor=white"/> <img src="https://img.shields.io/badge/Spring%205-6DB33F?style=for-the-badge&logo=Spring&logoColor=white" />  <img src="https://img.shields.io/badge/Springboot%202.7.17-6DB33F?style=for-the-badge&logo=Springboot&logoColor=white"/> <img src="https://img.shields.io/badge/Spring%20Security-6DB33F?style=for-the-badge&logo=spring-security&logoColor=white" />  <img src="https://img.shields.io/badge/Hibernate-59666C?style=for-the-badge&logo=Hibernate&logoColor=white" />  <img src="https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=Gradle&logoColor=white"/>  <br> <img src="https://img.shields.io/badge/QueryDSL-0769AD?style=for-the-badge&logoColor=white"/>  <img src="https://img.shields.io/badge/Asciidoctor-E40046?style=for-the-badge&logo=asciidoctor&logoColor=white">  <img src="https://img.shields.io/badge/Server%20Sent%20Event-09B3AF?style=for-the-badge&logoColor=white"/>  <img src="https://img.shields.io/badge/JWT-ED8106?style=for-the-badge&logoColor=white"/>  <img src="https://img.shields.io/badge/Oauth-7F5AB6?style=for-the-badge&logoColor=white"/>  <img src="https://img.shields.io/badge/Logback-231F20?style=for-the-badge&logoColor=white"/><img src="https://img.shields.io/badge/JUnit5-25A162?style=for-the-badge&logo=JUnit5&logoColor=white"/> <img src="https://img.shields.io/badge/Jacoco-9C4121?style=for-the-badge&logoColor=white"/>|
+|🚀 서비스 <br> 기술|<img src="https://img.shields.io/badge/Java%2017-007396?style=for-the-badge&logo=openJDK&logoColor=white"/> <img src="https://img.shields.io/badge/Spring%205-6DB33F?style=for-the-badge&logo=Spring&logoColor=white" />  <img src="https://img.shields.io/badge/Springboot%202.7.17-6DB33F?style=for-the-badge&logo=Springboot&logoColor=white"/> <img src="https://img.shields.io/badge/Spring%20Security-6DB33F?style=for-the-badge&logo=spring-security&logoColor=white" />  <img src="https://img.shields.io/badge/Hibernate-59666C?style=for-the-badge&logo=Hibernate&logoColor=white" />  <img src="https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=Gradle&logoColor=white"/> <img src="https://img.shields.io/badge/QueryDSL-0769AD?style=for-the-badge&logoColor=white"/>  <img src="https://img.shields.io/badge/Asciidoctor-E40046?style=for-the-badge&logo=asciidoctor&logoColor=white">  <img src="https://img.shields.io/badge/Server%20Sent%20Event-09B3AF?style=for-the-badge&logoColor=white"/>  <img src="https://img.shields.io/badge/JWT-ED8106?style=for-the-badge&logoColor=white"/>  <img src="https://img.shields.io/badge/Oauth-7F5AB6?style=for-the-badge&logoColor=white"/>  <img src="https://img.shields.io/badge/Logback-231F20?style=for-the-badge&logoColor=white"/><img src="https://img.shields.io/badge/JUnit5-25A162?style=for-the-badge&logo=JUnit5&logoColor=white"/> <img src="https://img.shields.io/badge/Jacoco-9C4121?style=for-the-badge&logoColor=white"/>|
 |🛠️ 인프라|<img src="https://img.shields.io/badge/NGINX-009639?style=for-the-badge&logo=nginx&logoColor=white"/>  <img src="https://img.shields.io/badge/MySQL%208-4479A1?style=for-the-badge&logo=MySQL&logoColor=white"/>  <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=Redis&logoColor=white"/>  <img src="https://img.shields.io/badge/Loki-008080?style=for-the-badge&logoColor=white"/>  <img src="https://img.shields.io/badge/Prometheus-E6522C?style=for-the-badge&logo=Prometheus&logoColor=white"/>  <img src="https://img.shields.io/badge/Grafana-F46800?style=for-the-badge&logo=Grafana&logoColor=white"/>  <img src="https://img.shields.io/badge/Kibana-005571?style=for-the-badge&logo=Kibana&logoColor=white"/>  <img src="https://img.shields.io/badge/Elastic%20Search-005571?style=for-the-badge&logo=ElasticSearch&logoColor=white"/>|
 |☁️ 클라우드|<img src="https://img.shields.io/badge/AWS%20EC2-FF9900?style=for-the-badge&logo=Amazon-EC2&logoColor=white"/>  <img src="https://img.shields.io/badge/AWS%20S3-569A31?style=for-the-badge&logo=Amazon-S3&logoColor=white"/>  <img src="https://img.shields.io/badge/AWS%20RDS-527FFF?style=for-the-badge&logo=Amazon-RDS&logoColor=white"/>  <img src="https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=GitHub-Actions&logoColor=white"/>  <img src="https://img.shields.io/badge/Code%20Deploy-2F93E0?style=for-the-badge&logoColor=white"/>  <img src="https://img.shields.io/badge/SonarCloud-F3702A?style=for-the-badge&logo=SonarCloud&logoColor=white"/>|
 |🤝 협업도구|<img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">  <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=GitHub&logoColor=white"/>  <img src="https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=Notion&logoColor=white"/>  <img src="https://img.shields.io/badge/Slack-4A154B?style=for-the-badge&logo=Slack&logoColor=white"/>  <img src="https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white"/>|
@@ -33,6 +33,57 @@
 <h2> 
    🎬 시연 영상 
 </h2>
+
+
+<details>
+<summary> 고객 </summary>
+<div markdown="1">
+
+|메인화면|회원가입|가게 검색|
+|--|--|--|
+|![고객-메인](https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/49016275/3978aa3f-f8bb-4fc1-b4e8-71d3178ae770)|![고객-회원가입](https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/49016275/6648d03c-7394-41f9-8fc2-34f3b6e6ffb2)|![업체 검색](https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/49016275/75ec04f2-e029-4ef3-aa61-041c11fbf29a)|--|--|
+
+|장바구니|주문|리뷰 작성|
+|--|--|--|
+![장바구니](https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/49016275/5b96fbaa-643b-4bb0-8559-6fee58f80cf8)|![주문](https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/49016275/5b01824e-459c-444f-93ef-f13f6ef9afb0)|![고객-리뷰](https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/49016275/2075cd64-6137-491c-a4a6-6aa1706e58d2)|
+
+
+</div>
+</details>
+
+
+<details>
+<summary> 업체 </summary>
+<div markdown="1">
+
+|업체 등록|상품 등록|마이페이지|업체 정보 수정|
+|--|--|--|--|
+|![업체등록](https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/49016275/1a0ffd1d-2f47-43a5-8a1f-c68dbe507acc)|![상품등록](https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/49016275/299601ac-c59c-4a9d-8ecc-bad2eb2419f8)|![업체 마이페이지](https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/49016275/50caf2d1-7bc7-439a-972a-64543a99c68b)|![업체 마이페이지-업체관리](https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/49016275/4fa9d3fd-a4b6-4ddd-a406-6e9e66ffe980)|
+
+</div>
+</details>
+
+
+
+<details>
+<summary> 업체 & 고객 - 주문 관련 </summary>
+<div markdown="1">
+
+|주문 승인|
+|--|
+|![주문 승인](https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/49016275/f4c189c1-c368-41fd-9ad7-aecebbab43c2)|
+
+|주문 완료(상품 수령 후)|
+|--|
+|![주문 완료](https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/49016275/3efc1782-0bca-4dc4-9fed-cabeaa65161c)|
+
+|주문 거절|
+|--|
+|![주문 거절](https://github.com/Team-PalPalHae-Dealight/Team-PalPalHae-Dealight-BE/assets/49016275/ef107a26-72ba-4960-b1f3-df427cf811fa)|
+
+</div>
+</details>
+
 
 <br>
 
