@@ -1,11 +1,10 @@
 package com.palpal.dealightbe.domain.order.application;
 
-import static com.palpal.dealightbe.domain.order.domain.OrderStatus.CANCELED;
-import static com.palpal.dealightbe.domain.order.domain.OrderStatus.RECEIVED;
-import static com.palpal.dealightbe.domain.store.domain.StoreStatus.OPENED;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static com.palpal.dealightbe.domain.order.domain.OrderStatus.*;
+import static com.palpal.dealightbe.domain.store.domain.StoreStatus.*;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -14,13 +13,11 @@ import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.palpal.dealightbe.common.IntegrationTest;
 import com.palpal.dealightbe.domain.address.domain.Address;
 import com.palpal.dealightbe.domain.item.domain.Item;
 import com.palpal.dealightbe.domain.member.domain.Member;
-import com.palpal.dealightbe.domain.notification.application.NotificationService;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderCreateReq;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderProductReq;
 import com.palpal.dealightbe.domain.order.application.dto.request.OrderProductsReq;
