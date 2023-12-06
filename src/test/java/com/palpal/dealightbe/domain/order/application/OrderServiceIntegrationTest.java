@@ -34,9 +34,6 @@ import com.palpal.dealightbe.global.error.exception.BusinessException;
 
 public class OrderServiceIntegrationTest extends IntegrationTest {
 
-	@MockBean
-	private NotificationService notificationService;
-
 	@Nested
 	@DisplayName("[주문 생성]")
 	class createTest {
