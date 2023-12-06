@@ -4,7 +4,6 @@ services:
   redis:
     container_name: dealight-cart-redis
     image: redis:latest
-    hostname: redis
     ports:
       - "6379:6379"
     restart: always
