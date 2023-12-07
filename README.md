@@ -30,8 +30,11 @@
 
 <br>
 
+
+<br>
+
 <h2> 
-   🎬 시연 영상 
+   🎬 주요 기능 소개
 </h2>
 
 
@@ -560,8 +563,3 @@ Team-PalPalHae-Dealight-BE [dealight-be]
 </details>
 
 
-<br>
-
-<h2>
-  🎯 주요 기능 소개
-</h2>
