@@ -561,5 +561,3 @@ Team-PalPalHae-Dealight-BE [dealight-be]
 ```
 
 </details>
-
-
