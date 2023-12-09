@@ -1,0 +1,9 @@
+version: "3"
+
+services:
+  redis:
+    container_name: dealight-cart-redis
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    restart: always

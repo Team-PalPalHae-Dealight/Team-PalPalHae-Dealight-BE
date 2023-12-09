@@ -18,51 +18,32 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestF
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.test.web.servlet.MockMvc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.palpal.dealightbe.config.SecurityConfig;
+import com.palpal.dealightbe.common.ControllerTest;
 import com.palpal.dealightbe.domain.address.application.dto.request.AddressReq;
 import com.palpal.dealightbe.domain.address.application.dto.response.AddressRes;
 import com.palpal.dealightbe.domain.image.application.dto.request.ImageUploadReq;
 import com.palpal.dealightbe.domain.image.application.dto.response.ImageRes;
-import com.palpal.dealightbe.domain.member.application.MemberService;
 import com.palpal.dealightbe.domain.member.application.dto.request.MemberUpdateReq;
 import com.palpal.dealightbe.domain.member.application.dto.response.MemberProfileRes;
 import com.palpal.dealightbe.domain.member.application.dto.response.MemberUpdateRes;
 import com.palpal.dealightbe.global.error.ErrorCode;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
 
-@WebMvcTest(value = MemberController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class,
-	OAuth2ClientAutoConfiguration.class}, excludeFilters = {
-	@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class)})
-@AutoConfigureRestDocs
-class MemberControllerTest {
+class MemberControllerTest extends ControllerTest {
 
-	@Autowired
-	MockMvc mockMvc;
-
-	@Autowired
-	ObjectMapper objectMapper;
-
-	@MockBean
-	MemberService memberService;
+	// @MockBean
+	// MemberService memberService;
 
 	@Test
 	@DisplayName("멤버 프로필 조회 성공")
@@ -79,6 +60,8 @@ class MemberControllerTest {
 		//when -> then
 		mockMvc.perform(
 				RestDocumentationRequestBuilders.get("/api/members/profiles")
+					.with(user("username").roles("MEMBER"))
+					.with(csrf())
 					.header("Authorization", "Bearer {ACCESS_TOKEN}")
 					.contentType(APPLICATION_JSON))
 			.andExpect(status().isOk())
@@ -113,6 +96,8 @@ class MemberControllerTest {
 		// when -> then
 		mockMvc.perform(
 				RestDocumentationRequestBuilders.get("/api/members/profiles")
+					.with(user("username").roles("MEMBER"))
+					.with(csrf())
 					.header("Authorization", "Bearer {ACCESS_TOKEN}")
 					.contentType(APPLICATION_JSON))
 			.andExpect(status().isNotFound())
@@ -138,10 +123,10 @@ class MemberControllerTest {
 
 		// given
 		AddressReq addressReq = new AddressReq("서울", 37.5665, 126.9780);
-		MemberUpdateReq updateRequest = new MemberUpdateReq("박명수", "유산슬", addressReq);
+		MemberUpdateReq updateRequest = new MemberUpdateReq("박명수", "01012341234", addressReq);
 
 		AddressRes addressRes = new AddressRes("서울", 37.5665, 126.9780);
-		MemberUpdateRes updateResponse = new MemberUpdateRes("박명수", "유산슬", addressRes);
+		MemberUpdateRes updateResponse = new MemberUpdateRes("박명수", "01012341234", addressRes);
 
 		given(memberService.updateMemberProfile(any(), eq(updateRequest)))
 			.willReturn(updateResponse);
@@ -149,6 +134,8 @@ class MemberControllerTest {
 		// when -> then
 		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/members/profiles")
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.with(user("username").roles("MEMBER"))
+				.with(csrf())
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(updateRequest)))
 			.andExpect(status().isOk())
@@ -160,14 +147,14 @@ class MemberControllerTest {
 					headerWithName("Authorization").description("Access Token")
 				),
 				requestFields(
-					fieldWithPath("nickname").description("업데이트하려는 닉네임"),
+					fieldWithPath("nickName").description("업데이트하려는 닉네임"),
 					fieldWithPath("phoneNumber").description("업데이트하려는 전화번호"),
 					fieldWithPath("address.name").description("업데이트하려는 주소명"),
 					fieldWithPath("address.xCoordinate").description("업데이트하려는 주소의 X 좌표"),
 					fieldWithPath("address.yCoordinate").description("업데이트하려는 주소의 Y 좌표")
 				),
 				responseFields(
-					fieldWithPath("nickname").description("업데이트된 닉네임"),
+					fieldWithPath("nickName").description("업데이트된 닉네임"),
 					fieldWithPath("phoneNumber").description("업데이트된 전화번호"),
 					fieldWithPath("address.name").description("업데이트된 주소명"),
 					fieldWithPath("address.xCoordinate").description("업데이트된 주소의 X 좌표"),
@@ -189,6 +176,8 @@ class MemberControllerTest {
 
 		// when -> then
 		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/members/profiles")
+				.with(user("username").roles("MEMBER"))
+				.with(csrf())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(updateRequest)))
@@ -201,7 +190,7 @@ class MemberControllerTest {
 					headerWithName("Authorization").description("Access Token")
 				),
 				requestFields(
-					fieldWithPath("nickname").description("업데이트하려는 닉네임"),
+					fieldWithPath("nickName").description("업데이트하려는 닉네임"),
 					fieldWithPath("phoneNumber").description("업데이트하려는 전화번호"),
 					fieldWithPath("address.name").description("업데이트하려는 주소명"),
 					fieldWithPath("address.xCoordinate").description("업데이트하려는 주소의 X 좌표"),
@@ -229,6 +218,8 @@ class MemberControllerTest {
 
 		// when -> then
 		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/members/addresses")
+				.with(user("username").roles("MEMBER"))
+				.with(csrf())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(addressReq)))
@@ -265,6 +256,8 @@ class MemberControllerTest {
 
 		// when -> then
 		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/members/addresses")
+				.with(user("username").roles("MEMBER"))
+				.with(csrf())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(addressReq)))
@@ -306,6 +299,8 @@ class MemberControllerTest {
 		// when -> then
 		mockMvc.perform(RestDocumentationRequestBuilders.multipart("/api/members/images")
 				.file(file)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.with(updateRequest -> {
 					updateRequest.setMethod("PATCH");
@@ -343,6 +338,8 @@ class MemberControllerTest {
 		// when -> then
 		mockMvc.perform(RestDocumentationRequestBuilders.multipart("/api/members/images")
 				.file(file)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.with(updateRequest -> {
 					updateRequest.setMethod("PATCH");
@@ -378,6 +375,8 @@ class MemberControllerTest {
 		// when -> then
 		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/members/images")
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.with(user("username").roles("MEMBER"))
+				.with(csrf())
 				.contentType(APPLICATION_JSON))
 			.andExpect(status().isNoContent())
 			.andDo(print())
@@ -401,6 +400,8 @@ class MemberControllerTest {
 		// when -> then
 		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/members/images")
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.with(user("username").roles("MEMBER"))
+				.with(csrf())
 				.contentType(APPLICATION_JSON))
 			.andExpect(status().isNotFound())
 			.andDo(print())

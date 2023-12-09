@@ -136,5 +136,4 @@ public class StoreController {
 
 		return ResponseEntity.ok(storeResponse);
 	}
-
 }

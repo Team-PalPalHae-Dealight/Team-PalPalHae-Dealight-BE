@@ -15,6 +15,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: docker-compose-test up
+        run: |
+          pwd
+          echo '도커 컴포즈 테스트 up'
+          docker-compose -f docker-compose-test.yml up -d
+
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:

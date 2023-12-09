@@ -31,6 +31,8 @@ public enum ErrorCode {
 	NOT_FOUND_STATUS("ST005", "존재하지 않는 영업 상태 입니다."),
 	CLOSED_STORE("ST006", "영업이 종료된 업체입니다."),
 	ALREADY_HAS_STORE("ST007", "이미 업체를 보유하고 있습니다"),
+	UPDATABLE_STORE_NOT_EXIST("ST008", "업데이트 가능한 업체가 없습니다."),
+	NOT_FOUND_UPDATED_STORE("ST009","기본 업체에 대응하는 업데이트 업체가 존재하지 않습니다."),
 
 	//상품
 	INVALID_ITEM_DISCOUNT_PRICE("I001", "상품 할인가는 원가보다 크거나 같을 수 없습니다."),
@@ -38,6 +40,7 @@ public enum ErrorCode {
 	DUPLICATED_ITEM_NAME("I003", "동일한 이름을 가진 상품이 이미 등록되어 있습니다."),
 	INVALID_ITEM_QUANTITY("I004", "상품 재고가 부족합니다"),
 	STORE_HAS_NO_ITEM("I005", "요청하신 상품은 해당 업체에 등록되지 않은 상품입니다."),
+	UPDATABLE_ITEM_NOT_EXIST("I006","업데이트 가능한 상품이 없습니다."),
 
 	//파일
 	NOT_FOUND_IMAGE("F001", "존재하지 않는 이미지 입니다."),
@@ -65,6 +68,7 @@ public enum ErrorCode {
 	ITEM_REMOVED_NO_LONGER_EXISTS_ITEM("CT007", "더 이상 존재하지 않는 상품이 장바구니에서 자동으로 삭제되었습니다."),
 	ITEM_REMOVED_NO_LONGER_EXISTS_STORE("CT008", "더 이상 존재하지 않는 업체의 상품이 장바구니에서 자동으로 삭제되었습니다."),
 	UNABLE_TO_ADD_TO_CART_ITEM_STOCK_ZERO("CT009", "재고가 0개인 상품은 담을 수 없습니다."),
+	TOO_MANY_CART_REQUESTS("CT010", "너무 많은 장바구니 요청을 시도했습니다. 잠시 후에 다시 시도해주세요."),
 
 	//인증, 인가
 	ACCESS_DENIED("AUTH001", "사용자 인증에 실패했습니다."),

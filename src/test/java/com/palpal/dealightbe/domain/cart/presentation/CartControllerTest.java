@@ -4,10 +4,11 @@ import static com.palpal.dealightbe.global.error.ErrorCode.ANOTHER_STORE_ITEM_AL
 import static com.palpal.dealightbe.global.error.ErrorCode.EXCEEDED_CART_ITEM_SIZE;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_ATTEMPT_TO_ADD_OWN_STORE_ITEM_TO_CART;
 import static com.palpal.dealightbe.global.error.ErrorCode.INVALID_CART_QUANTITY;
-import static com.palpal.dealightbe.global.error.ErrorCode.ITEM_REMOVED_NO_LONGER_EXISTS_STORE;
 import static com.palpal.dealightbe.global.error.ErrorCode.ITEM_REMOVED_NO_LONGER_EXISTS_ITEM;
+import static com.palpal.dealightbe.global.error.ErrorCode.ITEM_REMOVED_NO_LONGER_EXISTS_STORE;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_CART_ITEM;
 import static com.palpal.dealightbe.global.error.ErrorCode.NOT_FOUND_ITEM;
+import static com.palpal.dealightbe.global.error.ErrorCode.TOO_MANY_CART_REQUESTS;
 import static com.palpal.dealightbe.global.error.ErrorCode.UNABLE_TO_ADD_TO_CART_ITEM_STOCK_ZERO;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -27,6 +28,8 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestF
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -39,22 +42,11 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.test.web.servlet.MockMvc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.palpal.dealightbe.config.SecurityConfig;
+import com.palpal.dealightbe.common.ControllerTest;
 import com.palpal.dealightbe.domain.address.domain.Address;
-import com.palpal.dealightbe.domain.cart.application.CartService;
 import com.palpal.dealightbe.domain.cart.application.dto.request.CartReq;
 import com.palpal.dealightbe.domain.cart.application.dto.request.CartsReq;
 import com.palpal.dealightbe.domain.cart.application.dto.response.CartRes;
@@ -65,22 +57,9 @@ import com.palpal.dealightbe.domain.store.domain.DayOff;
 import com.palpal.dealightbe.domain.store.domain.Store;
 import com.palpal.dealightbe.global.error.exception.BusinessException;
 import com.palpal.dealightbe.global.error.exception.EntityNotFoundException;
+import com.palpal.dealightbe.global.error.exception.ExcessiveRequestException;
 
-@WebMvcTest(value = CartController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class,
-	OAuth2ClientAutoConfiguration.class}, excludeFilters = {
-	@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class)})
-@AutoConfigureRestDocs
-class CartControllerTest {
-
-	@Autowired
-	MockMvc mockMvc;
-
-	@Autowired
-	ObjectMapper objectMapper;
-
-	@MockBean
-	CartService cartService;
-
+class CartControllerTest extends ControllerTest {
 	private Store store;
 	private Item item;
 	private Item item2;
@@ -169,6 +148,8 @@ class CartControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.param("id", String.valueOf(itemId))
 				.param("type", "check"))
@@ -223,6 +204,8 @@ class CartControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.param("id", String.valueOf(itemId))
 				.param("type", "failure"))
@@ -264,6 +247,8 @@ class CartControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.param("id", String.valueOf(itemId))
 				.param("type", "check"))
@@ -305,6 +290,8 @@ class CartControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.param("id", String.valueOf(itemId))
 				.param("type", "check"))
@@ -346,6 +333,8 @@ class CartControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.param("id", String.valueOf(itemId))
 				.param("type", "check"))
@@ -387,6 +376,8 @@ class CartControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.param("id", String.valueOf(itemId))
 				.param("type", "check"))
@@ -428,6 +419,8 @@ class CartControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.param("id", String.valueOf(itemId))
 				.param("type", "check"))
@@ -469,6 +462,8 @@ class CartControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.param("id", String.valueOf(itemId))
 				.param("type", "check"))
@@ -510,6 +505,8 @@ class CartControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.param("id", String.valueOf(itemId))
 				.param("type", "check"))
@@ -540,7 +537,7 @@ class CartControllerTest {
 
 	@DisplayName("장바구니 담기 실패 테스트 - 재고가 0인 상품을 담기 시도하는 경우")
 	@Test
-	void addItemFailureTest_InvalidAddItemInCartItemStockZero() throws Exception {
+	void addItemFailureTest_UnableToAddToCartItemStockZero() throws Exception {
 		//given
 		Long itemId = 1L;
 
@@ -551,6 +548,8 @@ class CartControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.param("id", String.valueOf(itemId))
 				.param("type", "check"))
@@ -560,7 +559,50 @@ class CartControllerTest {
 			.andExpect(jsonPath("$.errors").isEmpty())
 			.andExpect(jsonPath("$.message").value("재고가 0개인 상품은 담을 수 없습니다."))
 			.andDo(print())
-			.andDo(document("cart/cart-add-item-item-removed-no-longer-exists-store",
+			.andDo(document("cart/cart-add-item-unable-to-add-to-cart-item-stock-zero",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				requestParameters(
+					parameterWithName("id").description("상품 ID"),
+					parameterWithName("type").description("장바구니 담기 타입")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("예외 코드"),
+					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@DisplayName("장바구니 담기 실패 테스트 - 단 시간에 너무 많은 담기 요청을 시도하는 경우")
+	@Test
+	void addItemFailureTest_TooManyCartRequests() throws Exception {
+		//given
+		Long itemId = 1L;
+
+		doThrow(new ExcessiveRequestException(TOO_MANY_CART_REQUESTS)).when(
+			cartService).addItem(any(), any(), any());
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/carts/items")
+				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.param("id", String.valueOf(itemId))
+				.param("type", "check"))
+			.andExpect(status().isTooManyRequests())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("CT010"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("너무 많은 장바구니 요청을 시도했습니다. 잠시 후에 다시 시도해주세요."))
+			.andDo(print())
+			.andDo(document("cart/cart-add-item-too-many-cart-requests",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestHeaders(
@@ -595,6 +637,8 @@ class CartControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/carts")
 				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}"))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.carts[0].cartId").value(cartRes1.cartId()))
@@ -645,6 +689,8 @@ class CartControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/carts")
 				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}"))
 			.andExpect(status().isNotFound())
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
@@ -678,6 +724,8 @@ class CartControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/carts")
 				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}"))
 			.andExpect(status().isNotFound())
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
@@ -719,6 +767,8 @@ class CartControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/carts")
 				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.content(objectMapper.writeValueAsString(cartsReq)))
 			.andExpect(status().isOk())
@@ -779,6 +829,8 @@ class CartControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/carts")
 				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.content(objectMapper.writeValueAsString(cartsReq)))
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
@@ -821,6 +873,8 @@ class CartControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/carts")
 				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.content(objectMapper.writeValueAsString(cartsReq)))
 			.andExpect(status().isNotFound())
@@ -864,6 +918,8 @@ class CartControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/carts")
 				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.content(objectMapper.writeValueAsString(cartsReq)))
 			.andExpect(status().isNotFound())
@@ -907,6 +963,8 @@ class CartControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/carts")
 				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.content(objectMapper.writeValueAsString(cartsReq)))
 			.andExpect(status().isNotFound())
@@ -916,6 +974,51 @@ class CartControllerTest {
 			.andExpect(jsonPath("$.message").value("더 이상 존재하지 않는 업체의 상품이 장바구니에서 자동으로 삭제되었습니다."))
 			.andDo(print())
 			.andDo(document("cart/cart-update-item-removed-no-longer-exists-store",
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(
+					headerWithName("Authorization").description("Access Token")
+				),
+				requestFields(
+					fieldWithPath("carts[0].itemId").description("상품 ID"),
+					fieldWithPath("carts[0].quantity").description("장바구니에 담은 개수")
+				),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("예외 코드"),
+					fieldWithPath("errors[]").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+	}
+
+	@DisplayName("장바구니 수정 실패 테스트 - 단 시간에 너무 많은 수정 요청을 시도하는 경우")
+	@Test
+	void updateFailureTest_TooManyCartRequests() throws Exception {
+		//given
+		CartReq cartReq = new CartReq(1L, 2);
+		CartReq cartReq2 = new CartReq(2L, 3);
+
+		CartsReq cartsReq = new CartsReq(List.of(cartReq, cartReq2));
+
+		doThrow(new ExcessiveRequestException(TOO_MANY_CART_REQUESTS)).when(
+			cartService).update(any(), any());
+
+		//when
+		//then
+		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/carts")
+				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
+				.header("Authorization", "Bearer {ACCESS_TOKEN}")
+				.content(objectMapper.writeValueAsString(cartsReq)))
+			.andExpect(status().isTooManyRequests())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("CT010"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("너무 많은 장바구니 요청을 시도했습니다. 잠시 후에 다시 시도해주세요."))
+			.andDo(print())
+			.andDo(document("cart/cart-update-too-many-cart-requests",
 				preprocessRequest(prettyPrint()),
 				preprocessResponse(prettyPrint()),
 				requestHeaders(
@@ -946,6 +1049,8 @@ class CartControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.param("id", String.valueOf(itemId)))
 			.andExpect(status().isNoContent())
@@ -975,6 +1080,8 @@ class CartControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/carts/items")
 				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}")
 				.param("id", String.valueOf(itemId)))
 			.andExpect(status().isNotFound())
@@ -1011,6 +1118,8 @@ class CartControllerTest {
 		//then
 		mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/carts")
 				.contentType(MediaType.APPLICATION_JSON)
+				.with(user("username").roles("MEMBER"))
+				.with(csrf().asHeader())
 				.header("Authorization", "Bearer {ACCESS_TOKEN}"))
 			.andExpect(status().isNoContent())
 			.andDo(print())

@@ -1,8 +1,8 @@
-package com.palpal.dealightbe.domain.item.domain;
+package com.palpal.dealightbe.domain.store.domain;
 
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ItemSearchRepository extends ElasticsearchRepository<ItemDocument, Long> {
+public interface StoreDocumentRepository extends ElasticsearchRepository<StoreDocument, Long> {
 }

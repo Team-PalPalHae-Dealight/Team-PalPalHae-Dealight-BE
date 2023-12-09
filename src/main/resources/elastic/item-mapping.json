@@ -1,13 +1,23 @@
 {
   "properties": {
     "id": {
-      "type": "long"
-    },
-    "name": {
       "type": "text"
     },
+    "name": {
+      "type": "text",
+      "analyzer": "nori"
+    },
     "storeId": {
-      "type": "long"
+      "type": "text"
+    },
+    "discountPrice": {
+      "type": "integer"
+    },
+    "originalPrice": {
+      "type": "integer"
+    },
+    "discountRate": {
+      "type": "double"
     }
   }
 }

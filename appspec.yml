@@ -16,11 +16,11 @@ permissions:
 
 hooks:
   BeforeInstall:
-    - location: infra-setup-prod.sh
+    - location: infra.sh
       timeout: 60
       runas: ubuntu
 
   AfterInstall:
-    - location: deploy-prod.sh
+    - location: deploy.sh
       timeout: 60
       runas: ubuntu

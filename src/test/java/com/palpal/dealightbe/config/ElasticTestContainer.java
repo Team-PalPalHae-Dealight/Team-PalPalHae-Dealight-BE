@@ -8,11 +8,11 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
-import com.palpal.dealightbe.domain.item.domain.ItemSearchRepository;
-import com.palpal.dealightbe.domain.store.domain.StoreSearchRepository;
+import com.palpal.dealightbe.domain.item.domain.ItemDocumentRepository;
+import com.palpal.dealightbe.domain.store.domain.StoreDocumentRepository;
 
 @TestConfiguration
-@EnableElasticsearchRepositories(basePackageClasses = {StoreSearchRepository.class, ItemSearchRepository.class})
+@EnableElasticsearchRepositories(basePackageClasses = {StoreDocumentRepository.class, ItemDocumentRepository.class})
 public class ElasticTestContainer extends AbstractElasticsearchConfiguration {
 
 
